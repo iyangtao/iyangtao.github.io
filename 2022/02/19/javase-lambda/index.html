@@ -13,20 +13,20 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="author" content="tao">
+  <meta name="author" content="Yangtao">
   <meta name="keywords" content="">
   
     <meta name="description" content="Lambda允许把函数作为一个方法的参数（函数作为参数传递到方法中）">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Lambda表达式">
 <meta property="og:url" content="http://example.com/2022/02/19/javase-lambda/index.html">
-<meta property="og:site_name" content="Tao&#39;s blog">
+<meta property="og:site_name" content="Programmer Yangtao">
 <meta property="og:description" content="Lambda允许把函数作为一个方法的参数（函数作为参数传递到方法中）">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/img/BlogIndexImg/lambda.png">
 <meta property="article:published_time" content="2022-02-19T11:13:51.000Z">
 <meta property="article:modified_time" content="2022-02-19T11:13:51.000Z">
-<meta property="article:author" content="tao">
+<meta property="article:author" content="Yangtao">
 <meta property="article:tag" content="JavaSE">
 <meta property="article:tag" content="Java8">
 <meta property="article:tag" content="函数式编程">
@@ -35,7 +35,7 @@
 <meta name="twitter:image" content="http://example.com/img/BlogIndexImg/lambda.png">
   
   
-  <title>Lambda表达式 - Tao&#39;s blog</title>
+  <title>Lambda表达式 - Programmer Yangtao</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
@@ -84,7 +84,7 @@
     <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">
-      <strong>Tao&#39;s blog</strong>
+      <strong>Programmer Yangtao</strong>
     </a>
 
     <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
@@ -202,7 +202,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-author" aria-hidden="true"></i>
-      tao
+      Yangtao
     </span>
   
   
@@ -277,38 +277,38 @@
               <p>Lambda允许把函数作为一个方法的参数（函数作为参数传递到方法中）                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               </p>
 <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>lambda表达式，即<strong>匿名函数</strong>，指一类无需定义标识符（函数名）的函数或子程序。</p>
 <p>格式为</p>
-<figure class="highlight java"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><pre><code class="hljs java">lambda形参列表（接口中的抽象方法的形参列表 -&gt; lambda体（重写的抽象方法的方法体）<br> <br>(parameters) -&gt; &#123; expression &#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">lambda形参列表（接口中的抽象方法的形参列表 -&gt; lambda体（重写的抽象方法的方法体）<br> <br>(parameters) -&gt; &#123; expression &#125;<br></code></pre></div></td></tr></table></figure>
 
 <p>java中lambda表达式的本质就是<strong>接口的实例</strong>！</p>
 <h2 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h2><ol>
 <li>无参、无返回</li>
 </ol>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java">Runnable r = () -&gt; System.out.println(<span class="hljs-string">&quot;hello world&quot;</span>);<br>r.run();<br></code></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">Runnable r = () -&gt; System.out.println(<span class="hljs-string">&quot;hello world&quot;</span>);<br>r.run();<br></code></pre></div></td></tr></table></figure>
 
 <ol start="2">
 <li>有参、无返回</li>
 </ol>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java">Consumer&lt;String&gt; consumer = (String s) -&gt; &#123;<br>    System.out.println(<span class="hljs-string">&quot;接收的参数为：&quot;</span> + s);<br>&#125;;<br>consumer.accept(<span class="hljs-string">&quot;123&quot;</span>);<br></code></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">Consumer&lt;String&gt; consumer = (String s) -&gt; &#123;<br>    System.out.println(<span class="hljs-string">&quot;接收的参数为：&quot;</span> + s);<br>&#125;;<br>consumer.accept(<span class="hljs-string">&quot;123&quot;</span>);<br></code></pre></div></td></tr></table></figure>
 
 <ol start="3">
 <li>省略数据类型</li>
 </ol>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java">Consumer&lt;String&gt; consumer1 = (s) -&gt; &#123;<br>    System.out.println(<span class="hljs-string">&quot;接收的参数为：&quot;</span> + s);<br>&#125;;<br>consumer1.accept(<span class="hljs-string">&quot;你好&quot;</span>);<br></code></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">Consumer&lt;String&gt; consumer1 = (s) -&gt; &#123;<br>    System.out.println(<span class="hljs-string">&quot;接收的参数为：&quot;</span> + s);<br>&#125;;<br>consumer1.accept(<span class="hljs-string">&quot;你好&quot;</span>);<br></code></pre></div></td></tr></table></figure>
 
 <ol start="4">
 <li>省略括号</li>
 </ol>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java">Consumer&lt;String&gt; consumer2 = s -&gt; &#123;<br>    System.out.println(<span class="hljs-string">&quot;接收的参数为：&quot;</span> + s);<br>&#125;;<br>consumer2.accept(<span class="hljs-string">&quot;hello&quot;</span>);<br></code></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">Consumer&lt;String&gt; consumer2 = s -&gt; &#123;<br>    System.out.println(<span class="hljs-string">&quot;接收的参数为：&quot;</span> + s);<br>&#125;;<br>consumer2.accept(<span class="hljs-string">&quot;hello&quot;</span>);<br></code></pre></div></td></tr></table></figure>
 
 <ol start="5">
 <li>多参、多执行语句、有返回</li>
 </ol>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs java">Comparator&lt;Integer&gt; comparator = (i, j) -&gt; &#123;<br>    System.out.println(i);<br>    System.out.println(j);<br>    <span class="hljs-keyword">return</span> i.compareTo(j);<br>&#125;;<br>System.out.println(comparator.compare(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>));<br></code></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">Comparator&lt;Integer&gt; comparator = (i, j) -&gt; &#123;<br>    System.out.println(i);<br>    System.out.println(j);<br>    <span class="hljs-keyword">return</span> i.compareTo(j);<br>&#125;;<br>System.out.println(comparator.compare(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>));<br></code></pre></div></td></tr></table></figure>
 
 <ol start="6">
 <li>只有一条语句，省略大括号</li>
 </ol>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java">Comparator&lt;Integer&gt; comparator1 = (i, j) -&gt; i.compareTo(j);<br>System.out.println(comparator1.compare(<span class="hljs-number">2</span>, <span class="hljs-number">3</span>));<br></code></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">Comparator&lt;Integer&gt; comparator1 = (i, j) -&gt; i.compareTo(j);<br>System.out.println(comparator1.compare(<span class="hljs-number">2</span>, <span class="hljs-number">3</span>));<br></code></pre></div></td></tr></table></figure>
 
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
 <li>形参类型可以省略</li>
@@ -400,7 +400,7 @@
       window.UtterancesThemeDark = dark;
       var s = document.createElement('script');
       s.setAttribute('src', 'https://utteranc.es/client.js');
-      s.setAttribute('repo', 'yangtaolive/yangtaolive.github.io');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
       s.setAttribute('issue-term', 'pathname');
       
       s.setAttribute('label', 'utterances');

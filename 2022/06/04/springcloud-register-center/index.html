@@ -13,20 +13,20 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="author" content="tao">
+  <meta name="author" content="Yangtao">
   <meta name="keywords" content="">
   
     <meta name="description" content="SpringCloud学习笔记——服务注册中心，讲了Eureka和Consul，Nacos后续再更~">
 <meta property="og:type" content="article">
 <meta property="og:title" content="SpringCloud——服务注册中心">
 <meta property="og:url" content="http://example.com/2022/06/04/springcloud-register-center/index.html">
-<meta property="og:site_name" content="Tao&#39;s blog">
+<meta property="og:site_name" content="Programmer Yangtao">
 <meta property="og:description" content="SpringCloud学习笔记——服务注册中心，讲了Eureka和Consul，Nacos后续再更~">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/img/BlogIndexImg/%E6%9C%8D%E5%8A%A1%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83.png">
 <meta property="article:published_time" content="2022-06-04T10:12:39.000Z">
 <meta property="article:modified_time" content="2022-06-04T10:12:39.000Z">
-<meta property="article:author" content="tao">
+<meta property="article:author" content="Yangtao">
 <meta property="article:tag" content="微服务">
 <meta property="article:tag" content="SpringCloud">
 <meta property="article:tag" content="服务注册中心">
@@ -36,7 +36,7 @@
 <meta name="twitter:image" content="http://example.com/img/BlogIndexImg/%E6%9C%8D%E5%8A%A1%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83.png">
   
   
-  <title>SpringCloud——服务注册中心 - Tao&#39;s blog</title>
+  <title>SpringCloud——服务注册中心 - Programmer Yangtao</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
@@ -85,7 +85,7 @@
     <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">
-      <strong>Tao&#39;s blog</strong>
+      <strong>Programmer Yangtao</strong>
     </a>
 
     <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
@@ -203,7 +203,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-author" aria-hidden="true"></i>
-      tao
+      Yangtao
     </span>
   
   
@@ -290,11 +290,11 @@
 <li><p>创建SpringBoot项目</p>
 </li>
 <li><p>引入Eureka的Maven依赖</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-netflix-eureka-server<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure></li>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-netflix-eureka-server<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></div></td></tr></table></figure></li>
 <li><p>编写配置文件</p>
-<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs properties"><span class="hljs-meta">server.port</span>=<span class="hljs-string">8761</span><br><span class="hljs-meta">spring.application.name</span>=<span class="hljs-string">eureka</span><br></code></pre></td></tr></table></figure></li>
+<figure class="highlight properties"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs properties"><span class="hljs-meta">server.port</span>=<span class="hljs-string">8761</span><br><span class="hljs-meta">spring.application.name</span>=<span class="hljs-string">eureka</span><br></code></pre></div></td></tr></table></figure></li>
 <li><p>入口类加上开启EurekaServer的注解</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@SpringBootApplication</span><br><span class="hljs-meta">@EnableEurekaServer</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">EurekaServerApplication</span> </span>&#123;...&#125;<br></code></pre></td></tr></table></figure></li>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@SpringBootApplication</span><br><span class="hljs-meta">@EnableEurekaServer</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">EurekaServerApplication</span> </span>&#123;...&#125;<br></code></pre></div></td></tr></table></figure></li>
 </ol>
 <h4 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h4><p>访问 <a target="_blank" rel="noopener" href="http://localhost:8761/">http://localhost:8761/</a></p>
 <p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220828220911823.png" srcset="/img/loading.gif" lazyload></p>
@@ -307,7 +307,7 @@
 <li>关闭eureka client的立即注册</li>
 <li>让当前应用仅作为服务注册中心，不做客户端</li>
 </ol>
-<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs properties"><span class="hljs-meta">eureka.client.fetch-registry</span>=<span class="hljs-string">false</span><br><span class="hljs-meta">eureka.client.register-with-eureka</span>=<span class="hljs-string">false</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight properties"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs properties"><span class="hljs-meta">eureka.client.fetch-registry</span>=<span class="hljs-string">false</span><br><span class="hljs-meta">eureka.client.register-with-eureka</span>=<span class="hljs-string">false</span><br></code></pre></div></td></tr></table></figure>
 
 <p>再次验证</p>
 <p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220828221201444.png" srcset="/img/loading.gif" lazyload></p>
@@ -317,11 +317,11 @@
 <li><p>创建SpringBoot项目</p>
 </li>
 <li><p>引入Eureka的Maven依赖</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java">&lt;dependency&gt;<br>    &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;<br>    &lt;artifactId&gt;spring-cloud-starter-netflix-eureka-client&lt;/artifactId&gt;<br>&lt;/dependency&gt;<br></code></pre></td></tr></table></figure></li>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">&lt;dependency&gt;<br>    &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;<br>    &lt;artifactId&gt;spring-cloud-starter-netflix-eureka-client&lt;/artifactId&gt;<br>&lt;/dependency&gt;<br></code></pre></div></td></tr></table></figure></li>
 <li><p>编写配置文件</p>
-<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs properties"><span class="hljs-meta">server.port</span>=<span class="hljs-string">10001</span><br><span class="hljs-meta">spring.application.name</span>=<span class="hljs-string">eureka-client</span><br><span class="hljs-meta">server.servlet.context-path</span>=<span class="hljs-string">/eureka-client</span><br><span class="hljs-comment"></span><br><span class="hljs-comment"># 服务注册中心的地址</span><br><span class="hljs-meta">eureka.client.service-url.defaultZone</span>=<span class="hljs-string">http://localhost:8761/eureka</span><br></code></pre></td></tr></table></figure></li>
+<figure class="highlight properties"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs properties"><span class="hljs-meta">server.port</span>=<span class="hljs-string">10001</span><br><span class="hljs-meta">spring.application.name</span>=<span class="hljs-string">eureka-client</span><br><span class="hljs-meta">server.servlet.context-path</span>=<span class="hljs-string">/eureka-client</span><br><span class="hljs-comment"></span><br><span class="hljs-comment"># 服务注册中心的地址</span><br><span class="hljs-meta">eureka.client.service-url.defaultZone</span>=<span class="hljs-string">http://localhost:8761/eureka</span><br></code></pre></div></td></tr></table></figure></li>
 <li><p>入口类加上开启EurekaClient的注解</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@SpringBootApplication</span><br><span class="hljs-meta">@EnableEurekaClient</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">EurekaClientApplication</span> </span>&#123;...&#125;<br></code></pre></td></tr></table></figure></li>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@SpringBootApplication</span><br><span class="hljs-meta">@EnableEurekaClient</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">EurekaClientApplication</span> </span>&#123;...&#125;<br></code></pre></div></td></tr></table></figure></li>
 </ol>
 <h4 id="验证-1"><a href="#验证-1" class="headerlink" title="验证"></a>验证</h4><p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220828221411549.png" srcset="/img/loading.gif" lazyload></p>
 <p>EUREKA-CLIENT已经注册到服务注册中心了 </p>
@@ -347,11 +347,11 @@
 </li>
 <li><p>关闭自我保护机制：</p>
 <p>server设置，且设置3000ms没有收到心跳就剔除该服务</p>
-<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs properties"><span class="hljs-meta">eureka.server.enable-self-preservation</span>=<span class="hljs-string">false</span><br><span class="hljs-meta">eureka.server.eviction-interval-timer-in-ms</span>=<span class="hljs-string">3000</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight properties"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs properties"><span class="hljs-meta">eureka.server.enable-self-preservation</span>=<span class="hljs-string">false</span><br><span class="hljs-meta">eureka.server.eviction-interval-timer-in-ms</span>=<span class="hljs-string">3000</span><br></code></pre></div></td></tr></table></figure>
 
 <p>关闭后会提示：**<code>THE SELF PRESERVATION MODE IS TURNED OFF. THIS MAY NOT PROTECT INSTANCE EXPIRY IN CASE OF NETWORK/OTHER PROBLEMS.</code>**</p>
 <p>client设置，向server发送心跳的时间设置为1s（默认30），server收到最后一次心跳后等待时间上限设置为2s（默认90），即告诉server，2s没有收到我的心跳就把我剔除</p>
-<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs properties"><span class="hljs-meta">eureka.instance.lease-renewal-interval-in-seconds</span>=<span class="hljs-string">1</span><br><span class="hljs-meta">eureka.instance.lease-expiration-duration-in-seconds</span>=<span class="hljs-string">2</span><br></code></pre></td></tr></table></figure></li>
+<figure class="highlight properties"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs properties"><span class="hljs-meta">eureka.instance.lease-renewal-interval-in-seconds</span>=<span class="hljs-string">1</span><br><span class="hljs-meta">eureka.instance.lease-expiration-duration-in-seconds</span>=<span class="hljs-string">2</span><br></code></pre></div></td></tr></table></figure></li>
 </ol>
 <h3 id="Eureka-Server集群搭建"><a href="#Eureka-Server集群搭建" class="headerlink" title="Eureka Server集群搭建"></a>Eureka Server集群搭建</h3><p>拓扑图</p>
 <p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405170324691.png" srcset="/img/loading.gif" lazyload></p>
@@ -360,9 +360,9 @@
 <p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405170329353.png" srcset="/img/loading.gif" lazyload></p>
 </li>
 <li><p>对每个复制的项目都修改配置文件（这里只写出节点1的配置）：节点1向节点2、3注册；节点2向节点1、3注册；节点3向节点1、2注册</p>
-<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs properties"><span class="hljs-meta">eureka.client.service-url.defaultZone</span>=<span class="hljs-string">http://localhost:9002/eureka,http://localhost:9003/eureka</span><br></code></pre></td></tr></table></figure></li>
+<figure class="highlight properties"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs properties"><span class="hljs-meta">eureka.client.service-url.defaultZone</span>=<span class="hljs-string">http://localhost:9002/eureka,http://localhost:9003/eureka</span><br></code></pre></div></td></tr></table></figure></li>
 <li><p>client配置文件中，服务注册中心的地址填上3个eureka的地址</p>
-<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs properties"><span class="hljs-meta">eureka.client.service-url.defaultZone</span>=<span class="hljs-string">http://localhost:9001/eureka,http://localhost:9002/eureka,http://localhost:9003/eureka</span><br></code></pre></td></tr></table></figure></li>
+<figure class="highlight properties"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs properties"><span class="hljs-meta">eureka.client.service-url.defaultZone</span>=<span class="hljs-string">http://localhost:9001/eureka,http://localhost:9002/eureka,http://localhost:9003/eureka</span><br></code></pre></div></td></tr></table></figure></li>
 <li><p>启动，client会随机挑选一个服务注册中心</p>
 </li>
 <li><p>当被client选中的服务注册中心宕机，若干秒以后，client会自动从另外两个服务注册中心中挑选一个作为服务注册中心，即完成了Eureka Server的集群搭建，实现了注册中心的高可用</p>
@@ -372,12 +372,12 @@
 <p>Consul用Golang实现，因此具有<strong>天然可移植性</strong>(支持Linux、Windows和Mac OS X)；安装包仅包含一个可执行文件，方便部署。</p>
 <p>官网：<a target="_blank" rel="noopener" href="https://www.consul.io/">https://www.consul.io/</a></p>
 <h3 id="Server实践"><a href="#Server实践" class="headerlink" title="Server实践"></a>Server实践</h3><p>启动</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">consul agent -dev<br></code></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">consul agent -dev<br></code></pre></div></td></tr></table></figure>
 
 <p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220828223412353.png" srcset="/img/loading.gif" lazyload></p>
 <ul>
 <li><p>dc1为datacenter，默认为dc1，可以指定数据中心启动</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">consul agent -dev -datacenter dc2<br></code></pre></td></tr></table></figure></li>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">consul agent -dev -datacenter dc2<br></code></pre></div></td></tr></table></figure></li>
 <li><p>services：当前consul服务中注册的服务列表，默认会自己注册自己，即出现一个consul服务</p>
 </li>
 <li><p>nodes：用来查看consul的集群节点</p>
@@ -385,18 +385,18 @@
 </ul>
 <h3 id="Client实践"><a href="#Client实践" class="headerlink" title="Client实践"></a>Client实践</h3><ol>
 <li><p>创建一个SpringBoot项目，引入consul-discovery依赖</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-consul-discovery<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure></li>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-consul-discovery<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></div></td></tr></table></figure></li>
 <li><p>配置文件指定consul-server服务注册中心的地址</p>
-<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs properties"><span class="hljs-meta">server.port</span>=<span class="hljs-string">10002</span><br><span class="hljs-meta">spring.application.name</span>=<span class="hljs-string">consul-client</span><br><span class="hljs-comment"></span><br><span class="hljs-comment"># 服务注册中心的地址及端口</span><br><span class="hljs-meta">spring.cloud.consul.host</span>=<span class="hljs-string">localhost</span><br><span class="hljs-meta">spring.cloud.consul.port</span>=<span class="hljs-string">8500</span><br><span class="hljs-comment"># 默认值为服务名，可更改</span><br><span class="hljs-meta">spring.cloud.consul.discovery.service-name</span>=<span class="hljs-string">$&#123;spring.application.name&#125;</span><br></code></pre></td></tr></table></figure></li>
+<figure class="highlight properties"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs properties"><span class="hljs-meta">server.port</span>=<span class="hljs-string">10002</span><br><span class="hljs-meta">spring.application.name</span>=<span class="hljs-string">consul-client</span><br><span class="hljs-comment"></span><br><span class="hljs-comment"># 服务注册中心的地址及端口</span><br><span class="hljs-meta">spring.cloud.consul.host</span>=<span class="hljs-string">localhost</span><br><span class="hljs-meta">spring.cloud.consul.port</span>=<span class="hljs-string">8500</span><br><span class="hljs-comment"># 默认值为服务名，可更改</span><br><span class="hljs-meta">spring.cloud.consul.discovery.service-name</span>=<span class="hljs-string">$&#123;spring.application.name&#125;</span><br></code></pre></div></td></tr></table></figure></li>
 <li><p>通用的服务注册中心注解（除Eureka），@EnableDisCoveryClient</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@SpringBootApplication</span><br><span class="hljs-meta">@EnableDiscoveryClient</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ConsulClientApplication</span> </span>&#123;...&#125;<br></code></pre></td></tr></table></figure></li>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@SpringBootApplication</span><br><span class="hljs-meta">@EnableDiscoveryClient</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ConsulClientApplication</span> </span>&#123;...&#125;<br></code></pre></div></td></tr></table></figure></li>
 <li><p>启动服务，查看services</p>
 <p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220828224005883.png" srcset="/img/loading.gif" lazyload></p>
 </li>
 <li><p>出错，consul-client无法正常响应server的心跳，需要手动引入健康检查的依赖，client才能响应server</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-actuator<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure></li>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-actuator<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></div></td></tr></table></figure></li>
 <li><p>或者关闭consul客户端的健康检查</p>
-<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs properties"><span class="hljs-meta">spring.cloud.consul.discovery.register-health-check</span>=<span class="hljs-string">false</span><br></code></pre></td></tr></table></figure></li>
+<figure class="highlight properties"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs properties"><span class="hljs-meta">spring.cloud.consul.discovery.register-health-check</span>=<span class="hljs-string">false</span><br></code></pre></div></td></tr></table></figure></li>
 <li><p>查看services</p>
 <p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220828224238542.png" srcset="/img/loading.gif" lazyload></p>
 </li>
@@ -517,7 +517,7 @@
       window.UtterancesThemeDark = dark;
       var s = document.createElement('script');
       s.setAttribute('src', 'https://utteranc.es/client.js');
-      s.setAttribute('repo', 'yangtaolive/yangtaolive.github.io');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
       s.setAttribute('issue-term', 'pathname');
       
       s.setAttribute('label', 'utterances');

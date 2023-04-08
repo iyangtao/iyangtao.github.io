@@ -13,20 +13,20 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="author" content="tao">
+  <meta name="author" content="Yangtao">
   <meta name="keywords" content="">
   
     <meta name="description" content="很多平台都提供了博客功能，本文讲述了基于Hexo + GitHub pages搭建个人博客系统，以及自定义主题和域名，HEXO这个博客框架也是本站的建站基础">
 <meta property="og:type" content="article">
 <meta property="og:title" content="基于Hexo+GitHub的博客搭建">
 <meta property="og:url" content="http://example.com/2022/01/08/blog-personal-blog-build-power-by-hexo/index.html">
-<meta property="og:site_name" content="Tao&#39;s blog">
+<meta property="og:site_name" content="Programmer Yangtao">
 <meta property="og:description" content="很多平台都提供了博客功能，本文讲述了基于Hexo + GitHub pages搭建个人博客系统，以及自定义主题和域名，HEXO这个博客框架也是本站的建站基础">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/img/BlogIndexImg/HEXO.png">
 <meta property="article:published_time" content="2022-01-07T22:31:00.000Z">
 <meta property="article:modified_time" content="2022-01-07T22:31:00.000Z">
-<meta property="article:author" content="tao">
+<meta property="article:author" content="Yangtao">
 <meta property="article:tag" content="Hexo">
 <meta property="article:tag" content="环境搭建">
 <meta property="article:tag" content="个人博客">
@@ -34,7 +34,7 @@
 <meta name="twitter:image" content="http://example.com/img/BlogIndexImg/HEXO.png">
   
   
-  <title>基于Hexo+GitHub的博客搭建 - Tao&#39;s blog</title>
+  <title>基于Hexo+GitHub的博客搭建 - Programmer Yangtao</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
@@ -83,7 +83,7 @@
     <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">
-      <strong>Tao&#39;s blog</strong>
+      <strong>Programmer Yangtao</strong>
     </a>
 
     <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
@@ -201,7 +201,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-author" aria-hidden="true"></i>
-      tao
+      Yangtao
     </span>
   
   
@@ -282,7 +282,7 @@
 </ul>
 <h3 id="Hexo"><a href="#Hexo" class="headerlink" title="Hexo"></a>Hexo</h3><ul>
 <li><p>npm全局安装</p>
-<figure class="highlight powershell"><table><tr><td class="gutter"><div class="code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><pre><code class="hljs powershell">npm install hexo<span class="hljs-literal">-cli</span> <span class="hljs-literal">-g</span><br></code></pre></td></tr></table></figure></li>
+<figure class="highlight powershell"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs powershell">npm install hexo<span class="hljs-literal">-cli</span> <span class="hljs-literal">-g</span><br></code></pre></div></td></tr></table></figure></li>
 </ul>
 <h2 id="远程仓库配置"><a href="#远程仓库配置" class="headerlink" title="远程仓库配置"></a>远程仓库配置</h2><p><em>这里使用GitHub，Gitee也大同小异，只是在pages需要实名认证以及自定义域名时需要收费</em></p>
 <h3 id="仓库名"><a href="#仓库名" class="headerlink" title="仓库名"></a>仓库名</h3><p><code>仓库名一定要是 &#123;用户名&#125;.github.io，仓库权限为public</code></p>
@@ -290,33 +290,33 @@
 <h3 id="SSH绑定"><a href="#SSH绑定" class="headerlink" title="SSH绑定"></a>SSH绑定</h3><p><em>使用SSH关联本地环境与远程仓库</em></p>
 <ol>
 <li><p>创建密钥对</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">ssh-keygen -t rsa -C <span class="hljs-string">&quot;&#123;GitHub注册邮箱&#125;&quot;</span><br></code></pre></td></tr></table></figure></li>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">ssh-keygen -t rsa -C <span class="hljs-string">&quot;&#123;GitHub注册邮箱&#125;&quot;</span><br></code></pre></div></td></tr></table></figure></li>
 <li><p>一路确认，在用户目录下的.ssh目录下有两个文件，其中id_rsa.pub为公钥，需要复制里面全部的内容</p>
 </li>
 <li><p>回到==GitHub==，进入==settings==，目录找到==SSH and GPG keys==，==new SSH==，将复制的公钥内容复制到==Key==框中，==Add SSH Key==即可</p>
 </li>
 <li><p>回到本地验证，看到成功绑定即可</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ ssh -T git@github.com<br>Hi yangtao8453! You<span class="hljs-string">&#x27;ve successfully authenticated, but GitHub does not provide shell access.</span><br></code></pre></td></tr></table></figure></li>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">$ ssh -T git@github.com<br>Hi yangtao8453! You<span class="hljs-string">&#x27;ve successfully authenticated, but GitHub does not provide shell access.</span><br></code></pre></div></td></tr></table></figure></li>
 </ol>
 <h2 id="本地博客"><a href="#本地博客" class="headerlink" title="本地博客"></a>本地博客</h2><p><em>创建一个本地文件夹作为博客的根目录，用于存放需要推送到github仓库的博客静态文件</em></p>
 <ol>
 <li><p>初始化（将hexo项目克隆到本地）</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">hexo init<br></code></pre></td></tr></table></figure></li>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">hexo init<br></code></pre></div></td></tr></table></figure></li>
 <li><p>启动本地服务</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">hexo s<br></code></pre></td></tr></table></figure></li>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">hexo s<br></code></pre></div></td></tr></table></figure></li>
 <li><p>访问<a target="_blank" rel="noopener" href="http://localhost:4000/">http://localhost:4000</a> ，可以看到博客页面，默认有一篇《Hello World》</p>
 <p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220925215020496.png" srcset="/img/loading.gif" lazyload></p>
 </li>
 </ol>
 <h2 id="部署远程"><a href="#部署远程" class="headerlink" title="部署远程"></a>部署远程</h2><ol>
 <li><p>来到博客根目录，编辑文件 <code>_config.yml</code></p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">deploy:</span> <br>  <span class="hljs-attr">type:</span> <span class="hljs-string">git</span><br>  <span class="hljs-attr">repository:</span> &#123;<span class="hljs-string">仓库的地址</span>&#125;  		 <span class="hljs-comment"># 推荐使用SSH的地址</span><br>  <span class="hljs-attr">branch:</span> <span class="hljs-string">main</span><br></code></pre></td></tr></table></figure></li>
+<figure class="highlight yaml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs yaml"><span class="hljs-attr">deploy:</span> <br>  <span class="hljs-attr">type:</span> <span class="hljs-string">git</span><br>  <span class="hljs-attr">repository:</span> &#123;<span class="hljs-string">仓库的地址</span>&#125;  		 <span class="hljs-comment"># 推荐使用SSH的地址</span><br>  <span class="hljs-attr">branch:</span> <span class="hljs-string">main</span><br></code></pre></div></td></tr></table></figure></li>
 <li><p>安装hexo部署工具</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">npm install hexo-deployer-git --save<br></code></pre></td></tr></table></figure></li>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">npm install hexo-deployer-git --save<br></code></pre></div></td></tr></table></figure></li>
 <li><p><code>博客根目录 \ source \ _posts</code>下新建markdown文件，这个就是博客正文内容</p>
 </li>
 <li><p>编辑完正文内容后，回到根目录，清理缓存、生成html、再部署即可</p>
-<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">hexo clean</span><br><span class="hljs-attribute">hexo g</span><br><span class="hljs-attribute">hexo d</span><br></code></pre></td></tr></table></figure></li>
+<figure class="highlight ebnf"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs ebnf"><span class="hljs-attribute">hexo clean</span><br><span class="hljs-attribute">hexo g</span><br><span class="hljs-attribute">hexo d</span><br></code></pre></div></td></tr></table></figure></li>
 <li><p>等待提交完成后，过一会就可以通过 <a target="_blank" rel="noopener" href="https://xxxxx.github.io/">https://xxxxx.github.io/</a> (xxxxx为github用户名)看到博客首页及内容了</p>
 </li>
 </ol>
@@ -426,7 +426,7 @@
       window.UtterancesThemeDark = dark;
       var s = document.createElement('script');
       s.setAttribute('src', 'https://utteranc.es/client.js');
-      s.setAttribute('repo', 'yangtaolive/yangtaolive.github.io');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
       s.setAttribute('issue-term', 'pathname');
       
       s.setAttribute('label', 'utterances');
