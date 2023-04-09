@@ -70,7 +70,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -296,7 +296,7 @@
 <h2 id="YUM包管理命令"><a href="#YUM包管理命令" class="headerlink" title="YUM包管理命令"></a>YUM包管理命令</h2><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 显示可用的原仓库</span><br>yum repolist enabled		<br><br><span class="hljs-comment"># 搜索软件包</span><br>yum search pkg_name			<br><br><span class="hljs-comment"># 下载并安装软件包</span><br>yum install pkg_name		<br><br><span class="hljs-comment"># 只下载不安装</span><br>yum install --downloadonly pkg_name		<br><br><span class="hljs-comment"># 显示所有程序包</span><br>yum list					<br><br><span class="hljs-comment"># 查看当前系统已安装包</span><br>yum list installed			<br><br><span class="hljs-comment"># 查看可以更新的包列表</span><br>yum list updates 			<br><br><span class="hljs-comment"># 查看可升级的软件包</span><br>yum check-update			<br><br><span class="hljs-comment"># 更新所有软件包</span><br>yum update					<br><br><span class="hljs-comment"># 升级指定软件包</span><br>yum update pkg_name			<br><br><span class="hljs-comment"># 列出软件包依赖关系</span><br>yum deplist pkg_name		<br><br><span class="hljs-comment"># 删除软件包</span><br>yum remove pkg_name			<br><br><span class="hljs-comment"># 清除缓存</span><br>yum clean all				<br><br><span class="hljs-comment"># 清除缓存的软件包</span><br>yum clean packages			<br><br><span class="hljs-comment"># 清除缓存的header</span><br>yum clean headers			<br></code></pre></div></td></tr></table></figure>
 
 <h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>好记性不如烂笔头，如果不常用的命令，还是记下来随时查阅比较实在 ^_^</p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/end.gif" srcset="/img/loading.gif" lazyload></p>
+<center>【END】</center>
 
             </div>
             <hr>
@@ -356,7 +356,7 @@
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -505,10 +505,6 @@
   <script  src="/js/local-search.js" ></script>
 
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 

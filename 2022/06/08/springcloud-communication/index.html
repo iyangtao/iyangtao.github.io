@@ -71,7 +71,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -332,7 +332,7 @@ client --&gt; Ribbon --&gt; cache --&gt; RestTemplate --&gt; ...
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">test</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> restTemplate.getForObject(<span class="hljs-string">&quot;http://RESTTEMPLATE2&quot;</span>, String.class);<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
 </ol>
 <h3 id="负载均衡策略"><a href="#负载均衡策略" class="headerlink" title="负载均衡策略"></a>负载均衡策略</h3><h4 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h4><p>抽象类AbstractLoadBalancerRule中可以查看实现类，即所有的负载均衡策略</p>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/AbstractLoadBalancerRule.png" srcset="/img/loading.gif" lazyload> </p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/AbstractLoadBalancerRule.png"> </p>
 <ul>
 <li><strong>ZoneAvoidanceRule</strong>：复合判断server所在区域的性能和server的可用性选择server</li>
 <li><strong>AvailabilityFilteringRule</strong>：过滤多次连接失败而处于断路器跳闸状态、或高并发的server</li>
@@ -366,7 +366,7 @@ client --&gt; Ribbon --&gt; cache --&gt; RestTemplate --&gt; ...
 <figure class="highlight properties"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs properties"><span class="hljs-meta">$&#123;server.id&#125;.ribbon.NFLoadBalancerRuleClassName</span>=<span class="hljs-string">com.netflix.loadbalancer.$&#123;rule&#125;</span><br></code></pre></div></td></tr></table></figure>
 
 <h3 id="传参处理"><a href="#传参处理" class="headerlink" title="传参处理"></a>传参处理</h3><p>建议所有的参数前都标识通过什么方式传参，如@RequestParam、@PathVariable，因为OpenFeign底层调用的是RestTemplate，无法自行组织参数，可能会报如下异常：</p>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220118212247867.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220118212247867.png"></p>
 <p>正确姿势：</p>
 <h4 id="路径传参"><a href="#路径传参" class="headerlink" title="路径传参"></a>路径传参</h4><p>@RequestParam / @PathVariable</p>
 <ul>
@@ -400,7 +400,7 @@ client --&gt; Ribbon --&gt; cache --&gt; RestTemplate --&gt; ...
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@GetMapping(&quot;/list&quot;)</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">testList</span><span class="hljs-params">()</span> </span>&#123;<br>    String[] strings = <span class="hljs-keyword">new</span> String[] &#123;<span class="hljs-string">&quot;1&quot;</span>, <span class="hljs-string">&quot;2&quot;</span>, <span class="hljs-string">&quot;3&quot;</span>&#125;;<br>    String s = feignClient.client2TestList(strings);<br>    System.out.println(s);<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
 </ul>
 <h3 id="超时处理"><a href="#超时处理" class="headerlink" title="超时处理"></a>超时处理</h3><p>默认超时：使用OpenFeign组件在进行服务间通信时<strong>要求被调用服务必须在 1s 内响应</strong>，否则直接报错</p>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220119080456231.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220119080456231.png"></p>
 <p>修改默认超时时间，可配置单个服务（通过serverID），也可配置所有服务的默认超时时间</p>
 <figure class="highlight properties"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs properties"><span class="hljs-comment"># 设置单个服务</span><br><span class="hljs-meta">feign.client.config.$&#123;serverId&#125;.connectTimeout</span>=<span class="hljs-string">$&#123;time&#125;</span><br><span class="hljs-meta">feign.client.config.$&#123;serverId&#125;.readTimeout</span>=<span class="hljs-string">$&#123;time&#125;</span><br><span class="hljs-comment"></span><br><span class="hljs-comment">#设置所有服务的默认超时时间</span><br><span class="hljs-meta">feign.client.config.default.connectTimeout</span>=<span class="hljs-string">5000</span><br><span class="hljs-meta">feign.client.config.default.readTimeout</span>=<span class="hljs-string">5000</span><br><br><span class="hljs-meta">feign.client.config.OPENFEIGN2.connectTimeout</span>=<span class="hljs-string">5000</span><br><span class="hljs-meta">feign.client.config.OPENFEIGN2.readTimeout</span>=<span class="hljs-string">5000</span><br></code></pre></div></td></tr></table></figure>
 
@@ -419,9 +419,9 @@ client --&gt; Ribbon --&gt; cache --&gt; RestTemplate --&gt; ...
 <figure class="highlight properties"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs properties"><span class="hljs-meta">logging.level.com.yangtao.feign.FeignClient</span>=<span class="hljs-string">debug</span><br></code></pre></div></td></tr></table></figure>
 
 <p>测试</p>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220119083126559.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220119083126559.png"></p>
 <h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>本文讲述了微服务之间的通信、负载均衡，以及SpringCloud常用的组件RestTemplate、OpenFeign以及Ribbon。</p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/end.gif" srcset="/img/loading.gif" lazyload></p>
+<center>【END】</center>
 
             </div>
             <hr>
@@ -483,7 +483,7 @@ client --&gt; Ribbon --&gt; cache --&gt; RestTemplate --&gt; ...
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -632,10 +632,6 @@ client --&gt; Ribbon --&gt; cache --&gt; RestTemplate --&gt; ...
   <script  src="/js/local-search.js" ></script>
 
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 

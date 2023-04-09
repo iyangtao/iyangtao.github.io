@@ -71,7 +71,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -268,20 +268,20 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：9 个月前
+                  本文最后更新于：10 个月前
                 
               </p>
             
             <div class="markdown-body">
               <p>SpringCloud统一配置组件config，实现服务配置文件的统一托管配置~                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     </p>
 <h2 id="配置中心"><a href="#配置中心" class="headerlink" title="配置中心"></a>配置中心</h2><h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>config（配置）又称为<strong>统一配置中心</strong>。Spring基于Netflix Config进行二次封装而来。顾名思义，就是<strong>将配置统一管理（托管到远程仓库）</strong>，配置统一管理的好处是在日后大规模集群部署服务应用时<strong>使相同的服务配置一致</strong>，日后再修改配置只需要<strong>统一修改</strong>全部同步，<strong>无需一个一个服务手动维护</strong>。</p>
-<h3 id="图示"><a href="#图示" class="headerlink" title="图示"></a>图示</h3><p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220124204121066.png" srcset="/img/loading.gif" lazyload></p>
+<h3 id="图示"><a href="#图示" class="headerlink" title="图示"></a>图示</h3><p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220124204121066.png"></p>
 <ul>
 <li><strong>服务端：配置所有的配置文件</strong></li>
 <li><strong>客户端：从服务端拉取配置文件进行配置</strong></li>
 </ul>
 <h2 id="Config"><a href="#Config" class="headerlink" title="Config"></a>Config</h2><h3 id="前置准备"><a href="#前置准备" class="headerlink" title="前置准备"></a>前置准备</h3><p>首先需要准备一个远程git仓库，用于保存配置文件</p>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220124212625044.png" srcset="/img/loading.gif" lazyload> </p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220124212625044.png"> </p>
 <h3 id="Config-Server开发"><a href="#Config-Server开发" class="headerlink" title="Config Server开发"></a>Config Server开发</h3><ol>
 <li><p>快速构建一个SpringBoot项目，加入服务注册中心，指定端口为6666，服务名为CONFIGSERVER，这一步很重要，等会需要config client指定config server</p>
 </li>
@@ -298,15 +298,15 @@
 
 <figure class="highlight properties"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs properties"><span class="hljs-attr">name</span>=<span class="hljs-string">pro</span><br></code></pre></div></td></tr></table></figure></li>
 <li><p>访问<a target="_blank" rel="noopener" href="http://localhost:7999/configclient-xx.properties">localhost:7999/configclient-xx.properties</a>，获取到的配置信息为</p>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220125234747030.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220125234747030.png"></p>
 </li>
 <li><p>原因：<strong>访问的configclient-xx.properties文件不存在，因此会拉取默认的configclient.properties</strong></p>
 </li>
 <li><p>当访问的配置<strong>文件存在时，会将该文件与configclient.properties合并返回</strong>，如访问：<a target="_blank" rel="noopener" href="http://localhost:7999/configclient-dev.properties">localhost:7999/configclient-dev.properties</a></p>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220125234925078.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220125234925078.png"></p>
 </li>
 <li><p>拉取后会在<strong>本地缓存</strong>一份配置文件</p>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220125235211955.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220125235211955.png"></p>
 </li>
 </ol>
 <h3 id="Config-Client"><a href="#Config-Client" class="headerlink" title="Config Client"></a>Config Client</h3><ol>
@@ -317,18 +317,18 @@
 <li><p>配置文件，指定config server的地址、注册中心的地址、需要的配置文件</p>
 <figure class="highlight properties"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs properties"><span class="hljs-comment"># 当前configclient统一配置中心在注册中心的服务id</span><br><span class="hljs-comment"># 当前configclient统一配置中心在注册中心的服务id</span><br><span class="hljs-meta">spring.cloud.config.discovery.service-id</span>=<span class="hljs-string">CONFIGSERVER</span><br><span class="hljs-comment"></span><br><span class="hljs-comment"># 开启config server发现</span><br><span class="hljs-meta">spring.cloud.config.discovery.enabled</span>=<span class="hljs-string">true</span><br><span class="hljs-comment"></span><br><span class="hljs-comment"># 配置注册中心</span><br><span class="hljs-meta">spring.cloud.consul.host</span>=<span class="hljs-string">localhost</span><br><span class="hljs-meta">spring.cloud.consul.port</span>=<span class="hljs-string">8500</span><br><span class="hljs-comment"></span><br><span class="hljs-comment"># 获取哪个配置文件：1.分支；2.文件名；3.环境</span><br><span class="hljs-meta">spring.cloud.config.label</span>=<span class="hljs-string">master</span><br><span class="hljs-meta">spring.cloud.config.name</span>=<span class="hljs-string">configclient</span><br><span class="hljs-meta">spring.cloud.config.profile</span>=<span class="hljs-string">dev</span><br></code></pre></div></td></tr></table></figure></li>
 <li><p>报错：默认从8888拉取配置文件</p>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220126001419784.png" srcset="/img/loading.gif" lazyload></p>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220126001050015.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220126001419784.png"></p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220126001050015.png"></p>
 </li>
 <li><p>服务以当前的配置文件启动，启动不起来，<strong>应配置更高优先级的配置文件</strong>，<strong>预先从config server拉取配置文件</strong>，<strong>再以application.properties启动</strong></p>
 </li>
 <li><p><strong>将config client的配置文件命名为bootstrap.properties</strong>，重新启动，可看到已拉取到配置文件</p>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220126002045851.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220126002045851.png"></p>
 </li>
 <li><p>controller测试</p>
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@RestController</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TestController</span> </span>&#123;<br>    <span class="hljs-meta">@Value(&quot;$&#123;name&#125;&quot;)</span><br>    String name;<br><br>    <span class="hljs-meta">@GetMapping</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">test</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;The env is &quot;</span> + name;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
 <li><p>访问<a target="_blank" rel="noopener" href="http://localhost:2333/">localhost:2333</a></p>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220126002302372.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220126002302372.png"></p>
 </li>
 <li><p>以后如果想切换环境，直接修改config client的配置文件bootstrap.properties中的<strong>spring.cloud.config.profile</strong>的值</p>
 </li>
@@ -340,13 +340,14 @@
 <li><p>config client<strong>暴露远端配置端点</strong>（bootstrap.properties中配置）</p>
 <figure class="highlight properties"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs properties"><span class="hljs-meta">management.endpoints.web.exposure.include</span>=<span class="hljs-string">*</span><br></code></pre></div></td></tr></table></figure></li>
 <li><p>修改完远程仓库的配置后，向config client发送一个post方式请求，访问：<a target="_blank" rel="noopener" href="http://localhost:2333/actuator/refresh">localhost:2333/actuator/refresh</a>，返回值会告诉我们哪些信息发生了改变</p>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220126004707646.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220126004707646.png"></p>
 </li>
 <li><p>虽然手动刷新配置不用重启服务，但还是要单独向每个服务发送post请求，服务集群主机一多还是很不方便。除了手动刷新配置，还有自动刷新配置，需配合BUS组件使用，下节再说。</p>
 </li>
 </ol>
 <h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>本文介绍了微服务中的配置中心，以及SpringCloud中的组件config，可以更方便地管理服务的配置。</p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/end.gif" srcset="/img/loading.gif" lazyload></p>
+<center>【END】</center>
+
 
             </div>
             <hr>
@@ -408,7 +409,7 @@
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -557,10 +558,6 @@
   <script  src="/js/local-search.js" ></script>
 
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 

@@ -73,7 +73,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -277,7 +277,7 @@
             <div class="markdown-body">
               <p>SpringCloud学习笔记——服务注册中心，讲了Eureka和Consul，Nacos后续再更~                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  </p>
 <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在整个微服务架构单独抽取一个服务，该服务没有任何业务功能，仅用来完成整个微服务系统的<strong>服务注册</strong>、<strong>服务发现</strong>、<strong>服务健康状态的监控和管理</strong>、<strong>以及服务元数据信息存储</strong>。</p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405170305807.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405170305807.png"></p>
 <p><strong>具体作用：</strong></p>
 <ul>
 <li>可以对所有的微服务的<strong>信息进行存储</strong>，如微服务的名称、IP、端口等。</li>
@@ -297,10 +297,10 @@
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@SpringBootApplication</span><br><span class="hljs-meta">@EnableEurekaServer</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">EurekaServerApplication</span> </span>&#123;...&#125;<br></code></pre></div></td></tr></table></figure></li>
 </ol>
 <h4 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h4><p>访问 <a target="_blank" rel="noopener" href="http://localhost:8761/">http://localhost:8761/</a></p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220828220911823.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220828220911823.png"></p>
 <p>可正常访问服务注册中心，服务列表中有EUREKA-SERVER</p>
 <h4 id="报错"><a href="#报错" class="headerlink" title="报错"></a>报错</h4><p><strong>com.netflix.discovery.DiscoveryClient    : DiscoveryClient_EUREKA-SERVER/localhost:eureka-server:8761 - was unable to refresh its cache! status = Cannot execute request on any known server</strong></p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220828220602345.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220828220602345.png"></p>
 <p><strong>原因：</strong>eureka包含两个组件，包含eureka client，项目启动时会将自己作为客户端立即进行注册，注册时server还没准备完成，所以出现这个错误。</p>
 <p><strong>解决：</strong></p>
 <ol>
@@ -310,7 +310,7 @@
 <figure class="highlight properties"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs properties"><span class="hljs-meta">eureka.client.fetch-registry</span>=<span class="hljs-string">false</span><br><span class="hljs-meta">eureka.client.register-with-eureka</span>=<span class="hljs-string">false</span><br></code></pre></div></td></tr></table></figure>
 
 <p>再次验证</p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220828221201444.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220828221201444.png"></p>
 <p>服务启动没有报异常，且注册中心页面已经找不到EUREKA-SERVER了</p>
 <h3 id="Eureka-Client实践"><a href="#Eureka-Client实践" class="headerlink" title="Eureka Client实践"></a>Eureka Client实践</h3><h4 id="创建-1"><a href="#创建-1" class="headerlink" title="创建"></a>创建</h4><p>注：这里的eureka client模拟的是基于业务拆分出来的一个个微服务，实际开发并没有这种服务</p>
 <ol>
@@ -323,7 +323,7 @@
 <li><p>入口类加上开启EurekaClient的注解</p>
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@SpringBootApplication</span><br><span class="hljs-meta">@EnableEurekaClient</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">EurekaClientApplication</span> </span>&#123;...&#125;<br></code></pre></div></td></tr></table></figure></li>
 </ol>
-<h4 id="验证-1"><a href="#验证-1" class="headerlink" title="验证"></a>验证</h4><p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220828221411549.png" srcset="/img/loading.gif" lazyload></p>
+<h4 id="验证-1"><a href="#验证-1" class="headerlink" title="验证"></a>验证</h4><p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220828221411549.png"></p>
 <p>EUREKA-CLIENT已经注册到服务注册中心了 </p>
 <h3 id="Eureka的自我保护机制"><a href="#Eureka的自我保护机制" class="headerlink" title="Eureka的自我保护机制"></a>Eureka的自我保护机制</h3><p><strong><code>EMERGENCY!  EUREKA MAY BE INCORRECTLY CLAIMING INSTANCES ARE UP WHEN THEY&#39;RE NOT.  RENEWALS ARE LESSER THAN THRESHOLD AND HENCE THE INSTANCES ARE NOT BEING EXPIRED JUST TO BE SAFE.</code></strong></p>
 <blockquote>
@@ -354,10 +354,10 @@
 <figure class="highlight properties"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs properties"><span class="hljs-meta">eureka.instance.lease-renewal-interval-in-seconds</span>=<span class="hljs-string">1</span><br><span class="hljs-meta">eureka.instance.lease-expiration-duration-in-seconds</span>=<span class="hljs-string">2</span><br></code></pre></div></td></tr></table></figure></li>
 </ol>
 <h3 id="Eureka-Server集群搭建"><a href="#Eureka-Server集群搭建" class="headerlink" title="Eureka Server集群搭建"></a>Eureka Server集群搭建</h3><p>拓扑图</p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405170324691.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405170324691.png"></p>
 <ol>
 <li><p>复制3个Server项目，通过运行参数修改启动端口</p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405170329353.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405170329353.png"></p>
 </li>
 <li><p>对每个复制的项目都修改配置文件（这里只写出节点1的配置）：节点1向节点2、3注册；节点2向节点1、3注册；节点3向节点1、2注册</p>
 <figure class="highlight properties"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs properties"><span class="hljs-meta">eureka.client.service-url.defaultZone</span>=<span class="hljs-string">http://localhost:9002/eureka,http://localhost:9003/eureka</span><br></code></pre></div></td></tr></table></figure></li>
@@ -374,7 +374,7 @@
 <h3 id="Server实践"><a href="#Server实践" class="headerlink" title="Server实践"></a>Server实践</h3><p>启动</p>
 <figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">consul agent -dev<br></code></pre></div></td></tr></table></figure>
 
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220828223412353.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220828223412353.png"></p>
 <ul>
 <li><p>dc1为datacenter，默认为dc1，可以指定数据中心启动</p>
 <figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">consul agent -dev -datacenter dc2<br></code></pre></div></td></tr></table></figure></li>
@@ -391,14 +391,14 @@
 <li><p>通用的服务注册中心注解（除Eureka），@EnableDisCoveryClient</p>
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@SpringBootApplication</span><br><span class="hljs-meta">@EnableDiscoveryClient</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ConsulClientApplication</span> </span>&#123;...&#125;<br></code></pre></div></td></tr></table></figure></li>
 <li><p>启动服务，查看services</p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220828224005883.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220828224005883.png"></p>
 </li>
 <li><p>出错，consul-client无法正常响应server的心跳，需要手动引入健康检查的依赖，client才能响应server</p>
 <figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-actuator<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></div></td></tr></table></figure></li>
 <li><p>或者关闭consul客户端的健康检查</p>
 <figure class="highlight properties"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs properties"><span class="hljs-meta">spring.cloud.consul.discovery.register-health-check</span>=<span class="hljs-string">false</span><br></code></pre></div></td></tr></table></figure></li>
 <li><p>查看services</p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220828224238542.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220828224238542.png"></p>
 </li>
 </ol>
 <h2 id="Eureka-VS-Consul"><a href="#Eureka-VS-Consul" class="headerlink" title="Eureka VS Consul"></a>Eureka VS Consul</h2><h3 id="CAP"><a href="#CAP" class="headerlink" title="CAP"></a>CAP</h3><p>指的是在一个分布式系统中，<strong>一致性（Consistency）</strong>、<strong>可用性（Availability）</strong>、<strong>分区容错性（Partition tolerance）</strong>。CAP 原则指的是，这三个要素<strong>最多只能同时实现两点</strong>，不可能三者兼顾。</p>
@@ -432,7 +432,7 @@
 </tr>
 </tbody></table>
 <h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>本文大致地说了下两种常用的服务注册中心的配置以及使用方法，并进行了简单的对比。</p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/end.gif" srcset="/img/loading.gif" lazyload></p>
+<center>【END】</center>
 
             </div>
             <hr>
@@ -498,7 +498,7 @@
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -647,10 +647,6 @@
   <script  src="/js/local-search.js" ></script>
 
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 

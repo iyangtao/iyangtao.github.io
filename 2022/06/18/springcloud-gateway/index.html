@@ -71,7 +71,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -281,7 +281,7 @@
 <li>响应数据的<strong>脱敏</strong></li>
 <li><strong>流量与并发控制</strong>、基于API调用的计量或计费等。</li>
 </ol>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220121203310614.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220121203310614.png"></p>
 <h2 id="gateway"><a href="#gateway" class="headerlink" title="gateway"></a>gateway</h2><h3 id="概述-1"><a href="#概述-1" class="headerlink" title="概述"></a>概述</h3><blockquote>
 <p>This project provides a library for building an API Gateway on top of Spring MVC. Spring Cloud Gateway aims to provide a simple, yet effective way to route to APIs and provide cross cutting concerns to them such as: security, monitoring/metrics, and resiliency.</p>
 </blockquote>
@@ -312,7 +312,7 @@
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Configuration</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GatewayConfig</span> </span>&#123;<br>    <span class="hljs-meta">@Bean</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> RouteLocator <span class="hljs-title">myLocator</span><span class="hljs-params">(RouteLocatorBuilder builder)</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> builder.routes()<br>                .route(<span class="hljs-string">&quot;openfeign&quot;</span>, r -&gt; r.path(<span class="hljs-string">&quot;/test&quot;</span>)<br>                .uri(<span class="hljs-string">&quot;lb://OPENFEIGN1&quot;</span>))<br>                .build();<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
 
 <h3 id="断言和过滤"><a href="#断言和过滤" class="headerlink" title="断言和过滤"></a>断言和过滤</h3><p>gateway的工作过程</p>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220123225812486.png" srcset="/img/loading.gif" lazyload> </p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220123225812486.png"> </p>
 <p><strong>网关（gateway） = 断言（predicates） + 过滤（filters）</strong></p>
 <h4 id="断言"><a href="#断言" class="headerlink" title="断言"></a>断言</h4><p><strong>当请求到达网关时，网关前置处理，满足断言时放行请求，不满足立即返回</strong>。</p>
 <p>内置断言：</p>
@@ -325,7 +325,7 @@
 <li>Header=X-Request-Id, \d+：基于请求头中的指定属性的正则匹配路由（这里全是整数）</li>
 <li>Method=GET,POST：基于指定的请求方式请求进行路由</li>
 </ul>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220123231126451.png" srcset="/img/loading.gif" lazyload> </p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220123231126451.png"> </p>
 <p>官方更多: <a target="_blank" rel="noopener" href="https://cloud.spring.io/spring-cloud-static/spring-cloud-gateway/2.2.3.RELEASE/reference/html/#the-cookie-route-predicate-factory">https://cloud.spring.io/spring-cloud-static/spring-cloud-gateway/2.2.3.RELEASE/reference/html/#the-cookie-route-predicate-factory</a></p>
 <h4 id="过滤"><a href="#过滤" class="headerlink" title="过滤"></a>过滤</h4><p><strong>路由过滤器允许以某种方式修改传入的HTTP请求或传出的HTTP响应。路由筛选器的作用域是特定路由。springcloudgateway包括许多内置的GatewayFilter工厂。</strong></p>
 <p>内置过滤器</p>
@@ -346,7 +346,7 @@
 <figure class="highlight json"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs json">[<br>	&#123;<br>		<span class="hljs-attr">&quot;predicate&quot;</span>: <span class="hljs-string">&quot;Paths: [/test/**], match trailing slash: true&quot;</span>,<br>        <span class="hljs-attr">&quot;route_id&quot;</span>: <span class="hljs-string">&quot;openfeignCliento&quot;</span>,<br>        <span class="hljs-attr">&quot;filters&quot;</span>: [ ],<br>        <span class="hljs-attr">&quot;uri&quot;</span>: <span class="hljs-string">&quot;http://localhost:8001/&quot;</span>,<br>        <span class="hljs-attr">&quot;order&quot;</span>: <span class="hljs-number">0</span><br>	&#125;,<br>	&#123;<br>        <span class="hljs-attr">&quot;predicate&quot;</span>: <span class="hljs-string">&quot;Paths: [/client2/**], match trailing slash: true&quot;</span>,<br>        <span class="hljs-attr">&quot;route_id&quot;</span>: <span class="hljs-string">&quot;openfeignClientt&quot;</span>,<br>        <span class="hljs-attr">&quot;filters&quot;</span>: [ ],<br>        <span class="hljs-attr">&quot;uri&quot;</span>: <span class="hljs-string">&quot;http://localhost:8002/&quot;</span>,<br>        <span class="hljs-attr">&quot;order&quot;</span>: <span class="hljs-number">0</span><br>	&#125;<br>]<br></code></pre></div></td></tr></table></figure>
 
 <h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>本文介绍了微服务中网关的概念以及常见组件SpringCloud Gateway。</p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/end.gif" srcset="/img/loading.gif" lazyload></p>
+<center>【END】</center>
 
             </div>
             <hr>
@@ -408,7 +408,7 @@
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -557,10 +557,6 @@
   <script  src="/js/local-search.js" ></script>
 
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 

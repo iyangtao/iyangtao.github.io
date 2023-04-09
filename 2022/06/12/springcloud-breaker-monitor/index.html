@@ -72,7 +72,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -276,7 +276,7 @@
             <div class="markdown-body">
               <p>SpringCloud的服务短路及监控工具——Hystrix，虽然已经停止维护，但还是有必要了解一下，后续再更SpringCloud Alibaba的sentinel                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         </p>
 <h2 id="服务雪崩"><a href="#服务雪崩" class="headerlink" title="服务雪崩"></a>服务雪崩</h2><h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>微服务在进行服务调用时，<strong>下游服务崩溃导致上级服务积压过多突发的请求</strong>，慢慢地，<strong>线程资源耗尽</strong>，服务崩溃，接着压力<strong>传递到更上一级服务</strong>，最终导致链路中<strong>所有服务都崩溃</strong>，即<strong>服务雪崩</strong>。</p>
-<h3 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h3><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220119200302699.png" srcset="/img/loading.gif" lazyload alt="image-20220119200302699" style="zoom:67%;" />  
+<h3 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h3><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220119200302699.png" alt="image-20220119200302699" style="zoom:67%;" />  
 
 <ol>
 <li>Service C突然崩溃，导致Service B积压过多的请求，没有释放资源</li>
@@ -285,9 +285,9 @@
 <li>链路中所有自C开始的上游服务全部崩溃</li>
 </ol>
 <h3 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h3><h4 id="服务熔断"><a href="#服务熔断" class="headerlink" title="服务熔断"></a>服务熔断</h4><p>当发现某个服务异常的时候，直接熔断整个服务，给上游服务（调用者）返回一个友好的错误提示，以此防止上游服务线程阻塞、耗尽资源、崩溃、进而引发雪崩效应（这有点类似家里的保险丝，用电功率过大保险丝就熔断，防止发生意外）；等待目标服务情况好转，主机有更多的空闲资源了，则继续恢复调用。</p>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220119201204390.png" srcset="/img/loading.gif" lazyload alt="image-20220119201204390"></p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220119201204390.png" alt="image-20220119201204390"></p>
 <h4 id="服务降级"><a href="#服务降级" class="headerlink" title="服务降级"></a>服务降级</h4><p>当服务压力剧增的时候根据当前的业务情况对一些服务和页面有策略的降级，缓解服务器的压力，保证核心任务能够完成（如双十一下单高峰期，只保证能够完成下单，但是下单成功后跳转到指定页面这种边缘服务则无所谓，可直接返回一个友好的报错页面，让用户自行刷新查看）。</p>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220119203031308.png" srcset="/img/loading.gif" lazyload alt="image-20220119203031308"></p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220119203031308.png" alt="image-20220119203031308"></p>
 <h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ol>
 <li>服务熔断和服务降级<strong>都是为了系统的可行性考虑</strong></li>
 <li>熔断是出于<strong>服务故障</strong>而触发，而降级是出于系统的<strong>整体负荷</strong>和核心业务而触发</li>
@@ -313,7 +313,7 @@
 <li><p>默认10s超过20个请求，或10s超过50%的请求失败则会将服务断开；现定义失败后的快速响应调用的方法（返回值和参数类型需对应），用抛出异常模拟服务调用失败</p>
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@RestController</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TestController</span> </span>&#123;<br><br>    <span class="hljs-meta">@GetMapping</span><br>    <span class="hljs-meta">@HystrixCommand(fallbackMethod = &quot;testFallBack&quot;)</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">test</span><span class="hljs-params">(Integer integer)</span> </span>&#123;<br>        <span class="hljs-keyword">if</span> (integer &lt; <span class="hljs-number">0</span>) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;模拟出错&quot;</span>);<br>        &#125;<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;hello&quot;</span>;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">testFallBack</span><span class="hljs-params">(Integer integer)</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;服务器繁忙，请稍后再试！&quot;</span>;<br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure></li>
 <li><p>10s内连续请求失败后，断路器打开，服务熔断，对于正确的请求也会返回快速响应</p>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220119213243728.png" srcset="/img/loading.gif" lazyload alt="image-20220119213243728"></p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220119213243728.png" alt="image-20220119213243728"></p>
 </li>
 <li><p>断路器打开条件：</p>
 <ul>
@@ -321,7 +321,7 @@
 <li>10s内超50%的请求失败</li>
 <li>断路器打开5s后，进入半开状态，如果一个请求成功则关闭断路器，否则继续打开断路器</li>
 </ul>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220119213945367.png" srcset="/img/loading.gif" lazyload alt="image-20220119213945367"></p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220119213945367.png" alt="image-20220119213945367"></p>
 </li>
 <li><p>如果不想在@HystrixCommand中自定义处理方法，则可以指定默认的快速响应方法</p>
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@HystrixCommand(fallbackMethod = &quot;testFallBack&quot;, defaultFallback = &quot;defaultFallBack&quot;)</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">test</span><span class="hljs-params">()</span> </span>&#123;...&#125;<br><br><span class="hljs-comment">//默认的快速响应方法，返回类型为String，空参</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">defaultFallBack</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;服务器繁忙，请稍后再试！&quot;</span>;<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
@@ -340,7 +340,7 @@
 <li><p>调用方controller</p>
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@RestController</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TestController</span> </span>&#123;<br><br>    <span class="hljs-meta">@Qualifier(&quot;com.yangtao.feign.HystrixClient&quot;)</span><br>    <span class="hljs-meta">@Autowired</span><br>    HystrixClient hystrixClient;<br><br>    <span class="hljs-meta">@GetMapping</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">test</span><span class="hljs-params">(<span class="hljs-meta">@RequestParam(&quot;integer&quot;)</span> Integer integer)</span> </span>&#123;<br>        String test = hystrixClient.test(integer);<br>        <span class="hljs-keyword">return</span> test;<br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure></li>
 <li><p>当满足断路器开启条件时，即使被调用方不开启断路器支持，调用方也会开启断路器</p>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220119221720495.png" srcset="/img/loading.gif" lazyload alt="image-20220119221720495"></p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220119221720495.png" alt="image-20220119221720495"></p>
 </li>
 </ol>
 <h2 id="Hystrix-Dashboard"><a href="#Hystrix-Dashboard" class="headerlink" title="Hystrix Dashboard"></a>Hystrix Dashboard</h2><h3 id="概述-2"><a href="#概述-2" class="headerlink" title="概述"></a>概述</h3><p>Hystrix仪表盘，收集了关于<strong>每个HystrixCommand的度量</strong>，以图形化界面显示每个断路器的运行状况。</p>
@@ -353,23 +353,23 @@
 <li><p>入口类开启dashboard</p>
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@SpringBootApplication</span><br><span class="hljs-meta">@EnableHystrixDashboard</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HystrixDashBoardApplication</span> </span>&#123;...&#125;<br></code></pre></div></td></tr></table></figure></li>
 <li><p>启动项目，访问图形化界面，<a target="_blank" rel="noopener" href="http://localhost/hystrix">http://localhost/hystrix</a></p>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220120082139565.png" srcset="/img/loading.gif" lazyload alt="image-20220120082139565"></p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220120082139565.png" alt="image-20220120082139565"></p>
 </li>
 <li><p>坑1：被监控的项目中入口类或新建配置类，加入监控路径配置（否则找不到监控的服务），并启动监控项目</p>
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Configuration</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HystrixDashboardConfig</span> </span>&#123;<br>    <span class="hljs-meta">@Bean</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> ServletRegistrationBean <span class="hljs-title">getServlet</span><span class="hljs-params">()</span> </span>&#123;<br>        HystrixMetricsStreamServlet streamServlet = <span class="hljs-keyword">new</span> HystrixMetricsStreamServlet();<br>        ServletRegistrationBean registrationBean = <span class="hljs-keyword">new</span> ServletRegistrationBean(streamServlet);<br>        registrationBean.setLoadOnStartup(<span class="hljs-number">1</span>);<br>        registrationBean.addUrlMappings(<span class="hljs-string">&quot;/hystrix.stream&quot;</span>);<br>        registrationBean.setName(<span class="hljs-string">&quot;HystrixMetricsStreamServlet&quot;</span>);<br>        <span class="hljs-keyword">return</span> registrationBean;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
 <li><p>坑2：新版本中springcloud将jquery版本升级为3.4.1，所以需要修改monitor.ftlh文件，如下：</p>
 <figure class="highlight javascript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs javascript">$(<span class="hljs-built_in">window</span>).load(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)  修改为   <span class="hljs-title">$</span>(<span class="hljs-params"><span class="hljs-built_in">window</span></span>).<span class="hljs-title">on</span>(<span class="hljs-params"><span class="hljs-string">&quot;load&quot;</span>,<span class="hljs-keyword">function</span>()</span></span><br></code></pre></div></td></tr></table></figure></li>
 <li><p>\repository\org\springframework\cloud\spring-cloud-netflix-hystrix-dashboard\2.2.3.RELEASE</p>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220120085034155.png" srcset="/img/loading.gif" lazyload alt="image-20220120085034155"></p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220120085034155.png" alt="image-20220120085034155"></p>
 </li>
 <li><p>监控路径去掉/actuator，如：<a target="_blank" rel="noopener" href="http://localhost:10087/hystrix.stream">http://localhost:10087/hystrix.stream</a></p>
 </li>
 <li><p>调用服务，查看失败率，断路器是否打开</p>
-<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220121005638286.png" srcset="/img/loading.gif" lazyload alt="image-20220121005638286"></p>
+<p><img src="https://gitee.com/yangtao8453/picgo/raw/master/img/image-20220121005638286.png" alt="image-20220121005638286"></p>
 </li>
 </ol>
 <h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>本文介绍了微服务中的断路以及监控组件，目前Hystrix DashBoard已经停止维护，所以存在较多未解决的bug，现在更推荐使用SpringCloud Alibaba的<strong>sentinel</strong>（后续更新~）。</p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/end.gif" srcset="/img/loading.gif" lazyload></p>
+<center>【END】</center>
 
             </div>
             <hr>
@@ -433,7 +433,7 @@
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -582,10 +582,6 @@
   <script  src="/js/local-search.js" ></script>
 
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 

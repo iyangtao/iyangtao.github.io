@@ -49,7 +49,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -203,8 +203,63 @@
     
     
       <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2022/03/23/js-promise/" target="_blank">
+          <img src="/img/BlogIndexImg/promise.jpeg" alt="Promise">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/03/23/js-promise/" target="_blank">
+          Promise
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2022/03/23/js-promise/" target="_blank">
+          
+          Promise 是一个 ECMAScript 6 提供的类，目的是更加优雅地书写复杂的异步任务
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-03-23 21:12" pubdate>
+              2022-03-23
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/JavaScript/">JavaScript</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/JavaScript/">JavaScript</a>
+            
+              <a href="/tags/ES6/">ES6</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2022/03/14/javase-stream/" target="_blank">
-          <img src="/img/BlogIndexImg/StreamAPI.jpg" srcset="/img/loading.gif" lazyload alt="Stream API">
+          <img src="/img/BlogIndexImg/StreamAPI.jpg" alt="Stream API">
         </a>
       </div>
     
@@ -261,7 +316,7 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2022/03/02/javase-optional/" target="_blank">
-          <img src="/img/BlogIndexImg/optional.jpg" srcset="/img/loading.gif" lazyload alt="Optional类">
+          <img src="/img/BlogIndexImg/optional.png" alt="Optional类">
         </a>
       </div>
     
@@ -318,7 +373,7 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2022/02/23/javase-method-reference/" target="_blank">
-          <img src="/img/BlogIndexImg/java8.jpg" srcset="/img/loading.gif" lazyload alt="方法引用">
+          <img src="/img/BlogIndexImg/java8.jpg" alt="方法引用">
         </a>
       </div>
     
@@ -379,7 +434,7 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2022/02/19/javase-lambda/" target="_blank">
-          <img src="/img/BlogIndexImg/lambda.png" srcset="/img/loading.gif" lazyload alt="Lambda表达式">
+          <img src="/img/BlogIndexImg/lambda.png" alt="Lambda表达式">
         </a>
       </div>
     
@@ -438,7 +493,7 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2022/02/17/javase-functional-interface/" target="_blank">
-          <img src="/img/BlogIndexImg/java8.jpg" srcset="/img/loading.gif" lazyload alt="函数式接口">
+          <img src="/img/BlogIndexImg/java8.jpg" alt="函数式接口">
         </a>
       </div>
     
@@ -495,7 +550,7 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2022/02/15/javase-datetime/" target="_blank">
-          <img src="/img/BlogIndexImg/LocalDateTime.png" srcset="/img/loading.gif" lazyload alt="Java8的日期时间类">
+          <img src="/img/BlogIndexImg/LocalDateTime.png" alt="Java8的日期时间类">
         </a>
       </div>
     
@@ -550,7 +605,7 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2022/02/07/vue-learning-about-nexttick/" target="_blank">
-          <img src="/img/BlogIndexImg/vue-nextTick.png" srcset="/img/loading.gif" lazyload alt="简单了解Vue.nextTick">
+          <img src="/img/BlogIndexImg/vue-nextTick.png" alt="简单了解Vue.nextTick">
         </a>
       </div>
     
@@ -605,7 +660,7 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2022/01/15/javase-arraylist-delete-element-problem/" target="_blank">
-          <img src="/img/BlogIndexImg/java-arraylist.jpg" srcset="/img/loading.gif" lazyload alt="关于ArrayList循环删除元素的坑">
+          <img src="/img/BlogIndexImg/java-arraylist.jpg" alt="关于ArrayList循环删除元素的坑">
         </a>
       </div>
     
@@ -664,7 +719,7 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2022/01/10/mysql-master-slave-out-of-syn/" target="_blank">
-          <img src="/img/BlogIndexImg/MySQL.png" srcset="/img/loading.gif" lazyload alt="MySQL读写不同步解决">
+          <img src="/img/BlogIndexImg/MySQL.png" alt="MySQL读写不同步解决">
         </a>
       </div>
     
@@ -714,68 +769,11 @@
     </article>
   </div>
 
-  <div class="row mx-auto index-card">
-    
-    
-      <div class="col-12 col-md-4 m-auto index-img">
-        <a href="/2022/01/08/blog-personal-blog-build-power-by-hexo/" target="_blank">
-          <img src="/img/BlogIndexImg/HEXO.png" srcset="/img/loading.gif" lazyload alt="基于Hexo+GitHub的博客搭建">
-        </a>
-      </div>
-    
-    <article class="col-12 col-md-8 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2022/01/08/blog-personal-blog-build-power-by-hexo/" target="_blank">
-          基于Hexo+GitHub的博客搭建
-        </a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/2022/01/08/blog-personal-blog-build-power-by-hexo/" target="_blank">
-          
-          很多平台都提供了博客功能，本文讲述了基于Hexo + GitHub pages搭建个人博客系统，以及自定义主题和域名，HEXO这个博客框架也是本站的建站基础
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-01-08 06:31" pubdate>
-              2022-01-08
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/categories/%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/">个人博客</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Hexo/">Hexo</a>
-            
-              <a href="/tags/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">环境搭建</a>
-            
-              <a href="/tags/%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/">个人博客</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
 
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <a class="extend prev" rel="prev" href="/"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+      <a class="extend prev" rel="prev" href="/"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/#board">3</a><a class="extend next" rel="next" href="/page/3/#board"><i class="iconfont icon-arrowright"></i></a>
     </span>
   </nav>
 
@@ -882,10 +880,6 @@
   <script  src="/js/local-search.js" ></script>
 
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 

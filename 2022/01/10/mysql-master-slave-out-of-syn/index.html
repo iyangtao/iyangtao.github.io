@@ -70,7 +70,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -273,7 +273,7 @@
             
             <div class="markdown-body">
               <p>前两天开发过程中遇到了读写不一致的情况，无奈只能叫公司大佬帮忙解决，事后复个盘，希望以后能自己解决这类问题（假装自己有操作数据库的权限…）                                                                                                                                                                                                                                                                                                 </p>
-<h2 id="公司的DB结构"><a href="#公司的DB结构" class="headerlink" title="公司的DB结构"></a>公司的DB结构</h2><p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405165409103.png" srcset="/img/loading.gif" lazyload> </p>
+<h2 id="公司的DB结构"><a href="#公司的DB结构" class="headerlink" title="公司的DB结构"></a>公司的DB结构</h2><p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405165409103.png"> </p>
 <h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><ol>
 <li><p>写库：192.168.8.128；读库：192.168.8.130</p>
 </li>
@@ -290,7 +290,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">mysql&gt; alter table db1.tb1 add `COL2` VARCHAR(20) NOT NULL;<br>Query OK, 0 rows affected (0.02 sec)<br>Records: 0  Duplicates: 0  Warnings: 0<br><br>mysql&gt; alter table db1.tb1 add `COL3` VARCHAR(20) NOT NULL;<br>Query OK, 0 rows affected (0.01 sec)<br>Records: 0  Duplicates: 0  Warnings: 0<br></code></pre></div></td></tr></table></figure>
 
 <p>从库查看状态</p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405165415206.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405165415206.png"></p>
 <h2 id="问题解决——方案1"><a href="#问题解决——方案1" class="headerlink" title="问题解决——方案1"></a>问题解决——方案1</h2><ol>
 <li><p>读库先停止读写同步</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">mysql&gt; stop slave;<br>Query OK, 0 rows affected (0.00 sec)<br></code></pre></div></td></tr></table></figure></li>
@@ -322,7 +322,7 @@
 <li>MySQL自身缺陷或读库版本低于写库，无法执行读库传过来的SQL语句</li>
 </ol>
 <h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>先了解为什么SQL会导致读写不同步，尽量避免，遇到时也可参考此篇文章快速解决。</p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/end.gif" srcset="/img/loading.gif" lazyload></p>
+<center>【END】</center>
 
             </div>
             <hr>
@@ -382,7 +382,7 @@
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -531,10 +531,6 @@
   <script  src="/js/local-search.js" ></script>
 
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 

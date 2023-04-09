@@ -70,7 +70,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -315,7 +315,7 @@
 <li><strong>成功</strong>变为<code>resolved</code></li>
 <li><strong>失败</strong>变为<code>rejected</code></li>
 </ul>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220415232636168.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220415232636168.png"></p>
 <h2 id="初体验"><a href="#初体验" class="headerlink" title="初体验"></a>初体验</h2><figure class="highlight javascript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs javascript"><span class="hljs-comment">// 1. 创建Promise对象</span><br><span class="hljs-keyword">const</span> promise = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Promise</span>(<span class="hljs-function">(<span class="hljs-params">resolve, reject</span>) =&gt;</span> &#123;<br>    <span class="hljs-comment">// 2. 执行异步操作</span><br>    <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> &#123;<br>        <span class="hljs-keyword">const</span> now = <span class="hljs-built_in">Date</span>.now();<br>        <span class="hljs-comment">// 成功操作</span><br>        <span class="hljs-keyword">if</span> (now % <span class="hljs-number">2</span> === <span class="hljs-number">0</span>) &#123;<br>            resolve(<span class="hljs-string">&#x27;success！&#x27;</span>);<br>        &#125;<br>        <span class="hljs-comment">// 失败操作</span><br>        <span class="hljs-keyword">else</span> &#123;<br>            reject(<span class="hljs-string">&#x27;fail！&#x27;</span>);<br>        &#125;<br>    &#125;, <span class="hljs-number">1000</span>)<br>&#125;)<br><br>promise.then(<br>    <span class="hljs-comment">// onResolved</span><br>    <span class="hljs-function"><span class="hljs-params">value</span> =&gt;</span> &#123;<br>        <span class="hljs-built_in">console</span>.log(value);<br>    &#125;,<br>    <span class="hljs-comment">// onRejected</span><br>    <span class="hljs-function"><span class="hljs-params">reason</span> =&gt;</span> &#123;<br>        <span class="hljs-built_in">console</span>.log(reason);<br>    &#125;<br>)<br></code></pre></div></td></tr></table></figure>
 
 <h2 id="好处"><a href="#好处" class="headerlink" title="好处"></a>好处</h2><ol>
@@ -411,7 +411,7 @@
 <li><strong>宏列队</strong>：用来保存待执行的宏任务(回调)，如定时器回调/DOM事件回调/ajax回调</li>
 <li><strong>微列队</strong>：用来保存待执行的微任务(回调)，比如：promise的回调/MutationObserver的回调</li>
 </ol>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220415232650544.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220415232650544.png"></p>
 <p><strong>JS代码执行顺序</strong></p>
 <ol>
 <li>先执行所有的初始化同步任务代码</li>
@@ -433,7 +433,7 @@
 <li>总体顺序：2  5  3  6  4  1</li>
 </ol>
 <h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>Promise是ES6新增加的特性，所以一些旧的浏览器并不支持，不过现在应该遇不到这种问题了。</p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/end.gif" srcset="/img/loading.gif" lazyload></p>
+<center>【END】</center>
 
             </div>
             <hr>
@@ -493,7 +493,7 @@
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -642,10 +642,6 @@
   <script  src="/js/local-search.js" ></script>
 
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 

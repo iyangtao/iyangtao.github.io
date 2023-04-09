@@ -70,7 +70,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -285,12 +285,12 @@
 <p>例如，当你设置 <code>vm.someData = &#39;new value&#39;</code>，该组件不会立即重新渲染。当刷新队列时，组件会在下一个事件循环“tick”中更新。多数情况我们不需要关心这个过程，但是如果你想基于更新后的 DOM 状态来做点什么，这就可能会有些棘手。虽然 Vue.js 通常鼓励开发人员使用“数据驱动”的方式思考，避免直接接触 DOM，但是有时我们必须要这么做。为了在数据变化之后等待 Vue 完成更新 DOM，可以在数据变化之后立即使用 <code>Vue.nextTick(callback)</code>。这样回调函数将在 DOM 更新完成后被调用</p>
 </blockquote>
 <p><strong>理解：数据发生变化后，DOM 不会立即发生变化，如果想立即获取变化后的 DOM，则需要将操作放入 Vue.nextTick 中，因为 DOM 完成渲染后会执行 Vue.nextTick(callback) 中的回调函数。</strong></p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220925215142085.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220925215142085.png"></p>
 <h2 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h2><ol>
 <li><p><strong>Vue生命周期前3个钩子函数</strong>（beforeCreate、created、beforeCreate）如果要<strong>操作 DOM</strong>，一定要放在 nextTick 中，否则直接报错，因为<strong>此时 DOM 还没进行渲染</strong></p>
 <figure class="highlight javascript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs javascript"><span class="hljs-function"><span class="hljs-title">beforeCreate</span>(<span class="hljs-params"></span>)</span> &#123;<br>    <span class="hljs-built_in">this</span>.$refs.a.innerText = <span class="hljs-string">&#x27;Hello World!&#x27;</span>;<br>&#125;<br></code></pre></div></td></tr></table></figure>
 
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220925215147310.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220925215147310.png"></p>
 <p>正确用法：</p>
 <figure class="highlight javascript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs javascript"><span class="hljs-function"><span class="hljs-title">beforeCreate</span>(<span class="hljs-params"></span>)</span> &#123;<br>    <span class="hljs-built_in">this</span>.$nextTick(<span class="hljs-function">() =&gt;</span> &#123;<br>        <span class="hljs-built_in">this</span>.$refs.a.innerText = <span class="hljs-string">&#x27;Hello World!1&#x27;</span>;<br>    &#125;)<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
 <li><p><strong>改变数据后，想获取到最新的 DOM</strong>，如：</p>
@@ -303,8 +303,7 @@
 <figure class="highlight javascript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs javascript"><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-title">show</span>(<span class="hljs-params"></span>)</span> &#123;<br>    <span class="hljs-built_in">this</span>.a = <span class="hljs-string">&#x27;world&#x27;</span>;<br>    <span class="hljs-keyword">await</span> <span class="hljs-built_in">this</span>.$nextTick()<br>    <span class="hljs-keyword">const</span> a = <span class="hljs-built_in">this</span>.$refs[<span class="hljs-string">&#x27;a&#x27;</span>].innerText;<br>    <span class="hljs-built_in">console</span>.log(a)<br>&#125;<br></code></pre></div></td></tr></table></figure>
 
 <p>此时输出的a也是最新的值 world，而不会出现 hello。</p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/end.gif" srcset="/img/loading.gif" lazyload></p>
-
+<center>【END】</center>
             </div>
             <hr>
             <div>
@@ -363,7 +362,7 @@
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -512,10 +511,6 @@
   <script  src="/js/local-search.js" ></script>
 
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 

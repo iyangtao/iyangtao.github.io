@@ -23,7 +23,7 @@
 <meta property="og:site_name" content="Programmer Yangtao">
 <meta property="og:description" content="空指针异常一直是个非常令人头疼的问题，Java8提供了一个新的类Optional，用于更好地解决空指针的问题">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/img/BlogIndexImg/optional.jpg">
+<meta property="og:image" content="http://example.com/img/BlogIndexImg/optional.png">
 <meta property="article:published_time" content="2022-03-02T13:21:41.000Z">
 <meta property="article:modified_time" content="2022-03-02T13:21:41.000Z">
 <meta property="article:author" content="Yangtao">
@@ -31,7 +31,7 @@
 <meta property="article:tag" content="Java8">
 <meta property="article:tag" content="Optional类">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/img/BlogIndexImg/optional.jpg">
+<meta name="twitter:image" content="http://example.com/img/BlogIndexImg/optional.png">
   
   
   <title>Optional类 - Programmer Yangtao</title>
@@ -71,7 +71,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -187,7 +187,7 @@
 </nav>
 
     <div class="banner" id="banner" parallax=true
-         style="background: url('/img/BlogBannerImg/optional.jpg') no-repeat center center;
+         style="background: url('/img/BlogBannerImg/optional.png') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
@@ -297,7 +297,7 @@
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Test</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">test3</span><span class="hljs-params">()</span> </span>&#123;<br>        Person person = <span class="hljs-keyword">new</span> Person();<br>        Optional&lt;Person&gt; optionalPerson1 = Optional.of(person);<br>        System.out.println(optionalPerson1.get());       <span class="hljs-comment">// Person&#123;name=&#x27;null&#x27;, age=0&#125;</span><br>        person = <span class="hljs-keyword">null</span>;<br>        Optional&lt;Person&gt; optionalPerson2 = Optional.ofNullable(person);<br>        <span class="hljs-comment">//System.out.println(optionalPerson2.get());      </span><br>        <span class="hljs-comment">// java.util.NoSuchElementException: No value present</span><br>        Person person1 = optionalPerson2.orElse(<span class="hljs-keyword">new</span> Person());<br>        System.out.println(person1);         <span class="hljs-comment">// Person&#123;name=&#x27;null&#x27;, age=0&#125;</span><br>        Person person2 = optionalPerson2.orElseGet(Person::<span class="hljs-keyword">new</span>);<br>        System.out.println(person2);         <span class="hljs-comment">// Person&#123;name=&#x27;null&#x27;, age=0&#125;</span><br>        System.out.println(optionalPerson2.orElseThrow(() -&gt;<br>                <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;对象为空&quot;</span>)<br>        ));                                  <span class="hljs-comment">// java.lang.RuntimeException: 对象为空</span><br>    &#125;<br></code></pre></div></td></tr></table></figure>
 
 <h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>Optional这个类真的能更优雅地解决空指针问题吗？怎么感觉比增加一个判空还更麻烦呢…</p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/end.gif" srcset="/img/loading.gif" lazyload></p>
+<center>【END】</center>
 
             </div>
             <hr>
@@ -359,7 +359,7 @@
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -508,10 +508,6 @@
   <script  src="/js/local-search.js" ></script>
 
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 

@@ -70,7 +70,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -291,7 +291,7 @@
 <h2 id="集群和分布式"><a href="#集群和分布式" class="headerlink" title="集群和分布式"></a>集群和分布式</h2><p><strong>集群：</strong>同一种软件服务的多个服务节点共同为系统提供服务过程，如MySQL集群，称之为服务集群。</p>
 <p><strong>分布式：</strong>不同软件集群（MySQL集群、Redis集群）共同为一个系统提供服务，这个系统称之为分布式集群。</p>
 <p>个人理解：一个项目组就好比一个分布式系统，里面有PM、需求、一群开发、一群开发（好比集群）</p>
-<h2 id="架构对比"><a href="#架构对比" class="headerlink" title="架构对比"></a>架构对比</h2><h3 id="单体应用"><a href="#单体应用" class="headerlink" title="单体应用"></a>单体应用</h3><p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405165835000.png" srcset="/img/loading.gif" lazyload></p>
+<h2 id="架构对比"><a href="#架构对比" class="headerlink" title="架构对比"></a>架构对比</h2><h3 id="单体应用"><a href="#单体应用" class="headerlink" title="单体应用"></a>单体应用</h3><p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405165835000.png"></p>
 <h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><ul>
 <li>项目初期开发、测试、部署都很方便</li>
 </ul>
@@ -300,7 +300,7 @@
 <li>想采用新的架构或语言只能重新来过</li>
 <li>系统可靠性低，一个漏洞影响整个应用</li>
 </ul>
-<h3 id="微服务架构应用"><a href="#微服务架构应用" class="headerlink" title="微服务架构应用"></a>微服务架构应用</h3><p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405165838825.png" srcset="/img/loading.gif" lazyload></p>
+<h3 id="微服务架构应用"><a href="#微服务架构应用" class="headerlink" title="微服务架构应用"></a>微服务架构应用</h3><p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405165838825.png"></p>
 <h4 id="优点-1"><a href="#优点-1" class="headerlink" title="优点"></a>优点</h4><ul>
 <li>每个服务<strong>高度自治</strong>，一个服务拆分为多个职责单一的服务</li>
 <li>服务之间<strong>松耦合</strong>，即使一个服务出错，不影响整体服务的运行</li>
@@ -311,7 +311,7 @@
 <li>集群部署，运维难度及压力提高</li>
 <li>服务治理和监控较难，如负载均衡、服务雪崩、配置管理</li>
 </ul>
-<h2 id="架构演变"><a href="#架构演变" class="headerlink" title="架构演变"></a>架构演变</h2><p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405165843367.png" srcset="/img/loading.gif" lazyload></p>
+<h2 id="架构演变"><a href="#架构演变" class="headerlink" title="架构演变"></a>架构演变</h2><p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405165843367.png"></p>
 <ul>
 <li><p><strong>All in One  单一架构</strong></p>
 <p>所有功能都写在一个应用，减少成本，此时期ORM是关键（解决对象关系映射）</p>
@@ -328,7 +328,7 @@
 </ul>
 <h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="Dubbo"><a href="#Dubbo" class="headerlink" title="Dubbo"></a>Dubbo</h3><p>阿里的分布式治理框架，2011年初出茅庐，刚出时很火，不到一年随着负责人的离职而停止维护，直至17年9月才又开始升级及维护，目前不是微服务的最佳解决方案。</p>
 <p><strong>官网：</strong><a target="_blank" rel="noopener" href="https://dubbo.apache.org/zh/">https://dubbo.apache.org/zh/</a></p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405165847783.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405165847783.png"></p>
 <h3 id="SpringCloud"><a href="#SpringCloud" class="headerlink" title="SpringCloud"></a>SpringCloud</h3><h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p><strong>细分：</strong></p>
 <ul>
 <li>SpringCloud Netflix</li>
@@ -340,7 +340,7 @@
 <p>Spring Cloud provides tools for developers to quickly build some of the common patterns in distributed systems (e.g. configuration management, service discovery, circuit breakers, intelligent routing, micro-proxy, control bus, one-time tokens, global locks, leadership election, distributed sessions, cluster state). Coordination of distributed systems leads to boiler plate patterns, and using Spring Cloud developers can quickly stand up services and applications that implement those patterns. They will work well in any distributed environment, including the developer’s own laptop, bare metal data centres, and managed platforms such as Cloud Foundry.</p>
 </blockquote>
 <p><strong>通俗理解：</strong>SpringCloud是一个工具集，提供了配置管理、服务发现、断路器、智能路由等等工具，可以帮助我们快建立这些模式的服务和应用程序。</p>
-<h3 id="核心架构及组件"><a href="#核心架构及组件" class="headerlink" title="核心架构及组件"></a>核心架构及组件</h3><p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405165851703.png" srcset="/img/loading.gif" lazyload></p>
+<h3 id="核心架构及组件"><a href="#核心架构及组件" class="headerlink" title="核心架构及组件"></a>核心架构及组件</h3><p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405165851703.png"></p>
 <ul>
 <li>注册中心：eureka、consul、nacos</li>
 <li>负载均衡：ribbon</li>
@@ -355,7 +355,7 @@
 <h3 id="基础环境搭建"><a href="#基础环境搭建" class="headerlink" title="基础环境搭建"></a>基础环境搭建</h3><figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-comment">&lt;!-- 继承SpringBoot父项目 --&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">parent</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-parent<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>2.2.5.RELEASE<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">parent</span>&gt;</span><br><br><span class="hljs-tag">&lt;<span class="hljs-name">properties</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">maven.compiler.source</span>&gt;</span>8<span class="hljs-tag">&lt;/<span class="hljs-name">maven.compiler.source</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">maven.compiler.target</span>&gt;</span>8<span class="hljs-tag">&lt;/<span class="hljs-name">maven.compiler.target</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">spring.cloud-version</span>&gt;</span>Hoxton.SR6<span class="hljs-tag">&lt;/<span class="hljs-name">spring.cloud-version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">properties</span>&gt;</span><br><br><span class="hljs-tag">&lt;<span class="hljs-name">dependencyManagement</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">dependencies</span>&gt;</span><br>        <span class="hljs-comment">&lt;!-- 维护SpringCloud版本 --&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>            <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>            <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-dependencies<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>            <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>$&#123;spring.cloud-version&#125;<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br>            <span class="hljs-tag">&lt;<span class="hljs-name">type</span>&gt;</span>pom<span class="hljs-tag">&lt;/<span class="hljs-name">type</span>&gt;</span><br>            <span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>import<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span><br>        <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">dependencies</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependencyManagement</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
 
 <h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>本篇介绍了微服务的概念，且列举了主流的微服务架构及其组件。</p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/end.gif" srcset="/img/loading.gif" lazyload></p>
+<center>【END】</center>
 
             </div>
             <hr>
@@ -415,7 +415,7 @@
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -564,10 +564,6 @@
   <script  src="/js/local-search.js" ></script>
 
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 

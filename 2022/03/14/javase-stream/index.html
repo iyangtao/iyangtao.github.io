@@ -71,7 +71,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -280,7 +280,7 @@
 <li>Stream不改变源对象，会返回一个新的Stream</li>
 <li>代码书写干净、简洁、高效</li>
 </ul>
-<h2 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h2><p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220213083140235.png" srcset="/img/loading.gif" lazyload></p>
+<h2 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h2><p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220213083140235.png"></p>
 <ol>
 <li><p>创建Stream</p>
 <p>一个数据源，如集合、数组，获取一个流</p>
@@ -293,7 +293,7 @@
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">test</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-keyword">int</span>[] ints = <span class="hljs-keyword">new</span> <span class="hljs-keyword">int</span>[]&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>&#125;;<br>    IntStream stream = Arrays.stream(ints);<br>    stream.forEach(System.out::println);<br>    stream.forEach(System.out::println);<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
 </ol>
 <p>报错</p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220213092419050.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220213092419050.png"></p>
 <h2 id="Stream的创建"><a href="#Stream的创建" class="headerlink" title="Stream的创建"></a>Stream的创建</h2><ol>
 <li><p>通过集合创建</p>
 </li>
@@ -407,7 +407,7 @@
 </tr>
 </tbody></table>
 <h2 id="拓展"><a href="#拓展" class="headerlink" title="拓展"></a>拓展</h2><p>流式编程DEBUG，在添加断点的时候可以单独为一个中间操作加上断点，也可以加上行断点，对于整个中间操作过程可以通过【Trace Current Stream Chain】查看</p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/%E6%B5%81%E5%BC%8F%E7%BC%96%E7%A8%8BDebug.gif" srcset="/img/loading.gif" lazyload></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/%E6%B5%81%E5%BC%8F%E7%BC%96%E7%A8%8BDebug.gif"></p>
 <p>附[1]：</p>
 <p>Person类</p>
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Data</span><br><span class="hljs-meta">@AllArgsConstructor</span><br><span class="hljs-meta">@NoArgsConstructor</span><br><span class="hljs-meta">@Setter</span><br><span class="hljs-meta">@Getter</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Person</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> String no;<br>    <span class="hljs-keyword">private</span> String name;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> age;<br>    <span class="hljs-keyword">private</span> List&lt;String&gt; hobbies;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> rank;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">equals</span><span class="hljs-params">(Object o)</span> </span>&#123;<br>        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span> == o) &#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;<br>        &#125;<br>        <span class="hljs-keyword">if</span> (o == <span class="hljs-keyword">null</span> || getClass() != o.getClass()) &#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;<br>        &#125;<br>        Person person = (Person) o;<br>        <span class="hljs-keyword">return</span> no.equals(person.no);<br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">hashCode</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> Objects.hash(no);<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
@@ -416,8 +416,7 @@
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> List&lt;Person&gt; <span class="hljs-title">initList</span><span class="hljs-params">()</span> </span>&#123;<br>    Person zs = <span class="hljs-keyword">new</span> Person(<span class="hljs-string">&quot;002&quot;</span>, <span class="hljs-string">&quot;zs&quot;</span>, <span class="hljs-number">15</span>, Arrays.asList(<span class="hljs-string">&quot;篮球&quot;</span>, <span class="hljs-string">&quot;足球&quot;</span>), <span class="hljs-number">0</span>);<br>    Person ls = <span class="hljs-keyword">new</span> Person(<span class="hljs-string">&quot;001&quot;</span>, <span class="hljs-string">&quot;ls&quot;</span>, <span class="hljs-number">12</span>, Arrays.asList(<span class="hljs-string">&quot;围棋&quot;</span>, <span class="hljs-string">&quot;足球&quot;</span>), <span class="hljs-number">0</span>);<br>    Person ww = <span class="hljs-keyword">new</span> Person(<span class="hljs-string">&quot;005&quot;</span>, <span class="hljs-string">&quot;ww&quot;</span>, <span class="hljs-number">16</span>, Arrays.asList(<span class="hljs-string">&quot;棒球&quot;</span>, <span class="hljs-string">&quot;唱歌&quot;</span>), <span class="hljs-number">0</span>);<br>    Person zl = <span class="hljs-keyword">new</span> Person(<span class="hljs-string">&quot;004&quot;</span>, <span class="hljs-string">&quot;zl&quot;</span>, <span class="hljs-number">12</span>, Arrays.asList(<span class="hljs-string">&quot;篮球&quot;</span>, <span class="hljs-string">&quot;桌球&quot;</span>), <span class="hljs-number">0</span>);<br>    Person tq = <span class="hljs-keyword">new</span> Person(<span class="hljs-string">&quot;003&quot;</span>, <span class="hljs-string">&quot;tq&quot;</span>, <span class="hljs-number">13</span>, Arrays.asList(<span class="hljs-string">&quot;健身&quot;</span>, <span class="hljs-string">&quot;网游&quot;</span>), <span class="hljs-number">0</span>);<br>    Person zb = <span class="hljs-keyword">new</span> Person(<span class="hljs-string">&quot;006&quot;</span>, <span class="hljs-string">&quot;zb&quot;</span>, <span class="hljs-number">18</span>, Arrays.asList(<span class="hljs-string">&quot;游泳&quot;</span>, <span class="hljs-string">&quot;足球&quot;</span>), <span class="hljs-number">0</span>);<br>    <span class="hljs-keyword">return</span> Arrays.asList(zs, ls, ww, zl, tq, zb);<br>&#125;<br></code></pre></div></td></tr></table></figure>
 
 <h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>Stream API是Java8新增的非常强大、易用、简洁、易理解的API，Java程序员的必修课！</p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/end.gif" srcset="/img/loading.gif" lazyload></p>
-
+<center>【END】</center>
             </div>
             <hr>
             <div>
@@ -478,7 +477,7 @@
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -627,10 +626,6 @@
   <script  src="/js/local-search.js" ></script>
 
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 
