@@ -216,7 +216,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      2.4k 字
+      2.5k 字
     </span>
   
 
@@ -266,7 +266,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：14 分钟前
+                  本文最后更新于：18 分钟前
                 
               </p>
             
@@ -302,7 +302,7 @@
 </li>
 </ul>
 <h2 id="举例"><a href="#举例" class="headerlink" title="举例"></a>举例</h2><p>前置数据（虚构）</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs plsql">-- 城市GDP信息表<br>create table city_gdp<br>(<br>    id       int not null primary key auto_increment,<br>    province varchar(50),<br>    city     varchar(50),<br>    gdp      decimal(10, 2)<br>) default charset = utf8mb4 auto_increment = 1;<br><br>-- 数据<br>insert into city_gdp(province, city, gdp)<br>values (&#x27;广东省&#x27;, &#x27;广州市&#x27;, 1234),<br>       (&#x27;广东省&#x27;, &#x27;深圳市&#x27;, 1333),<br>       (&#x27;广东省&#x27;, &#x27;东莞市&#x27;, 888),<br>       (&#x27;广东省&#x27;, &#x27;佛山市&#x27;, 903),<br>       (&#x27;广东省&#x27;, &#x27;惠州市&#x27;, 793),<br>       (&#x27;福建省&#x27;, &#x27;福州市&#x27;, 1088),<br>       (&#x27;福建省&#x27;, &#x27;厦门市&#x27;, 928),<br>       (&#x27;浙江省&#x27;, &#x27;杭州市&#x27;, 1192),<br>       (&#x27;浙江省&#x27;, &#x27;宁波市&#x27;, 723),<br>       (&#x27;浙江省&#x27;, &#x27;嘉兴市&#x27;, 814),<br>       (&#x27;浙江省&#x27;, &#x27;金华市&#x27;, 514);<br></code></pre></div></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs plsql">-- 城市GDP信息表<br>create table city_gdp<br>(<br>    id       int not null primary key auto_increment,<br>    province varchar(50),<br>    city     varchar(50),<br>    gdp      decimal(10, 2)<br>) default charset = utf8mb4 auto_increment = 1;<br><br>-- 数据<br>insert into city_gdp(province, city, gdp)<br>values (&#x27;广东省&#x27;, &#x27;广州市&#x27;, 1234.88),<br>       (&#x27;广东省&#x27;, &#x27;深圳市&#x27;, 1333.23),<br>       (&#x27;广东省&#x27;, &#x27;东莞市&#x27;, 903.11),<br>       (&#x27;广东省&#x27;, &#x27;佛山市&#x27;, 903.11),<br>       (&#x27;广东省&#x27;, &#x27;惠州市&#x27;, 793.10),<br>       (&#x27;福建省&#x27;, &#x27;福州市&#x27;, 1088.20),<br>       (&#x27;福建省&#x27;, &#x27;厦门市&#x27;, 928.55),<br>       (&#x27;浙江省&#x27;, &#x27;杭州市&#x27;, 1192.12),<br>       (&#x27;浙江省&#x27;, &#x27;宁波市&#x27;, 723.54),<br>       (&#x27;浙江省&#x27;, &#x27;嘉兴市&#x27;, 814.84),<br>       (&#x27;浙江省&#x27;, &#x27;金华市&#x27;, 514.23);<br></code></pre></div></td></tr></table></figure>
 <ol>
 <li><p>按照省份分组，获取省份内城市GDP排行</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">select province,<br>       city,<br>       gdp,<br>       row_number() over (partition by province order by gdp desc, id) as res<br>from city_gdp;<br></code></pre></div></td></tr></table></figure>
