@@ -280,7 +280,7 @@
 <li>Stream不改变源对象，会返回一个新的Stream</li>
 <li>代码书写干净、简洁、高效</li>
 </ul>
-<h2 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h2><p><img src="C:\Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164011707.png"></p>
+<h2 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h2><p><img src="/2022/03/14/javase-stream/Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164011707.png"></p>
 <ol>
 <li><p>创建Stream</p>
 <p>一个数据源，如集合、数组，获取一个流</p>
@@ -293,7 +293,7 @@
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">test</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-keyword">int</span>[] ints = <span class="hljs-keyword">new</span> <span class="hljs-keyword">int</span>[]&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>&#125;;<br>    IntStream stream = Arrays.stream(ints);<br>    stream.forEach(System.out::println);<br>    stream.forEach(System.out::println);<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
 </ol>
 <p>报错</p>
-<p><img src="C:\Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164028214.png"></p>
+<p><img src="/2022/03/14/javase-stream/Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164028214.png"></p>
 <h2 id="Stream的创建"><a href="#Stream的创建" class="headerlink" title="Stream的创建"></a>Stream的创建</h2><ol>
 <li><p>通过集合创建</p>
 </li>
@@ -319,7 +319,7 @@
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">test</span><span class="hljs-params">()</span> </span>&#123;<br>    List&lt;Person&gt; list = initList();<br>    Stream&lt;Person&gt; stream = list.stream()<br>        .distinct()<br>        .filter(p -&gt; p.getAge() &gt; <span class="hljs-number">10</span>)<br>        .skip(<span class="hljs-number">2</span>)<br>        .limit(<span class="hljs-number">5</span>);<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
 
 <h3 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h3><ol>
-<li>Stream<T> peek(Consumer&lt;? super T&gt; action); 对流中元素进行操作</li>
+<li>Stream<T> peek(Consumer&lt;? super T&gt; action); 对流中元素进行操作</T></li>
 </ol>
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">test11</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-keyword">int</span>[] rank = &#123;<span class="hljs-number">1</span>&#125;;<br>    List&lt;Person&gt; list = initList();<br>    Stream&lt;Person&gt; stream = list.stream()<br>        .peek(p -&gt; p.setRank(rank[<span class="hljs-number">0</span>]++));	<span class="hljs-comment">// 设置排名</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
 

@@ -273,7 +273,7 @@
             
             <div class="markdown-body">
               <p>前两天开发过程中遇到了读写不一致的情况，无奈只能叫公司大佬帮忙解决，事后复个盘，希望以后能自己解决这类问题（假装自己有操作数据库的权限…）                                                                                                                                                                                                                                                                                                 </p>
-<h2 id="公司的DB结构"><a href="#公司的DB结构" class="headerlink" title="公司的DB结构"></a>公司的DB结构</h2><p><img src="C:\Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164408364.png"> </p>
+<h2 id="公司的DB结构"><a href="#公司的DB结构" class="headerlink" title="公司的DB结构"></a>公司的DB结构</h2><p><img src="/2022/01/10/mysql-master-slave-out-of-syn/Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164408364.png"> </p>
 <h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><ol>
 <li><p>写库：192.168.8.128；读库：192.168.8.130</p>
 </li>
@@ -290,7 +290,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">mysql&gt; alter table db1.tb1 add `COL2` VARCHAR(20) NOT NULL;<br>Query OK, 0 rows affected (0.02 sec)<br>Records: 0  Duplicates: 0  Warnings: 0<br><br>mysql&gt; alter table db1.tb1 add `COL3` VARCHAR(20) NOT NULL;<br>Query OK, 0 rows affected (0.01 sec)<br>Records: 0  Duplicates: 0  Warnings: 0<br></code></pre></div></td></tr></table></figure>
 
 <p>从库查看状态</p>
-<p><img src="C:\Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164416232.png"></p>
+<p><img src="/2022/01/10/mysql-master-slave-out-of-syn/Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164416232.png"></p>
 <h2 id="问题解决——方案1"><a href="#问题解决——方案1" class="headerlink" title="问题解决——方案1"></a>问题解决——方案1</h2><ol>
 <li><p>读库先停止读写同步</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">mysql&gt; stop slave;<br>Query OK, 0 rows affected (0.00 sec)<br></code></pre></div></td></tr></table></figure></li>
