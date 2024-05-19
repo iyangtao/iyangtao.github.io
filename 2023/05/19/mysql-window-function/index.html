@@ -307,52 +307,52 @@
 <li><p>按照省份分组，获取省份内城市GDP排行</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">select province,<br>       city,<br>       gdp,<br>       row_number() over (partition by province order by gdp desc, id) as res<br>from city_gdp;<br></code></pre></div></td></tr></table></figure>
 
-<p><img src="/2023/05/19/mysql-window-function/Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164432029.png"></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20240519181124146.png"></p>
 </li>
 <li><p>按照省份分组，获取省份内城市GDP排位信息</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">select province,<br>       city,<br>       gdp,<br>       rank() over (partition by province order by gdp desc) as res<br>from city_gdp;<br></code></pre></div></td></tr></table></figure>
 
-<p><img src="/2023/05/19/mysql-window-function/Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164438722.png"></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20240519181130998.png"></p>
 </li>
 <li><p>按照省份分组，获取省份内城市GDP排位信息</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">select province,<br>       city,<br>       gdp,<br>       dense_rank() over (partition by province order by gdp desc) as res<br>from city_gdp;<br></code></pre></div></td></tr></table></figure>
 
-<p><img src="/2023/05/19/mysql-window-function/Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164446272.png"></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20240519181136221.png"></p>
 </li>
 <li><p>按照省份分组，获取等级值百分比</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">select province,<br>       city,<br>       gdp,<br>       rank() over (partition by province order by gdp desc)         as res_,<br>       percent_rank() over (partition by province order by gdp desc) as res<br>from city_gdp;<br></code></pre></div></td></tr></table></figure>
 
-<p><img src="/2023/05/19/mysql-window-function/Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164453682.png"></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20240519181140962.png"></p>
 </li>
 <li><p>按照省份分组，查询GDP大于等于当前城市的城市比例</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">select province,<br>       city,<br>       gdp,<br>       cume_dist() over (partition by province order by gdp desc) as res<br>from city_gdp;<br></code></pre></div></td></tr></table></figure>
 
-<p><img src="/2023/05/19/mysql-window-function/Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164503490.png"></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20240519181145198.png"></p>
 </li>
 <li><p>按照省份分组，获取GDP在本城市前一位的城市GDP</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">select province,<br>       city,<br>       gdp,<br>       lag(gdp, 1) over (partition by province order by gdp desc) as res<br>from city_gdp;<br></code></pre></div></td></tr></table></figure>
 
-<p><img src="/2023/05/19/mysql-window-function/Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164511344.png"></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20240519181150379.png"></p>
 </li>
 <li><p>按照省份分组，获取GDP在本城市后一位的城市GDP</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">select province,<br>       city,<br>       gdp,<br>       lead(gdp, 1) over (partition by province order by gdp desc) as res<br>from city_gdp;<br></code></pre></div></td></tr></table></figure>
 
-<p><img src="/2023/05/19/mysql-window-function/Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164519167.png"></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20240519181154415.png"></p>
 </li>
 <li><p>按照省份分组，获取与GDP排名第一的城市GDP差值</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">select province,<br>       city,<br>       gdp,<br>       first_value(gdp) over (partition by province order by gdp desc) - gdp as res<br>from city_gdp;<br></code></pre></div></td></tr></table></figure>
 
-<p><img src="/2023/05/19/mysql-window-function/Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164529094.png"></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20240519181200176.png"></p>
 </li>
 <li><p>按照省份分组，获取排名第2的城市GDP</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">select province,<br>       city,<br>       gdp,<br>       nth_value(gdp, 2) over (partition by province order by gdp desc) as res<br>from city_gdp;<br></code></pre></div></td></tr></table></figure>
 
-<p><img src="/2023/05/19/mysql-window-function/Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164537417.png"></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20240519181204198.png"></p>
 </li>
 <li><p>按照省份分组，将城市按GDP大小平均划为3个梯度</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">select province,<br>       city,<br>       gdp,<br>       ntile(3) over (partition by province order by gdp desc) as res<br>from city_gdp;<br></code></pre></div></td></tr></table></figure>
 
-<p><img src="/2023/05/19/mysql-window-function/Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164553836.png"></p>
+<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20240519181208729.png"></p>
 </li>
 </ol>
 <center>【END】</center>
