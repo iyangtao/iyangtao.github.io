@@ -20,7 +20,7 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="MySQL窗口函数">
 <meta property="og:url" content="http://example.com/2023/05/19/mysql-window-function/index.html">
-<meta property="og:site_name" content="Programmer Yangtao">
+<meta property="og:site_name" content="Yangtao&#39;s space">
 <meta property="og:description" content="MySQL从8.0版本开始，引入了窗口函数，一行或多行的值可以为每一行提供一个值，作为对比的是聚合函数（聚合函数的分组会将分组结果聚合成一条记录）">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/img/BlogIndexImg/window-function.png">
@@ -32,7 +32,7 @@
 <meta name="twitter:image" content="http://example.com/img/BlogIndexImg/window-function.png">
   
   
-  <title>MySQL窗口函数 - Programmer Yangtao</title>
+  <title>MySQL窗口函数 - Yangtao&#39;s space</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
@@ -266,7 +266,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：18 分钟前
+                  本文最后更新于：1 年前
                 
               </p>
             
@@ -307,52 +307,52 @@
 <li><p>按照省份分组，获取省份内城市GDP排行</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">select province,<br>       city,<br>       gdp,<br>       row_number() over (partition by province order by gdp desc, id) as res<br>from city_gdp;<br></code></pre></div></td></tr></table></figure>
 
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20230519020211151.png"></p>
+<p><img src="C:\Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164432029.png"></p>
 </li>
 <li><p>按照省份分组，获取省份内城市GDP排位信息</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">select province,<br>       city,<br>       gdp,<br>       rank() over (partition by province order by gdp desc) as res<br>from city_gdp;<br></code></pre></div></td></tr></table></figure>
 
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20230519020233574.png"></p>
+<p><img src="C:\Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164438722.png"></p>
 </li>
 <li><p>按照省份分组，获取省份内城市GDP排位信息</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">select province,<br>       city,<br>       gdp,<br>       dense_rank() over (partition by province order by gdp desc) as res<br>from city_gdp;<br></code></pre></div></td></tr></table></figure>
 
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20230519020249183.png"></p>
+<p><img src="C:\Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164446272.png"></p>
 </li>
 <li><p>按照省份分组，获取等级值百分比</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">select province,<br>       city,<br>       gdp,<br>       rank() over (partition by province order by gdp desc)         as res_,<br>       percent_rank() over (partition by province order by gdp desc) as res<br>from city_gdp;<br></code></pre></div></td></tr></table></figure>
 
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20230519020332568.png"></p>
+<p><img src="C:\Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164453682.png"></p>
 </li>
 <li><p>按照省份分组，查询GDP大于等于当前城市的城市比例</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">select province,<br>       city,<br>       gdp,<br>       cume_dist() over (partition by province order by gdp desc) as res<br>from city_gdp;<br></code></pre></div></td></tr></table></figure>
 
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20230519020338434.png"></p>
+<p><img src="C:\Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164503490.png"></p>
 </li>
 <li><p>按照省份分组，获取GDP在本城市前一位的城市GDP</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">select province,<br>       city,<br>       gdp,<br>       lag(gdp, 1) over (partition by province order by gdp desc) as res<br>from city_gdp;<br></code></pre></div></td></tr></table></figure>
 
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20230519020345152.png"></p>
+<p><img src="C:\Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164511344.png"></p>
 </li>
 <li><p>按照省份分组，获取GDP在本城市后一位的城市GDP</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">select province,<br>       city,<br>       gdp,<br>       lead(gdp, 1) over (partition by province order by gdp desc) as res<br>from city_gdp;<br></code></pre></div></td></tr></table></figure>
 
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20230519020350490.png"></p>
+<p><img src="C:\Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164519167.png"></p>
 </li>
 <li><p>按照省份分组，获取与GDP排名第一的城市GDP差值</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">select province,<br>       city,<br>       gdp,<br>       first_value(gdp) over (partition by province order by gdp desc) - gdp as res<br>from city_gdp;<br></code></pre></div></td></tr></table></figure>
 
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20230519020356168.png"></p>
+<p><img src="C:\Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164529094.png"></p>
 </li>
 <li><p>按照省份分组，获取排名第2的城市GDP</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">select province,<br>       city,<br>       gdp,<br>       nth_value(gdp, 2) over (partition by province order by gdp desc) as res<br>from city_gdp;<br></code></pre></div></td></tr></table></figure>
 
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20230519020401523.png"></p>
+<p><img src="C:\Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164537417.png"></p>
 </li>
 <li><p>按照省份分组，将城市按GDP大小平均划为3个梯度</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">select province,<br>       city,<br>       gdp,<br>       ntile(3) over (partition by province order by gdp desc) as res<br>from city_gdp;<br></code></pre></div></td></tr></table></figure>
 
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20230519020406370.png"></p>
+<p><img src="C:\Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164553836.png"></p>
 </li>
 </ol>
 <center>【END】</center>
@@ -390,12 +390,18 @@
                   <article class="post-prev col-6">
                     
                     
+                      <a href="/2024/05/19/mysql-commands/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
                   </article>
                   <article class="post-next col-6">
                     
                     
                       <a href="/2023/04/09/javase-bigdecimal/">
-                        <span class="hidden-mobile">金额计算一定要用BigDecimal</span>
+                        <span class="hidden-mobile">BigDecimal</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

@@ -20,20 +20,20 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="MySQL读写不同步解决">
 <meta property="og:url" content="http://example.com/2022/01/10/mysql-master-slave-out-of-syn/index.html">
-<meta property="og:site_name" content="Programmer Yangtao">
+<meta property="og:site_name" content="Yangtao&#39;s space">
 <meta property="og:description" content="前两天开发过程中遇到了读写不一致的情况，无奈只能叫公司大佬帮忙解决，事后复个盘，希望以后能自己解决这类问题（假装自己有操作数据库的权限…）">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/img/BlogIndexImg/MySQL.png">
 <meta property="article:published_time" content="2022-01-10T12:22:11.000Z">
 <meta property="article:modified_time" content="2022-01-10T12:22:11.000Z">
 <meta property="article:author" content="Yangtao">
-<meta property="article:tag" content="问题复盘">
 <meta property="article:tag" content="MySQL">
+<meta property="article:tag" content="问题复盘">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://example.com/img/BlogIndexImg/MySQL.png">
   
   
-  <title>MySQL读写不同步解决 - Programmer Yangtao</title>
+  <title>MySQL读写不同步解决 - Yangtao&#39;s space</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
@@ -267,13 +267,13 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：1 年前
+                  本文最后更新于：2 年前
                 
               </p>
             
             <div class="markdown-body">
               <p>前两天开发过程中遇到了读写不一致的情况，无奈只能叫公司大佬帮忙解决，事后复个盘，希望以后能自己解决这类问题（假装自己有操作数据库的权限…）                                                                                                                                                                                                                                                                                                 </p>
-<h2 id="公司的DB结构"><a href="#公司的DB结构" class="headerlink" title="公司的DB结构"></a>公司的DB结构</h2><p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405165409103.png"> </p>
+<h2 id="公司的DB结构"><a href="#公司的DB结构" class="headerlink" title="公司的DB结构"></a>公司的DB结构</h2><p><img src="C:\Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164408364.png"> </p>
 <h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><ol>
 <li><p>写库：192.168.8.128；读库：192.168.8.130</p>
 </li>
@@ -290,7 +290,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">mysql&gt; alter table db1.tb1 add `COL2` VARCHAR(20) NOT NULL;<br>Query OK, 0 rows affected (0.02 sec)<br>Records: 0  Duplicates: 0  Warnings: 0<br><br>mysql&gt; alter table db1.tb1 add `COL3` VARCHAR(20) NOT NULL;<br>Query OK, 0 rows affected (0.01 sec)<br>Records: 0  Duplicates: 0  Warnings: 0<br></code></pre></div></td></tr></table></figure>
 
 <p>从库查看状态</p>
-<p><img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20220405165415206.png"></p>
+<p><img src="C:\Users\yangtao\OneDrive\Blog-Hexo-Github\source_posts\assets\image-20240519164416232.png"></p>
 <h2 id="问题解决——方案1"><a href="#问题解决——方案1" class="headerlink" title="问题解决——方案1"></a>问题解决——方案1</h2><ol>
 <li><p>读库先停止读写同步</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">mysql&gt; stop slave;<br>Query OK, 0 rows affected (0.00 sec)<br></code></pre></div></td></tr></table></figure></li>
@@ -340,9 +340,9 @@
                   <div class="post-meta">
                     <i class="iconfont icon-tags"></i>
                     
-                      <a class="hover-with-bg" href="/tags/%E9%97%AE%E9%A2%98%E5%A4%8D%E7%9B%98/">问题复盘</a>
-                    
                       <a class="hover-with-bg" href="/tags/MySQL/">MySQL</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E9%97%AE%E9%A2%98%E5%A4%8D%E7%9B%98/">问题复盘</a>
                     
                   </div>
                 
@@ -359,21 +359,15 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2022/01/15/javase-arraylist-delete-element-problem/">
+                      <a href="/2022/02/07/vue-learning-about-nexttick/">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">关于ArrayList循环删除元素的坑</span>
+                        <span class="hidden-mobile">简单了解Vue.nextTick</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
                   </article>
                   <article class="post-next col-6">
                     
-                    
-                      <a href="/2022/01/08/blog-personal-blog-build-power-by-hexo/">
-                        <span class="hidden-mobile">基于Hexo+GitHub的博客搭建</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
                     
                   </article>
                 </div>
