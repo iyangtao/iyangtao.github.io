@@ -18,21 +18,22 @@
   
     <meta name="description" content="故宫博物院 游玩时间：2024-05-30 08:30:00~14:00:00  路线图   景点须知  购票方式：微信小程序“故宫博物院” 放票时间：每日20:00放票，可提前7天购票 开放时间：08:30在午门开始检票、旺季（4.1-10.31）16:00 &#x2F; 淡季（11.1-3.31）停止检票、17:00闭馆，非节假日每周一闭馆 物品寄存、退票见故宫博物院参观须知 - 故宫博物院 (dpm.">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Yangtao&#39;s space">
-<meta property="og:url" content="http://example.com/2024/05/30/peking-day1/index.html">
+<meta property="og:title" content="MySQL读写不同步解决">
+<meta property="og:url" content="http://example.com/2022/01/10/peking-day1/index.html">
 <meta property="og:site_name" content="Yangtao&#39;s space">
 <meta property="og:description" content="故宫博物院 游玩时间：2024-05-30 08:30:00~14:00:00  路线图   景点须知  购票方式：微信小程序“故宫博物院” 放票时间：每日20:00放票，可提前7天购票 开放时间：08:30在午门开始检票、旺季（4.1-10.31）16:00 &#x2F; 淡季（11.1-3.31）停止检票、17:00闭馆，非节假日每周一闭馆 物品寄存、退票见故宫博物院参观须知 - 故宫博物院 (dpm.">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20240530233405487.png">
-<meta property="og:image" content="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20240530234047467.png">
-<meta property="article:published_time" content="2024-05-30T10:23:11.799Z">
-<meta property="article:modified_time" content="2024-05-30T15:44:45.000Z">
+<meta property="og:image" content="http://example.com/img/BlogIndexImg/MySQL.png">
+<meta property="article:published_time" content="2022-01-10T12:22:11.000Z">
+<meta property="article:modified_time" content="2022-01-10T12:22:11.000Z">
 <meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="MySQL">
+<meta property="article:tag" content="问题复盘">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/image-20240530233405487.png">
+<meta name="twitter:image" content="http://example.com/img/BlogIndexImg/MySQL.png">
   
   
-  <title>Yangtao&#39;s space</title>
+  <title>MySQL读写不同步解决 - Yangtao&#39;s space</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
@@ -185,12 +186,12 @@
 </nav>
 
     <div class="banner" id="banner" parallax=true
-         style="background: url('/img/BannerImg/%E6%B5%B7%E7%8E%8B%E6%98%9F.jpg') no-repeat center center;
+         style="background: url('/img/BlogBannerImg/MySQL_logo.jpg') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="">
+            <span class="h2" id="subtitle" title="MySQL读写不同步解决">
               
             </span>
 
@@ -205,8 +206,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2024-05-30 18:23" pubdate>
-        2024年5月30日 晚上
+      <time datetime="2022-01-10 20:22" pubdate>
+        2022年1月10日 晚上
       </time>
     </span>
   
@@ -262,11 +263,11 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none"></h1>
+            <h1 style="display: none">MySQL读写不同步解决</h1>
             
               <p class="note note-info">
                 
-                  本文最后更新于：6 天前
+                  本文最后更新于：2 年前
                 
               </p>
             
@@ -322,6 +323,22 @@
             <div>
               <div class="post-metas mb-3">
                 
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E9%97%AE%E9%A2%98%E5%A4%8D%E7%9B%98/">问题复盘</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/MySQL/">MySQL</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E9%97%AE%E9%A2%98%E5%A4%8D%E7%9B%98/">问题复盘</a>
+                    
+                  </div>
                 
               </div>
               
@@ -331,23 +348,6 @@
                   
                 </p>
               
-              
-                <div class="post-prevnext">
-                  <article class="post-prev col-6">
-                    
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2024/05/26/mysql-window-function/">
-                        <span class="hidden-mobile">MySQL窗口函数</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
               
             </div>
 
