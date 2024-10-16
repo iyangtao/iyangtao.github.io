@@ -1,0 +1,924 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="一名普通的Java程序猿">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Yangtao&#39;s space">
+<meta property="og:url" content="http://example.com/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="一名普通的Java程序猿">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="Yangtao">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 100vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/BannerImg/%E6%B5%B7%E7%8E%8B%E6%98%9F2.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="一名普通的Java程序猿">
+              
+            </span>
+
+            
+          </div>
+
+          
+            <div class="scroll-down-bar">
+              <i class="iconfont icon-arrowdown"></i>
+            </div>
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      <div class="container nopadding-x-md">
+        <div class="py-5" id="board"
+          style=margin-top:0>
+          
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-md-10 m-auto">
+                
+
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/10/17/springdoc-javadoc/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/springdoc-openapi.webp" alt="Springdoc——根据JavaDoc生成接口文档">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/10/17/springdoc-javadoc/" target="_blank">
+          Springdoc——根据JavaDoc生成接口文档
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/10/17/springdoc-javadoc/" target="_blank">
+          
+          在现代应用程序开发中，API文档是非常重要的一部分，它不仅帮助开发者更好地理解接口的使用，也有助于跨团队协作。本文将介绍如何使用Springdoc自动地、无侵入地生成基于Javadoc的API文档，帮助你在开发中更简单地维护API文档。
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-10-17 03:29" pubdate>
+              2024-10-17
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Springdoc/">Springdoc</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Springdoc/">Springdoc</a>
+            
+              <a href="/tags/OpenAPI%EF%BC%8C%E9%A1%B9%E7%9B%AE%E5%8D%8F%E4%BD%9C/">OpenAPI，项目协作</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/09/23/spring-application-web/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/spring-application-web.webp" alt="Spring-ApplicationContext-Web">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/09/23/spring-application-web/" target="_blank">
+          Spring-ApplicationContext-Web
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/09/23/spring-application-web/" target="_blank">
+          
+          我们将以常见的Web应用开发对ApplicationContext进行展开，本篇文章将初步介绍Spring Boot提供了构建两种主要Web应用模型的能力：传统的基于Servlet的模型和新兴的基于响应式编程的模型。本文将探索这两种模型的特点、适用场景以及对应的类图。
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-09-23 23:44" pubdate>
+              2024-09-23
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Spring/">Spring</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Spring/">Spring</a>
+            
+              <a href="/tags/SpringBoot/">SpringBoot</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/09/18/spring-application-context-interface/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/spring-application-context-banner.webp" alt="Spring-ApplicationContext初认识">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/09/18/spring-application-context-interface/" target="_blank">
+          Spring-ApplicationContext初认识
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/09/18/spring-application-context-interface/" target="_blank">
+          
+          Spring的ApplicationContext提供了一个功能丰富的环境。本文将对ApplicationContext做一个初步的介绍，主要是对其实现的接口做一个详细说明。
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-09-18 01:13" pubdate>
+              2024-09-18
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Spring/">Spring</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Spring/">Spring</a>
+            
+              <a href="/tags/SpringBoot/">SpringBoot</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/08/13/alg-fast-exponentiation/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/fast-exponentiation.png" alt="快速幂运算">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/08/13/alg-fast-exponentiation/" target="_blank">
+          快速幂运算
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/08/13/alg-fast-exponentiation/" target="_blank">
+          
+          在计算机科学和数值计算中，快速幂运算是一种非常高效的算法，用于计算幂运算an，尤其是当n非常大时。传统的幂运算方法通过连续乘法实现，时间复杂度为O(n)。然而，快速幂算法通过减少乘法的次数，将时间复杂度降低到O(log⁡ n)，显著提高了计算效率。本文详细介绍了快速幂算法的原理、实现方法及其在取模运算中的应用。 基础算法快速幂算法的核心是“倍增法”，也就是连续平方。例如，计算a64可以通过以下步骤
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-08-13 22:54" pubdate>
+              2024-08-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E7%AE%97%E6%B3%95/">算法</a>
+            
+              <a href="/tags/%E5%B9%82%E8%BF%90%E7%AE%97/">幂运算</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/08/11/alg-binary-search/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/cover-binary-search.jpg" alt="二分查找">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/08/11/alg-binary-search/" target="_blank">
+          二分查找
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/08/11/alg-binary-search/" target="_blank">
+          
+          二分查找是计算机科学中一种基本而强大的算法，它允许在对数时间内快速查找有序集合中的元素。这种方法通过不断将搜索区间分成两半来快速定位目标值，广泛应用于算法竞赛和软件开发中，接下来本文将对二分查找进行详细的介绍。
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-08-11 23:45" pubdate>
+              2024-08-11
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E7%AE%97%E6%B3%95/">算法</a>
+            
+              <a href="/tags/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE/">二分查找</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/07/15/spring-cache/" target="_blank">
+          <img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/spring-cache.webp" alt="Spring Cache">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/07/15/spring-cache/" target="_blank">
+          Spring Cache
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/07/15/spring-cache/" target="_blank">
+          
+          Spring Cache是Spring Framework中提供的缓存抽象机制，它允许开发者通过注解或XML配置简化缓存的使用。Spring Cache支持多种缓存实现，包括Ehcache、Caffeine、Redis、Guava等。下面将对Spring Cache展开详细的介绍。
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-07-15 22:58" pubdate>
+              2024-07-15
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Spring/">Spring</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Spring/">Spring</a>
+            
+              <a href="/tags/SpringBoot/">SpringBoot</a>
+            
+              <a href="/tags/%E7%BC%93%E5%AD%98/">缓存</a>
+            
+              <a href="/tags/%E6%80%A7%E8%83%BD/">性能</a>
+            
+              <a href="/tags/Spring-Cache/">Spring Cache</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/05/26/mysql-window-function/" target="_blank">
+          <img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/mysql-windows-function.webp" alt="MySQL窗口函数">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/05/26/mysql-window-function/" target="_blank">
+          MySQL窗口函数
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/05/26/mysql-window-function/" target="_blank">
+          
+          引言随着数据分析需求的增加，数据库查询的复杂性也随之提高。MySQL从8.0版本引入的窗口函数，为数据分析提供了更多的灵活性和强大的数据处理能力。窗口函数使得在单个查询中执行多种计算成为可能，大大增强了SQL的表达力。
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-05-26 15:00" pubdate>
+              2024-05-26
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/MySQL/">MySQL</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/MySQL/">MySQL</a>
+            
+              <a href="/tags/MySQL8/">MySQL8</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/05/25/javase-threadlocal/" target="_blank">
+          <img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/threadlocal.webp" alt="ThreadLocal详解">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/05/25/javase-threadlocal/" target="_blank">
+          ThreadLocal详解
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/05/25/javase-threadlocal/" target="_blank">
+          
+          引言在多线程编程中，确保线程安全是至关重要的。Java提供了多种机制来处理线程间的数据隔离，其中ThreadLocal是一个非常强大的工具，它可以为每个使用该变量的线程提供一个独立的变量副本。这意味着每个线程都可以在不影响其他线程的情况下，修改自己的副本。这种方式特别适用于管理会话信息、用户ID、事务ID等线程敏感的数据。
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-05-25 02:59" pubdate>
+              2024-05-25
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B/">Java多线程</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B/">Java多线程</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2022/04/22/docker-commands/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/docker-default-meta-image-1110x583.png" alt="Docker基础命令">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/04/22/docker-commands/" target="_blank">
+          Docker基础命令
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2022/04/22/docker-commands/" target="_blank">
+          
+          随着容器化技术的兴起，Docker已成为现代软件开发和部署的核心工具之一。Docker提供了一种高效的方式来打包、分发和运行应用，无论是在本地开发环境还是在复杂的生产环境中。本文将介绍Docker的基本命令，帮助新用户快速掌握如何使用Docker来创建和管理容器。
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-04-22 20:12" pubdate>
+              2022-04-22
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Docker/">Docker</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Docker/">Docker</a>
+            
+              <a href="/tags/%E5%AE%B9%E5%99%A8/">容器</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2022/04/21/git-commands/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/git-blog-header_1.png" alt="Git基础命令">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/04/21/git-commands/" target="_blank">
+          Git基础命令
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2022/04/21/git-commands/" target="_blank">
+          
+          在现代软件开发中，版本控制系统是不可或缺的工具，它帮助团队高效地管理源代码的变更和历史。Git，作为一个分布式版本控制系统，因其强大的分支管理和灵活的远程协作能力而广受欢迎。本文汇总了Git的常用命令和操作，旨在帮助开发者快速掌握Git的核心功能，无论是进行日常的代码提交、版本回退、还是进行复杂的分支操作和协作。
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-04-21 21:52" pubdate>
+              2022-04-21
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Docker/">Docker</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Docker/">Docker</a>
+            
+              <a href="/tags/%E5%AE%B9%E5%99%A8/">容器</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+
+
+  <nav aria-label="navigation">
+    <span class="pagination" id="pagination">
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/#board">2</a><a class="extend next" rel="next" href="/page/2/#board"><i class="iconfont icon-arrowright"></i></a>
+    </span>
+  </nav>
+
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
