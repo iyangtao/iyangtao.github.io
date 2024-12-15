@@ -203,6 +203,118 @@
     
     
       <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/12/15/redis-distributed-lock-usage/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png" alt="Redis——Redisson分布式锁">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/12/15/redis-distributed-lock-usage/" target="_blank">
+          Redis——Redisson分布式锁
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/12/15/redis-distributed-lock-usage/" target="_blank">
+          
+          前言前面我们基于Redis实现的分布式锁能处理最基本的互斥，但还有许多的功能没有实现，如可重入、可重试、自旋等，在企业开发环境下，通常会引入Redisson这个成熟的框架来完善这些功能。本文将详细介绍Redisson的分布式锁功能，包括不同类型的锁的特性、应用场景以及如何在Spring Boot项目中实现和配置这些锁。 Redisson分布式锁支持Redisson是一个在Java环境下使用Redi
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-12-15 22:58" pubdate>
+              2024-12-15
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Redis/">Redis</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Redis/">Redis</a>
+            
+              <a href="/tags/NoSQL/">NoSQL</a>
+            
+              <a href="/tags/Redisson/">Redisson</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/12/13/redis-distributed-lock/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png" alt="Redis——分布式锁">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/12/13/redis-distributed-lock/" target="_blank">
+          Redis——分布式锁
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/12/13/redis-distributed-lock/" target="_blank">
+          
+          引言在分布式系统中，管理并发访问共享资源是一个挑战，需要确保系统的一致性和可靠性。分布式锁提供了一种机制，通过锁定资源来控制跨多个节点的并发访问。Redis，作为高性能的NoSQL数据库，由于其内存操作的特性和灵活的数据结构，被广泛用于实现分布式锁。本文详细介绍了分布式锁的概念、设计原则、实现方式，以及如何利用Redis和Lua脚本来实现高效且安全的分布式锁。 分布式锁简介分布式锁是一种在分布式系
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-12-13 22:15" pubdate>
+              2024-12-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Redis/">Redis</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Redis/">Redis</a>
+            
+              <a href="/tags/NoSQL/">NoSQL</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2024/12/04/redis-base/" target="_blank">
           <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png" alt="Redis——基础篇">
         </a>
@@ -638,112 +750,6 @@
               <a href="/tags/MySQL/">MySQL</a>
             
               <a href="/tags/MySQL8/">MySQL8</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-      <div class="col-12 col-md-4 m-auto index-img">
-        <a href="/2024/05/25/javase-threadlocal/" target="_blank">
-          <img src="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/threadlocal.webp" alt="ThreadLocal详解">
-        </a>
-      </div>
-    
-    <article class="col-12 col-md-8 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2024/05/25/javase-threadlocal/" target="_blank">
-          ThreadLocal详解
-        </a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/2024/05/25/javase-threadlocal/" target="_blank">
-          
-          引言在多线程编程中，确保线程安全是至关重要的。Java提供了多种机制来处理线程间的数据隔离，其中ThreadLocal是一个非常强大的工具，它可以为每个使用该变量的线程提供一个独立的变量副本。这意味着每个线程都可以在不影响其他线程的情况下，修改自己的副本。这种方式特别适用于管理会话信息、用户ID、事务ID等线程敏感的数据。
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-05-25 02:59" pubdate>
-              2024-05-25
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/categories/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B/">Java多线程</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B/">Java多线程</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-      <div class="col-12 col-md-4 m-auto index-img">
-        <a href="/2022/08/07/mybatis-spring-boot/" target="_blank">
-          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/mybatis.jpg" alt="Spring Boot整合MyBatis">
-        </a>
-      </div>
-    
-    <article class="col-12 col-md-8 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2022/08/07/mybatis-spring-boot/" target="_blank">
-          Spring Boot整合MyBatis
-        </a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/2022/08/07/mybatis-spring-boot/" target="_blank">
-          
-          引言随着微服务和容器化技术的普及，Spring Boot成为Java开发者首选的微服务框架之一，而MyBatis作为一个灵活且功能强大的持久层框架，其与Spring Boot的集成可以极大地提高数据库操作的效率和灵活性。本文将详细介绍如何在Spring Boot项目中集成MyBatis，从依赖管理到配置细节，每一步都旨在帮助开发者构建一个高效、可维护的应用。 引入依赖在Spring Boot项目中
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-08-07 22:51" pubdate>
-              2022-08-07
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/categories/MyBatis/">MyBatis</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/MyBatis/">MyBatis</a>
             
           </div>
         
