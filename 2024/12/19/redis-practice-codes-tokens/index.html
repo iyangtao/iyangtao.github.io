@@ -218,7 +218,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      8.7k 字
+      8.3k 字
     </span>
   
 
@@ -227,7 +227,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      15 分钟
+      14 分钟
     </span>
   
 
@@ -268,7 +268,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2 分钟前
+                  本文最后更新于：7 分钟前
                 
               </p>
             
@@ -284,31 +284,29 @@
 <li>将邮箱与验证码的对应关系存入Redis中，并设置一定的过期时间。</li>
 <li>异步地将验证码发送至对应的邮箱中，并进行日志记录与监控。</li>
 </ol>
-<h3 id="时序图"><a href="#时序图" class="headerlink" title="时序图"></a>时序图</h3><pre><code class=" mermaid">sequenceDiagram
+<h3 id="时序图"><a href="#时序图" class="headerlink" title="时序图"></a>时序图</h3><div class="hljs code-wrapper"><pre class="mermaid">sequenceDiagram
     participant 客户端
     participant 服务端
     participant Redis
     participant 邮件服务
     participant 日志系统
 
-    客户端-&gt;&gt;服务端: 提交邮箱
-    服务端-&gt;&gt;服务端: 校验邮箱合法性
+    客户端->>服务端: 提交邮箱
+    服务端->>服务端: 校验邮箱合法性
     alt 邮箱不合法
-        服务端-&gt;&gt;客户端: 提示重新输入
+        服务端->>客户端: 提示重新输入
     else 邮箱合法
-        服务端-&gt;&gt;Redis: 检查是否有未过期的验证码
+        服务端->>Redis: 检查是否有未过期的验证码
         alt 存在未过期的验证码
-            服务端-&gt;&gt;客户端: 提示勿频繁请求
+            服务端->>客户端: 提示勿频繁请求
         else 无未过期验证码
-            服务端-&gt;&gt;服务端: 生成验证码
-            服务端-&gt;&gt;Redis: 存储邮箱与验证码关系并设置过期时间
-            服务端-&gt;&gt;邮件服务: 异步发送验证码
-            服务端-&gt;&gt;日志系统: 记录日志与监控
-            服务端-&gt;&gt;客户端: 验证码发送成功提示
+            服务端->>服务端: 生成验证码
+            服务端->>Redis: 存储邮箱与验证码关系并设置过期时间
+            服务端->>邮件服务: 异步发送验证码
+            服务端->>日志系统: 记录日志与监控
+            服务端->>客户端: 验证码发送成功提示
         end
-    end
-
-</code></pre>
+    end</pre></div>
 
 <h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> RestResult <span class="hljs-title">sendEmailCode</span><span class="hljs-params">(String email)</span> </span>&#123;<br>    <span class="hljs-comment">// 校验邮箱合法性</span><br>    <span class="hljs-keyword">if</span> (RegexUtils.isEmailInvalid(email)) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;邮箱格式错误！&quot;</span>);<br>    &#125;<br>    <br>    <span class="hljs-comment">// 生成验证码</span><br>    String code = RandomUtil.randomNumbers(<span class="hljs-number">6</span>);<br>    <br>    <span class="hljs-comment">// 使用Redis的SETNX确保验证码判断存在与存储是原子操作</span><br>    Boolean isSet = stringRedisTemplate.opsForValue().setIfAbsent(LOGIN_CODE_KEY + email, code, LOGIN_CODE_TTL, TimeUnit.MINUTES);<br>    <span class="hljs-keyword">if</span> (Boolean.FALSE.equals(isSet)) &#123;<br>        <span class="hljs-comment">// 已存在且未过期</span><br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;请求频繁，请稍后再试！&quot;</span>);<br>    &#125;<br>    <br>    <span class="hljs-comment">// 发送邮件（异步）</span><br>    springMailUtil.sendSimpleEmail(email, <span class="hljs-string">&quot;验证码&quot;</span>, <span class="hljs-string">&quot;您的验证码是：&quot;</span> + code);<br>    <br>    <span class="hljs-keyword">return</span> RestResult.success();<br>&#125;<br></code></pre></div></td></tr></table></figure>
 
@@ -322,39 +320,37 @@
 <li>将校验通过地邮箱验证码对应关系进行删除，防止重复使用。</li>
 <li>返回Token至客户端。</li>
 </ol>
-<h3 id="时序图-1"><a href="#时序图-1" class="headerlink" title="时序图"></a>时序图</h3><pre><code class=" mermaid">sequenceDiagram
+<h3 id="时序图-1"><a href="#时序图-1" class="headerlink" title="时序图"></a>时序图</h3><div class="hljs code-wrapper"><pre class="mermaid">sequenceDiagram
     participant 客户端
     participant 服务端
     participant Redis
     participant 用户数据库
 
-    客户端-&gt;&gt;服务端: 提交邮箱和验证码
-    服务端-&gt;&gt;服务端: 校验邮箱合法性
+    客户端->>服务端: 提交邮箱和验证码
+    服务端->>服务端: 校验邮箱合法性
     alt 邮箱不合法
-        服务端-&gt;&gt;客户端: 提示重新输入
+        服务端->>客户端: 提示重新输入
     else 邮箱合法
-        服务端-&gt;&gt;Redis: 检查该邮箱的登录尝试次数
+        服务端->>Redis: 检查该邮箱的登录尝试次数
         alt 验证次数过多
-            服务端-&gt;&gt;客户端: 限制登录操作
+            服务端->>客户端: 限制登录操作
         else 验证次数正常
-            服务端-&gt;&gt;Redis: 校验邮箱与验证码的对应关系
+            服务端->>Redis: 校验邮箱与验证码的对应关系
             alt 校验失败
-                服务端-&gt;&gt;客户端: 提示重新输入
+                服务端->>客户端: 提示重新输入
             else 校验成功
-                服务端-&gt;&gt;用户数据库: 根据邮箱查找用户
+                服务端->>用户数据库: 根据邮箱查找用户
                 alt 用户不存在
-                    服务端-&gt;&gt;用户数据库: 创建新用户
+                    服务端->>用户数据库: 创建新用户
                 end
-                服务端-&gt;&gt;服务端: 生成Token
-                服务端-&gt;&gt;Redis: 存储Token与用户的对应关系并设置过期时间
-                服务端-&gt;&gt;Redis: 删除邮箱与验证码的对应关系
-                服务端-&gt;&gt;客户端: 返回Token
-                客户端-&gt;&gt;客户端: 本地存储Token值
+                服务端->>服务端: 生成Token
+                服务端->>Redis: 存储Token与用户的对应关系并设置过期时间
+                服务端->>Redis: 删除邮箱与验证码的对应关系
+                服务端->>客户端: 返回Token
+                客户端->>客户端: 本地存储Token值
             end
         end
-    end
-
-</code></pre>
+    end</pre></div>
 
 <h3 id="代码示例-1"><a href="#代码示例-1" class="headerlink" title="代码示例"></a>代码示例</h3><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> RestResult&lt;String&gt; <span class="hljs-title">emailLogin</span><span class="hljs-params">(String email, String code)</span> </span>&#123;<br>    <span class="hljs-comment">// 校验邮箱合法性</span><br>    <span class="hljs-keyword">if</span> (RegexUtils.isEmailInvalid(email)) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;邮箱格式错误&quot;</span>);<br>    &#125;<br>    <span class="hljs-comment">// 校验验证码合法性</span><br>    <span class="hljs-keyword">if</span> (code == <span class="hljs-keyword">null</span> || code.length() != <span class="hljs-number">6</span>) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;验证码错误&quot;</span>);<br>    &#125;<br>    <span class="hljs-comment">// 失败次数过多拦截</span><br>    String loginFailValue = stringRedisTemplate.opsForValue().get(LOGIN_FAIL_COUNT + email);<br>    <span class="hljs-keyword">if</span> (loginFailValue != <span class="hljs-keyword">null</span> &amp;&amp; Integer.parseInt(loginFailValue) &gt;= <span class="hljs-number">5</span>) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;请稍后再试！&quot;</span>);<br>    &#125;<br>    <span class="hljs-comment">// 校验验证码是否正确</span><br>    String cacheCode = stringRedisTemplate.opsForValue().get(LOGIN_CODE_KEY + email);<br>    <span class="hljs-keyword">if</span> (cacheCode == <span class="hljs-keyword">null</span>) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;验证码已过期&quot;</span>);<br>    &#125;<br>    <span class="hljs-keyword">if</span> (!code.equals(cacheCode)) &#123;<br>        stringRedisTemplate.opsForValue().increment(LOGIN_FAIL_COUNT + email);<br>        stringRedisTemplate.expire(LOGIN_FAIL_COUNT + email, <span class="hljs-number">5</span>, TimeUnit.MINUTES);<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;验证码错误&quot;</span>);<br>    &#125;<br>    <span class="hljs-comment">// 查找用户，不存在则新建</span><br>    User user = query().eq(<span class="hljs-string">&quot;email&quot;</span>, email).one();<br>    <span class="hljs-keyword">if</span> (user == <span class="hljs-keyword">null</span>) &#123;<br>        user = <span class="hljs-keyword">new</span> User();<br>        user.setEmail(email);<br>        user.setNickName(USER_NICK_NAME_PREFIX + RandomUtil.randomString(<span class="hljs-number">10</span>));<br>        save(user);<br>    &#125;<br>    <span class="hljs-comment">// 生成Token并将Token与用户对象的对应关系存入Redis中</span><br>    String token = UUID.randomUUID().toString(<span class="hljs-keyword">true</span>);<br>    UserDTO userDTO = BeanUtil.copyProperties(user, UserDTO.class);<br>    stringRedisTemplate.opsForHash().putAll(LOGIN_USER_KEY + token, BeanUtil.beanToMap(userDTO));<br>    <span class="hljs-comment">// 删除验证码，防止重复使用</span><br>    stringRedisTemplate.delete(LOGIN_CODE_KEY + email);<br>    <span class="hljs-comment">// 返回Token</span><br>    <span class="hljs-keyword">return</span> RestResult.successWithData(token);<br>&#125;<br></code></pre></div></td></tr></table></figure>
 
@@ -367,29 +363,27 @@
 <li>放行请求。</li>
 <li>注意请求处理结束以后需及时清理ThreadLocal中的用户数据，避免内存泄漏。</li>
 </ol>
-<h3 id="时序图-2"><a href="#时序图-2" class="headerlink" title="时序图"></a>时序图</h3><pre><code class=" mermaid">sequenceDiagram
+<h3 id="时序图-2"><a href="#时序图-2" class="headerlink" title="时序图"></a>时序图</h3><div class="hljs code-wrapper"><pre class="mermaid">sequenceDiagram
     participant 客户端
     participant 服务端
     participant Redis
 
-    客户端-&gt;&gt;服务端: 发送请求（带Token）
-    服务端-&gt;&gt;服务端: 拦截器获取请求头中的Token值
+    客户端->>服务端: 发送请求（带Token）
+    服务端->>服务端: 拦截器获取请求头中的Token值
     alt Token为空
-        服务端-&gt;&gt;客户端: 返回401响应
+        服务端->>客户端: 返回401响应
     else Token不为空
-        服务端-&gt;&gt;Redis: 根据Token从Redis获取用户对象
+        服务端->>Redis: 根据Token从Redis获取用户对象
         alt 用户对象为空
-            服务端-&gt;&gt;客户端: 返回401响应
+            服务端->>客户端: 返回401响应
         else 用户对象存在
-            服务端-&gt;&gt;服务端: 往ThreadLocal存入用户对象
-            服务端-&gt;&gt;Redis: 刷新Token的过期时间
-            服务端-&gt;&gt;服务端: 放行请求
-            服务端-&gt;&gt;服务端: 处理请求
-            服务端-&gt;&gt;服务端: 请求结束，清理ThreadLocal中的用户数据
+            服务端->>服务端: 往ThreadLocal存入用户对象
+            服务端->>Redis: 刷新Token的过期时间
+            服务端->>服务端: 放行请求
+            服务端->>服务端: 处理请求
+            服务端->>服务端: 请求结束，清理ThreadLocal中的用户数据
         end
-    end
-
-</code></pre>
+    end</pre></div>
 
 <h3 id="代码示例-2"><a href="#代码示例-2" class="headerlink" title="代码示例"></a>代码示例</h3><p>用户信息存取工具类</p>
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserHolder</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> ThreadLocal&lt;UserDTO&gt; tl = <span class="hljs-keyword">new</span> ThreadLocal&lt;&gt;();<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">saveUser</span><span class="hljs-params">(UserDTO user)</span></span>&#123;<br>        tl.set(user);<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> UserDTO <span class="hljs-title">getUser</span><span class="hljs-params">()</span></span>&#123;<br>        <span class="hljs-keyword">return</span> tl.get();<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">removeUser</span><span class="hljs-params">()</span></span>&#123;<br>        tl.remove();<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
@@ -412,23 +406,21 @@
 <li>Token的多设备支持，应根据业务要求决定是否允许单一Token多设备登录，或者为每个设备生成独立的Token。登出时，可以选择删除单个Token或所有相关Token。</li>
 <li>确保客户端在登出后，清理本地存储的Token，防止意外的会话恢复。</li>
 </ol>
-<h3 id="时序图-3"><a href="#时序图-3" class="headerlink" title="时序图"></a>时序图</h3><pre><code class=" mermaid">sequenceDiagram
+<h3 id="时序图-3"><a href="#时序图-3" class="headerlink" title="时序图"></a>时序图</h3><div class="hljs code-wrapper"><pre class="mermaid">sequenceDiagram
     participant 客户端
     participant 服务端
     participant Redis
 
-    客户端-&gt;&gt;服务端: 发送登出请求（带Token）
-    服务端-&gt;&gt;服务端: 获取请求头中的Token值
+    客户端->>服务端: 发送登出请求（带Token）
+    服务端->>服务端: 获取请求头中的Token值
     alt Token不合法
-        服务端-&gt;&gt;客户端: 返回错误信息
+        服务端->>客户端: 返回错误信息
     else Token合法
-        服务端-&gt;&gt;Redis: 删除Token对应的键值对数据
-        服务端-&gt;&gt;服务端: 删除ThreadLocal中的用户信息
-        服务端-&gt;&gt;客户端: 返回登出成功消息
-        客户端-&gt;&gt;客户端: 删除本地存取的Token值
-    end
-
-</code></pre>
+        服务端->>Redis: 删除Token对应的键值对数据
+        服务端->>服务端: 删除ThreadLocal中的用户信息
+        服务端->>客户端: 返回登出成功消息
+        客户端->>客户端: 删除本地存取的Token值
+    end</pre></div>
 
 <h3 id="代码示例-3"><a href="#代码示例-3" class="headerlink" title="代码示例"></a>代码示例</h3><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> RestResult&lt;String&gt; <span class="hljs-title">logout</span><span class="hljs-params">(HttpServletRequest request)</span> </span>&#123;<br>    <span class="hljs-comment">// 获取请求头中的Token值</span><br>    String token = request.getHeader(<span class="hljs-string">&quot;Authorization&quot;</span>);<br><br>    <span class="hljs-keyword">if</span> (token != <span class="hljs-keyword">null</span>) &#123;<br>        <span class="hljs-comment">// 删除Redis中Token对应的用户数据</span><br>        stringRedisTemplate.delete(LOGIN_USER_KEY + token);<br>        <span class="hljs-comment">// 清理ThreadLocal中的用户信息</span><br>        UserHolder.removeUser();<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-comment">// 如果Token为空，返回401 Unauthorized</span><br>        <span class="hljs-keyword">return</span> RestResult.fail(<span class="hljs-string">&quot;Token已过期或无效，请重新登录&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-keyword">return</span> RestResult.success(<span class="hljs-string">&quot;登出成功&quot;</span>);<br>&#125;<br></code></pre></div></td></tr></table></figure>
 
@@ -691,6 +683,13 @@
 
 
 
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize({"theme":"default"});
+    }
+  </script>
 
 
 
