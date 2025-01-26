@@ -16,12 +16,12 @@
   <meta name="author" content="Yangtao">
   <meta name="keywords" content="">
   
-    <meta name="description" content="引言并发编程的本质是如何安全、高效地管理多个线程对共享资源的访问。管程（Monitor），作为一种高层次的并发控制抽象，能够帮助我们在多线程环境中实现对共享资源的互斥访问与条件同步。Java 语言内建了管程机制，通过关键字 synchronized 以及 wait() &#x2F; notify() 等方法，让开发者能够自然地在代码层面封装共享数据的访问方式、保护临界区，降低并发编程的复杂度。本篇文章将基于">
+    <meta name="description" content="引言并发编程的本质是如何安全、高效地管理多个线程对共享资源的访问，而管程切好能够帮助我们在多线程环境中实现对共享资源的互斥访问与条件同步。Java 语言内建了管程机制，通过关键字 synchronized 以及 wait() &#x2F; notify() 等方法，让开发者能够自然地在代码层面封装共享数据的访问方式、保护临界区，降低并发编程的复杂度。本篇文章将基于管程这一概念，深入探讨其在 JVM 层级的实">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java并发编程——管程Monitor">
 <meta property="og:url" content="http://example.com/2021/08/05/javase-cp-monitor/index.html">
 <meta property="og:site_name" content="Yangtao&#39;s space">
-<meta property="og:description" content="引言并发编程的本质是如何安全、高效地管理多个线程对共享资源的访问。管程（Monitor），作为一种高层次的并发控制抽象，能够帮助我们在多线程环境中实现对共享资源的互斥访问与条件同步。Java 语言内建了管程机制，通过关键字 synchronized 以及 wait() &#x2F; notify() 等方法，让开发者能够自然地在代码层面封装共享数据的访问方式、保护临界区，降低并发编程的复杂度。本篇文章将基于">
+<meta property="og:description" content="引言并发编程的本质是如何安全、高效地管理多个线程对共享资源的访问，而管程切好能够帮助我们在多线程环境中实现对共享资源的互斥访问与条件同步。Java 语言内建了管程机制，通过关键字 synchronized 以及 wait() &#x2F; notify() 等方法，让开发者能够自然地在代码层面封装共享数据的访问方式、保护临界区，降低并发编程的复杂度。本篇文章将基于管程这一概念，深入探讨其在 JVM 层级的实">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/java-concurrency-programming-logo.png">
 <meta property="article:published_time" content="2021-08-04T17:17:11.000Z">
@@ -273,15 +273,15 @@
               </p>
             
             <div class="markdown-body">
-              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>并发编程的本质是如何安全、高效地管理多个线程对共享资源的访问。<strong>管程（Monitor）</strong>，作为一种高层次的并发控制抽象，能够帮助我们在多线程环境中实现对共享资源的互斥访问与条件同步。Java 语言内建了管程机制，通过关键字 <code>synchronized</code> 以及 <code>wait()</code> / <code>notify()</code> 等方法，让开发者能够自然地在代码层面封装共享数据的访问方式、保护临界区，降低并发编程的复杂度。本篇文章将基于管程这一概念，深入探讨其在 JVM 层级的实现细节与常见应用场景，同时结合示例剖析多线程间的经典问题及应对思路。</p>
-<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><strong>管程（Monitor）</strong>是一种高级并发控制机制，用于管理多个线程对共享资源的访问，保证线程之间的同步，避免数据竞争和状态不一致问题。Java语言通过内置锁和 <code>Object</code> 类的方法（如 <code>wait()</code>、<code>notify()</code>、<code>notifyAll()</code>）实现了管程的机制。</p>
-<h3 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h3><h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><ol>
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>并发编程的本质是如何安全、高效地管理多个线程对共享资源的访问，而管程切好能够帮助我们在多线程环境中实现对共享资源的互斥访问与条件同步。Java 语言内建了管程机制，通过关键字 <code>synchronized</code> 以及 <code>wait()</code> / <code>notify()</code> 等方法，让开发者能够自然地在代码层面封装共享数据的访问方式、保护临界区，降低并发编程的复杂度。本篇文章将基于管程这一概念，深入探讨其在 JVM 层级的实现细节与常见应用场景，同时结合示例剖析多线程间的经典问题及应对思路。</p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>管程（Monitor）是一种高级并发控制机制，用于管理多个线程对共享资源的访问，保证线程之间的同步，避免数据竞争和状态不一致问题。Java语言通过内置锁和 <code>Object</code> 类的方法（如 <code>wait()</code>、<code>notify()</code>、<code>notifyAll()</code>）实现了管程的机制。</p>
+<h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><ol>
 <li><strong>简化同步问题</strong>：管程封装了对共享资源的访问，使得线程之间的协调变得更加简单。使用 <code>synchronized</code> 或其他同步机制时，开发者无需显式地管理锁和线程的状态。</li>
 <li><strong>自动互斥</strong>：管程自动处理线程间的互斥，确保同一时刻只有一个线程可以执行管程内的方法，从而避免了竞态条件。</li>
 <li><strong>线程协调</strong>：管程通过条件变量（如 <code>wait()</code>、<code>notify()</code> 等）提供了线程间的协调机制，生产者和消费者等模式能够更加自然地实现。</li>
 <li><strong>高层次抽象</strong>：管程提供了对共享资源和同步机制的高层次抽象，开发者只需关注如何定义和操作共享资源，不需要关注底层的锁管理。</li>
 </ol>
-<h4 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h4><ol>
+<h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><ol>
 <li><strong>性能开销</strong>：由于管程的锁和同步机制，每次进入管程时都需要获取锁，操作完成后释放锁。这会带来一定的性能开销，尤其是当管程内的操作较为频繁时，性能可能受到影响。</li>
 <li><strong>缺乏灵活性</strong>：管程的实现较为抽象和封闭，可能不适用于所有场景。在一些复杂的并发控制情况下，可能需要更灵活的机制，如显式的锁（<code>ReentrantLock</code>）或其他并发控制策略。</li>
 <li><strong>容易出现假唤醒</strong>：在使用条件变量时，如果没有正确地检查条件，可能会遇到假唤醒的问题，导致线程被错误地唤醒并继续执行。这需要额外的逻辑判断来防止此类问题。</li>
@@ -294,7 +294,7 @@
 <li><strong>唤醒其他线程</strong>：当其他线程修改了共享资源的状态，可能会唤醒等待队列中的某些线程（调用 <code>notify()</code> 或 <code>notifyAll()</code>）。这些线程会重新竞争管程的锁，并继续执行。</li>
 <li><strong>退出和释放锁</strong>：当线程完成了它在管程中的工作后，它会释放锁，使得其他线程可以进入管程。释放锁后，线程会从管程退出。</li>
 </ol>
-<p>以<strong>生产者-消费者模型</strong>对管程的工作流程展开说明：</p>
+<p>以“生产者-消费者模型”对管程的工作流程展开说明：</p>
 <pre><code class=" mermaid">sequenceDiagram
     participant P as 生产者
     participant C as 消费者
@@ -327,7 +327,7 @@
 <li><strong>条件变量</strong>：用于线程之间的通信和协作，允许线程在特定条件下进入等待状态或被唤醒。</li>
 <li><strong>同步队列</strong>：线程在等待条件变量时会被加入到一个同步队列中，唤醒时会从队列中取出线程。</li>
 </ul>
-<h3 id="JVM-层级"><a href="#JVM-层级" class="headerlink" title="JVM 层级"></a>JVM 层级</h3><h4 id="对象头结构"><a href="#对象头结构" class="headerlink" title="对象头结构"></a>对象头结构</h4><p>Java 对象在内存中的布局包括<strong>对象头</strong>、<strong>实例数据</strong>和<strong>对齐填充</strong>。对象头中的 <code>Mark Word</code> 存储了锁的信息，包括：</p>
+<h3 id="JVM-层级"><a href="#JVM-层级" class="headerlink" title="JVM 层级"></a>JVM 层级</h3><h4 id="对象头结构"><a href="#对象头结构" class="headerlink" title="对象头结构"></a>对象头结构</h4><p>Java 对象在内存中的布局包括对象头、实例数据和对齐填充。对象头中的 <code>Mark Word</code> 存储了锁的信息，包括：</p>
 <ul>
 <li><strong>偏向锁</strong>：记录线程 ID、偏向时间等。</li>
 <li><strong>轻量级锁</strong>：记录锁记录指针（Lock Record）。</li>
@@ -336,7 +336,7 @@
 <p>这也就意味着每个 Java 对象在 JVM 中都具备 <code>Monitor</code> 锁机制。</p>
 <h4 id="同步队列"><a href="#同步队列" class="headerlink" title="同步队列"></a>同步队列</h4><ul>
 <li><code>Monitor</code> 依赖于底层的操作系统互斥量实现。</li>
-<li>每个线程请求锁时会尝试进入 <code>Monitor</code>，如果失败，则会进入<strong>等待队列</strong>。</li>
+<li>每个线程请求锁时会尝试进入 <code>Monitor</code>，如果失败，则会进入等待队列。</li>
 </ul>
 <h4 id="对象监视器锁"><a href="#对象监视器锁" class="headerlink" title="对象监视器锁"></a>对象监视器锁</h4><p><code>synchronized</code> 的底层实现依赖于 <code>Monitor</code>，而 <code>Monitor</code> 依托于对象头中的 <code>Mark Word</code> 实现。</p>
 <ul>
@@ -394,20 +394,20 @@
 <li><strong>锁偏向撤销</strong>：如果偏向锁的线程发生变化，会撤销偏向锁并升级为轻量级锁。</li>
 <li><strong>自适应自旋锁</strong>：在锁竞争时，线程会进行一定次数的自旋操作，避免频繁上下文切换。</li>
 </ul>
-<h3 id="互斥"><a href="#互斥" class="headerlink" title="互斥"></a>互斥</h3><p>管程的核心特点之一是<strong>互斥</strong>，即每次只有一个线程能够进入管程执行代码。这是通过给管程中的操作加锁来实现的。在 Java 中，<code>synchronized</code> 关键字或者 <code>ReentrantLock</code> 都可以用于实现互斥访问。每个管程都只有一个锁（也可以理解为一个监视器），同一时刻只有一个线程能够持有这个锁，其他线程必须等待。</p>
+<h3 id="互斥"><a href="#互斥" class="headerlink" title="互斥"></a>互斥</h3><p>管程的核心特点之一是互斥，即每次只有一个线程能够进入管程执行代码。这是通过给管程中的操作加锁来实现的。在 Java 中，<code>synchronized</code> 关键字或者 <code>ReentrantLock</code> 都可以用于实现互斥访问。每个管程都只有一个锁（也可以理解为一个监视器），同一时刻只有一个线程能够持有这个锁，其他线程必须等待。</p>
 <ul>
 <li>在 Java 中，类的 <code>synchronized</code> 方法或同步块（<code>synchronized block</code>）都隐式地使用了这个锁。</li>
 <li>该锁保护了管程内的共享资源，防止多个线程同时访问这些资源，避免了竞态条件的发生。</li>
 </ul>
-<h3 id="条件变量"><a href="#条件变量" class="headerlink" title="条件变量"></a>条件变量</h3><p>除了互斥，管程还使用<strong>条件变量</strong>来控制线程的执行顺序。当某个线程需要等待某些条件成立时，它可以将自己挂起，并在条件成立时被唤醒。条件变量通常包括 <code>wait()</code>、<code>notify()</code> 和 <code>notifyAll()</code> 方法（在 Java 中是 <code>Object</code> 类的方法），用于实现线程之间的协作和通信。</p>
+<h3 id="条件变量"><a href="#条件变量" class="headerlink" title="条件变量"></a>条件变量</h3><p>除了互斥，管程还使用条件变量来控制线程的执行顺序。当某个线程需要等待某些条件成立时，它可以将自己挂起，并在条件成立时被唤醒。条件变量通常包括 <code>wait()</code>、<code>notify()</code> 和 <code>notifyAll()</code> 方法（在 Java 中是 <code>Object</code> 类的方法），用于实现线程之间的协作和通信。</p>
 <ul>
 <li><code>wait()</code>：使当前线程进入等待队列，直到被唤醒。</li>
 <li><code>notify()</code>：唤醒一个等待队列中的线程。</li>
 <li><code>notifyAll()</code>：唤醒所有等待队列中的线程。</li>
 </ul>
 <p>通过条件变量，线程可以在满足某些条件时再继续执行，从而避免了不必要的资源竞争。</p>
-<h3 id="入口和出口"><a href="#入口和出口" class="headerlink" title="入口和出口"></a>入口和出口</h3><p>管程的访问通常是通过特定的方法（称为<strong>入口</strong>）来进行的。每次线程访问管程时，都需要通过这些方法来进入，线程在进入管程之前必须获得锁。在完成操作后，线程可以通过<strong>出口</strong>释放锁，使得其他线程可以进入管程。</p>
-<p>每个管程可以包含多个<strong>入口</strong>方法（例如，增加、减少、检查状态等），但同一时刻只有一个线程能执行这些方法。</p>
+<h3 id="入口和出口"><a href="#入口和出口" class="headerlink" title="入口和出口"></a>入口和出口</h3><p>管程的访问通常是通过特定的方法（称为“入口”）来进行的。每次线程访问管程时，都需要通过这些方法来进入，线程在进入管程之前必须获得锁。在完成操作后，线程可以通过“出口”释放锁，使得其他线程可以进入管程。</p>
+<p>每个管程可以包含多个“入口”方法（例如，增加、减少、检查状态等），但同一时刻只有一个线程能执行这些方法。</p>
 <h3 id="管程的封装"><a href="#管程的封装" class="headerlink" title="管程的封装"></a>管程的封装</h3><p>管程通过封装来隐藏共享资源的细节和同步机制，确保外部线程无法直接访问共享数据。所有对共享资源的操作都必须通过管程提供的方法来进行，从而保证了资源的一致性和线程安全。</p>
 <p>在 Java 中，这通常通过将共享资源和对其操作的实现封装在类内部，避免外部代码直接修改。</p>
 <h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><h3 id="互斥访问"><a href="#互斥访问" class="headerlink" title="互斥访问"></a>互斥访问</h3><p>管程提供了一种机制，确保同一时刻只有一个线程可以访问共享资源，从而实现线程间的互斥。</p>
@@ -434,7 +434,7 @@
 <li><strong>信号量管理</strong>：使用管程来实现信号量的功能，控制对某些资源的并发访问数量。</li>
 <li><strong>多线程游戏</strong>：比如在线游戏中，同步多个玩家的动作。</li>
 </ul>
-<h2 id="应用示例"><a href="#应用示例" class="headerlink" title="应用示例"></a>应用示例</h2><h3 id="生产者-消费者模型"><a href="#生产者-消费者模型" class="headerlink" title="生产者-消费者模型"></a>生产者-消费者模型</h3><h4 id="描述"><a href="#描述" class="headerlink" title="描述"></a>描述</h4><p><strong>生产者-消费者模型</strong>是多线程同步中的经典应用，涉及两个类型的线程：</p>
+<h2 id="应用示例"><a href="#应用示例" class="headerlink" title="应用示例"></a>应用示例</h2><h3 id="生产者-消费者模型"><a href="#生产者-消费者模型" class="headerlink" title="生产者-消费者模型"></a>生产者-消费者模型</h3><h4 id="描述"><a href="#描述" class="headerlink" title="描述"></a>描述</h4><p>“生产者-消费者模型”是多线程同步中的经典应用，涉及两个类型的线程：</p>
 <ul>
 <li><strong>生产者（Producer）</strong>：生成数据并将其放入共享缓冲区。</li>
 <li><strong>消费者（Consumer）</strong>：从共享缓冲区中取出数据并进行处理。</li>
@@ -472,7 +472,7 @@
 <li><strong>同步块的锁对象</strong>：在此示例中，锁对象为缓冲区 <code>buffer</code>。选择合适的锁对象对于同步至关重要。</li>
 <li><strong>避免过度唤醒</strong>：尽量使用 <code>notify()</code> 而非 <code>notifyAll()</code>，除非确实需要唤醒所有等待线程，以提高性能。</li>
 </ul>
-<h3 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h3><h4 id="描述-1"><a href="#描述-1" class="headerlink" title="描述"></a>描述</h4><p><strong>线程池（Thread Pool）</strong>是一种管理和复用多个线程的机制，旨在减少创建和销毁线程的开销，提高系统性能和资源利用率。Java通过 <code>java.util.concurrent</code> 包提供了强大的线程池实现，但在自定义线程池时，也可以使用管程机制来管理线程和任务队列。</p>
+<h3 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h3><h4 id="描述-1"><a href="#描述-1" class="headerlink" title="描述"></a>描述</h4><p>线程池（Thread Pool）是一种管理和复用多个线程的机制，旨在减少创建和销毁线程的开销，提高系统性能和资源利用率。Java通过 <code>java.util.concurrent</code> 包提供了强大的线程池实现，但在自定义线程池时，也可以使用管程机制来管理线程和任务队列。</p>
 <h4 id="思路-1"><a href="#思路-1" class="headerlink" title="思路"></a>思路</h4><ul>
 <li><strong>任务队列的管理</strong>：生产者（任务提交者）向任务队列添加任务，消费者（线程池中的工作线程）从任务队列中获取并执行任务。</li>
 <li><strong>线程的同步与协调</strong>：确保任务队列的线程安全，控制任务的添加和获取，管理线程的等待与唤醒。</li>
@@ -511,7 +511,7 @@
 <li><strong>避免死锁</strong>：确保锁的获取顺序一致，避免多个锁的嵌套使用导致死锁。</li>
 <li><strong>任务异常处理</strong>：在工作线程中捕获任务执行中的异常，防止异常导致线程终止。</li>
 </ul>
-<h3 id="读写锁"><a href="#读写锁" class="headerlink" title="读写锁"></a>读写锁</h3><h4 id="描述-2"><a href="#描述-2" class="headerlink" title="描述"></a>描述</h4><p><strong>读写锁（Read-Write Lock）</strong>是一种同步机制，允许多个线程同时读取共享资源，但在写入时必须排他。即：</p>
+<h3 id="读写锁"><a href="#读写锁" class="headerlink" title="读写锁"></a>读写锁</h3><h4 id="描述-2"><a href="#描述-2" class="headerlink" title="描述"></a>描述</h4><p>读写锁（Read-Write Lock）是一种同步机制，允许多个线程同时读取共享资源，但在写入时必须排他。即：</p>
 <ul>
 <li><strong>读锁（Read Lock）</strong>：多个线程可以同时持有，只要没有线程持有写锁。</li>
 <li><strong>写锁（Write Lock）</strong>：独占锁，只有一个线程可以持有，且期间不允许其他线程持有读锁或写锁。</li>
@@ -567,7 +567,7 @@
 <li><strong>避免死锁</strong>：确保锁的获取和释放顺序一致，避免多锁嵌套引发死锁。</li>
 <li><strong>锁的粒度</strong>：合理设计锁的范围，避免过度锁定导致性能瓶颈。</li>
 </ul>
-<h2 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h2><h3 id="死锁（Deadlock）"><a href="#死锁（Deadlock）" class="headerlink" title="死锁（Deadlock）"></a>死锁（Deadlock）</h3><h4 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h4><p><strong>死锁</strong>是指两个或多个线程由于互相等待对方持有的资源而陷入无限等待的状态，导致这些线程无法继续执行。死锁通常发生在以下四个必要条件同时满足时：</p>
+<h2 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h2><h3 id="死锁（Deadlock）"><a href="#死锁（Deadlock）" class="headerlink" title="死锁（Deadlock）"></a>死锁（Deadlock）</h3><h4 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h4><p>死锁是指两个或多个线程由于互相等待对方持有的资源而陷入无限等待的状态，导致这些线程无法继续执行。死锁通常发生在以下四个必要条件同时满足时：</p>
 <ol>
 <li><strong>互斥条件（Mutual Exclusion）</strong>：至少有一个资源是非共享的，即同一时间只能被一个线程占用。</li>
 <li><strong>持有并等待（Hold and Wait）</strong>：一个线程持有至少一个资源，并且正在等待获取其他被其他线程持有的资源。</li>
@@ -597,7 +597,7 @@
 <li><strong>未能拿到两只叉子时释放已拿到的叉子</strong>：如果无法同时拿到两只叉子，就释放已拿到的叉子，即通过避免持有单只叉子而等待另一只叉子，打破了死锁的循环等待条件。</li>
 <li><strong>使用仲裁者（Arbitrator）</strong>：引入一个仲裁者（如一个专门的管理线程）来管理叉子的分配，哲学家在需要叉子时，向仲裁者请求，当仲裁者认为可以安全分配时，才允许哲学家拿起叉子。</li>
 </ol>
-<h3 id="活锁（Livelock）"><a href="#活锁（Livelock）" class="headerlink" title="活锁（Livelock）"></a>活锁（Livelock）</h3><h4 id="概念-1"><a href="#概念-1" class="headerlink" title="概念"></a><strong>概念</strong></h4><p><strong>活锁</strong>是指两个或多个线程不断改变自身状态以响应彼此的动作，但实际上没有任何线程能够继续执行有用的工作。与死锁不同，活锁中的线程不会被永久阻塞，它们仍然处于活动状态，但无法完成任务。</p>
+<h3 id="活锁（Livelock）"><a href="#活锁（Livelock）" class="headerlink" title="活锁（Livelock）"></a>活锁（Livelock）</h3><h4 id="概念-1"><a href="#概念-1" class="headerlink" title="概念"></a><strong>概念</strong></h4><p>活锁是指两个或多个线程不断改变自身状态以响应彼此的动作，但实际上没有任何线程能够继续执行有用的工作。与死锁不同，活锁中的线程不会被永久阻塞，它们仍然处于活动状态，但无法完成任务。</p>
 <h4 id="预防-1"><a href="#预防-1" class="headerlink" title="预防"></a>预防</h4><ol>
 <li><p><strong>限制重试次数</strong>：为线程的重试操作设置最大次数，超过后放弃或采取其他措施。</p>
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">int</span> retries = <span class="hljs-number">0</span>;<br><span class="hljs-keyword">while</span> (retries &lt; MAX_RETRIES) &#123;<br>    <span class="hljs-keyword">if</span> (tryAcquire()) &#123;<br>        <span class="hljs-keyword">break</span>;<br>    &#125;<br>    retries++;<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
@@ -611,7 +611,7 @@
 <li><strong>监控线程活动</strong>：监控线程的执行频率和状态，识别是否存在频繁的资源获取和释放。</li>
 <li><strong>日志分析</strong>：通过日志记录线程的操作步骤，分析是否存在循环的资源操作。</li>
 </ol>
-<h3 id="饥饿（Starvation）"><a href="#饥饿（Starvation）" class="headerlink" title="饥饿（Starvation）"></a>饥饿（Starvation）</h3><h4 id="概念-2"><a href="#概念-2" class="headerlink" title="概念"></a>概念</h4><p><strong>饥饿</strong>是指某些线程长期无法获取所需资源，导致它们无法执行。这通常是由于其他高优先级线程持续占用资源，或由于资源分配策略不公平，某些线程得不到足够的执行机会。</p>
+<h3 id="饥饿（Starvation）"><a href="#饥饿（Starvation）" class="headerlink" title="饥饿（Starvation）"></a>饥饿（Starvation）</h3><h4 id="概念-2"><a href="#概念-2" class="headerlink" title="概念"></a>概念</h4><p>饥饿是指某些线程长期无法获取所需资源，导致它们无法执行。这通常是由于其他高优先级线程持续占用资源，或由于资源分配策略不公平，某些线程得不到足够的执行机会。</p>
 <h4 id="预防-2"><a href="#预防-2" class="headerlink" title="预防"></a>预防</h4><ol>
 <li><p><strong>使用公平锁</strong>：采用公平锁（如 <code>ReentrantLock</code> 的公平性选项），确保锁的获取按照线程请求的顺序进行。</p>
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">ReentrantLock lock = <span class="hljs-keyword">new</span> ReentrantLock(<span class="hljs-keyword">true</span>); <span class="hljs-comment">// 公平锁</span><br></code></pre></div></td></tr></table></figure></li>
@@ -628,7 +628,7 @@
 <li><strong>性能分析工具</strong>：使用性能分析工具（如 <code>Java VisualVM</code>、<code>JProfiler</code>）检测线程的状态和资源获取情况。</li>
 <li><strong>日志和指标</strong>：通过日志记录和指标监控，识别线程的等待和执行模式，发现饥饿现象。</li>
 </ol>
-<h3 id="假唤醒（Spurious-Wakeup）"><a href="#假唤醒（Spurious-Wakeup）" class="headerlink" title="假唤醒（Spurious Wakeup）"></a>假唤醒（Spurious Wakeup）</h3><h4 id="概念-3"><a href="#概念-3" class="headerlink" title="概念"></a>概念</h4><p><strong>假唤醒</strong>指的是线程在没有收到明确的通知（<code>notify()</code> 或 <code>notifyAll()</code>）情况下，被唤醒的现象。这可能导致线程在错误的时间继续执行，导致程序逻辑错误。</p>
+<h3 id="虚假唤醒（Spurious-Wakeup）"><a href="#虚假唤醒（Spurious-Wakeup）" class="headerlink" title="虚假唤醒（Spurious Wakeup）"></a>虚假唤醒（Spurious Wakeup）</h3><h4 id="概念-3"><a href="#概念-3" class="headerlink" title="概念"></a>概念</h4><p>虚假唤醒指的是线程在没有收到明确的通知（<code>notify()</code> 或 <code>notifyAll()</code>）情况下，被唤醒的现象。这可能导致线程在错误的时间继续执行，导致程序逻辑错误。</p>
 <h4 id="预防-3"><a href="#预防-3" class="headerlink" title="预防"></a><strong>预防</strong></h4><p>使用循环检查条件：在调用 <code>wait() </code>  后，使用 <code>while</code> 循环检查条件，而不是 <code>if</code> 语句，确保线程在条件真正满足时才继续执行。</p>
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">synchronized</span> (lock) &#123;<br>    <span class="hljs-keyword">while</span> (!condition) &#123;<br>        lock.wait();<br>    &#125;<br>    <span class="hljs-comment">// 执行操作</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
 
@@ -640,7 +640,7 @@
 
 <h4 id="软件检测"><a href="#软件检测" class="headerlink" title="软件检测"></a>软件检测</h4><p>使用 <code>Java VisualVM</code> 或 <code>JConsole</code> 连接 JVM 实例检测死锁。</p>
 <p>如 <code>JConsole</code> 连接到 JVM 实例后，在线程页检测死锁：</p>
-<p><img src="./assets/image-20250102233846558.png" alt="image-20250102233846558"></p>
+<p><img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/jconsole-deadlock-detection.png" alt="JConsole-线程-死锁"></p>
 <h4 id="分析堆栈跟踪"><a href="#分析堆栈跟踪" class="headerlink" title="分析堆栈跟踪"></a>分析堆栈跟踪</h4><p>先通过 <code>jps</code> 获取 Java 进程的 <code>PID</code></p>
 <figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">C:\Users\yangtao&gt;jps -l<br>25136 space.yangtao.monitor.deadlock.DeadLockTestClient<br>16164 org.jetbrains.jps.cmdline.Launcher<br>11352 sun.tools.jps.Jps<br>12728 com.intellij.idea.Main<br></code></pre></div></td></tr></table></figure>
 
@@ -707,9 +707,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2022/02/07/vue-nexttick/">
+                      <a href="/2021/08/05/javase-cp-jmm/">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">简单了解Vue.nextTick</span>
+                        <span class="hidden-mobile">Java并发编程——Java内存模型</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
