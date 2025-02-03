@@ -1,0 +1,661 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="引言在高并发和大数据量的应用场景中，缓存机制对于提升性能和降低数据库负担至关重要。MyBatis作为一个流行的持久层框架，提供了灵活的缓存配置选项，允许开发者根据具体需求实施一级缓存和二级缓存策略。此外，MyBatis还支持与第三方缓存框架如EhCache的集成，进一步扩展了缓存的功能和效率。本文将详细介绍这些缓存机制的工作原理和配置方法。 一级缓存（Session Cache）简介一级缓存是My">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MyBatis缓存">
+<meta property="og:url" content="http://example.com/2022/08/05/mybatis-cache/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="引言在高并发和大数据量的应用场景中，缓存机制对于提升性能和降低数据库负担至关重要。MyBatis作为一个流行的持久层框架，提供了灵活的缓存配置选项，允许开发者根据具体需求实施一级缓存和二级缓存策略。此外，MyBatis还支持与第三方缓存框架如EhCache的集成，进一步扩展了缓存的功能和效率。本文将详细介绍这些缓存机制的工作原理和配置方法。 一级缓存（Session Cache）简介一级缓存是My">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/mybatis.jpg">
+<meta property="article:published_time" content="2022-08-05T13:32:25.000Z">
+<meta property="article:modified_time" content="2022-08-05T13:32:25.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="MyBatis">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/mybatis.jpg">
+  
+  
+  <title>MyBatis缓存 - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/mybatis.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="MyBatis缓存">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-08-05 21:32" pubdate>
+        2022年8月5日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      31k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      52 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">MyBatis缓存</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：2 年前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>在高并发和大数据量的应用场景中，缓存机制对于提升性能和降低数据库负担至关重要。MyBatis作为一个流行的持久层框架，提供了灵活的缓存配置选项，允许开发者根据具体需求实施一级缓存和二级缓存策略。此外，MyBatis还支持与第三方缓存框架如EhCache的集成，进一步扩展了缓存的功能和效率。本文将详细介绍这些缓存机制的工作原理和配置方法。</p>
+<h2 id="一级缓存（Session-Cache）"><a href="#一级缓存（Session-Cache）" class="headerlink" title="一级缓存（Session Cache）"></a>一级缓存（Session Cache）</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>一级缓存是MyBatis中默认启用的缓存。它的作用范围限定于同一个<code>SqlSession</code>内。当在同一个<code>SqlSession</code>内执行相同的 SQL 查询时，结果会被缓存起来，并在下次查询相同SQL时直接从缓存返回结果，避免了对数据库的重复查询。</p>
+<ul>
+<li><strong>作用域</strong>：仅限于同一<code>SqlSession</code>。</li>
+<li><strong>生命周期</strong>：与<code>SqlSession</code>的生命周期相同。当<code>SqlSession</code>关闭或执行非查询类SQL时，其一级缓存也会被清空。</li>
+</ul>
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><p>一级缓存是自动启用的，无需特别配置。</p>
+<h3 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h3><p>在多次查询中观察控制台日志输出（数据库隔离级别为<strong>可重复读</strong>）</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">SqlSessionFactoryBuilder sqlSessionFactoryBuilder = <span class="hljs-keyword">new</span> SqlSessionFactoryBuilder();<br>SqlSessionFactory sqlSessionFactory = sqlSessionFactoryBuilder.build(Resources.getResourceAsStream(<span class="hljs-string">&quot;mybatis-config.xml&quot;</span>));<br>SqlSession session = sqlSessionFactory.openSession();<br>StudentMapper studentMapper = session.getMapper(StudentMapper.class);<br>StudentPO studentPO;<br>log.info(<span class="hljs-string">&quot;第1次SqlSession查询：&#123;&#125;&quot;</span>, studentMapper.getById(<span class="hljs-number">1L</span>));<br>log.info(<span class="hljs-string">&quot;第2次相同SqlSession查询：&#123;&#125;&quot;</span>, studentPO = studentMapper.getById(<span class="hljs-number">1L</span>));<br><br>log.info(<span class="hljs-string">&quot;相同SqlSession更新相同行操作&quot;</span>);<br>studentMapper.updateById(studentPO.setName(<span class="hljs-string">&quot;zhangsan1&quot;</span>));<br>log.info(<span class="hljs-string">&quot;第3次更新相同行后SqlSession查询：&#123;&#125;&quot;</span>, studentMapper.getById(<span class="hljs-number">1L</span>));<br>log.info(<span class="hljs-string">&quot;第4次相同SqlSession查询：&#123;&#125;&quot;</span>, studentMapper.getById(<span class="hljs-number">1L</span>));<br><br>log.info(<span class="hljs-string">&quot;相同SqlSession更新不同行操作&quot;</span>);<br>studentMapper.updateById(studentPO.setId(<span class="hljs-number">2L</span>).setName(<span class="hljs-string">&quot;zhangsan1&quot;</span>));<br>log.info(<span class="hljs-string">&quot;第5次更新不同行后SqlSession查询：&#123;&#125;&quot;</span>, studentMapper.getById(<span class="hljs-number">1L</span>));<br>log.info(<span class="hljs-string">&quot;第6次相同SqlSession查询：&#123;&#125;&quot;</span>, studentMapper.getById(<span class="hljs-number">1L</span>));<br><br>log.info(<span class="hljs-string">&quot;相同SqlSession更新其它表操作&quot;</span>);<br>VehicleMapper vehicleMapper = session.getMapper(VehicleMapper.class);<br>vehicleMapper.deleteVehicle(<span class="hljs-number">1L</span>);<br><br>log.info(<span class="hljs-string">&quot;第7次更新其它表后SqlSession查询：&#123;&#125;&quot;</span>, studentMapper.getById(<span class="hljs-number">1L</span>));<br>log.info(<span class="hljs-string">&quot;第8次相同SqlSession查询：&#123;&#125;&quot;</span>, studentMapper.getById(<span class="hljs-number">1L</span>));<br><br>log.info(<span class="hljs-string">&quot;相同SqlSession手动清理缓存&quot;</span>);<br>session.clearCache();<br><br>log.info(<span class="hljs-string">&quot;第9次手动清理缓存后SqlSession查询：&#123;&#125;&quot;</span>, studentMapper.getById(<span class="hljs-number">1L</span>));<br>log.info(<span class="hljs-string">&quot;第10次相同SqlSession查询：&#123;&#125;&quot;</span>, studentMapper.getById(<span class="hljs-number">1L</span>));<br><br>session.commit();<br>log.info(<span class="hljs-string">&quot;session提交事务&quot;</span>);<br>log.info(<span class="hljs-string">&quot;第11次相同SqlSession提交事务后查询：&#123;&#125;&quot;</span>, studentMapper.getById(<span class="hljs-number">1L</span>));<br>log.info(<span class="hljs-string">&quot;第12次相同SqlSession查询：&#123;&#125;&quot;</span>, studentMapper.getById(<span class="hljs-number">1L</span>));<br><br>log.info(<span class="hljs-string">&quot;不同SqlSession发生更新不同行操作&quot;</span>);<br>SqlSession session2 = sqlSessionFactory.openSession();<br>StudentMapper studentMapper2 = session2.getMapper(StudentMapper.class);<br>studentMapper2.updateById(studentPO.setId(<span class="hljs-number">3L</span>).setName(<span class="hljs-string">&quot;zhangsan2&quot;</span>));<br><br>session2.commit();<br>session2.close();<br><br>log.info(<span class="hljs-string">&quot;第13次不同SqlSession更新后查询：&#123;&#125;&quot;</span>, studentMapper.getById(<span class="hljs-number">1L</span>));<br>log.info(<span class="hljs-string">&quot;第14次相同SqlSession查询：&#123;&#125;&quot;</span>, studentMapper.getById(<span class="hljs-number">1L</span>));<br><br>session.rollback();<br>log.info(<span class="hljs-string">&quot;session回滚事务&quot;</span>);<br>log.info(<span class="hljs-string">&quot;第15次回滚后查询：&#123;&#125;&quot;</span>, studentMapper.getById(<span class="hljs-number">1L</span>));<br><br>session2.rollback();<br>log.info(<span class="hljs-string">&quot;session2回滚事务&quot;</span>);<br>log.info(<span class="hljs-string">&quot;第16次不同SqlSession回滚后查询：&#123;&#125;&quot;</span>, studentMapper.getById(<span class="hljs-number">1L</span>));<br><br>session.close();<br></code></pre></div></td></tr></table></figure>
+
+<p>运行程序，控制台输出日志如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">...<br>21:30:02.311 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ?<br>21:30:02.324 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt; Parameters: 1(Long)<br>21:30:02.334 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:30:02.335 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==        Row: 1, 1, zhangsan1, 180.0, 男, 1990-01-01, 2022-07-01 22:10:22<br>21:30:02.336 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - &lt;==      Total: 1<br>21:30:02.337 [main] INFO  space.yangtao.client.StudentMapperTest - 第1次SqlSession查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>21:30:02.338 [main] INFO  space.yangtao.client.StudentMapperTest - 第2次相同SqlSession查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>21:30:02.338 [main] INFO  space.yangtao.client.StudentMapperTest - 相同SqlSession更新相同行操作<br>21:30:02.338 [main] DEBUG space.yangtao.mapper.StudentMapper.updateById - ==&gt;  Preparing: update tt_student <span class="hljs-built_in">set</span> name = ?, height = ?, gender = ?, birthday = ?, create_time = ? <span class="hljs-built_in">where</span> id = ?<br>21:30:02.344 [main] DEBUG space.yangtao.mapper.StudentMapper.updateById - ==&gt; Parameters: zhangsan1(String), 180.0(Double), 男(String), 1990-01-01 00:00:00.0(Timestamp), 2022-07-01 22:10:22.0(Timestamp), 1(Long)<br>21:30:02.345 [main] DEBUG space.yangtao.mapper.StudentMapper.updateById - &lt;==    Updates: 1<br>21:30:02.345 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ?<br>21:30:02.345 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt; Parameters: 1(Long)<br>21:30:02.346 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:30:02.346 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==        Row: 1, 1, zhangsan1, 180.0, 男, 1990-01-01, 2022-07-01 22:10:22<br>21:30:02.346 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - &lt;==      Total: 1<br>21:30:02.346 [main] INFO  space.yangtao.client.StudentMapperTest - 第3次更新相同行后SqlSession查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>21:30:02.347 [main] INFO  space.yangtao.client.StudentMapperTest - 第4次相同SqlSession查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>21:30:02.347 [main] INFO  space.yangtao.client.StudentMapperTest - 相同SqlSession更新不同行操作<br>21:30:02.347 [main] DEBUG space.yangtao.mapper.StudentMapper.updateById - ==&gt;  Preparing: update tt_student <span class="hljs-built_in">set</span> name = ?, height = ?, gender = ?, birthday = ?, create_time = ? <span class="hljs-built_in">where</span> id = ?<br>21:30:02.347 [main] DEBUG space.yangtao.mapper.StudentMapper.updateById - ==&gt; Parameters: zhangsan1(String), 180.0(Double), 男(String), 1990-01-01 00:00:00.0(Timestamp), 2022-07-01 22:10:22.0(Timestamp), 2(Long)<br>21:30:02.348 [main] DEBUG space.yangtao.mapper.StudentMapper.updateById - &lt;==    Updates: 1<br>21:30:02.348 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ?<br>21:30:02.348 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt; Parameters: 1(Long)<br>21:30:02.349 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:30:02.349 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==        Row: 1, 1, zhangsan1, 180.0, 男, 1990-01-01, 2022-07-01 22:10:22<br>21:30:02.350 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - &lt;==      Total: 1<br>21:30:02.350 [main] INFO  space.yangtao.client.StudentMapperTest - 第5次更新不同行后SqlSession查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>21:30:02.350 [main] INFO  space.yangtao.client.StudentMapperTest - 第6次相同SqlSession查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>21:30:02.350 [main] INFO  space.yangtao.client.StudentMapperTest - 相同SqlSession更新其它表操作<br>21:30:02.351 [main] DEBUG space.yangtao.mapper.VehicleMapper.deleteVehicle - ==&gt;  Preparing: delete from tt_vehicle <span class="hljs-built_in">where</span> id = ?<br>21:30:02.351 [main] DEBUG space.yangtao.mapper.VehicleMapper.deleteVehicle - ==&gt; Parameters: 1(Long)<br>21:30:02.351 [main] DEBUG space.yangtao.mapper.VehicleMapper.deleteVehicle - &lt;==    Updates: 0<br>21:30:02.352 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ?<br>21:30:02.352 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt; Parameters: 1(Long)<br>21:30:02.352 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:30:02.353 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==        Row: 1, 1, zhangsan1, 180.0, 男, 1990-01-01, 2022-07-01 22:10:22<br>21:30:02.353 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - &lt;==      Total: 1<br>21:30:02.353 [main] INFO  space.yangtao.client.StudentMapperTest - 第7次更新其它表后SqlSession查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>21:30:02.353 [main] INFO  space.yangtao.client.StudentMapperTest - 第8次相同SqlSession查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>21:30:02.354 [main] INFO  space.yangtao.client.StudentMapperTest - 相同SqlSession手动清理缓存<br>21:30:02.354 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ?<br>21:30:02.354 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt; Parameters: 1(Long)<br>21:30:02.355 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:30:02.355 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==        Row: 1, 1, zhangsan1, 180.0, 男, 1990-01-01, 2022-07-01 22:10:22<br>21:30:02.355 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - &lt;==      Total: 1<br>21:30:02.356 [main] INFO  space.yangtao.client.StudentMapperTest - 第9次手动清理缓存后SqlSession查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>21:30:02.356 [main] INFO  space.yangtao.client.StudentMapperTest - 第10次相同SqlSession查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>21:30:02.356 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Committing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@a22cb6a]<br>21:30:02.357 [main] INFO  space.yangtao.client.StudentMapperTest - session提交事务<br>21:30:02.357 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ?<br>21:30:02.357 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt; Parameters: 1(Long)<br>21:30:02.358 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:30:02.358 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==        Row: 1, 1, zhangsan1, 180.0, 男, 1990-01-01, 2022-07-01 22:10:22<br>21:30:02.358 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - &lt;==      Total: 1<br>21:30:02.358 [main] INFO  space.yangtao.client.StudentMapperTest - 第11次相同SqlSession提交事务后查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>21:30:02.358 [main] INFO  space.yangtao.client.StudentMapperTest - 第12次相同SqlSession查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>21:30:02.358 [main] INFO  space.yangtao.client.StudentMapperTest - 不同SqlSession发生更新不同行操作<br>21:30:02.359 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Opening JDBC Connection<br>21:30:02.369 [main] DEBUG o.apache.ibatis.datasource.pooled.PooledDataSource - Created connection 1976401987.<br>21:30:02.369 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Setting autocommit to <span class="hljs-literal">false</span> on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@75cd8043]<br>21:30:02.370 [main] DEBUG space.yangtao.mapper.StudentMapper.updateById - ==&gt;  Preparing: update tt_student <span class="hljs-built_in">set</span> name = ?, height = ?, gender = ?, birthday = ?, create_time = ? <span class="hljs-built_in">where</span> id = ?<br>21:30:02.370 [main] DEBUG space.yangtao.mapper.StudentMapper.updateById - ==&gt; Parameters: zhangsan2(String), 180.0(Double), 男(String), 1990-01-01 00:00:00.0(Timestamp), 2022-07-01 22:10:22.0(Timestamp), 3(Long)<br>21:30:02.371 [main] DEBUG space.yangtao.mapper.StudentMapper.updateById - &lt;==    Updates: 1<br>21:30:02.371 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Committing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@75cd8043]<br>21:30:02.371 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Resetting autocommit to <span class="hljs-literal">true</span> on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@75cd8043]<br>21:30:02.372 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Closing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@75cd8043]<br>21:30:02.372 [main] DEBUG o.apache.ibatis.datasource.pooled.PooledDataSource - Returned connection 1976401987 to pool.<br>21:30:02.372 [main] INFO  space.yangtao.client.StudentMapperTest - 第13次不同SqlSession更新后查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>21:30:02.372 [main] INFO  space.yangtao.client.StudentMapperTest - 第14次相同SqlSession查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>21:30:02.372 [main] INFO  space.yangtao.client.StudentMapperTest - session回滚事务<br>21:30:02.372 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ?<br>21:30:02.372 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt; Parameters: 1(Long)<br>21:30:02.373 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:30:02.373 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==        Row: 1, 1, zhangsan1, 180.0, 男, 1990-01-01, 2022-07-01 22:10:22<br>21:30:02.373 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - &lt;==      Total: 1<br>21:30:02.373 [main] INFO  space.yangtao.client.StudentMapperTest - 第15次回滚后查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>21:30:02.373 [main] INFO  space.yangtao.client.StudentMapperTest - session2回滚事务<br>21:30:02.373 [main] INFO  space.yangtao.client.StudentMapperTest - 第16次不同SqlSession回滚后查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>...<br></code></pre></div></td></tr></table></figure>
+
+
+
+<p><strong>日志分析</strong>：</p>
+<ol>
+<li>第1次和第2次使用相同的SqlSession，因此第2次查询直接从缓存中取数据。</li>
+<li>第3次查询前发生了SqlSession更新相同行操作，因此查询没使用缓存，而第4次查询使用了缓存。</li>
+<li>第5次查询前发生了SqlSession更新不同行操作，因此查询没使用缓存，而第6次查询使用了缓存。</li>
+<li>第7次查询前发生了SqlSession更新其他表操作，因此查询没使用缓存，而第8次查询使用了缓存。</li>
+<li>第9次查询前手动清除了SqlSession的缓存，因此查询没有使用缓存，而第10次查询使用了缓存。</li>
+<li>第11次查询前SqlSession提交了一次事务，因此查询没有使用缓存，而第12次查询使用了缓存。</li>
+<li>第13次查询前其他SqlSession发生了更新不同行的操作，但不影响本SqlSession，因此第13次和第14次查询都使用了缓存。</li>
+<li>第15次查询前SqlSession回滚了事务，因此查询没使用缓存，而后不同SqlSession回滚了事务，但不影响本SqlSession，因此第16次查询使用了缓存。</li>
+<li>注意这里隐藏了一个场景，其他SqlSession更新了相同行，因为更新相同行的条件是本SqlSession提交事务，否则MySQL的行锁会导致其他SqlSession更新相同行失败，因此结果跟本次SqlSession提交事务后的结果是一致的，即提交了事务后本次SqlSession的查询不使用缓存。</li>
+</ol>
+<p><strong>总结</strong>：在默认的一级缓存中，相同的事务中SqlSession只要执行了非查询类的操作（更新、删除、事务提交或回滚），就会导致本次事务中的所有缓存都失效，在可重复度的隔离级别下，其他事务不会影响本次事务，因此不会影响本次事务的缓存。</p>
+<h2 id="二级缓存（Mapper-Cache）"><a href="#二级缓存（Mapper-Cache）" class="headerlink" title="二级缓存（Mapper Cache）"></a>二级缓存（Mapper Cache）</h2><h3 id="简介-1"><a href="#简介-1" class="headerlink" title="简介"></a>简介</h3><p>二级缓存的作用范围更广，可以跨多个<code>SqlSession</code>和<code>SqlMapper</code>。二级缓存需要显式地在MyBatis配置文件中或通过注解启用。启用后，多个会话可以重用缓存的数据，大大减少数据库的查询次数，提高了应用性能。</p>
+<ul>
+<li><strong>作用域</strong>：跨<code>SqlSession</code>，通常绑定到一个Mapper接口。</li>
+<li><strong>生命周期</strong>：通常跟应用的生命周期一致，或者是缓存提供者（如Ehcache、Redis）管理的。</li>
+<li><strong>配置</strong>：需要在MyBatis的配置文件中启用，并且可以对其细粒度控制，例如配置缓存的大小、清除策略、读写策略等。</li>
+</ul>
+<h3 id="配置-1"><a href="#配置-1" class="headerlink" title="配置"></a>配置</h3><ol>
+<li><p>全局配置文件中开启（默认开启）</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">setting</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;cacheEnabled&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;true&quot;</span>/&gt;</span><br></code></pre></div></td></tr></table></figure></li>
+<li><p>Mapper文件中加上<code>&lt;cache/&gt;</code>标签表示局部开启</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">cache</span> <span class="hljs-attr">eviction</span>=<span class="hljs-string">&quot;FIFO&quot;</span> <span class="hljs-attr">flushInterval</span>=<span class="hljs-string">&quot;60000&quot;</span> <span class="hljs-attr">size</span>=<span class="hljs-string">&quot;512&quot;</span> <span class="hljs-attr">readOnly</span>=<span class="hljs-string">&quot;true&quot;</span>/&gt;</span><br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li><p><strong>eviction</strong>：缓存的回收策略。默认为LRU策略。</p>
+<ul>
+<li><p><strong>LRU</strong>：Least Recently Used，最近最少使用。</p>
+</li>
+<li><p><strong>FIFO</strong>：First In First Out，先进先出。</p>
+</li>
+<li><p><strong>SOFT</strong>：软引用指向对象优先淘汰。</p>
+</li>
+<li><p><strong>WEAK</strong>：弱引用指向对象优先淘汰。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>flushInterval</strong>：二级缓存的刷新时间间隔，单位为毫秒，没有则代表不刷新缓存。</p>
+</li>
+<li><p><strong>readOnly</strong></p>
+<ul>
+<li><p><strong>true</strong>：多条相同语句执行返回的对象是共享的一个，性能高，可能有并发问题。</p>
+</li>
+<li><p><strong>false</strong>：多条相同语句执行返回的对象是克隆出来的副本，性能一般，多线程安全。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>size</strong>：引用数目，一个数值，表示缓存中可以存储的引用数量，默认1024。</p>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="DEMO"><a href="#DEMO" class="headerlink" title="DEMO"></a>DEMO</h3><p>在多次查询中观察控制台日志输出（数据库隔离级别为<strong>可重复读</strong>）</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">SqlSessionFactoryBuilder sqlSessionFactoryBuilder = <span class="hljs-keyword">new</span> SqlSessionFactoryBuilder();<br>SqlSessionFactory sqlSessionFactory = sqlSessionFactoryBuilder.build(Resources.getResourceAsStream(<span class="hljs-string">&quot;mybatis-config.xml&quot;</span>));<br>SqlSession session1 = sqlSessionFactory.openSession();<br>SqlSession session2 = sqlSessionFactory.openSession();<br><br>StudentMapper mapper1 = session1.getMapper(StudentMapper.class);<br>StudentMapper mapper2 = session2.getMapper(StudentMapper.class);<br><br>log.info(<span class="hljs-string">&quot;session1 第1次查询：&#123;&#125;&quot;</span>, mapper1.getById(<span class="hljs-number">1L</span>));<br>log.info(<span class="hljs-string">&quot;session2 第1次查询：&#123;&#125;&quot;</span>, mapper2.getById(<span class="hljs-number">1L</span>));<br><br>session1.commit();<br>session2.clearCache();<br><br>log.info(<span class="hljs-string">&quot;session2 第2次查询：&#123;&#125;&quot;</span>, mapper2.getById(<span class="hljs-number">1L</span>));<br>session2.clearCache();<br><br>log.info(<span class="hljs-string">&quot;session2 第3次查询：&#123;&#125;&quot;</span>, mapper2.getById(<span class="hljs-number">1L</span>));<br>VehicleMapper vehicleMapper = session1.getMapper(VehicleMapper.class);<br>vehicleMapper.deleteVehicle(<span class="hljs-number">1L</span>);<br>session1.commit();<br>session2.commit();<br>log.info(<span class="hljs-string">&quot;session2 第4次查询：&#123;&#125;&quot;</span>, mapper2.getById(<span class="hljs-number">1L</span>));<br>session2.clearCache();<br><br>mapper1.updateById(mapper1.getById(<span class="hljs-number">3L</span>).setId(<span class="hljs-number">2L</span>).setName(<span class="hljs-string">&quot;zhangsan1&quot;</span>));<br>log.info(<span class="hljs-string">&quot;session2 第5次查询：&#123;&#125;&quot;</span>, mapper2.getById(<span class="hljs-number">1L</span>));<br>session1.commit();<br><br>log.info(<span class="hljs-string">&quot;session2 第6次查询：&#123;&#125;&quot;</span>, mapper2.getById(<span class="hljs-number">1L</span>));<br>session2.close();<br>session1.clearCache();<br><br>log.info(<span class="hljs-string">&quot;session1 第2次查询：&#123;&#125;&quot;</span>, mapper1.getById(<span class="hljs-number">1L</span>));<br>log.info(<span class="hljs-string">&quot;session1 第3次查询：&#123;&#125;&quot;</span>, mapper1.getById(<span class="hljs-number">1L</span>));<br></code></pre></div></td></tr></table></figure>
+
+<p>运行结果如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">...<br>22:22:04.491 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ?<br>22:22:04.505 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt; Parameters: 1(Long)<br>22:22:04.516 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>22:22:04.516 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==        Row: 1, 1, zhangsan1, 180.0, 男, 1990-01-01, 2022-07-01 22:10:22<br>22:22:04.518 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - &lt;==      Total: 1<br>22:22:04.519 [main] INFO  space.yangtao.client.StudentMapperTest - session1 第1次查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>22:22:04.520 [main] DEBUG space.yangtao.mapper.StudentMapper - Cache Hit Ratio [space.yangtao.mapper.StudentMapper]: 0.0<br>22:22:04.520 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Opening JDBC Connection<br>22:22:04.530 [main] DEBUG o.apache.ibatis.datasource.pooled.PooledDataSource - Created connection 1653361344.<br>22:22:04.530 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Setting autocommit to <span class="hljs-literal">false</span> on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@628c4ac0]<br>22:22:04.530 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ?<br>22:22:04.530 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt; Parameters: 1(Long)<br>22:22:04.531 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>22:22:04.531 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==        Row: 1, 1, zhangsan1, 180.0, 男, 1990-01-01, 2022-07-01 22:10:22<br>22:22:04.531 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - &lt;==      Total: 1<br>22:22:04.532 [main] INFO  space.yangtao.client.StudentMapperTest - session2 第1次查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>22:22:04.534 [main] WARN  org.apache.ibatis.io.SerialFilterChecker - As you are using functionality that deserializes object streams, it is recommended to define the JEP-290 serial filter. Please refer to https://docs.oracle.com/pls/topic/lookup?ctx=javase15&amp;id=GUID-8296D8E8-2B93-4B9A-856E-0A65AF9B8C66<br>22:22:04.536 [main] DEBUG space.yangtao.mapper.StudentMapper - Cache Hit Ratio [space.yangtao.mapper.StudentMapper]: 0.3333333333333333<br>22:22:04.536 [main] INFO  space.yangtao.client.StudentMapperTest - session2 第2次查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>22:22:04.536 [main] DEBUG space.yangtao.mapper.StudentMapper - Cache Hit Ratio [space.yangtao.mapper.StudentMapper]: 0.5<br>22:22:04.536 [main] INFO  space.yangtao.client.StudentMapperTest - session2 第3次查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>22:22:04.537 [main] DEBUG space.yangtao.mapper.VehicleMapper.deleteVehicle - ==&gt;  Preparing: delete from tt_vehicle <span class="hljs-built_in">where</span> id = ?<br>22:22:04.537 [main] DEBUG space.yangtao.mapper.VehicleMapper.deleteVehicle - ==&gt; Parameters: 1(Long)<br>22:22:04.538 [main] DEBUG space.yangtao.mapper.VehicleMapper.deleteVehicle - &lt;==    Updates: 0<br>22:22:04.538 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Committing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@79c7532f]<br>22:22:04.538 [main] DEBUG space.yangtao.mapper.StudentMapper - Cache Hit Ratio [space.yangtao.mapper.StudentMapper]: 0.6<br>22:22:04.538 [main] INFO  space.yangtao.client.StudentMapperTest - session2 第4次查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>22:22:04.539 [main] DEBUG space.yangtao.mapper.StudentMapper - Cache Hit Ratio [space.yangtao.mapper.StudentMapper]: 0.5<br>22:22:04.539 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ?<br>22:22:04.539 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt; Parameters: 3(Long)<br>22:22:04.539 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>22:22:04.540 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==        Row: 3, 2, zhangsan2, 180.0, 男, 1990-01-01, 2022-07-01 22:10:22<br>22:22:04.540 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - &lt;==      Total: 1<br>22:22:04.540 [main] DEBUG space.yangtao.mapper.StudentMapper.updateById - ==&gt;  Preparing: update tt_student <span class="hljs-built_in">set</span> name = ?, height = ?, gender = ?, birthday = ?, create_time = ? <span class="hljs-built_in">where</span> id = ?<br>22:22:04.546 [main] DEBUG space.yangtao.mapper.StudentMapper.updateById - ==&gt; Parameters: zhangsan1(String), 180.0(Double), 男(String), 1990-01-01 00:00:00.0(Timestamp), 2022-07-01 22:10:22.0(Timestamp), 2(Long)<br>22:22:04.547 [main] DEBUG space.yangtao.mapper.StudentMapper.updateById - &lt;==    Updates: 1<br>22:22:04.548 [main] DEBUG space.yangtao.mapper.StudentMapper - Cache Hit Ratio [space.yangtao.mapper.StudentMapper]: 0.5714285714285714<br>22:22:04.548 [main] INFO  space.yangtao.client.StudentMapperTest - session2 第5次查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>22:22:04.548 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Committing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@79c7532f]<br>22:22:04.548 [main] DEBUG space.yangtao.mapper.StudentMapper - Cache Hit Ratio [space.yangtao.mapper.StudentMapper]: 0.5<br>22:22:04.548 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ?<br>22:22:04.548 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt; Parameters: 1(Long)<br>22:22:04.549 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>22:22:04.549 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==        Row: 1, 1, zhangsan1, 180.0, 男, 1990-01-01, 2022-07-01 22:10:22<br>22:22:04.550 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - &lt;==      Total: 1<br>22:22:04.551 [main] INFO  space.yangtao.client.StudentMapperTest - session2 第6次查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>22:22:04.551 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Resetting autocommit to <span class="hljs-literal">true</span> on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@628c4ac0]<br>22:22:04.552 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Closing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@628c4ac0]<br>22:22:04.552 [main] DEBUG o.apache.ibatis.datasource.pooled.PooledDataSource - Returned connection 1653361344 to pool.<br>22:22:04.552 [main] DEBUG space.yangtao.mapper.StudentMapper - Cache Hit Ratio [space.yangtao.mapper.StudentMapper]: 0.5555555555555556<br>22:22:04.552 [main] INFO  space.yangtao.client.StudentMapperTest - session1 第2次查询：StudentPO(id=1, classId=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>22:22:04.552 [main] DEBUG space.yangtao.mapper.StudentMapper - Cache Hit Ratio [space.yangtao.mapper.StudentMapper]: 0.5<br>22:22:04.552 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ?<br>22:22:04.553 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt; Parameters: 2(Long)<br>22:22:04.553 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>22:22:04.553 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==        Row: 2, 2, zhangsan1, 180.0, 男, 1990-01-01, 2022-07-01 22:10:22<br>22:22:04.554 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - &lt;==      Total: 1<br>22:22:04.554 [main] INFO  space.yangtao.client.StudentMapperTest - session1 第3次查询：StudentPO(id=2, classId=2, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>...<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>日志分析</strong>：</p>
+<ol>
+<li>由于session1第1次查询后未提交或关闭session，因此session2的查询不是从二级缓存中取数据，而是从磁盘中取数据。</li>
+<li>session1提交、同时清除session2的一级缓存，因此session2的第2次查询从二级缓存中取数据。</li>
+<li>session2在第2次查询后就清除了一级缓存，第3次查询仍然是从缓存中取数据，因此可以判定缓存为二级缓存。</li>
+<li>session1更新其它的数据表并提交事务、session2重新开启事务，第4次查询仍然从二级缓存中取数据。</li>
+<li>session1更新相同表的其他行数据，未提交事务前，session2的第5次查询从二级缓存中取数据。</li>
+<li>session1提交事务后，二级缓存失效，session2的第6次查询重新从磁盘中读取数据。</li>
+<li>session2关闭，此时将session1的一级缓存清除，查询仍然从二级缓存中取数据，而对于刚才更新并提交事务的相同行，则会重新从磁盘中取数据。</li>
+</ol>
+<p><strong>总结</strong>：在原有一级缓存的规则下，其他session的事务提交或会话关闭会将其一级缓存写入到二级缓存中，且未有session提交此表相同行的事务的前提下，此表中该行的二级缓存会一直存在于SqlSessionFactory中。</p>
+<h2 id="集成EhCache"><a href="#集成EhCache" class="headerlink" title="集成EhCache"></a>集成EhCache</h2><h3 id="简介-2"><a href="#简介-2" class="headerlink" title="简介"></a>简介</h3><p>EhCache是一个广泛使用的开源Java分布式缓存框架，提供了内存和磁盘存储的缓存功能，非常适合用作MyBatis的二级缓存。通过集成<code>EhCache</code>，MyBatis可以提升应用性能，减少数据库访问次数，以及提供更复杂的缓存管理功能。</p>
+<p>集成<code>EcCache</code>可以替换MyBatis自带的二级缓存（一级缓存无法替代）。</p>
+<h3 id="DEMO-1"><a href="#DEMO-1" class="headerlink" title="DEMO"></a>DEMO</h3><ol>
+<li><p>引入依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.mybatis.caches<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>mybatis-ehcache<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>1.2.3<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></div></td></tr></table></figure></li>
+<li><p>类的根路径下创建配置文件ehcache.xml</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">ehcache</span> <span class="hljs-attr">xmlns:xsi</span>=<span class="hljs-string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span><br><span class="hljs-tag">         <span class="hljs-attr">xsi:noNamespaceSchemaLocation</span>=<span class="hljs-string">&quot;http://ehcache.org/ehcache.xsd&quot;</span></span><br><span class="hljs-tag">         <span class="hljs-attr">updateCheck</span>=<span class="hljs-string">&quot;false&quot;</span>&gt;</span><br>    <span class="hljs-comment">&lt;!--磁盘存储：将缓存中暂时不使用的对象，转移到硬盘，类似于Windows系统的虚拟内存。--&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">diskStore</span> <span class="hljs-attr">path</span>=<span class="hljs-string">&quot;e:/ehcache&quot;</span>/&gt;</span><br>  <br>    <span class="hljs-comment">&lt;!--defaultCache：默认的管理策略--&gt;</span><br>    <span class="hljs-comment">&lt;!--eternal：设定缓存的elements是否永远不过期。如果为true，则缓存的数据始终有效，如果为false那么还要根据timeToIdleSeconds，timeToLiveSeconds判断--&gt;</span><br>    <span class="hljs-comment">&lt;!--maxElementsInMemory：在内存中缓存的element的最大数目--&gt;</span><br>    <span class="hljs-comment">&lt;!--overflowToDisk：如果内存中数据超过内存限制，是否要缓存到磁盘上--&gt;</span><br>    <span class="hljs-comment">&lt;!--diskPersistent：是否在磁盘上持久化。指重启jvm后，数据是否有效。默认为false--&gt;</span><br>    <span class="hljs-comment">&lt;!--timeToIdleSeconds：对象空闲时间(单位：秒)，指对象在多长时间没有被访问就会失效。只对eternal为false的有效。默认值0，表示一直可以访问--&gt;</span><br>    <span class="hljs-comment">&lt;!--timeToLiveSeconds：对象存活时间(单位：秒)，指对象从创建到失效所需要的时间。只对eternal为false的有效。默认值0，表示一直可以访问--&gt;</span><br>    <span class="hljs-comment">&lt;!--memoryStoreEvictionPolicy：缓存的3 种清空策略--&gt;</span><br>    <span class="hljs-comment">&lt;!--FIFO：first in first out (先进先出)--&gt;</span><br>    <span class="hljs-comment">&lt;!--LFU：Less Frequently Used (最少使用).意思是一直以来最少被使用的。缓存的元素有一个hit 属性，hit 值最小的将会被清出缓存--&gt;</span><br>    <span class="hljs-comment">&lt;!--LRU：Least Recently Used(最近最少使用). (ehcache 默认值).缓存的元素有一个时间戳，当缓存容量满了，而又需要腾出地方来缓存新的元素的时候，那么现有缓存元素中时间戳离当前时间最远的元素将被清出缓存--&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">defaultCache</span> <span class="hljs-attr">eternal</span>=<span class="hljs-string">&quot;false&quot;</span> <span class="hljs-attr">maxElementsInMemory</span>=<span class="hljs-string">&quot;1000&quot;</span> <span class="hljs-attr">overflowToDisk</span>=<span class="hljs-string">&quot;false&quot;</span> <span class="hljs-attr">diskPersistent</span>=<span class="hljs-string">&quot;false&quot;</span></span><br><span class="hljs-tag">                  <span class="hljs-attr">timeToIdleSeconds</span>=<span class="hljs-string">&quot;0&quot;</span> <span class="hljs-attr">timeToLiveSeconds</span>=<span class="hljs-string">&quot;600&quot;</span> <span class="hljs-attr">memoryStoreEvictionPolicy</span>=<span class="hljs-string">&quot;LRU&quot;</span>/&gt;</span><br><br><span class="hljs-tag">&lt;/<span class="hljs-name">ehcache</span>&gt;</span><br></code></pre></div></td></tr></table></figure></li>
+<li><p>在Mapper文件中指定使用<code>EhCache</code></p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">cache</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;org.mybatis.caches.ehcache.EhcacheCache&quot;</span>/&gt;</span><br></code></pre></div></td></tr></table></figure></li>
+<li><p>运行测试程序</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">SqlSessionFactoryBuilder sqlSessionFactoryBuilder = <span class="hljs-keyword">new</span> SqlSessionFactoryBuilder();<br>SqlSessionFactory sqlSessionFactory = sqlSessionFactoryBuilder.build(Resources.getResourceAsStream(<span class="hljs-string">&quot;mybatis-config.xml&quot;</span>));<br>SqlSession session1 = sqlSessionFactory.openSession();<br>SqlSession session2 = sqlSessionFactory.openSession();<br><br>StudentMapper mapper1 = session1.getMapper(StudentMapper.class);<br>StudentMapper mapper2 = session2.getMapper(StudentMapper.class);<br><br>log.info(<span class="hljs-string">&quot;session1 第1次查询：&#123;&#125;&quot;</span>, mapper1.getById(<span class="hljs-number">1L</span>));<br>log.info(<span class="hljs-string">&quot;session2 第1次查询：&#123;&#125;&quot;</span>, mapper2.getById(<span class="hljs-number">1L</span>));<br><br>session1.close();<br>session2.clearCache();<br><br>log.info(<span class="hljs-string">&quot;session2 第2次查询：&#123;&#125;&quot;</span>, mapper2.getById(<span class="hljs-number">1L</span>));<br></code></pre></div></td></tr></table></figure></li>
+<li><p>控制台输出如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">22:40:41.562 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Opening JDBC Connection<br>22:40:42.323 [main] DEBUG o.apache.ibatis.datasource.pooled.PooledDataSource - Created connection 1205559205.<br>22:40:42.323 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Setting autocommit to <span class="hljs-literal">false</span> on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@47db5fa5]<br>22:40:42.325 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ?<br>22:40:42.350 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt; Parameters: 1(Long)<br>22:40:42.362 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>22:40:42.363 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==        Row: 1, 1, zhangsan1, 180.0, 男, 1990-01-01, 2022-07-01 22:10:22<br>22:40:42.365 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - &lt;==      Total: 1<br>22:40:42.367 [main] INFO  space.yangtao.client.StudentMapperTest - session1 第1次查询：StudentPO(id=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>22:40:42.367 [main] DEBUG space.yangtao.mapper.StudentMapper - Cache Hit Ratio [space.yangtao.mapper.StudentMapper]: 0.0<br>22:40:42.367 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Opening JDBC Connection<br>22:40:42.381 [main] DEBUG o.apache.ibatis.datasource.pooled.PooledDataSource - Created connection 367967231.<br>22:40:42.382 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Setting autocommit to <span class="hljs-literal">false</span> on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@15eebbff]<br>22:40:42.382 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ?<br>22:40:42.382 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt; Parameters: 1(Long)<br>22:40:42.383 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>22:40:42.383 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==        Row: 1, 1, zhangsan1, 180.0, 男, 1990-01-01, 2022-07-01 22:10:22<br>22:40:42.384 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - &lt;==      Total: 1<br>22:40:42.384 [main] INFO  space.yangtao.client.StudentMapperTest - session2 第1次查询：StudentPO(id=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>22:40:42.385 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Resetting autocommit to <span class="hljs-literal">true</span> on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@47db5fa5]<br>22:40:42.385 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Closing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@47db5fa5]<br>22:40:42.385 [main] DEBUG o.apache.ibatis.datasource.pooled.PooledDataSource - Returned connection 1205559205 to pool.<br>22:40:42.385 [main] DEBUG space.yangtao.mapper.StudentMapper - Cache Hit Ratio [space.yangtao.mapper.StudentMapper]: 0.3333333333333333<br>22:40:42.385 [main] INFO  space.yangtao.client.StudentMapperTest - session2 第2次查询：StudentPO(id=1, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br></code></pre></div></td></tr></table></figure>
+
+<p>由日志可知，MyBatis已集成并使用<code>EhCache</code>。</p>
+</li>
+</ol>
+<p><strong>注意</strong>：建议提醒读者在实际应用中，需要根据应用的并发量和数据量，合理配置缓存大小，以防止内存溢出或缓存失效等问题。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过本文的学习，开发者可以充分理解并运用MyBatis提供的缓存机制，有效地管理SqlSession的生命周期和跨会话的数据共享。一级缓存带来了会话内的数据访问优化，而二级缓存则扩展了数据共享的范围，提高了应用的响应速度和数据处理能力。此外，通过EhCache的集成，开发者能够实现更复杂的缓存策略，如数据的持久化和过期策略管理。掌握这些技能将显著提升数据库操作的效率和应用的性能。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/MyBatis/">MyBatis</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/MyBatis/">MyBatis</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/08/06/mybatis-annotation-dev/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">MyBatis注解开发</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/08/04/mybatis-pagination/">
+                        <span class="hidden-mobile">MyBatis分页</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

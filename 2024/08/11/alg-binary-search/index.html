@@ -1,0 +1,748 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="二分查找是计算机科学中一种基本而强大的算法，它允许在对数时间内快速查找有序集合中的元素。这种方法通过不断将搜索区间分成两半来快速定位目标值，广泛应用于算法竞赛和软件开发中，接下来本文将对二分查找进行详细的介绍。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="二分查找">
+<meta property="og:url" content="http://example.com/2024/08/11/alg-binary-search/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="二分查找是计算机科学中一种基本而强大的算法，它允许在对数时间内快速查找有序集合中的元素。这种方法通过不断将搜索区间分成两半来快速定位目标值，广泛应用于算法竞赛和软件开发中，接下来本文将对二分查找进行详细的介绍。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/cover-binary-search.jpg">
+<meta property="article:published_time" content="2024-08-11T15:45:21.000Z">
+<meta property="article:modified_time" content="2024-08-11T15:45:21.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="二分查找">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/cover-binary-search.jpg">
+  
+  
+  <title>二分查找 - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/cover-binary-search.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="二分查找">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2024-08-11 23:45" pubdate>
+        2024年8月11日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      12k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      20 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">二分查找</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：6 个月前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <p>二分查找是计算机科学中一种基本而强大的算法，它允许在对数时间内快速查找有序集合中的元素。这种方法通过不断将搜索区间分成两半来快速定位目标值，广泛应用于算法竞赛和软件开发中，接下来本文将对二分查找进行详细的介绍。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              </p>
+<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p><strong>二分查找（Binary Search）</strong>，也称为折半查找，是一种在有序数组中查找某一特定元素的搜索算法。</p>
+<h3 id="术语"><a href="#术语" class="headerlink" title="术语"></a>术语</h3><ul>
+<li><strong>目标target</strong>：要查找的值。</li>
+<li><strong>索引index</strong>：查找的当前位置。</li>
+<li><strong>左右指示符left、right</strong>：维持查找空间的指标。</li>
+<li><strong>中间指示符mid</strong>：用来应用条件以确定向左查找还是向右查找的索引。</li>
+</ul>
+<h3 id="算法思想"><a href="#算法思想" class="headerlink" title="算法思想"></a>算法思想</h3><p>通过不断将待查找的数据范围分成两半，然后根据中间值与目标值的比较，决定下一步在哪一半中继续查找，由于每次都能将搜索范围缩小一半，所以能加快搜索速度。</p>
+<h3 id="基本步骤"><a href="#基本步骤" class="headerlink" title="基本步骤"></a>基本步骤</h3><ol>
+<li><strong>初始化</strong>：设定两个指针，一个指向数组的起始位置（<code>left</code>），另一个指向数组的结束位置（<code>right</code>）。</li>
+<li><strong>中间元素比较</strong>：计算中间位置的索引 <code>mid = left + (right - left) / 2</code>，并比较中间元素与目标值：<ul>
+<li>如果中间元素等于目标值，搜索结束，返回该位置的索引。</li>
+<li>如果中间元素小于目标值，说明目标值位于数组的后半段，调整 <code>left</code> 指针到 <code>mid + 1</code>。</li>
+<li>如果中间元素大于目标值，说明目标值位于数组的前半段，调整 <code>right</code> 指针到 <code>mid - 1</code>。</li>
+</ul>
+</li>
+<li><strong>迭代或递归</strong>：重复上述步骤，每次都根据比较结果调整查找范围，直到 <code>left</code> 指针超过 <code>right</code> 指针，这时如果仍未找到目标值，则表示数组中不存在该元素，返回 -1 或其他标识未找到的结果。</li>
+</ol>
+<h3 id="复杂度分析"><a href="#复杂度分析" class="headerlink" title="复杂度分析"></a>复杂度分析</h3><ul>
+<li><strong>时间复杂度</strong>：<code>O(log n)</code>，因为每次查找都将查找范围缩小为原来的一半。</li>
+<li><strong>空间复杂度</strong>：<code>O(1)</code>，只使用了常数空间。</li>
+</ul>
+<h3 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h3><ul>
+<li><strong>高效</strong>：二分查找的时间复杂度为 <code>O(log n)</code>，其中 n 是数组的长度。相较于线性查找的 <code>O(n)</code>，二分查找在大数据集上表现更优。</li>
+<li><strong>前提条件</strong>：二分查找要求数据结构是有序的。对于无序数据集，必须先进行排序，这可能会增加额外的时间成本。</li>
+<li><strong>适用场景</strong>：最适合用于不经常变动但频繁搜索的数据集。例如，数据库的索引通常就是利用类似二分查找的算法进行优化的。</li>
+</ul>
+<h2 id="模板"><a href="#模板" class="headerlink" title="模板"></a>模板</h2><p>用以下这道标准的二分查找为例，根据指针边界的定义（即区间的开闭情况），可分为4个模板。</p>
+<p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/binary-search/">704. 二分查找 - 力扣（LeetCode）</a></p>
+<blockquote>
+<p>给定一个 n 个元素有序的（升序）整型数组 nums 和一个目标值 target  ，写一个函数搜索 nums 中的 target，如果目标值存在返回下标，否则返回 -1。</p>
+</blockquote>
+<h3 id="Ⅰ-左闭右闭"><a href="#Ⅰ-左闭右闭" class="headerlink" title="Ⅰ 左闭右闭"></a>Ⅰ 左闭右闭</h3><p>搜索区间包含左右边界，即<code>[left, right]</code>，适用于大多数基本的二分查找问题，其中目标值可能刚好位于数组的端点。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Solution</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">search</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] nums, <span class="hljs-keyword">int</span> target)</span> </span>&#123;<br>        <span class="hljs-comment">// 初始化左指针为0</span><br>        <span class="hljs-keyword">int</span> left = <span class="hljs-number">0</span>;<br>        <span class="hljs-comment">// 初始化右指针为数组长度减1</span><br>        <span class="hljs-keyword">int</span> right = nums.length - <span class="hljs-number">1</span>;<br>        <span class="hljs-comment">// 当处于合法区间（左指针不大于右指针）时，继续循环</span><br>        <span class="hljs-keyword">while</span> (left &lt;= right) &#123;<br>            <span class="hljs-comment">// 计算中间位置</span><br>            <span class="hljs-keyword">int</span> mid = left + (right - left) / <span class="hljs-number">2</span>;<br>            <span class="hljs-comment">// 如果中间元素大于目标值，则将新的二分查找范围缩减为mid的左区间</span><br>            <span class="hljs-keyword">if</span> (nums[mid] &gt; target) &#123;<br>                <span class="hljs-comment">// mid已经明确不符合条件，为了满足新区间的右闭，所以新区间取值为[left, mid - 1]</span><br>                right = mid - <span class="hljs-number">1</span>;<br>            &#125;<br>            <span class="hljs-comment">// 如果中间元素小于目标值，则将新的二分查找范围缩减为mid右区间</span><br>            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (nums[mid] &lt; target) &#123;<br>                <span class="hljs-comment">// mid已经明确不符合条件，为了满足新区间的左闭，所以新区间取值为[mid + 1, right]</span><br>                left = mid + <span class="hljs-number">1</span>;<br>            &#125;<br>            <span class="hljs-comment">// 如果中间元素等于目标值, 则返回中间位置，即找到目标值</span><br>            <span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-keyword">return</span> mid;<br>            &#125;<br>        &#125;<br>        <span class="hljs-comment">// 未找到目标值，返回-1</span><br>        <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="Ⅱ-左闭右开"><a href="#Ⅱ-左闭右开" class="headerlink" title="Ⅱ 左闭右开"></a>Ⅱ 左闭右开</h3><p>搜索区间包括左边界但不包括右边界，即<code>[left, right)</code>，常见于某些编程语言的标准库实现中。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Solution</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">search</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] nums, <span class="hljs-keyword">int</span> target)</span> </span>&#123;<br>        <span class="hljs-keyword">int</span> left = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">int</span> right = nums.length;<br>        <span class="hljs-keyword">while</span> (left &lt; right) &#123;<br>            <span class="hljs-keyword">int</span> mid = left + (right - left) / <span class="hljs-number">2</span>;<br>            <span class="hljs-keyword">if</span> (nums[mid] &gt; target) &#123;<br>                <span class="hljs-comment">// mid已经明确不符合条件，为了满足新区间的右开，所以新区间取值为[left, mid)</span><br>                right = mid;<br>            &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (nums[mid] &lt; target) &#123;<br>                left = mid + <span class="hljs-number">1</span>;<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-keyword">return</span> mid;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="Ⅲ-左开右闭"><a href="#Ⅲ-左开右闭" class="headerlink" title="Ⅲ 左开右闭"></a>Ⅲ 左开右闭</h3><p>搜索区间不包括左边界但包括右边界，即<code>(left, right]</code>，比较少见，但可能适用于某些需要初始边界外扩展的特定算法设计，如处理某些周期性边界问题。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Solution</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">search3</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] nums, <span class="hljs-keyword">int</span> target)</span> </span>&#123;<br>        <span class="hljs-keyword">int</span> left = -<span class="hljs-number">1</span>;<br>        <span class="hljs-keyword">int</span> right = nums.length - <span class="hljs-number">1</span>;<br>        <span class="hljs-keyword">while</span> (left + <span class="hljs-number">1</span> &lt;= right) &#123;<br>            <span class="hljs-comment">// 注意此处 +1 处理：mid的计算方式向右收缩更加积极，规避程序除法向下取整导致无法缩小范围的死循环</span><br>            <span class="hljs-keyword">int</span> mid = left + (right - left + <span class="hljs-number">1</span>) / <span class="hljs-number">2</span>;<br>            <span class="hljs-keyword">if</span> (nums[mid] &gt; target) &#123;<br>                right = mid - <span class="hljs-number">1</span>;<br>            &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (nums[mid] &lt; target) &#123;<br>                <span class="hljs-comment">// mid已经明确不符合条件，为了满足新区间的左开，所以新区间取值为(mid, right]</span><br>                left = mid;<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-keyword">return</span> mid;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="Ⅳ-左开右开"><a href="#Ⅳ-左开右开" class="headerlink" title="Ⅳ 左开右开"></a>Ⅳ 左开右开</h3><p>搜索区间既不包括左边界也不包括右边界，即<code>(left, right)</code>，较少使用，适合于需要频繁调整边界判定逻辑的复杂查找或特殊情况处理。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Solution</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">search</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] nums, <span class="hljs-keyword">int</span> target)</span> </span>&#123;<br>        <span class="hljs-keyword">int</span> left = -<span class="hljs-number">1</span>;<br>        <span class="hljs-keyword">int</span> right = nums.length;<br>        <span class="hljs-keyword">while</span> (left + <span class="hljs-number">1</span> &lt; right) &#123;<br>            <span class="hljs-comment">// mid已经明确不符合条件，且为了满足新区间的左开右开，因此新区间取值为(left, mid)或(mid, right)</span><br>            <span class="hljs-keyword">int</span> mid = left + (right - left) / <span class="hljs-number">2</span>;<br>            <span class="hljs-keyword">if</span> (nums[mid] &gt; target) &#123;<br>                right = mid;<br>            &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (nums[mid] &lt; target) &#123;<br>                left = mid;<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-keyword">return</span> mid;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="题型"><a href="#题型" class="headerlink" title="题型"></a>题型</h2><h3 id="标准二分"><a href="#标准二分" class="headerlink" title="标准二分"></a>标准二分</h3><h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/search-insert-position/description/">35. 搜索插入位置 - 力扣（LeetCode）</a></p>
+<p><img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/image-20240811223220561.png"></p>
+<h4 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h4><p>这个问题是典型的二分查找应用。给定一个无重复元素的升序数组和一个目标值，需要找到目标值在数组中的索引或者应该插入的位置。二分查找是解决这类问题的理想方法，因为它能够在对数时间内缩小搜索范围。</p>
+<h4 id="解题过程"><a href="#解题过程" class="headerlink" title="解题过程"></a>解题过程</h4><ol>
+<li><strong>初始化指针</strong>：设置两个指针 <code>left</code> 和 <code>right</code> 分别指向数组的开始和结束位置。</li>
+<li><strong>二分搜索</strong>：计算中点 <code>mid</code> 并比较 <code>nums[mid]</code> 和 <code>target</code>：<ol>
+<li>如果 <code>nums[mid]</code> 等于 <code>target</code>，直接返回 <code>mid</code> 作为答案。</li>
+<li>如果 <code>nums[mid]</code> 大于 <code>target</code>，调整 <code>right</code> 指针到 <code>mid - 1</code>，因为目标值在左半边。</li>
+<li>如果 <code>nums[mid]</code> 小于 <code>target</code>，调整 <code>left</code> 指针到 <code>mid + 1</code>，因为目标值在右半边。</li>
+</ol>
+</li>
+<li><strong>找到插入位置</strong>：如果循环结束还没有找到目标值，<code>left</code> 指针将指向应该插入目标值的位置。因为循环终止时，<code>left</code> 是第一个大于 <code>target</code> 的位置的索引。</li>
+</ol>
+<h4 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h4><ul>
+<li><strong>时间复杂度</strong>：<code>O(logn)</code>，其中 <code>n</code> 是数组 <code>nums</code> 的长度。二分查找确保了对数级的搜索时间。</li>
+<li><strong>空间复杂度</strong>：<code>O(1)</code>，只使用了有限的额外空间。</li>
+</ul>
+<h4 id="Code"><a href="#Code" class="headerlink" title="Code"></a>Code</h4><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Solution</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">searchInsert</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] nums, <span class="hljs-keyword">int</span> target)</span> </span>&#123;<br>        <span class="hljs-keyword">int</span> left = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">int</span> right = nums.length - <span class="hljs-number">1</span>;<br>        <span class="hljs-keyword">while</span> (left &lt;= right) &#123;<br>            <span class="hljs-keyword">int</span> mid = left + (right - left) / <span class="hljs-number">2</span>;<br>            <span class="hljs-keyword">if</span> (nums[mid] &gt; target) &#123;<br>                right = mid - <span class="hljs-number">1</span>;<br>            &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (nums[mid] &lt; target) &#123;<br>                left = mid + <span class="hljs-number">1</span>;<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-keyword">return</span> mid;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> left;  <span class="hljs-comment">// left 是第一个大于 target 的位置</span><br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="数组中查找"><a href="#数组中查找" class="headerlink" title="数组中查找"></a>数组中查找</h3><h4 id="题目-1"><a href="#题目-1" class="headerlink" title="题目"></a>题目</h4><p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/find-right-interval/description/">436. 寻找右区间 - 力扣（LeetCode）</a></p>
+<p><img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/image-20240811221144973.png"></p>
+<h4 id="思路-1"><a href="#思路-1" class="headerlink" title="思路"></a>思路</h4><p>解决这个问题的关键是能够快速找到每个区间的右侧区间。为了实现这一点，可以利用数组的排序和二分搜索。首先，我们需要对区间按起始位置进行排序。然后，对每个区间使用二分搜索来找到第一个起始位置不小于该区间结束位置的其他区间的索引值。</p>
+<h4 id="解题过程-1"><a href="#解题过程-1" class="headerlink" title="解题过程"></a>解题过程</h4><ol>
+<li><strong>构建辅助数组</strong>：创建一个数组 <code>arr</code> 来保存原始区间的索引和起始位置。这样在排序后我们仍能追踪到每个区间的原始位置。</li>
+<li><strong>排序</strong>：对 <code>arr</code> 按照区间的起始位置进行排序。排序后，对于任意区间 <code>i</code>，所有在 <code>i</code> 之后的区间都有不小于 <code>i</code> 的起始位置。</li>
+<li><strong>二分搜索</strong>：对于排序后的每个区间，使用二分搜索在 <code>arr</code> 中找到第一个起始位置大于等于该区间结束位置的区间。这个区间就是所求的右侧区间。</li>
+<li><strong>特殊处理</strong>：处理没有右侧区间的情况，即如果二分搜索没有找到符合条件的区间，则为该区间返回 <code>-1</code>。</li>
+</ol>
+<h4 id="复杂度-1"><a href="#复杂度-1" class="headerlink" title="复杂度"></a>复杂度</h4><ul>
+<li><strong>时间复杂度</strong>：<code>O(nlogn)</code>，主要由排序和对每个区间进行二分搜索的操作组成，每次二分搜索的时间复杂度为 <code>O(log n)</code>，总共需要进行 <code>n</code> 次。</li>
+<li><strong>空间复杂度</strong>：<code>O(n)</code>，用于存储辅助数组 <code>arr</code> 以及最终的答案数组。</li>
+</ul>
+<h4 id="Code-1"><a href="#Code-1" class="headerlink" title="Code"></a>Code</h4><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Solution</span> </span>&#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span>[] findRightInterval(<span class="hljs-keyword">int</span>[][] intervals) &#123;<br>        <span class="hljs-keyword">int</span> l = intervals.length;<br>        <span class="hljs-keyword">int</span>[][] arr = <span class="hljs-keyword">new</span> <span class="hljs-keyword">int</span>[l][<span class="hljs-number">3</span>];<br>        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; l; i++) &#123;<br>            <span class="hljs-comment">// 保存原始索引</span><br>            arr[i][<span class="hljs-number">0</span>] = i;<br>            arr[i][<span class="hljs-number">1</span>] = intervals[i][<span class="hljs-number">0</span>];<br>            arr[i][<span class="hljs-number">2</span>] = intervals[i][<span class="hljs-number">1</span>];<br>        &#125;<br>        Arrays.sort(arr, (o1, o2) -&gt; o1[<span class="hljs-number">1</span>] - o2[<span class="hljs-number">1</span>]);<br>        <span class="hljs-keyword">int</span>[] ans = <span class="hljs-keyword">new</span> <span class="hljs-keyword">int</span>[l];<br>        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; l; i++) &#123;<br>            <span class="hljs-comment">// 在arr中查找第一个满足intervals[i][1]&lt;arr[?][1]的arr[?][0]</span><br>            ans[i] = binarySearch(arr, intervals[i][<span class="hljs-number">1</span>]);<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">binarySearch</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[][] arr, <span class="hljs-keyword">int</span> target)</span> </span>&#123;<br>        <span class="hljs-keyword">int</span> left = <span class="hljs-number">0</span>, right = arr.length;<br>        <span class="hljs-keyword">while</span> (left &lt; right) &#123;<br>            <span class="hljs-keyword">int</span> mid = left + (right - left) / <span class="hljs-number">2</span>;<br>            <span class="hljs-keyword">if</span> (arr[mid][<span class="hljs-number">1</span>] &lt; target) &#123;<br>                left = mid + <span class="hljs-number">1</span>;<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                right = mid;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> left == arr.length ? -<span class="hljs-number">1</span> : arr[left][<span class="hljs-number">0</span>];<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="旋转数组"><a href="#旋转数组" class="headerlink" title="旋转数组"></a>旋转数组</h3><h4 id="题目-2"><a href="#题目-2" class="headerlink" title="题目"></a>题目</h4><p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/search-in-rotated-sorted-array/description/">33. 搜索旋转排序数组 - 力扣（LeetCode）</a></p>
+<p><img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/image-20240811221419936.png"></p>
+<h4 id="思路-2"><a href="#思路-2" class="headerlink" title="思路"></a>思路</h4><p>此题要求在一个旋转排序数组中寻找目标值的索引。由于数组原本是升序的，但在某个未知下标上进行了旋转，使得该问题的解决需要考虑旋转的影响。该问题可以通过二分查找的方式解决，首先确定旋转点，然后在适当的半边数组中进行标准的二分查找。</p>
+<h4 id="解题过程-2"><a href="#解题过程-2" class="headerlink" title="解题过程"></a>解题过程</h4><ol>
+<li><strong>寻找旋转点</strong>：旋转点是数组中唯一的点，它比其右侧的元素大。通过二分查找来寻找这个点。此过程中，如果中间元素大于数组最右端的元素，旋转点必定在中间元素的右侧；否则，旋转点在左侧或就是中间元素本身。</li>
+<li><strong>判断搜索区域</strong>：确定旋转点后，需要判断目标值位于旋转点的左侧还是右侧。如果目标值在旋转点的值和数组最右端值之间，应在旋转点右侧搜索；否则，在左侧搜索。</li>
+<li><strong>执行二分查找</strong>：在确定的区域内执行标准的二分查找。如果找到目标值，返回其索引；否则，返回 <code>-1</code> 表示目标值不存在。</li>
+</ol>
+<h4 id="复杂度-2"><a href="#复杂度-2" class="headerlink" title="复杂度"></a>复杂度</h4><ul>
+<li><strong>时间复杂度</strong>：<code>O(logn)</code>，这里 <code>n</code> 是数组的长度。整个过程中，寻找旋转点和在一半的数组中查找目标值都是通过二分查找实现的，每个操作的时间复杂度都是 <code>O(log n)</code>。</li>
+<li><strong>空间复杂度</strong>：<code>O(1)</code>，只使用了常数个额外空间用于存储变量。</li>
+</ul>
+<h4 id="Code-2"><a href="#Code-2" class="headerlink" title="Code"></a>Code</h4><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Solution</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">search</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] nums, <span class="hljs-keyword">int</span> target)</span> </span>&#123;<br>        <span class="hljs-keyword">int</span> left = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">int</span> right = nums.length - <span class="hljs-number">1</span>;<br>        <span class="hljs-keyword">int</span> revIdx = findRevIdx(nums);<br>        <span class="hljs-keyword">if</span> (nums[revIdx] == target) &#123;<br>            <span class="hljs-keyword">return</span> revIdx;<br>        &#125;<br>        <span class="hljs-keyword">if</span> (nums[right] &gt;= target) &#123;<br>            <span class="hljs-keyword">return</span> bs(revIdx + <span class="hljs-number">1</span>, right, nums, target);<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            <span class="hljs-keyword">return</span> bs(left, revIdx - <span class="hljs-number">1</span>, nums, target);<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">// 二分查找返回下标</span><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> <span class="hljs-title">bs</span><span class="hljs-params">(<span class="hljs-keyword">int</span> left, <span class="hljs-keyword">int</span> right, <span class="hljs-keyword">int</span>[] nums, <span class="hljs-keyword">int</span> target)</span> </span>&#123;<br>        <span class="hljs-keyword">if</span> (left &gt; right) &#123;<br>            <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;<br>        &#125;<br>        <span class="hljs-keyword">int</span> mid = left + (right - left) / <span class="hljs-number">2</span>;<br>        <span class="hljs-keyword">if</span> (nums[mid] == target) &#123;<br>            <span class="hljs-keyword">return</span> mid;<br>        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (nums[mid] &lt; target) &#123;<br>            <span class="hljs-keyword">return</span> bs(mid + <span class="hljs-number">1</span>, right, nums, target);<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            <span class="hljs-keyword">return</span> bs(left, mid - <span class="hljs-number">1</span>, nums, target);<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">// 寻找数组翻转下标</span><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> <span class="hljs-title">findRevIdx</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] nums)</span> </span>&#123;<br>        <span class="hljs-keyword">int</span> left = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">int</span> right = nums.length - <span class="hljs-number">1</span>;<br>        <span class="hljs-keyword">while</span> (left &lt; right) &#123;<br>            <span class="hljs-keyword">int</span> mid = left + (right - left) / <span class="hljs-number">2</span>;<br>            <span class="hljs-keyword">if</span> (nums[mid] &gt; nums[right]) &#123;<br>                left = mid + <span class="hljs-number">1</span>;<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                right = mid;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> left;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="数学"><a href="#数学" class="headerlink" title="数学"></a>数学</h3><h4 id="题目-3"><a href="#题目-3" class="headerlink" title="题目"></a>题目</h4><p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/sqrtx/description/">69. x 的平方根 - 力扣（LeetCode）</a></p>
+<p><img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/image-20240811225241200.png"></p>
+<h4 id="思路-3"><a href="#思路-3" class="headerlink" title="思路"></a>思路</h4><p>计算整数 <code>x</code> 的算术平方根可以通过二分查找实现。问题的关键是找到一个数 <code>m</code>，使得 <code>m^2</code> 最接近且不大于 <code>x</code>。根据题意 <code>x</code> 的取值不会大于 <code>2^31 - 1</code>，可知结果的范围不会超过 <code>2^16</code>，我们可以在 <code>0</code> 到这个数的范围内使用二分查找来寻找这个数。</p>
+<h4 id="解题过程-3"><a href="#解题过程-3" class="headerlink" title="解题过程"></a>解题过程</h4><ol>
+<li><strong>初始化二分查找边界</strong>：<code>left</code> 初始化为 <code>0</code>，<code>right</code> 初始化为 <code>65535</code>，或者一个足够大的数（例如 <code>65536</code>，对于本题足够覆盖输入范围内的平方根）。</li>
+<li><strong>二分查找</strong>：在每次迭代中，计算 <code>mid</code> 作为 <code>left</code> 和 <code>right</code> 的平均值 <code>mid</code>，进而计算 <code>mid</code> 的平方 <code>res</code>。为避免整型溢出，使用 <code>long</code> 类型进行计算。<ol>
+<li>如果 <code>res</code> 小于 <code>x</code>，则 <code>mid</code> 可能是答案，但需要尝试更大的数，所以将 <code>left</code> 设置为 <code>mid</code>。</li>
+<li>如果 <code>res</code> 大于 <code>x</code>，说明 <code>mid</code> 太大，需要尝试更小的数，所以将 <code>right</code> 设置为 <code>mid</code>。</li>
+<li>如果 <code>res</code> 等于 <code>x</code>，直接返回 <code>mid</code> 作为答案。</li>
+</ol>
+</li>
+<li><strong>返回结果</strong>：如果循环结束还没有找到恰好等于 <code>x</code> 的平方根，返回 <code>left</code>。这是因为当 <code>left + 1</code> 等于 <code>right</code> 时，已经确认 <code>left</code> 是小于等于 <code>x</code> 平方根的最大整数。</li>
+</ol>
+<h4 id="复杂度-3"><a href="#复杂度-3" class="headerlink" title="复杂度"></a>复杂度</h4><ul>
+<li><strong>时间复杂度</strong>：<code>O(logx)</code>，二分查找的时间复杂度为对数级。</li>
+<li><strong>空间复杂度</strong>：<code>O(1)</code>，仅使用了固定的额外空间。</li>
+</ul>
+<h4 id="Code-3"><a href="#Code-3" class="headerlink" title="Code"></a>Code</h4><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Solution</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">mySqrt</span><span class="hljs-params">(<span class="hljs-keyword">int</span> x)</span> </span>&#123;<br>        <span class="hljs-keyword">long</span> left = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">long</span> right = <span class="hljs-number">65536</span>;<br>        <span class="hljs-keyword">while</span> (left + <span class="hljs-number">1</span> &lt; right) &#123;<br>            <span class="hljs-keyword">long</span> mid = left + (right - left) / <span class="hljs-number">2</span>;<br>            <span class="hljs-keyword">long</span> res = mid * mid;<br>            <span class="hljs-keyword">if</span> (res &lt; x) &#123;<br>                left = mid;<br>            &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (res &gt; x) &#123;<br>                right = mid;<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-keyword">return</span> (<span class="hljs-keyword">int</span>) mid;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> (<span class="hljs-keyword">int</span>) left;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="不变量"><a href="#不变量" class="headerlink" title="不变量"></a>不变量</h3><h4 id="题目-4"><a href="#题目-4" class="headerlink" title="题目"></a>题目</h4><p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/h-index-ii/description/">275. H 指数 II - 力扣（LeetCode）</a></p>
+<p><img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/image-20240811225905952.png"></p>
+<h4 id="思路-4"><a href="#思路-4" class="headerlink" title="思路"></a>思路</h4><p>这道题目要求计算科研人员的 <code>h</code> 指数，<code>h</code> 指数的定义是至少有 <code>h</code> 篇论文分别被引用了至少 <code>h</code> 次。数组已经按照升序排列，因此我们可以利用二分搜索来加速查找过程。</p>
+<h4 id="解题过程-4"><a href="#解题过程-4" class="headerlink" title="解题过程"></a>解题过程</h4><ol>
+<li><strong>初始化</strong>：设定二分搜索的边界，<code>left</code> 为 <code>0</code>，<code>right</code> 为论文总数减一（<code>length - 1</code>）。</li>
+<li><strong>二分搜索</strong>：<ol>
+<li>计算中点 <code>mid</code>，以及中点论文的引用次数 <code>midVal = citations[mid]</code>。</li>
+<li>根据 <code>h</code> 指数的定义，如果 <code>midVal</code> 大于等于从当前论文到数组末尾的论文数量（<code>length - mid</code>），这意味着至少有 <code>length - mid</code> 篇论文被引用了至少 <code>midVal</code> 次。这种情况下，我们尝试查看是否可以有更大的 <code>h</code> 指数，即向左移动 <code>right</code> 边界。</li>
+<li>否则，向右移动 <code>left</code> 边界，尝试找到满足条件的较小论文集合。</li>
+</ol>
+</li>
+<li><strong>更新结果</strong>：如果找到符合条件的 <code>h</code> 指数，更新 <code>ans</code>。</li>
+</ol>
+<h4 id="复杂度-4"><a href="#复杂度-4" class="headerlink" title="复杂度"></a>复杂度</h4><ul>
+<li><strong>时间复杂度</strong>：<code>O(logn)</code>，这里 <code>n</code> 是数组 <code>citations</code> 的长度。使用二分查找来优化查找过程。</li>
+<li><strong>空间复杂度</strong>：<code>O(1)</code>，算法只使用常数额外空间。</li>
+</ul>
+<h4 id="Code-4"><a href="#Code-4" class="headerlink" title="Code"></a>Code</h4><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Solution</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">hIndex</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] citations)</span> </span>&#123;<br>        <span class="hljs-keyword">int</span> length = citations.length;<br>        <span class="hljs-keyword">int</span> ans = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">int</span> left = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">int</span> right = length - <span class="hljs-number">1</span>;<br>        <span class="hljs-keyword">while</span> (left &lt;= right) &#123;<br>            <span class="hljs-keyword">int</span> mid = left + (right - left) / <span class="hljs-number">2</span>;<br>            <span class="hljs-keyword">int</span> midVal = citations[mid];<br>            <span class="hljs-keyword">if</span> (midVal &gt;= length - mid) &#123;<br>                ans = length - mid;  <span class="hljs-comment">// 更新潜在的 h 指数</span><br>                right = mid - <span class="hljs-number">1</span>;     <span class="hljs-comment">// 尝试寻找一个更大的 h 指数</span><br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                left = mid + <span class="hljs-number">1</span>;      <span class="hljs-comment">// 寻找满足条件的更小的集合</span><br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="作为一种方法"><a href="#作为一种方法" class="headerlink" title="作为一种方法"></a>作为一种方法</h3><h4 id="题目-5"><a href="#题目-5" class="headerlink" title="题目"></a>题目</h4><p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/longest-increasing-subsequence/description/">300. 最长递增子序列 - 力扣（LeetCode）</a></p>
+<p><img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/image-20240811231048103.png"></p>
+<h4 id="思路-5"><a href="#思路-5" class="headerlink" title="思路"></a>思路</h4><p>为了使递增序列更长，我们要尽量让序列“增长地更慢”，即保证序列中的元素尽可能小，增加后续元素扩展序列的可能性。为此维护一个辅助数组 <code>arr</code>，其中 <code>arr[i]</code> 表示长度为 <code>i+1</code> 的所有递增子序列中末尾元素的最小值。这个方法保证了 <code>arr</code> 数组是单调递增的，使得可以通过二分搜索来优化查找和替换操作。</p>
+<h4 id="解题过程-5"><a href="#解题过程-5" class="headerlink" title="解题过程"></a>解题过程</h4><ol>
+<li><strong>初始化</strong>：创建一个数组 <code>arr</code>，用来存储在扫描过程中遇到的递增序列的最小可能末尾值。<code>arrLength</code> 记录 <code>arr</code> 的有效长度，即最长递增子序列的当前最大长度。</li>
+<li><strong>迭代更新</strong>，遍历原数组 <code>nums</code>，对于每个元素<ol>
+<li>如果当前元素 <code>nums[i]</code> 大于 <code>arr</code> 的最后一个元素，则将其添加到 <code>arr</code> 的末尾，因为它可以扩展当前最长的递增子序列。</li>
+<li>如果 <code>nums[i]</code> 小于或等于 <code>arr</code> 的最后一个元素，则使用二分搜索找到第一个不小于 <code>nums[i]</code> 的元素在 <code>arr</code> 中的位置，并替换它。这样做是为了保持 <code>arr</code> 中元素尽可能小，增加后续元素扩展序列的可能性。</li>
+</ol>
+</li>
+<li><strong>二分搜索</strong>：利用二分搜索优化查找和替换操作，确保 <code>arr</code> 中的元素是有序的。</li>
+</ol>
+<h4 id="复杂度-5"><a href="#复杂度-5" class="headerlink" title="复杂度"></a>复杂度</h4><ul>
+<li><strong>时间复杂度</strong>：<code>O(nlogn)</code>，其中 <code>n</code> 是 <code>nums</code> 数组的长度。每个元素最多进行一次二分搜索，每次搜索的时间复杂度为 <code>O(log n)</code>。</li>
+<li><strong>空间复杂度</strong>：<code>O(n)</code>，需要额外的空间来存储 <code>arr</code> 数组。</li>
+</ul>
+<h4 id="Code-5"><a href="#Code-5" class="headerlink" title="Code"></a>Code</h4><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Solution</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">lengthOfLIS</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] nums)</span> </span>&#123;<br>        <span class="hljs-keyword">int</span>[] arr = <span class="hljs-keyword">new</span> <span class="hljs-keyword">int</span>[nums.length];<br>        arr[<span class="hljs-number">0</span>] = nums[<span class="hljs-number">0</span>];<br>        <span class="hljs-keyword">int</span> arrLength = <span class="hljs-number">1</span>;<br>        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">1</span>; i &lt; nums.length; i++) &#123;<br>            <span class="hljs-keyword">if</span> (nums[i] &gt; arr[arrLength - <span class="hljs-number">1</span>]) &#123;<br>                arr[arrLength] = nums[i];<br>                arrLength++;<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-keyword">int</span> index = binarySearch(arr, <span class="hljs-number">0</span>, arrLength - <span class="hljs-number">1</span>, nums[i]);<br>                arr[index] = nums[i];<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> arrLength;<br>    &#125;<br><br>    <span class="hljs-comment">// 二分查找target应插入的位置或替换的位置</span><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> <span class="hljs-title">binarySearch</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] arr, <span class="hljs-keyword">int</span> left, <span class="hljs-keyword">int</span> right, <span class="hljs-keyword">int</span> target)</span> </span>&#123;<br>        <span class="hljs-keyword">while</span> (left &lt;= right) &#123;<br>            <span class="hljs-keyword">int</span> mid = left + (right - left) / <span class="hljs-number">2</span>;<br>            <span class="hljs-keyword">if</span> (arr[mid] &lt; target) &#123;<br>                left = mid + <span class="hljs-number">1</span>;<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                right = mid - <span class="hljs-number">1</span>;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> left;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="结合贪心"><a href="#结合贪心" class="headerlink" title="结合贪心"></a>结合贪心</h3><h4 id="题目-6"><a href="#题目-6" class="headerlink" title="题目"></a>题目</h4><p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/split-array-largest-sum/description/">410. 分割数组的最大值 - 力扣（LeetCode）</a></p>
+<p><img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/image-20240811231709590.png"></p>
+<h4 id="思路-6"><a href="#思路-6" class="headerlink" title="思路"></a>思路</h4><p>此问题要求将一个非负整数数组分割成 <code>k</code> 个连续子数组，使得这些子数组中的最大和最小。为实现此目标，我们采用二分搜索与贪心算法的结合。二分搜索确定最大子数组和的可能最小值，而贪心算法用来验证在给定最大子数组和的约束下是否能有效地分割数组。</p>
+<h4 id="解题过程-6"><a href="#解题过程-6" class="headerlink" title="解题过程"></a>解题过程</h4><ol>
+<li><strong>确定二分搜索范围</strong>：<ol>
+<li>下界为数组中的最大值，因为任何有效的分割方式中，最大子数组的和不可能小于数组中的最大单个元素。</li>
+<li>上界为所有数组元素的总和，因为在极端情况下，所有元素都可以在一个子数组中。</li>
+</ol>
+</li>
+<li><strong>二分搜索</strong>：对上述范围进行二分搜索，寻找可以满足条件的最小可能的最大子数组和。</li>
+<li><strong>贪心验证</strong>：对于每个中间值（即二分搜索的当前中值），尝试使用该值作为最大子数组和来分割数组。如果能将数组分割成不超过 <code>k</code> 个这样的子数组，则该中值可行。</li>
+</ol>
+<h4 id="复杂度-6"><a href="#复杂度-6" class="headerlink" title="复杂度"></a>复杂度</h4><ul>
+<li><strong>时间复杂度</strong>：<code>O(nlogS)</code>，其中 <code>n</code> 是数组的长度，<code>S</code> 是二分搜索的范围，即从 <code>max(nums)</code> 到 <code>sum(nums)</code>。</li>
+<li><strong>空间复杂度</strong>：<code>O(1)</code>，仅使用了有限的额外空间。</li>
+</ul>
+<h4 id="Code-6"><a href="#Code-6" class="headerlink" title="Code"></a>Code</h4><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Solution</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">splitArray</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] nums, <span class="hljs-keyword">int</span> k)</span> </span>&#123;<br>        <span class="hljs-keyword">int</span> left = <span class="hljs-number">0</span>, right = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> num : nums) &#123;<br>            right += num;<br>            <span class="hljs-keyword">if</span> (num &gt; left) &#123;<br>                left = num; <span class="hljs-comment">// 最大的一个元素是最小可能的最大子数组和的下界</span><br>            &#125;<br>        &#125;<br><br>        <span class="hljs-keyword">while</span> (left &lt; right) &#123;<br>            <span class="hljs-keyword">int</span> mid = left + (right - left) / <span class="hljs-number">2</span>;<br>            <span class="hljs-keyword">if</span> (valid(nums, k, mid)) &#123;<br>                right = mid; 	<span class="hljs-comment">// 如果可以实现，尝试更小的值</span><br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                left = mid + <span class="hljs-number">1</span>; <span class="hljs-comment">// 如果不可以实现，尝试更大的值</span><br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> left;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">valid</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] nums, <span class="hljs-keyword">int</span> k, <span class="hljs-keyword">int</span> maxSum)</span> </span>&#123;<br>        <span class="hljs-keyword">int</span> currentSum = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">int</span> count = <span class="hljs-number">1</span>; <span class="hljs-comment">// 至少需要一个子数组</span><br>        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> num : nums) &#123;<br>            <span class="hljs-keyword">if</span> (currentSum + num &gt; maxSum) &#123;<br>                count++;<br>                currentSum = num; <span class="hljs-comment">// 重新开始一个新的子数组</span><br>                <span class="hljs-keyword">if</span> (count &gt; k) &#123;<br>                    <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>; <span class="hljs-comment">// 如果子数组数量超过 k，则不满足条件</span><br>                &#125;<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                currentSum += num;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="结合动态规划"><a href="#结合动态规划" class="headerlink" title="结合动态规划"></a>结合动态规划</h3><h4 id="题目-7"><a href="#题目-7" class="headerlink" title="题目"></a>题目</h4><p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/maximum-profit-in-job-scheduling/description/">1235. 规划兼职工作 - 力扣（LeetCode）</a></p>
+<p><img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/image-20240811232718366.png"></p>
+<h4 id="思路-7"><a href="#思路-7" class="headerlink" title="思路"></a>思路</h4><p>这个问题要求解决的是一种典型的动态规划问题，结合了时间管理和最大化利润。任务是选择一系列不冲突的工作以获得最大收益。这可以通过排序和使用动态规划表来解决，其中利用二分搜索优化了寻找不冲突工作的过程。</p>
+<h4 id="解题过程-7"><a href="#解题过程-7" class="headerlink" title="解题过程"></a>解题过程</h4><ol>
+<li><strong>构造工作数组</strong>：将 <code>startTime</code>，<code>endTime</code> 和 <code>profit</code> 整合到一个数组 <code>jobs</code> 中，每个工作作为一个三元组 [开始时间, 结束时间, 利润]。</li>
+<li><strong>排序</strong>：按工作的结束时间对 <code>jobs</code> 进行排序。这样做可以更容易地管理工作之间的时间冲突。</li>
+<li><strong>动态规划初始化</strong>：创建一个动态规划数组 <code>f</code>，其中 <code>f[i]</code> 表示考虑到第 <code>i</code> 个工作时可以获得的最大利润。初始化 <code>f[0] = 0</code>。</li>
+<li><strong>填充动态规划表</strong>：<ol>
+<li>排序后的工作，对于每个工作，使用二分搜索找到最后一个结束时间不晚于当前工作开始时间的工作的索引 <code>j</code>。</li>
+<li>更新 <code>f[i]</code> 为不选择当前工作时的最大利润 <code>f[i-1]</code> 与选择当前工作后的总利润 <code>f[j + 1]</code> + 当前工作的利润 中的较大值。</li>
+</ol>
+</li>
+<li><strong>二分搜索实现</strong>：对于每个工作，查找不晚于该工作开始时间的最后一个工作的索引，这个索引用于确定不与当前工作冲突的前一个工作。</li>
+</ol>
+<h4 id="复杂度-7"><a href="#复杂度-7" class="headerlink" title="复杂度"></a>复杂度</h4><ul>
+<li><strong>时间复杂度</strong>：<code>O(nlogn)</code>，其中 n 是工作的数量。排序需要 <code>O(nlogn)</code> 时间，每次插入动态规划表需要 <code>O(logn)</code> 时间进行二分搜索。</li>
+<li><strong>空间复杂度</strong>：<code>O(n)</code>，用于存储排序后的工作和动态规划表。</li>
+</ul>
+<h4 id="Code-7"><a href="#Code-7" class="headerlink" title="Code"></a>Code</h4><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Solution</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">jobScheduling</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] startTime, <span class="hljs-keyword">int</span>[] endTime, <span class="hljs-keyword">int</span>[] profit)</span> </span>&#123;<br>        <span class="hljs-keyword">int</span> n = startTime.length;<br>        <span class="hljs-keyword">int</span>[][] jobs = <span class="hljs-keyword">new</span> <span class="hljs-keyword">int</span>[n][];<br>        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; n; i++) &#123;<br>            jobs[i] = <span class="hljs-keyword">new</span> <span class="hljs-keyword">int</span>[]&#123;startTime[i], endTime[i], profit[i]&#125;;<br>        &#125;<br>        Arrays.sort(jobs, Comparator.comparingInt(o -&gt; o[<span class="hljs-number">1</span>])); <span class="hljs-comment">// 按照结束时间排序</span><br><br>        <span class="hljs-keyword">int</span>[] f = <span class="hljs-keyword">new</span> <span class="hljs-keyword">int</span>[n + <span class="hljs-number">1</span>];<br>        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; n; i++) &#123;<br>            <span class="hljs-keyword">int</span> j = search(jobs, i, jobs[i][<span class="hljs-number">0</span>]);<br>            f[i + <span class="hljs-number">1</span>] = Math.max(f[i], f[j + <span class="hljs-number">1</span>] + jobs[i][<span class="hljs-number">2</span>]);<br>        &#125;<br>        <span class="hljs-keyword">return</span> f[n];<br>    &#125;<br><br>    <span class="hljs-comment">// 返回 endTime &lt;= upper 的最大下标</span><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> <span class="hljs-title">search</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[][] jobs, <span class="hljs-keyword">int</span> right, <span class="hljs-keyword">int</span> upper)</span> </span>&#123;<br>        <span class="hljs-keyword">int</span> left = -<span class="hljs-number">1</span>;<br>        <span class="hljs-keyword">while</span> (left + <span class="hljs-number">1</span> &lt; right) &#123;<br>            <span class="hljs-keyword">int</span> mid = (left + right) &gt;&gt;&gt; <span class="hljs-number">1</span>;<br>            <span class="hljs-keyword">if</span> (jobs[mid][<span class="hljs-number">1</span>] &lt;= upper) &#123;<br>                left = mid;<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                right = mid;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> left;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过本文的学习，读者不仅可以掌握二分查找的基本方法和几种常见的变体，还可以通过实际的编程题加深理解和应用。掌握二分查找对于提高编程效率和解决复杂问题具有重要意义，是每个软件开发者必备的技能之一。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/%E7%AE%97%E6%B3%95/">算法</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE/">二分查找</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/08/13/alg-fast-exponentiation/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">快速幂运算</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/07/15/spring-cache/">
+                        <span class="hidden-mobile">Spring Cache</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

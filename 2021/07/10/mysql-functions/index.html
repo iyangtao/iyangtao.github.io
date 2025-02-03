@@ -1,0 +1,866 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="引言在数据库管理和查询中，函数扮演着至关重要的角色，它们极大地增强了SQL语言的表达力和处理能力。MySQL作为世界上最流行的关系数据库之一，提供了丰富的内置函数来支持数据处理和查询。本文详细介绍了MySQL中的常用函数，涵盖了数据聚合、流程控制、数据类型转换、字符串操作等多个方面，旨在帮助开发者和数据库管理员充分利用这些功能来优化查询和增强数据处理能力。 聚合函数 AVG([DISTINCT]">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL常用函数">
+<meta property="og:url" content="http://example.com/2021/07/10/mysql-functions/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="引言在数据库管理和查询中，函数扮演着至关重要的角色，它们极大地增强了SQL语言的表达力和处理能力。MySQL作为世界上最流行的关系数据库之一，提供了丰富的内置函数来支持数据处理和查询。本文详细介绍了MySQL中的常用函数，涵盖了数据聚合、流程控制、数据类型转换、字符串操作等多个方面，旨在帮助开发者和数据库管理员充分利用这些功能来优化查询和增强数据处理能力。 聚合函数 AVG([DISTINCT]">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/mysql.webp">
+<meta property="article:published_time" content="2021-07-10T01:25:12.000Z">
+<meta property="article:modified_time" content="2021-07-10T01:25:12.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="MySQL">
+<meta property="article:tag" content="手册">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/mysql.webp">
+  
+  
+  <title>MySQL常用函数 - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/mysql.webp') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="MySQL常用函数">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-07-10 09:25" pubdate>
+        2021年7月10日 上午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      6.8k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      12 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">MySQL常用函数</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：4 年前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>在数据库管理和查询中，函数扮演着至关重要的角色，它们极大地增强了SQL语言的表达力和处理能力。MySQL作为世界上最流行的关系数据库之一，提供了丰富的内置函数来支持数据处理和查询。本文详细介绍了MySQL中的常用函数，涵盖了数据聚合、流程控制、数据类型转换、字符串操作等多个方面，旨在帮助开发者和数据库管理员充分利用这些功能来优化查询和增强数据处理能力。</p>
+<h2 id="聚合函数"><a href="#聚合函数" class="headerlink" title="聚合函数"></a>聚合函数</h2><ul>
+<li><code>AVG([DISTINCT] expr)</code>：（分组）对列的数据求平均值</li>
+<li><code> SUM([DISTINCT] expr)</code>：（分组）对列的数据求总和</li>
+<li> <code>MIN([DISTINCT] expr)</code>：（分组）求列数据的最小值</li>
+<li> <code>MAX([DISTINCT] expr)</code>：（分组）求列数据的最大值</li>
+<li><code>COUNT([DISTINCT] expr)</code>：（分组）求数据行数</li>
+</ul>
+<h2 id="流程控制"><a href="#流程控制" class="headerlink" title="流程控制"></a>流程控制</h2><ul>
+<li><code>IF(expr1,expr2,expr3)</code>：如果expr1的值为TRUE，返回expr2， 否则返回expr3</li>
+<li><code>IFNULL(expr1,expr2)</code>：如果expr1不为NULL，返回expr1，否则返回expr2</li>
+<li><code>CASE WHEN when_value THEN statement_list WHEN when_value THEN statement_list .... [ELSE resultn] END</code>：相当于Java的if…else if…else… </li>
+<li><code>CASE case_value WHEN when_value THEN statement_list ELSE statement_list END CASE;</code>：相当于Java的switch…case…</li>
+<li><code>BENCHMARK(count,expr)</code>：将表达式expr重复执行count次</li>
+<li>REPEAT statement_list UNTIL search_condition END REPEAT;：循环执行直至达成条件</li>
+</ul>
+<h2 id="数据库信息"><a href="#数据库信息" class="headerlink" title="数据库信息"></a>数据库信息</h2><ul>
+<li><code>VERSION()</code>：返回当前MySQL的版本号</li>
+<li><code>CONNECTION_ID()</code>：返回当前MySQL服务器的连接数</li>
+<li><code>DATABASE()</code>，<code>SCHEMA()</code>：返回MySQL命令行当前所在的数据库</li>
+<li><code>USER()</code>、<code>CURRENT_USER()</code>、<code>SYSTEM_USER()</code>、<code>SESSION_USER()</code>：返回当前连接MySQL的用户名，返回结果格式为 “主机名@用户名” </li>
+<li><code>CHARSET(str)</code>：返回字符串str自变量的字符集</li>
+<li><code>COLLATION(str)</code>：返回字符串str的比较规则</li>
+<li><code>CONVERT(expr USING transcoding_name)</code>：将expr所使用的字符编码修改为transcoding_name</li>
+<li><code>ROW_COUNT()</code>：返回上一句sql增删改影响的记录数，查询返回-1</li>
+<li><code>FOUND_ROWS()</code>：上一句select或show语句的结果集的记录数</li>
+</ul>
+<h2 id="计算-比较"><a href="#计算-比较" class="headerlink" title="计算/比较"></a>计算/比较</h2><ul>
+<li><p><code>ABS(X)</code>：返回x的绝对值</p>
+</li>
+<li><p><code>SIGN(X)</code>：返回x的符号，正数为1，负数为-1，0返回0</p>
+</li>
+<li><p><code>PI()</code>：返回圆周率</p>
+</li>
+<li><p><code>CEIL(X)</code> / <code>CEILING(X)</code>：返回大于或等于某个值的最小整数</p>
+</li>
+<li><p><code>FLOOR(X)</code>：返回小于或等于某个值的最大整数</p>
+</li>
+<li><p><code>LEAST(value1,value2,...)</code>：返回列表中的最小值，列表含null则返回null</p>
+</li>
+<li><p><code>GREATEST(value1,value2,...)</code>：返回列表中的最大值，列表含null则返回null</p>
+</li>
+<li><p><code>MOD(N,M)</code>：返回X除以Y后的余数</p>
+</li>
+<li><p><code>RAND()</code>：返回0~1的随机值</p>
+</li>
+<li><p><code>RAND(X)</code>：返回0~1的随机值，其中x的值用作种子值，相同的X值会产生相同的随机 数</p>
+</li>
+<li><p><code>ROUND(X)</code>：返回一个对x的值进行四舍五入后，最接近于X的整数</p>
+</li>
+<li><p><code>ROUND(X,D)</code>：返回一个对x的值进行四舍五入后最接近X的值，并保留到小数点后面Y位</p>
+</li>
+<li><p><code>TRUNCATE(X,D)</code>：返回数字x截断为y位小数的结果</p>
+</li>
+</ul>
+<h2 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h2><ul>
+<li><code>ASCII(str)</code>：返回字符串str中的第一个字符的ASCII码值 </li>
+<li><code>CHAR_LENGTH(str)</code>：返回字符串str的字符数。作用与CHARACTER_LENGTH(str)相同 </li>
+<li><code>LENGTH(str)</code>：返回字符串str的字节数，和字符集有关 </li>
+<li><code>CONCAT(str1,str2,..)</code>：连接str1,str2,..为一个字符串 </li>
+<li><code>CONCAT_WS(separator,str1,str2,...)</code>：同CONCAT(str1,str2,..)函数，但是每个字符串之间要加上separator</li>
+<li><code>INSERT(str,pos,len,newstr)</code>：将字符串str从第pos位置开始，len个字符长的子串替换为字符串newstr</li>
+<li><code>REPLACE(str,from_str,to_str)</code>：用字符串to_str替换字符串str中所有出现的字符串from_str</li>
+<li><code>UPPER(str)</code> / <code>UCASE(str)</code>：将字符串str的所有字母转成大写字母 </li>
+<li><code>LOWER(str)</code> / <code>LCASE(str)</code>：将字符串str的所有字母转成小写字母 </li>
+<li><code>LEFT(str,len)</code>：返回字符串str最左边的len个字符 </li>
+<li><code>RIGHT(str,len)</code>：返回字符串str最右边的len个字符 </li>
+<li><code>LPAD(str,len,padstr)</code>：用字符串padstr对str最左边进行填充，直到str的长度为len个字符 </li>
+<li><code>RPAD(str,len,padstr)</code>：用字符串padstr对str最右边进行填充，直到str的长度为len个字符 </li>
+<li><code>TRIM(str)</code>：去掉字符串str开始与结尾的空格 </li>
+<li><code>LTRIM(str)</code>：去掉字符串str左侧的空格 </li>
+<li><code>RTRIM(str)</code>：去掉字符串str右侧的空格 </li>
+<li><code>TRIM([&#123;BOTH | LEADING | TRAILING&#125; [remstr] FROM] str)</code>：去掉str两边/开始/结尾处的remstr</li>
+<li><code>REPEAT(str,count)</code>：返回str重复count次的结果 </li>
+<li><code>SPACE(N)</code>：返回N个空格 </li>
+<li><code>STRCMP(expr1,expr2)</code>：比较字符串expr1,expr2的ASCII码值的大小 </li>
+<li><code>SUBSTR(str,pos,len)</code>：返回从字符串str的pos位置其len个字符，作用与<code>SUBSTRING(str,pos,len)</code>、 <code>MID(str,pos,len)</code>相同 </li>
+<li><code>LOCATE(substr,str)</code>：返回字符串substr在字符串str中首次出现的位置，作用于<code>POSITION(substr IN str)</code>、<code>INSTR(str,substr)</code>相同。未找到，返回0 </li>
+<li><code>ELT(N,str1,str2,str3,...)</code>：返回指定位置的字符串，如果N=1，则返回str1，如果N=2，则返回str2…，与<code>MAKE_SET(bits,str1,str2,...)</code>作用相同</li>
+<li><code>FIELD(str,str1,str2,str3,...)</code>：返回字符串str在字符串列表中第一次出现的位置</li>
+<li><code>FIND_IN_SET(str,strlist)</code>：返回字符串str在字符串strlist中出现的位置。其中，字符串strlist是一个以逗号分隔的字符串 </li>
+<li><code>REVERSE(str)</code>：返回str反转后的字符串 </li>
+<li><code>NULLIF(expr1,expr2)</code>：比较两个字符串，如果expr1与expr2相等，则返回NULL，否则返回expr1</li>
+</ul>
+<h2 id="日期和时间"><a href="#日期和时间" class="headerlink" title="日期和时间"></a>日期和时间</h2><ul>
+<li><code>CURDATE()</code> / <code>CURRENT_DATE()</code>：返回当前日期，只包含年、 月、日</li>
+<li><code>CURTIME()</code> / <code>CURRENT_TIME()</code>：返回当前时间，只包含时、 分、秒 </li>
+<li><code>NOW()</code> / <code>SYSDATE()</code> / <code>CURRENT_TIMESTAMP()</code> / <code>LOCALTIME()</code> / <code>LOCALTIMESTAMP()</code>：返回当前系统日期和时间 </li>
+<li><code>UTC_DATE()</code>：返回UTC（世界标准时间）日期 </li>
+<li><code>UTC_TIME()</code>：返回UTC（世界标准时间）时间</li>
+<li><code>UNIX_TIMESTAMP()</code>：以UNIX时间戳的形式返回当前时间</li>
+<li><code>UNIX_TIMESTAMP(date)</code>：将时间date以UNIX时间戳的形式返回</li>
+<li><code>FROM_UNIXTIME(unix_timestamp)</code>：将UNIX时间戳转换为普通格式的时间</li>
+<li><code>FROM_UNIXTIME(unix_timestamp,format)</code>：将UNIX时间戳转换为指定格式的时间</li>
+<li><code>YEAR(date)</code> / <code>MONTH(date)</code> / <code>DAY(date)</code>：返回具体的日期值 </li>
+<li><code>HOUR(time)</code> / <code>MINUTE(time)</code> / <code>SECOND(time)</code>：返回具体的时间值 </li>
+<li><code>MONTHNAME(date)</code>：返回月份：January，… </li>
+<li><code>DAYNAME(date)</code>：返回星期几：MONDAY，TUESDAY，…，SUNDAY </li>
+<li><code>WEEKDAY(date)</code>：返回周几，注意，周1是0，周2是1，…，周日是6 </li>
+<li><code>QUARTER(date)</code>：返回日期对应的季度，范围为1～4 </li>
+<li><code>WEEK(date)</code> / <code>WEEKOFYEAR(date)</code>：返回一年中的第几周 </li>
+<li><code>DAYOFYEAR(date)</code>：返回日期是一年中的第几天</li>
+<li><code>DAYOFMONTH(date)</code>：返回日期位于所在月份的第几天</li>
+<li><code>DAYOFWEEK(date)</code>：返回周几，注意：周日是1，周一是2，…，周六是7</li>
+<li><code>EXTRACT(unit FROM date)</code>：返回指定日期中的特定部分或组合，如SECOND、HOUR、YEAR、…、DAY_HOUR</li>
+<li><code>TIME_TO_SEC(time)</code>：将 time 转化为秒并返回结果值。转化的公式为： 小时*3600+分钟 *60+秒 </li>
+<li><code>SEC_TO_TIME(seconds)</code>：将 seconds 描述转化为包含小时、分钟和秒的时间</li>
+<li><code>DATE_ADD(date,INTERVAL expr unit)</code> / <code>ADDDATE(date,INTERVAL expr unit)</code>：返回与给定日期时间date相差INTERVAL时间段的日期时间（单位为unit）</li>
+<li><code>DATE_SUB(date,INTERVAL expr unit)</code> / <code>SUBDATE(date,INTERVAL expr unit)</code>：返回与date相差INTERVAL时间间隔的 日期（单位为unit）</li>
+<li><code>ADDTIME(expr1,expr2)</code>：返回expr1加上expr2的时间。当expr2为一个数字时，代表的是秒，可以为负数 </li>
+<li><code>SUBTIME(expr1,expr2)</code>：返回expr1减去expr2后的时间。当expr2为一个数字时，代表的是秒 ，可以为负数 </li>
+<li><code>DATEDIFF(expr1,expr2)</code>：返回expr1- expr2的日期间隔天数</li>
+<li><code>TIMEDIFF(expr1,expr2)</code>：返回expr1- expr2的时间间隔</li>
+<li><code>FROM_DAYS(N)</code>：返回从0000年1月1日起，N天以后的日期</li>
+<li><code>TO_DAYS(date)</code>：返回日期date距离0000年1月1日的天数</li>
+<li><code>LAST_DAY(date)</code>：返回date所在月份的最后一天的日期</li>
+<li><code>MAKEDATE(year,dayofyear)</code>：返回给定年份year的第dayofyear天的日期</li>
+<li><code>MAKETIME(hour,minute,second)</code>：将给定的小时、分钟和秒组合成时间并返回</li>
+<li><code>PERIOD_ADD(P,N)</code>：返回P加上N后的时间，如20221203+3=20221206，202212+3=202303</li>
+<li><code>PERIOD_DIFF(P1,P2)</code>：计算P1-P2，参数格式为%YY%m%s或%YY%m，结果单位为%s或%m</li>
+</ul>
+<h2 id="格式化"><a href="#格式化" class="headerlink" title="格式化"></a>格式化</h2><ul>
+<li><code>FORMAT(X,D)</code>：返回对数字X进行格式化后的结果数据，保留小数D位（四舍五入）</li>
+<li><code>DATE_FORMAT(date,format)</code>：按照字符串format格式化日期date值 </li>
+<li><code>TIME_FORMAT(time,format)</code>：按照字符串format格式化时间time值</li>
+<li><code>GET_FORMAT(&#123;DATE|TIME|DATETIME&#125;, &#123;&#39;EUR&#39;|&#39;USA&#39;|&#39;JIS&#39;|&#39;ISO&#39;|&#39;INTERNAL&#39;&#125;)</code>：返回日期字符串的显示格式</li>
+<li><code>STR_TO_DATE(str, format)</code>：按照字符串format对str进行解析，解析为一个日期，%Y-%m-%d %H:%i:%s</li>
+</ul>
+<h2 id="类型转换"><a href="#类型转换" class="headerlink" title="类型转换"></a>类型转换</h2><ul>
+<li><code>CAST(any AS datatype)</code>：将任何类型的值转换为指定类型的值，目标类型可能是BINARY、CHAR、DATE、DATETIME、TIME、DECIMAL、SIGNED、UNSIGNED，如不能进行转换则只为null</li>
+<li><code>CONVERT(str, cast_datatype)</code>：将字符串转换为指定类型的值，大多数情况下与CAST函数功能重叠</li>
+<li><code>CONVERT(str USING charset)</code>：将字符串转换为指定的字符集</li>
+</ul>
+<h2 id="指数-对数"><a href="#指数-对数" class="headerlink" title="指数/对数"></a>指数/对数</h2><ul>
+<li><code>SQRT(X)</code>：返回x的平方根。当X的值为负数时，返回NULL</li>
+<li><code>POW(X,Y)</code> / <code>POWER(X,Y)</code>：返回x的y次方 </li>
+<li><code>EXP(X)</code>：返回e的X次方，其中e是一个常数，2.718281828459045</li>
+<li><code>LN(X)</code> / <code>LOG(X)</code>：返回以e为底的X的对数，当X &lt;= 0 时，返回的结果为NULL </li>
+<li><code>LOG10(X)</code>：返回以10为底的X的对数，当X &lt;= 0 时，返回的结果为NULL </li>
+<li><code>LOG2(X)</code>：返回以2为底的X的对数，当X &lt;= 0 时，返回NULL</li>
+<li><code>LOG(B,X)</code>：以B为底X的对数，当X &lt;= 0 时，返回NULL</li>
+</ul>
+<h2 id="进制"><a href="#进制" class="headerlink" title="进制"></a>进制</h2><ul>
+<li><code>BIN(X)</code>：返回X的二进制编码 </li>
+<li><code>HEX(X)</code>：返回X的十六进制编码 </li>
+<li><code>OCT(X)</code>：返回X的八进制编码 </li>
+<li><code>CONV(N,from_base,to_base)</code>：将N从from_base进制转为to_base进制</li>
+</ul>
+<h2 id="角度"><a href="#角度" class="headerlink" title="角度"></a>角度</h2><ul>
+<li><code>RADIANS(X)</code>：将角度转化为弧度，其中，参数X为角度值</li>
+<li><code>DEGREES(X)</code>：将弧度转化为角度，其中，参数X为弧度值</li>
+</ul>
+<h2 id="IP地址"><a href="#IP地址" class="headerlink" title="IP地址"></a>IP地址</h2><ul>
+<li><code>INET_ATON(expr)</code>：将以点分隔的IP地址转化为一个数字，值为字符串类型</li>
+<li><code>INET_NTOA(expr)</code>：将数字形式的IP地址转化为以点分隔的IP地址，值为字符串类型</li>
+</ul>
+<h2 id="三角函数"><a href="#三角函数" class="headerlink" title="三角函数"></a>三角函数</h2><ul>
+<li><code>SIN(X)</code>：返回X的正弦值，其中，参数X为弧度值 </li>
+<li><code>ASIN(X)</code>：返回X的反正弦值，即获取正弦为X的值。如果X的值不在-1到1之间，则返回NULL </li>
+<li><code>COS(X)</code>：返回X的余弦值，其中，参数X为弧度值 </li>
+<li><code>ACOS(X)</code>：返回X的反余弦值，即获取余弦为x的值。如果X的值不在-1到1之间，则返回NULL </li>
+<li><code>TAN(X)</code>：返回X的正切值，其中，参数X为弧度值 </li>
+<li><code>ATAN(X)</code>：返回X的反正切值，即返回正切值为X的值 </li>
+<li><code>ATAN2(Y,X)</code>：返回两个参数的反正切值 </li>
+<li><code>COT(X)</code>：返回X的余切值，其中，X为弧度值</li>
+</ul>
+<h2 id="加解密"><a href="#加解密" class="headerlink" title="加解密"></a>加解密</h2><ul>
+<li><code>PASSWORD(str)</code>：返回字符串str的加密版本，41位长的字符串。加密结果不可逆，常用于用户的密码加密</li>
+<li><code>MD5(str)</code>：返回字符串str的md5加密后的值，也是一种加密方式。若参数为 NULL，则会返回NULL</li>
+<li><code>SHA(str)</code>：从原明文密码str计算并返回加密后的密码字符串，当参数为NULL时，返回NULL。SHA加密算法比MD5更加安全</li>
+<li><code>ENCODE(str,pass_str)</code>：返回使用pass_str作为加密密码加密str</li>
+<li><code>DECODE(str,pass_str)</code>：返回使用pass_str作为加密密码解密str</li>
+</ul>
+<h2 id="日期格式化附录"><a href="#日期格式化附录" class="headerlink" title="日期格式化附录"></a>日期格式化附录</h2><table>
+<thead>
+<tr>
+<th>格式</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>%a</td>
+<td>缩写星期名</td>
+</tr>
+<tr>
+<td>%b</td>
+<td>缩写月名</td>
+</tr>
+<tr>
+<td>%c</td>
+<td>月，数值</td>
+</tr>
+<tr>
+<td>%D</td>
+<td>带有英文前缀的月中的天</td>
+</tr>
+<tr>
+<td>%d</td>
+<td>月的天，数值(00-31)</td>
+</tr>
+<tr>
+<td>%e</td>
+<td>月的天，数值(0-31)</td>
+</tr>
+<tr>
+<td>%f</td>
+<td>微秒</td>
+</tr>
+<tr>
+<td>%H</td>
+<td>小时 (00-23)</td>
+</tr>
+<tr>
+<td>%h</td>
+<td>小时 (01-12)</td>
+</tr>
+<tr>
+<td>%I</td>
+<td>小时 (01-12)</td>
+</tr>
+<tr>
+<td>%i</td>
+<td>分钟，数值(00-59)</td>
+</tr>
+<tr>
+<td>%j</td>
+<td>年的天 (001-366)</td>
+</tr>
+<tr>
+<td>%k</td>
+<td>小时 (0-23)</td>
+</tr>
+<tr>
+<td>%l</td>
+<td>小时 (1-12)</td>
+</tr>
+<tr>
+<td>%M</td>
+<td>月名</td>
+</tr>
+<tr>
+<td>%m</td>
+<td>月，数值(00-12)</td>
+</tr>
+<tr>
+<td>%p</td>
+<td>AM 或 PM</td>
+</tr>
+<tr>
+<td>%r</td>
+<td>时间，12-小时（hh:mm:ss AM 或 PM）</td>
+</tr>
+<tr>
+<td>%S</td>
+<td>秒(00-59)</td>
+</tr>
+<tr>
+<td>%s</td>
+<td>秒(00-59)</td>
+</tr>
+<tr>
+<td>%T</td>
+<td>时间, 24-小时 (hh:mm:ss)</td>
+</tr>
+<tr>
+<td>%U</td>
+<td>周 (00-53) 星期日是一周的第一天</td>
+</tr>
+<tr>
+<td>%u</td>
+<td>周 (00-53) 星期一是一周的第一天</td>
+</tr>
+<tr>
+<td>%V</td>
+<td>周 (01-53) 星期日是一周的第一天，与 %X 使用</td>
+</tr>
+<tr>
+<td>%v</td>
+<td>周 (01-53) 星期一是一周的第一天，与 %x 使用</td>
+</tr>
+<tr>
+<td>%W</td>
+<td>星期名</td>
+</tr>
+<tr>
+<td>%w</td>
+<td>周的天 （0=星期日, 6=星期六）</td>
+</tr>
+<tr>
+<td>%X</td>
+<td>年，其中的星期日是周的第一天，4 位，与 %V 使用</td>
+</tr>
+<tr>
+<td>%x</td>
+<td>年，其中的星期一是周的第一天，4 位，与 %v 使用</td>
+</tr>
+<tr>
+<td>%Y</td>
+<td>年，4 位</td>
+</tr>
+<tr>
+<td>%y</td>
+<td>年，2 位</td>
+</tr>
+</tbody></table>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过本文的学习，读者可以深入了解MySQL提供的各类函数及其应用场景。从基础的字符串处理到复杂的日期和时间计算，从简单的数据聚合到高级的加解密操作，这些函数不仅提高了数据查询的效率，也简化了复杂的SQL语句。掌握这些函数对于进行高效的数据库操作和性能优化至关重要。随着对MySQL函数更深入的理解和实践，开发者和数据库管理员将能更有效地管理和分析数据。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/MySQL/">MySQL</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/MySQL/">MySQL</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E6%89%8B%E5%86%8C/">手册</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/08/01/javase-cp-thread/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Java并发编程——线程</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/07/07/mysql-commands/">
+                        <span class="hidden-mobile">MySQL常用命令</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

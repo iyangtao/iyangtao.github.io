@@ -1,0 +1,594 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="在现代应用程序开发中，API文档是非常重要的一部分，它不仅帮助开发者更好地理解接口的使用，也有助于跨团队协作。本文将介绍如何使用Springdoc自动地、无侵入地生成基于Javadoc的API文档，帮助你在开发中更简单地维护API文档。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Springdoc——根据JavaDoc生成接口文档">
+<meta property="og:url" content="http://example.com/2024/10/17/springdoc-javadoc/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="在现代应用程序开发中，API文档是非常重要的一部分，它不仅帮助开发者更好地理解接口的使用，也有助于跨团队协作。本文将介绍如何使用Springdoc自动地、无侵入地生成基于Javadoc的API文档，帮助你在开发中更简单地维护API文档。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/springdoc-openapi.webp">
+<meta property="article:published_time" content="2024-10-16T19:29:34.000Z">
+<meta property="article:modified_time" content="2024-10-16T19:29:34.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="Springdoc">
+<meta property="article:tag" content="OpenAPI，项目协作">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/springdoc-openapi.webp">
+  
+  
+  <title>Springdoc——根据JavaDoc生成接口文档 - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/springdoc-openapi.webp') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Springdoc——根据JavaDoc生成接口文档">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2024-10-17 03:29" pubdate>
+        2024年10月17日 凌晨
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      15k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      25 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Springdoc——根据JavaDoc生成接口文档</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：4 个月前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <p>在现代应用程序开发中，API文档是非常重要的一部分，它不仅帮助开发者更好地理解接口的使用，也有助于跨团队协作。本文将介绍如何使用<code>Springdoc</code>自动地、无侵入地生成基于<code>Javadoc</code>的<code>API</code>文档，帮助你在开发中更简单地维护API文档。                                                                                                                                                                                                                                                                                                                      </p>
+<h2 id="项目配置"><a href="#项目配置" class="headerlink" title="项目配置"></a>项目配置</h2><p>为了实现根据<code>Javadoc</code>自动生成API文档，需要在项目中引用<code>Springdoc</code>提供的<code>springdoc-openapi-webmvc-core</code>和<code>springdoc-openapi-javadoc</code>依赖，在POM文件中添加以下配置：</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springdoc<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>springdoc-openapi-webmvc-core<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>$&#123;springdoc.version&#125;<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springdoc<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>springdoc-openapi-javadoc<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>$&#123;springdoc.version&#125;<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+
+<p>为了保留运行时的注释信息，使用了<code>Maven Compiler Plugin</code>并进行了如下配置：</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">plugin</span>&gt;</span><br>     <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>     <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>maven-compiler-plugin<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>     <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>3.9.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br>     <span class="hljs-tag">&lt;<span class="hljs-name">configuration</span>&gt;</span><br>         <span class="hljs-tag">&lt;<span class="hljs-name">source</span>&gt;</span>$&#123;java.version&#125;<span class="hljs-tag">&lt;/<span class="hljs-name">source</span>&gt;</span><br>         <span class="hljs-tag">&lt;<span class="hljs-name">target</span>&gt;</span>$&#123;java.version&#125;<span class="hljs-tag">&lt;/<span class="hljs-name">target</span>&gt;</span><br>         <span class="hljs-tag">&lt;<span class="hljs-name">encoding</span>&gt;</span>$&#123;project.build.sourceEncoding&#125;<span class="hljs-tag">&lt;/<span class="hljs-name">encoding</span>&gt;</span><br>         <span class="hljs-tag">&lt;<span class="hljs-name">annotationProcessorPaths</span>&gt;</span><br>             <span class="hljs-tag">&lt;<span class="hljs-name">path</span>&gt;</span><br>                 <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>com.github.therapi<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>                 <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>therapi-runtime-javadoc-scribe<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>                 <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>0.15.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br>             <span class="hljs-tag">&lt;/<span class="hljs-name">path</span>&gt;</span><br>         <span class="hljs-tag">&lt;/<span class="hljs-name">annotationProcessorPaths</span>&gt;</span><br>     <span class="hljs-tag">&lt;/<span class="hljs-name">configuration</span>&gt;</span><br> <span class="hljs-tag">&lt;/<span class="hljs-name">plugin</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+
+<p>该依赖用于在编译时处理<code>Javadoc</code>注释并将其保留在运行时，方便<code>Springdoc</code>生成基于<code>Javadoc</code>的 API 文档。这使得文档信息可以在应用程序运行时动态提取。</p>
+<h2 id="Springdoc配置"><a href="#Springdoc配置" class="headerlink" title="Springdoc配置"></a>Springdoc配置</h2><p>为了更好地控制API文档的生成，我们可以创建一个配置类<code>SpringDocProperties</code>来定义文档的属性</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Data</span><br><span class="hljs-meta">@Component</span><br><span class="hljs-meta">@ConfigurationProperties(prefix = &quot;springdoc&quot;)</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SpringDocProperties</span> </span>&#123;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 文档基本信息</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@NestedConfigurationProperty</span><br>    <span class="hljs-keyword">private</span> InfoProperties info = <span class="hljs-keyword">new</span> InfoProperties();<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 扩展文档地址</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@NestedConfigurationProperty</span><br>    <span class="hljs-keyword">private</span> ExternalDocumentation externalDocs;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 标签</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> List&lt;Tag&gt; tags = <span class="hljs-keyword">null</span>;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 路径</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@NestedConfigurationProperty</span><br>    <span class="hljs-keyword">private</span> Paths paths = <span class="hljs-keyword">null</span>;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 组件</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@NestedConfigurationProperty</span><br>    <span class="hljs-keyword">private</span> Components components = <span class="hljs-keyword">null</span>;<br><br>    <span class="hljs-meta">@Data</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">InfoProperties</span> </span>&#123;<br><br>        <span class="hljs-comment">/**</span><br><span class="hljs-comment">         * 标题</span><br><span class="hljs-comment">         */</span><br>        <span class="hljs-keyword">private</span> String title = <span class="hljs-keyword">null</span>;<br><br>        <span class="hljs-comment">/**</span><br><span class="hljs-comment">         * 描述</span><br><span class="hljs-comment">         */</span><br>        <span class="hljs-keyword">private</span> String description = <span class="hljs-keyword">null</span>;<br><br>        <span class="hljs-comment">/**</span><br><span class="hljs-comment">         * 联系人信息</span><br><span class="hljs-comment">         */</span><br>        <span class="hljs-meta">@NestedConfigurationProperty</span><br>        <span class="hljs-keyword">private</span> Contact contact = <span class="hljs-keyword">null</span>;<br><br>        <span class="hljs-comment">/**</span><br><span class="hljs-comment">         * 许可证</span><br><span class="hljs-comment">         */</span><br>        <span class="hljs-meta">@NestedConfigurationProperty</span><br>        <span class="hljs-keyword">private</span> License license = <span class="hljs-keyword">null</span>;<br><br>        <span class="hljs-comment">/**</span><br><span class="hljs-comment">         * 版本</span><br><span class="hljs-comment">         */</span><br>        <span class="hljs-keyword">private</span> String version = <span class="hljs-keyword">null</span>;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="配置Springdoc"><a href="#配置Springdoc" class="headerlink" title="配置Springdoc"></a>配置Springdoc</h2><p>接下来，创建<code>SpringDocConfig</code>配置类，这个类将根据前面的<code>SpringDocProperties</code>来配置生成的文档信息</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@RequiredArgsConstructor</span><br><span class="hljs-meta">@Configuration</span><br><span class="hljs-meta">@AutoConfigureBefore(SpringDocConfiguration.class)</span> <span class="hljs-comment">// 在 SpringDocConfiguration 配置类之前自动配置</span><br><span class="hljs-meta">@ConditionalOnProperty(name = &quot;springdoc.api-docs.enabled&quot;, havingValue = &quot;true&quot;, matchIfMissing = true)</span> <span class="hljs-comment">// 只有在属性 springdoc.api-docs.enabled 设置为true或缺省时，才启用此配置类</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SpringDocConfig</span> </span>&#123;<br><br>    <span class="hljs-comment">// 注入SpringDocProperties配置类，用于获取文档的基本属性配置</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> SpringDocProperties springDocProperties;<br>    <br>    <span class="hljs-comment">// 注入ServerProperties用于获取服务器的上下文路径等信息</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> ServerProperties serverProperties;<br><br>    <span class="hljs-meta">@Bean</span><br>    <span class="hljs-meta">@ConditionalOnMissingBean(OpenAPI.class)</span> <span class="hljs-comment">// 如果没有OpenAPI的Bean实例，则创建一个</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> OpenAPI <span class="hljs-title">openApi</span><span class="hljs-params">()</span> </span>&#123;<br>        OpenAPI openApi = <span class="hljs-keyword">new</span> OpenAPI();<br>        <span class="hljs-comment">// 设置文档基本信息</span><br>        SpringDocProperties.InfoProperties infoProperties = springDocProperties.getInfo();<br>        Info info = convertInfo(infoProperties);<br>        openApi.info(info);<br>        <span class="hljs-comment">// 设置扩展文档信息</span><br>        openApi.externalDocs(springDocProperties.getExternalDocs());<br>        <span class="hljs-comment">// 设置文档标签</span><br>        openApi.tags(springDocProperties.getTags());<br>        <span class="hljs-comment">// 设置路径信息</span><br>        openApi.paths(springDocProperties.getPaths());<br>        <span class="hljs-comment">// 设置组件信息</span><br>        openApi.components(springDocProperties.getComponents());<br>        <br>        <span class="hljs-comment">// 配置安全需求</span><br>        Set&lt;String&gt; keySet = springDocProperties.getComponents().getSecuritySchemes().keySet();<br>        List&lt;SecurityRequirement&gt; list = <span class="hljs-keyword">new</span> ArrayList&lt;&gt;();<br>        SecurityRequirement securityRequirement = <span class="hljs-keyword">new</span> SecurityRequirement();<br>        <span class="hljs-comment">// 将每个安全方案添加到安全需求列表中</span><br>        keySet.forEach(securityRequirement::addList);<br>        list.add(securityRequirement);<br>        openApi.security(list);<br><br>        <span class="hljs-keyword">return</span> openApi;<br>    &#125;<br><br>    <span class="hljs-comment">// 将SpringDocProperties的InfoProperties转换为OpenAPI 的Info对象</span><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> Info <span class="hljs-title">convertInfo</span><span class="hljs-params">(SpringDocProperties.InfoProperties infoProperties)</span> </span>&#123;<br>        Info info = <span class="hljs-keyword">new</span> Info();<br>        info.setTitle(infoProperties.getTitle()); <span class="hljs-comment">// 设置标题</span><br>        info.setDescription(infoProperties.getDescription()); <span class="hljs-comment">// 设置描述</span><br>        info.setContact(infoProperties.getContact()); <span class="hljs-comment">// 设置联系人信息</span><br>        info.setLicense(infoProperties.getLicense()); <span class="hljs-comment">// 设置许可证信息</span><br>        info.setVersion(infoProperties.getVersion()); <span class="hljs-comment">// 设置版本信息</span><br>        <span class="hljs-keyword">return</span> info;<br>    &#125;<br>    <br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 自定义openapi处理器</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Bean</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> OpenAPIService <span class="hljs-title">openApiBuilder</span><span class="hljs-params">(Optional&lt;OpenAPI&gt; openAPI,</span></span><br><span class="hljs-params"><span class="hljs-function">                                         SecurityService securityParser,</span></span><br><span class="hljs-params"><span class="hljs-function">                                         SpringDocConfigProperties springDocConfigProperties, PropertyResolverUtils propertyResolverUtils,</span></span><br><span class="hljs-params"><span class="hljs-function">                                         Optional&lt;List&lt;OpenApiBuilderCustomizer&gt;&gt; openApiBuilderCustomisers,</span></span><br><span class="hljs-params"><span class="hljs-function">                                         Optional&lt;List&lt;ServerBaseUrlCustomizer&gt;&gt; serverBaseUrlCustomisers, Optional&lt;JavadocProvider&gt; javadocProvider)</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> OpenApiHandler(openAPI, securityParser, springDocConfigProperties, propertyResolverUtils, openApiBuilderCustomisers, serverBaseUrlCustomisers, javadocProvider);<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 对已经生成好的OpenApi进行自定义操作</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Bean</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> OpenApiCustomiser <span class="hljs-title">openApiCustomiser</span><span class="hljs-params">()</span> </span>&#123;<br>        String contextPath = serverProperties.getServlet().getContextPath();<br>        String finalContextPath;<br>        <span class="hljs-comment">// 如果上下文路径为空或为&quot;/&quot;，则设置为空字符串，否则使用原始上下文路径</span><br>        <span class="hljs-keyword">if</span> (StringUtils.isBlank(contextPath) || <span class="hljs-string">&quot;/&quot;</span>.equals(contextPath)) &#123;<br>            finalContextPath = <span class="hljs-string">&quot;&quot;</span>;<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            finalContextPath = contextPath;<br>        &#125;<br>        <span class="hljs-comment">// 对所有路径增加前置上下文路径</span><br>        <span class="hljs-keyword">return</span> openApi -&gt; &#123;<br>            Paths oldPaths = openApi.getPaths();<br>            <span class="hljs-keyword">if</span> (oldPaths <span class="hljs-keyword">instanceof</span> PlusPaths) &#123;<br>                <span class="hljs-keyword">return</span>;<br>            &#125;<br>            PlusPaths newPaths = <span class="hljs-keyword">new</span> PlusPaths();<br>            <span class="hljs-comment">// 将旧路径增加上下文路径后存入新路径对象中</span><br>            oldPaths.forEach((k,v) -&gt; newPaths.addPathItem(finalContextPath + k, v));<br>            openApi.setPaths(newPaths);<br>        &#125;;<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 单独使用一个类便于判断，解决springdoc路径拼接重复问题</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PlusPaths</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Paths</span> </span>&#123;<br>        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">PlusPaths</span><span class="hljs-params">()</span> </span>&#123;<br>            <span class="hljs-keyword">super</span>();<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="自定义API处理器"><a href="#自定义API处理器" class="headerlink" title="自定义API处理器"></a>自定义API处理器</h2><p>为了更好地生成文档信息，我们可以实现一个自定义的<code>OpenAPI</code>处理器：<code>OpenApiHandler</code>。这个类可以从<code>Javadoc</code>中提取注释信息，并将其添加到<code>OpenAPI</code>文档中。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">OpenApiHandler</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">OpenAPIService</span> </span>&#123;<br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 日志记录器，用于记录处理过程中的信息</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> Logger LOGGER = LoggerFactory.getLogger(OpenAPIService.class);<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 应用程序上下文</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> ApplicationContext context;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 安全解析器，用于处理安全相关的配置</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> SecurityService securityParser;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 存储映射信息的映射表</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Map&lt;String, Object&gt; mappingsMap = <span class="hljs-keyword">new</span> HashMap&lt;&gt;();<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 存储Springdoc标签信息的映射表</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Map&lt;HandlerMethod, io.swagger.v3.oas.models.tags.Tag&gt; springdocTags = <span class="hljs-keyword">new</span> HashMap&lt;&gt;();<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * OpenAPI构建自定义器列表</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Optional&lt;List&lt;OpenApiBuilderCustomizer&gt;&gt; openApiBuilderCustomisers;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 服务器基础URL自定义器列表</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Optional&lt;List&lt;ServerBaseUrlCustomizer&gt;&gt; serverBaseUrlCustomizers;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * SpringDoc配置属性</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> SpringDocConfigProperties springDocConfigProperties;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * OpenAPI对象</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> OpenAPI openAPI;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 缓存的OpenAPI映射表</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Map&lt;String, OpenAPI&gt; cachedOpenAPI = <span class="hljs-keyword">new</span> HashMap&lt;&gt;();<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 标识是否存在服务器配置</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">boolean</span> isServersPresent;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 服务器基础URL</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> String serverBaseUrl;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 属性解析工具类</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> PropertyResolverUtils propertyResolverUtils;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * Javadoc提供者，用于从Javadoc中提取注释信息</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Optional&lt;JavadocProvider&gt; javadocProvider;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 基础错误控制器类</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Class&lt;?&gt; basicErrorController;<br><br>    <span class="hljs-keyword">static</span> &#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-comment">// 尝试加载Spring Boot 2的基础错误控制器类</span><br>            basicErrorController = Class.forName(<span class="hljs-string">&quot;org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController&quot;</span>);<br>        &#125; <span class="hljs-keyword">catch</span> (ClassNotFoundException e) &#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                <span class="hljs-comment">// 如果找不到，尝试加载Spring Boot 1的基础错误控制器类</span><br>                basicErrorController = Class.forName(<span class="hljs-string">&quot;org.springframework.boot.autoconfigure.web.BasicErrorController&quot;</span>);<br>            &#125; <span class="hljs-keyword">catch</span> (ClassNotFoundException classNotFoundException) &#123;<br>                <span class="hljs-comment">// 如果仍然找不到，记录错误信息</span><br>                LOGGER.trace(classNotFoundException.getMessage());<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 构造函数，初始化各个属性</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">OpenApiHandler</span><span class="hljs-params">(Optional&lt;OpenAPI&gt; openAPI, SecurityService securityParser,</span></span><br><span class="hljs-params"><span class="hljs-function">                          SpringDocConfigProperties springDocConfigProperties, PropertyResolverUtils propertyResolverUtils,</span></span><br><span class="hljs-params"><span class="hljs-function">                          Optional&lt;List&lt;OpenApiBuilderCustomizer&gt;&gt; openApiBuilderCustomizers,</span></span><br><span class="hljs-params"><span class="hljs-function">                          Optional&lt;List&lt;ServerBaseUrlCustomizer&gt;&gt; serverBaseUrlCustomizers,</span></span><br><span class="hljs-params"><span class="hljs-function">                          Optional&lt;JavadocProvider&gt; javadocProvider)</span> </span>&#123;<br>        <span class="hljs-keyword">super</span>(openAPI, securityParser, springDocConfigProperties, propertyResolverUtils, openApiBuilderCustomizers, serverBaseUrlCustomizers, javadocProvider);<br>        <span class="hljs-keyword">if</span> (openAPI.isPresent()) &#123;<br>            <span class="hljs-keyword">this</span>.openAPI = openAPI.get();<br>            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.openAPI.getComponents() == <span class="hljs-keyword">null</span>)<br>                <span class="hljs-keyword">this</span>.openAPI.setComponents(<span class="hljs-keyword">new</span> Components());<br>            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.openAPI.getPaths() == <span class="hljs-keyword">null</span>)<br>                <span class="hljs-keyword">this</span>.openAPI.setPaths(<span class="hljs-keyword">new</span> Paths());<br>            <span class="hljs-keyword">if</span> (!CollectionUtils.isEmpty(<span class="hljs-keyword">this</span>.openAPI.getServers()))<br>                <span class="hljs-keyword">this</span>.isServersPresent = <span class="hljs-keyword">true</span>;<br>        &#125;<br>        <span class="hljs-keyword">this</span>.propertyResolverUtils = propertyResolverUtils;<br>        <span class="hljs-keyword">this</span>.securityParser = securityParser;<br>        <span class="hljs-keyword">this</span>.springDocConfigProperties = springDocConfigProperties;<br>        <span class="hljs-keyword">this</span>.openApiBuilderCustomisers = openApiBuilderCustomizers;<br>        <span class="hljs-keyword">this</span>.serverBaseUrlCustomizers = serverBaseUrlCustomizers;<br>        <span class="hljs-keyword">this</span>.javadocProvider = javadocProvider;<br>        <span class="hljs-keyword">if</span> (springDocConfigProperties.isUseFqn())<br>            TypeNameResolver.std.setUseFqn(<span class="hljs-keyword">true</span>);<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 构建操作标签</span><br><span class="hljs-comment">     *</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> handlerMethod 处理方法</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> operation     操作对象</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> openAPI       OpenAPI 对象</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> locale        语言环境</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span> 构建后的操作对象</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> Operation <span class="hljs-title">buildTags</span><span class="hljs-params">(HandlerMethod handlerMethod, Operation operation, OpenAPI openAPI, Locale locale)</span> </span>&#123;<br>        Set&lt;Tag&gt; tags = <span class="hljs-keyword">new</span> HashSet&lt;&gt;();<br>        Set&lt;String&gt; tagsStr = <span class="hljs-keyword">new</span> HashSet&lt;&gt;();<br><br>        <span class="hljs-comment">// 从方法和类中构建标签</span><br>        buildTagsFromMethod(handlerMethod.getMethod(), tags, tagsStr, locale);<br>        buildTagsFromClass(handlerMethod.getBeanType(), tags, tagsStr, locale);<br><br>        <span class="hljs-keyword">if</span> (!CollectionUtils.isEmpty(tagsStr))<br>            tagsStr = tagsStr.stream()<br>                    .map(str -&gt; propertyResolverUtils.resolve(str, locale))<br>                    .collect(Collectors.toSet());<br><br>        <span class="hljs-comment">// 处理自定义的Springdoc标签</span><br>        <span class="hljs-keyword">if</span> (springdocTags.containsKey(handlerMethod)) &#123;<br>            io.swagger.v3.oas.models.tags.Tag tag = springdocTags.get(handlerMethod);<br>            tagsStr.add(tag.getName());<br>            <span class="hljs-keyword">if</span> (openAPI.getTags() == <span class="hljs-keyword">null</span> || !openAPI.getTags().contains(tag)) &#123;<br>                openAPI.addTagsItem(tag);<br>            &#125;<br>        &#125;<br><br>        <span class="hljs-comment">// 设置操作的标签</span><br>        <span class="hljs-keyword">if</span> (!CollectionUtils.isEmpty(tagsStr)) &#123;<br>            <span class="hljs-keyword">if</span> (CollectionUtils.isEmpty(operation.getTags()))<br>                operation.setTags(<span class="hljs-keyword">new</span> ArrayList&lt;&gt;(tagsStr));<br>            <span class="hljs-keyword">else</span> &#123;<br>                Set&lt;String&gt; operationTagsSet = <span class="hljs-keyword">new</span> HashSet&lt;&gt;(operation.getTags());<br>                operationTagsSet.addAll(tagsStr);<br>                operation.getTags().clear();<br>                operation.getTags().addAll(operationTagsSet);<br>            &#125;<br>        &#125;<br><br>        <span class="hljs-comment">// 自动从类名生成标签</span><br>        <span class="hljs-keyword">if</span> (isAutoTagClasses(operation)) &#123;<br>            <span class="hljs-keyword">if</span> (javadocProvider.isPresent()) &#123;<br>                <span class="hljs-comment">// 使用Javadoc提供者从类中提取注释作为标签</span><br>                String description = javadocProvider.get().getClassJavadoc(handlerMethod.getBeanType());<br>                <span class="hljs-keyword">if</span> (StringUtils.isNotBlank(description)) &#123;<br>                    io.swagger.v3.oas.models.tags.Tag tag = <span class="hljs-keyword">new</span> io.swagger.v3.oas.models.tags.Tag();<br>                    List&lt;String&gt; list = IoUtil.readLines(<span class="hljs-keyword">new</span> StringReader(description), <span class="hljs-keyword">new</span> ArrayList&lt;&gt;());<br>                    tag.setName(list.get(<span class="hljs-number">0</span>));<br>                    operation.addTagsItem(list.get(<span class="hljs-number">0</span>));<br>                    tag.setDescription(description);<br>                    <span class="hljs-keyword">if</span> (openAPI.getTags() == <span class="hljs-keyword">null</span> || !openAPI.getTags().contains(tag)) &#123;<br>                        openAPI.addTagsItem(tag);<br>                    &#125;<br>                &#125;<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                String tagAutoName = splitCamelCase(handlerMethod.getBeanType().getSimpleName());<br>                operation.addTagsItem(tagAutoName);<br>            &#125;<br>        &#125;<br><br>        <span class="hljs-keyword">if</span> (!CollectionUtils.isEmpty(tags)) &#123;<br>            <span class="hljs-comment">// Existing tags</span><br>            List&lt;io.swagger.v3.oas.models.tags.Tag&gt; openApiTags = openAPI.getTags();<br>            <span class="hljs-keyword">if</span> (!CollectionUtils.isEmpty(openApiTags))<br>                tags.addAll(openApiTags);<br>            openAPI.setTags(<span class="hljs-keyword">new</span> ArrayList&lt;&gt;(tags));<br>        &#125;<br><br>        <span class="hljs-comment">// 添加安全需求到操作级别</span><br>        io.swagger.v3.oas.annotations.security.SecurityRequirement[] securityRequirements = securityParser<br>                .getSecurityRequirements(handlerMethod);<br>        <span class="hljs-keyword">if</span> (securityRequirements != <span class="hljs-keyword">null</span>) &#123;<br>            <span class="hljs-keyword">if</span> (securityRequirements.length == <span class="hljs-number">0</span>)<br>                operation.setSecurity(Collections.emptyList());<br>            <span class="hljs-keyword">else</span><br>                securityParser.buildSecurityRequirement(securityRequirements, operation);<br>        &#125;<br><br>        <span class="hljs-keyword">return</span> operation;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">buildTagsFromMethod</span><span class="hljs-params">(Method method, Set&lt;io.swagger.v3.oas.models.tags.Tag&gt; tags, Set&lt;String&gt; tagsStr, Locale locale)</span> </span>&#123;<br>        <span class="hljs-comment">// method tags</span><br>        Set&lt;Tags&gt; tagsSet = AnnotatedElementUtils<br>                .findAllMergedAnnotations(method, Tags.class);<br>        Set&lt;io.swagger.v3.oas.annotations.tags.Tag&gt; methodTags = tagsSet.stream()<br>                .flatMap(x -&gt; Stream.of(x.value())).collect(Collectors.toSet());<br>        methodTags.addAll(AnnotatedElementUtils.findAllMergedAnnotations(method, io.swagger.v3.oas.annotations.tags.Tag.class));<br>        <span class="hljs-keyword">if</span> (!CollectionUtils.isEmpty(methodTags)) &#123;<br>            tagsStr.addAll(methodTags.stream().map(tag -&gt; propertyResolverUtils.resolve(tag.name(), locale)).collect(Collectors.toSet()));<br>            List&lt;io.swagger.v3.oas.annotations.tags.Tag&gt; allTags = <span class="hljs-keyword">new</span> ArrayList&lt;&gt;(methodTags);<br>            addTags(allTags, tags, locale);<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">addTags</span><span class="hljs-params">(List&lt;io.swagger.v3.oas.annotations.tags.Tag&gt; sourceTags, Set&lt;io.swagger.v3.oas.models.tags.Tag&gt; tags, Locale locale)</span> </span>&#123;<br>        Optional&lt;Set&lt;io.swagger.v3.oas.models.tags.Tag&gt;&gt; optionalTagSet = AnnotationsUtils<br>                .getTags(sourceTags.toArray(<span class="hljs-keyword">new</span> io.swagger.v3.oas.annotations.tags.Tag[<span class="hljs-number">0</span>]), <span class="hljs-keyword">true</span>);<br>        optionalTagSet.ifPresent(tagsSet -&gt; &#123;<br>            tagsSet.forEach(tag -&gt; &#123;<br>                tag.name(propertyResolverUtils.resolve(tag.getName(), locale));<br>                tag.description(propertyResolverUtils.resolve(tag.getDescription(), locale));<br>                <span class="hljs-keyword">if</span> (tags.stream().noneMatch(t -&gt; t.getName().equals(tag.getName())))<br>                    tags.add(tag);<br>            &#125;);<br>        &#125;);<br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>为服务添加<code>Springdoc</code>的配置</p>
+<figure class="highlight properties"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs properties"><span class="hljs-meta">springdoc.api-docs.enabled</span>=<span class="hljs-string">true</span><br><span class="hljs-meta">springdoc.api-docs.path</span>=<span class="hljs-string">/v3/api-docs</span><br><span class="hljs-meta">springdoc.info.title</span>=<span class="hljs-string">System API</span><br><span class="hljs-meta">springdoc.info.description</span>=<span class="hljs-string">System API</span><br><span class="hljs-meta">springdoc.info.version</span>=<span class="hljs-string">1.0.0</span><br></code></pre></div></td></tr></table></figure>
+
+<p>编写<code>Controller</code>接口如下</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 测试Controller</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">@RestController</span><br><span class="hljs-meta">@RequestMapping(&quot;/test&quot;)</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TestController</span> </span>&#123;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 查询</span><br><span class="hljs-comment">     *</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> queryDTO 查询条件</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span> &#123;<span class="hljs-doctag">@link</span> List &#125;&lt;&#123;<span class="hljs-doctag">@link</span> TestVO &#125;&gt; 查询结果</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@PostMapping(&quot;/query&quot;)</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> List&lt;TestVO&gt; <span class="hljs-title">query</span><span class="hljs-params">(<span class="hljs-meta">@RequestBody</span> TestQueryDTO queryDTO)</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;<br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>接口参数DTO和返回结果VO定义如下</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 测试DTO</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">@Data</span><br><span class="hljs-meta">@NoArgsConstructor</span><br><span class="hljs-meta">@AllArgsConstructor</span><br><span class="hljs-meta">@Accessors(chain = true)</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TestQueryDTO</span> </span>&#123;<br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 名称</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> String name;<br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 年龄</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> Integer age;<br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 生日</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> LocalDate birthday;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Data</span><br><span class="hljs-meta">@NoArgsConstructor</span><br><span class="hljs-meta">@AllArgsConstructor</span><br><span class="hljs-meta">@Accessors(chain = true)</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TestVO</span> </span>&#123;<br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 名称</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> String name;<br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 年龄</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> Integer age;<br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 生日</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> LocalDate birthday;<br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 其他</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> String others;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>启动项目，使用<code>Postman</code>导入接口<code>api-docs</code>，<code>api-docs</code>的路径为服务配置的<code>/v3/api-docs</code></p>
+<p><img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/springdoc-javadoc-postman.png"></p>
+<p>或者使用<code>ApiFox</code>等对API文档支持更好的软件，能看到接口的详细信息</p>
+<p><img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/springdoc-javadoc-apifox.png"></p>
+<p>如图，接口、实体类的<code>JavaDoc</code>信息已被提取到API文档中。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过结合<code>Springdoc</code>和<code>Javadoc</code>，你可以轻松地生成完整的API文档，不仅节省了手动编写文档的时间，也减少了维护文档的工作量。结合本文中的配置方法，你可以自定义文档的各个部分，使项目协作更加高效便捷。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Springdoc/">Springdoc</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Springdoc/">Springdoc</a>
+                    
+                      <a class="hover-with-bg" href="/tags/OpenAPI%EF%BC%8C%E9%A1%B9%E7%9B%AE%E5%8D%8F%E4%BD%9C/">OpenAPI，项目协作</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/12/04/redis-base/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Redis——基础篇</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/09/23/spring-application-web/">
+                        <span class="hidden-mobile">Spring-ApplicationContext-Web</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

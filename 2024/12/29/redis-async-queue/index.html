@@ -1,0 +1,899 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="引言在现代分布式系统中，消息队列起着至关重要的作用。它通过异步通信的方式，实现系统各服务间的解耦和流量削峰。对于初级场景，我们可能在单个 Java 应用中借助阻塞队列来简化异步处理，但随着业务需求的增长和系统架构的演进，跨进程通信、数据持久化、高并发以及分布式部署成为关键要素。此时，Redis 作为一款高性能的内存数据库，提供了多种消息队列实现方式——包括 List、Pub&#x2F;Sub 和 Strea">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis实战——消息队列">
+<meta property="og:url" content="http://example.com/2024/12/29/redis-async-queue/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="引言在现代分布式系统中，消息队列起着至关重要的作用。它通过异步通信的方式，实现系统各服务间的解耦和流量削峰。对于初级场景，我们可能在单个 Java 应用中借助阻塞队列来简化异步处理，但随着业务需求的增长和系统架构的演进，跨进程通信、数据持久化、高并发以及分布式部署成为关键要素。此时，Redis 作为一款高性能的内存数据库，提供了多种消息队列实现方式——包括 List、Pub&#x2F;Sub 和 Strea">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png">
+<meta property="article:published_time" content="2024-12-29T00:37:26.000Z">
+<meta property="article:modified_time" content="2024-12-29T00:37:26.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="Redis">
+<meta property="article:tag" content="NoSQL">
+<meta property="article:tag" content="Redis实战">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png">
+  
+  
+  <title>Redis实战——消息队列 - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Redis实战——消息队列">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2024-12-29 08:37" pubdate>
+        2024年12月29日 早上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      18k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      31 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Redis实战——消息队列</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：1 个月前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>在现代分布式系统中，消息队列起着至关重要的作用。它通过异步通信的方式，实现系统各服务间的解耦和流量削峰。对于初级场景，我们可能在单个 Java 应用中借助阻塞队列来简化异步处理，但随着业务需求的增长和系统架构的演进，跨进程通信、数据持久化、高并发以及分布式部署成为关键要素。此时，Redis 作为一款高性能的内存数据库，提供了多种消息队列实现方式——包括 <code>List</code>、<code>Pub/Sub</code> 和 <code>Streams</code>，从而在不同层次的需求下灵活应对。本篇文章将从一个简单的“订单保存”案例入手，循序渐进地介绍如何使用 Redis 取代单机内存队列，实现跨进程、多节点的异步处理，并探讨不同模式的优缺点、适用场景以及注意事项。</p>
+<h2 id="问题场景"><a href="#问题场景" class="headerlink" title="问题场景"></a>问题场景</h2><p>订单保存订单操作</p>
+<h3 id="同步操作"><a href="#同步操作" class="headerlink" title="同步操作"></a>同步操作</h3><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Override</span><br><span class="hljs-meta">@Transactional</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">saveIt</span><span class="hljs-params">(SalesOrder salesOrder)</span> </span>&#123;<br>    <span class="hljs-comment">// 校验</span><br>    check(salesOrder);<br>    <span class="hljs-comment">// 生成销售订单号</span><br>    String soNo = generateSoNo();<br>    <span class="hljs-comment">// 保存</span><br>    doSave(soNo);<br>    <span class="hljs-keyword">return</span> soNo;<br>&#125;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 保存</span><br><span class="hljs-comment"> */</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">doSave</span><span class="hljs-params">(String soNo)</span> </span>&#123;<br>    SalesOrder salesOrder = <span class="hljs-keyword">new</span> SalesOrder();<br>    salesOrder.setId(IdWorker.getId());<br>    salesOrder.setSoNo(soNo);<br>    save(salesOrder);<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="Java-内存异步"><a href="#Java-内存异步" class="headerlink" title="Java 内存异步"></a>Java 内存异步</h3><p>对于保存这个比较耗费时间的动作，可使用阻塞队列异步进行处理（基于内存）</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-comment">// 阻塞队列</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> BlockingQueue&lt;String&gt; QUEUE = <span class="hljs-keyword">new</span> ArrayBlockingQueue&lt;&gt;(<span class="hljs-number">100000</span>);<br><br><span class="hljs-comment">// 异步处理线程池</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();<br><br><span class="hljs-meta">@Override</span><br><span class="hljs-meta">@Transactional</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">saveIt</span><span class="hljs-params">(SalesOrder salesOrder)</span> </span>&#123;<br>    <span class="hljs-comment">// 校验</span><br>    check(salesOrder);<br>    <span class="hljs-comment">// 生成销售订单号</span><br>    String soNo = generateSoNo();<br>    <span class="hljs-comment">// 保存</span><br>    <span class="hljs-comment">// doSave(soNo);</span><br>    asyncSave(soNo);<br>    <span class="hljs-keyword">return</span> soNo;<br>&#125;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 保存</span><br><span class="hljs-comment"> */</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">doSave</span><span class="hljs-params">(String soNo)</span> </span>&#123;<br>    <span class="hljs-comment">// 模拟延迟</span><br>    <span class="hljs-keyword">try</span> &#123;<br>        Thread.sleep(<span class="hljs-number">5000</span>);<br>    &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;<br>        e.printStackTrace();<br>    &#125;<br>    SalesOrder salesOrder = <span class="hljs-keyword">new</span> SalesOrder();<br>    salesOrder.setId(IdWorker.getId());<br>    salesOrder.setSoNo(soNo);<br>    save(salesOrder);<br>&#125;<br><br><span class="hljs-meta">@PostConstruct</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">init</span><span class="hljs-params">()</span> </span>&#123;<br>    EXECUTOR.submit(<span class="hljs-keyword">new</span> SaveTask());<br>&#125;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SaveTask</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Runnable</span> </span>&#123;<br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">while</span> (<span class="hljs-keyword">true</span>) &#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                doSave(QUEUE.take());<br>            &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;<br>                log.error(<span class="hljs-string">&quot;保存销售订单异常&quot;</span>, e);<br>            &#125;<br>        &#125;<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 异步保存</span><br><span class="hljs-comment"> */</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">asyncSave</span><span class="hljs-params">(String soNo)</span> </span>&#123;<br>    QUEUE.add(soNo);<br>&#125;<br><br><span class="hljs-meta">@PreDestroy</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">destroy</span><span class="hljs-params">()</span> </span>&#123;<br>    EXECUTOR.shutdown();<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="存在问题"><a href="#存在问题" class="headerlink" title="存在问题"></a>存在问题</h3><ol>
+<li><strong>不支持跨进程</strong>：异步数据不支持跨进程，仅限于同一个 JVM 进程内部。</li>
+<li><strong>无持久化实现</strong>：一旦应用退出或 JVM 崩溃，队列中的数据会丢失。</li>
+<li><strong>无分布式支持</strong>：Java 阻塞队列仅限于单个进程或节点使用，不适合分布式场景。</li>
+<li><strong>数据监控困难</strong>：Java 阻塞队列无法直接提供可观测性，需额外编写代码实现状态监控。</li>
+</ol>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>消息队列是一种用于在不同系统组件之间传递数据的通信机制。它通过将消息存储在队列中，使得生产者和消费者可以异步地进行数据交换。Redis 作为一个内存数据库，凭借其高速读写能力和丰富的数据结构，常被用来实现高效的消息队列系统。</p>
+<h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><ul>
+<li><strong>高性能</strong>：Redis 基于内存，读写速度极快，能够处理大量的消息。</li>
+<li><strong>简单易用</strong>：通过简单的命令和数据结构即可实现基本的消息队列功能。</li>
+<li><strong>丰富的数据结构</strong>：支持多种数据结构（如 <code>List</code>、<code>Pub/Sub</code>、<code>Streams</code>），满足不同的应用场景。</li>
+<li><strong>持久化支持</strong>：通过 <code>RDB</code> 和 <code>AOF</code> 机制，Redis 能够持久化存储消息，防止数据丢失。</li>
+<li><strong>可扩展性</strong>：支持主从复制和分片，能够扩展到大型分布式系统。</li>
+<li><strong>跨进程</strong>：Redis 是基于网络的内存存储，支持多个进程或多种语言的客户端通过网络共享队列。</li>
+</ul>
+<h3 id="不足"><a href="#不足" class="headerlink" title="不足"></a>不足</h3><ul>
+<li><strong>内存消耗</strong>：Redis 基于内存存储，消息量大时会消耗大量内存，成本较高。</li>
+<li><strong>缺乏高级特性</strong>：相比于专门的消息队列系统（如 <code>RabbitMQ</code>、<code>Kafka</code>），Redis 在消息路由、事务支持等方面功能有限。</li>
+<li><strong>消息持久化性能</strong>：虽然 Redis 支持持久化，但在高并发下，持久化性能可能成为瓶颈。</li>
+<li><strong>可靠性</strong>：在某些实现方式中（如 <code>List</code> 和 <code>Pub/Sub</code>），缺乏完善的消息确认和重试机制，可能导致消息丢失或重复消费。</li>
+</ul>
+<h2 id="List消息队列"><a href="#List消息队列" class="headerlink" title="List消息队列"></a>List消息队列</h2><h3 id="概述-1"><a href="#概述-1" class="headerlink" title="概述"></a>概述</h3><p><code>Redis List</code> 是一个列表数据结构，支持从队列的头部或尾部插入和移除元素，非常适合用来实现队列。</p>
+<h3 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h3><p><img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-queue-list.png"></p>
+<p>在使用 Redis 实现消息队列时，通常将一个 <code>Redis List</code> 作为队列：</p>
+<ul>
+<li><strong>生产者（Producer）</strong>：将消息插入队列的一个端（通常是左端）。</li>
+<li><strong>消费者（Consumer）</strong>：从队列的另一个端弹出消息（通常是右端），以实现先进先出（<code>FIFO</code>）的队列行为。</li>
+</ul>
+<p>这种模式利用了 <code>Redis List</code> 的高效插入和弹出操作，适用于简单的消息传递需求。</p>
+<h3 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h3><p><strong>优点</strong>：</p>
+<ul>
+<li><p><strong>简单易用</strong>：只需使用 <code>LPUSH</code> 和 <code>BRPOP</code> 等简单命令即可实现消息队列。。</p>
+</li>
+<li><p><strong>高性能</strong>：Redis 基于内存，读写速度极快，适合高吞吐量的消息传递。</p>
+<p><strong>阻塞操作</strong>：<code>BRPOP</code> 命令支持阻塞弹出，消费者可以高效地等待新消息，减少轮询开销。</p>
+<p><strong>持久化支持</strong>：通过 Redis 的持久化机制，可以在一定程度上保证消息的持久性。</p>
+</li>
+</ul>
+<p><strong>缺点</strong>：</p>
+<ul>
+<li><strong>缺乏消息确认机制</strong>：使用 <code>Redis List</code> 实现的队列没有内置的消息确认机制，可能导致消息丢失或重复消费。</li>
+<li><strong>无法实现消费者组</strong>：无法像 <code>Redis Streams</code> 那样支持多个消费者组，难以实现消息的负载均衡和广播。</li>
+<li><strong>有限的功能</strong>：相较于 <code>Redis Streams</code> 或专门的消息队列系统，List实现的消息队列功能较为基础，缺乏高级特性如消息重试、消息优先级等。</li>
+<li><strong>内存消耗</strong>：所有消息存储在内存中，消息量大时会占用大量内存资源。</li>
+</ul>
+<h3 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h3><ul>
+<li><strong>简单的任务队列</strong>：适用于异步处理任务，如发送邮件、图片处理等。</li>
+<li><strong>轻量级消息传递</strong>：适用于不需要复杂消息确认和消费者管理的场景。</li>
+<li><strong>实时通知</strong>：适用于低延迟的通知系统，虽然不如 <code>Pub/Sub</code> 实时，但在队列模式下具备一定的灵活性。</li>
+<li><strong>短期存储和处理</strong>：适用于消息量较小且不需要长期存储的场景。</li>
+</ul>
+<h3 id="Redis命令示例"><a href="#Redis命令示例" class="headerlink" title="Redis命令示例"></a>Redis命令示例</h3><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 生产者推送消息</span><br>127.0.0.1:6379&gt; LPUSH myqueue <span class="hljs-string">&quot;message1&quot;</span><br>(<span class="hljs-built_in">integer</span>) 1<br>127.0.0.1:6379&gt; LPUSH myqueue <span class="hljs-string">&quot;message2&quot;</span><br>(<span class="hljs-built_in">integer</span>) 2<br><br><span class="hljs-comment"># 消费者弹出消息</span><br>127.0.0.1:6379&gt; BRPOP myqueue 0<br>1) <span class="hljs-string">&quot;myqueue&quot;</span><br>2) <span class="hljs-string">&quot;message1&quot;</span><br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li><strong>myqueue</strong>：队列名称</li>
+<li><strong>0</strong>：阻塞时间，单位为秒，0表示无限等待。</li>
+</ul>
+<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><p>使用 <code>RedisTemplate</code> 操作 <code>Redis List</code>，往保存订单的队列中添加消息，同时启用消费者线程将队列中的消息取出进行消费（创建订单）</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Resource</span><br><span class="hljs-keyword">private</span> RedisTemplate&lt;String, String&gt; redisTemplate;<br><br><span class="hljs-comment">// 异步处理线程池</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();<br><br><span class="hljs-meta">@PostConstruct</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">init</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-comment">// 启动异步保存线程</span><br>    EXECUTOR.submit(<span class="hljs-keyword">new</span> OrderSaveListConsumer(redisTemplate));<br>&#125;<br><br><span class="hljs-meta">@Override</span><br><span class="hljs-meta">@Transactional</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">saveIt</span><span class="hljs-params">(SalesOrder salesOrder)</span> </span>&#123;<br>    <span class="hljs-comment">// 校验</span><br>    check(salesOrder);<br>    <span class="hljs-comment">// 生成销售订单号</span><br>    String soNo = generateSoNo();<br>    <span class="hljs-comment">// 异步保存</span><br>    asyncSave(soNo);<br>    <span class="hljs-keyword">return</span> soNo;<br>&#125;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 异步保存</span><br><span class="hljs-comment"> */</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">asyncSave</span><span class="hljs-params">(String soNo)</span> </span>&#123;<br>    redisTemplate.opsForList().leftPush(OrderSaveListConsumer.ASYNC_SAVE_QUEUE, soNo);<br>&#125;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 订单保存列表消费者</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">@AllArgsConstructor</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">OrderSaveListConsumer</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Runnable</span> </span>&#123;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> String ASYNC_SAVE_QUEUE = <span class="hljs-string">&quot;order.save.queue&quot;</span>;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> RedisTemplate&lt;String, String&gt; redisTemplate;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">while</span> (<span class="hljs-keyword">true</span>) &#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                String message = redisTemplate.opsForList().rightPop(ASYNC_SAVE_QUEUE);<br>                <span class="hljs-keyword">if</span> (StrUtil.isNotBlank(message)) &#123;<br>                    SpringUtil.getBean(SalesOrderServiceImpl.class).doSave(message);<br>                &#125;<br>            &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>                log.error(<span class="hljs-string">&quot;处理销售订单异常&quot;</span>, e);<br>                <span class="hljs-comment">// 根据需要，可以实现重试机制或将失败的消息重新放回队列</span><br>            &#125;<br>        &#125;<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 保存</span><br><span class="hljs-comment"> */</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">doSave</span><span class="hljs-params">(String soNo)</span> </span>&#123;<br>    SalesOrder salesOrder = <span class="hljs-keyword">new</span> SalesOrder();<br>    salesOrder.setId(IdWorker.getId());<br>    salesOrder.setSoNo(soNo);<br>    save(salesOrder);<br>&#125;<br><br><span class="hljs-meta">@PreDestroy</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">destroy</span><span class="hljs-params">()</span> </span>&#123;<br>    EXECUTOR.shutdown();<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>使用 <code>Redisson</code> 也可以完成相同的操作，只需对上面生产和消费的方法进行简单的改造。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Resource</span><br><span class="hljs-keyword">private</span> RedisTemplate&lt;String, String&gt; redisTemplate;<br><br><span class="hljs-comment">// 异步处理线程池</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();<br><br><span class="hljs-meta">@PostConstruct</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">init</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-comment">// 启动异步保存线程</span><br>    EXECUTOR.submit(<span class="hljs-keyword">new</span> OrderSaveListConsumer(redissonClient));<br>&#125;<br><br><span class="hljs-meta">@Override</span><br><span class="hljs-meta">@Transactional</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">saveIt</span><span class="hljs-params">(SalesOrder salesOrder)</span> </span>&#123;<br>    <span class="hljs-comment">// 校验</span><br>    check(salesOrder);<br>    <span class="hljs-comment">// 生成销售订单号</span><br>    String soNo = generateSoNo();<br>    <span class="hljs-comment">// 异步保存</span><br>    asyncSave(soNo);<br>    <span class="hljs-keyword">return</span> soNo;<br>&#125;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 异步保存</span><br><span class="hljs-comment"> */</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">asyncSave</span><span class="hljs-params">(String soNo)</span> </span>&#123;<br>    redissonClient.getQueue(OrderSaveListConsumer.ASYNC_SAVE_QUEUE).add(soNo);<br>&#125;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 订单保存列表消费者</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">@AllArgsConstructor</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">OrderSaveListConsumer</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Runnable</span> </span>&#123;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> String ASYNC_SAVE_QUEUE = <span class="hljs-string">&quot;order.save.queue&quot;</span>;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> RedissonClient redissonClient;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">while</span> (<span class="hljs-keyword">true</span>) &#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                List&lt;Object&gt; poll = redissonClient.getQueue(ASYNC_SAVE_QUEUE).poll(<span class="hljs-number">1</span>);<br>                <span class="hljs-keyword">if</span> (CollUtil.isEmpty(poll)) &#123;<br>                    <span class="hljs-keyword">continue</span>;<br>                &#125;<br>                Object o = poll.get(<span class="hljs-number">0</span>);<br>                <span class="hljs-keyword">if</span> (o == <span class="hljs-keyword">null</span> || StrUtil.isBlank(o.toString())) &#123;<br>                    <span class="hljs-keyword">continue</span>;<br>                &#125;<br>                SpringUtil.getBean(SalesOrderServiceImpl.class).doSave(o.toString());<br>            &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>                log.error(<span class="hljs-string">&quot;处理销售订单异常&quot;</span>, e);<br>                <span class="hljs-comment">// 根据需要，可以实现重试机制或将失败的消息重新放回队列</span><br>            &#125;<br>        &#125;<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 保存</span><br><span class="hljs-comment"> */</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">doSave</span><span class="hljs-params">(String soNo)</span> </span>&#123;<br>    SalesOrder salesOrder = <span class="hljs-keyword">new</span> SalesOrder();<br>    salesOrder.setId(IdWorker.getId());<br>    salesOrder.setSoNo(soNo);<br>    save(salesOrder);<br>&#125;<br><br><span class="hljs-meta">@PreDestroy</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">destroy</span><span class="hljs-params">()</span> </span>&#123;<br>    EXECUTOR.shutdown();<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>使用 <code>Redis List</code> 实现消息队列适用于简单、低复杂度的场景，如基本的任务异步处理和轻量级消息传递。然而，由于其缺乏高级特性和在可靠性、扩展性方面的局限，当业务需求变得复杂或对消息队列的可靠性要求更高时，可能需要考虑其他解决方案。</p>
+<h2 id="Pub-Sub消息队列"><a href="#Pub-Sub消息队列" class="headerlink" title="Pub/Sub消息队列"></a>Pub/Sub消息队列</h2><h3 id="概述-2"><a href="#概述-2" class="headerlink" title="概述"></a>概述</h3><p>Redis 的 <code>Pub/Sub</code>（发布/订阅）是一种消息传递模式，允许消息生产者（发布者）向一个或多个频道发布消息，而消息消费者（订阅者）订阅这些频道以接收相关消息。<code>Pub/Sub</code> 模式适用于实时消息传递和广播场景。</p>
+<p><img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-pub-sub.png"></p>
+<p>Redis 通过维护频道与订阅者的映射关系，实现消息的即时推送。发布者和订阅者之间无需直接通信，Redis 负责将消息分发给所有订阅者。</p>
+<h3 id="优缺点-1"><a href="#优缺点-1" class="headerlink" title="优缺点"></a>优缺点</h3><p><strong>优点</strong>：</p>
+<ul>
+<li><strong>实时性强</strong>：消息一旦发布，所有订阅者立即接收到，无需轮询或等待。</li>
+<li><strong>简单易用</strong>：通过简单的 <code>PUBLISH</code> 和 <code>SUBSCRIBE</code> 命令即可实现消息传递。</li>
+<li><strong>广播机制</strong>：支持将消息广播给所有订阅者，适合实时通知和广播场景。</li>
+<li><strong>低延迟</strong>：基于内存操作，消息传递延迟极低。</li>
+</ul>
+<p><strong>缺点</strong>：</p>
+<ul>
+<li><strong>无持久化</strong>：消息不会被持久化，订阅者必须在线才能接收消息，离线订阅者将错过消息且后续也无法获取。</li>
+<li><strong>无消息确认机制</strong>：发布的消息无法确认是否被订阅者成功接收，存在消息丢失的风险。</li>
+<li><strong>不支持消费者组</strong>：无法像 <code>Streams</code> 那样实现负载均衡和消息分发给多个消费者组。</li>
+<li><strong>只有广播模式</strong>：<code>Pub/Sub</code> 本质上是广播机制，每个订阅者都会收到发布频道的消息，因此如果一个服务有多个实例的话会被多次消费，应该注意业务逻辑的正确性。</li>
+</ul>
+<h3 id="适用场景-1"><a href="#适用场景-1" class="headerlink" title="适用场景"></a>适用场景</h3><ul>
+<li><strong>实时通知系统</strong>：如在线聊天、即时消息推送、实时监控报警等，需要实时将消息推送给多个用户。</li>
+<li><strong>事件驱动架构</strong>：微服务之间的事件通知和实时通信，确保各服务能够即时响应事件。</li>
+<li><strong>直播和广播</strong>：适用于需要将数据实时广播给多个订阅者的场景，如直播平台的数据分发。</li>
+<li><strong>即时数据更新</strong>：如实时股票行情、体育比赛得分更新等，确保客户端能够即时接收最新数据。</li>
+</ul>
+<h3 id="Redis命令示例-1"><a href="#Redis命令示例-1" class="headerlink" title="Redis命令示例"></a>Redis命令示例</h3><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 订阅者订阅频道</span><br>127.0.0.1:6379&gt; SUBSCRIBE mychannel<br>1) <span class="hljs-string">&quot;subscribe&quot;</span><br>2) <span class="hljs-string">&quot;mychannel&quot;</span><br>3) (<span class="hljs-built_in">integer</span>) 1<br><br><span class="hljs-comment"># 发布者发布消息</span><br>127.0.0.1:6379&gt; PUBLISH mychannel <span class="hljs-string">&quot;Hello, Subscribers!&quot;</span><br>(<span class="hljs-built_in">integer</span>) 2<br><br><span class="hljs-comment"># 订阅者接收消息</span><br>1) <span class="hljs-string">&quot;message&quot;</span><br>2) <span class="hljs-string">&quot;mychannel&quot;</span><br>3) <span class="hljs-string">&quot;Hello, Subscribers!&quot;</span><br></code></pre></div></td></tr></table></figure>
+
+<h3 id="代码示例-1"><a href="#代码示例-1" class="headerlink" title="代码示例"></a>代码示例</h3><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Resource</span><br><span class="hljs-keyword">private</span> RedisTemplate&lt;String, String&gt; redisTemplate;<br><br><span class="hljs-meta">@Resource</span><br><span class="hljs-keyword">private</span> RedissonClient redissonClient;<br><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">asyncSave</span><span class="hljs-params">(String soNo)</span> </span>&#123;<br>    redisTemplate.convertAndSend(OrderSaveSubscriber.ASYNC_SAVE_CHANNEL, soNo);<br>    <span class="hljs-comment">// 或使用Redisson发布订阅</span><br> 	redissonClient.getTopic(OrderSaveSubscriber.ASYNC_SAVE_CHANNEL).publish(soNo);<br>&#125;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 订单保存订阅者</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">@Component</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">OrderSaveSubscriber</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> String ASYNC_SAVE_CHANNEL = <span class="hljs-string">&quot;order.save.channel&quot;</span>;<br><br>    <span class="hljs-meta">@Bean</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> RedisMessageListenerContainer <span class="hljs-title">container</span><span class="hljs-params">(RedisConnectionFactory connectionFactory,</span></span><br><span class="hljs-params"><span class="hljs-function">                                                   MessageListener listener)</span> </span>&#123;<br>        RedisMessageListenerContainer container = <span class="hljs-keyword">new</span> RedisMessageListenerContainer();<br>        container.setConnectionFactory(connectionFactory);<br>        container.addMessageListener(listener, <span class="hljs-keyword">new</span> ChannelTopic(ASYNC_SAVE_CHANNEL));<br>        <span class="hljs-keyword">return</span> container;<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 消息监听器</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Bean</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> MessageListener <span class="hljs-title">listener</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> (message, pattern) -&gt; &#123;<br>            String soNo = <span class="hljs-keyword">new</span> String(message.getBody());<br>            log.info(<span class="hljs-string">&quot;接收到销售订单号：&#123;&#125;&quot;</span>, soNo);<br>            SpringUtil.getBean(SalesOrderServiceImpl.class).doSave(soNo);<br>        &#125;;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>注意</strong>：<code>Pub/Sub</code> 为广播模式，请特别注意多个实例导致的重复消费问题。</p>
+<p>虽然 <code>Pub/Sub</code> 模式在即时消息传递和广播通知方面表现出色，但它缺乏消息持久化和确认机制，导致在某些情况下可能会出现消息丢失或重复消费的问题，为此 <code>Redis 5.0</code> 中引入了 <code>Streams</code> 数据结构，提供了更加丰富和可靠的消息队列功能。</p>
+<h2 id="Stream消息队列"><a href="#Stream消息队列" class="headerlink" title="Stream消息队列"></a>Stream消息队列</h2><h3 id="概述-3"><a href="#概述-3" class="headerlink" title="概述"></a>概述</h3><p><code>Redis Streams</code> 是 <code>Redis 5.0</code> 引入的一种新的数据结构，旨在提供更强大和灵活的消息队列功能。与 <code>Redis List</code> 和 <code>Pub/Sub</code> 不同，<code>Redis Streams</code> 支持消息的持久化、消费者组、消息确认和重试机制，使其适用于需要高可靠性和复杂消息处理逻辑的场景。</p>
+<h3 id="基本原理-1"><a href="#基本原理-1" class="headerlink" title="基本原理"></a>基本原理</h3><p>在 <code>Redis Streams</code> 中，消息以条目的形式存储在一个有序的日志中。每个条目都有一个唯一的 <code>ID</code>（通常是时间戳加序列号），并包含一个或多个字段-值对。生产者将消息添加到流中，而消费者则通过消费者组读取和处理这些消息。</p>
+<p><strong>核心概念：</strong></p>
+<ul>
+<li><strong>Stream（流）</strong>：消息的集合，类似于一个日志。</li>
+<li><strong>Entry（条目）</strong>：流中的单条消息，包含唯一 <code>ID</code> 和字段-值对。</li>
+<li><strong>Consumer Group（消费者组）</strong>：一组消费者共同消费流中的消息，每条消息只被组内一个消费者处理。</li>
+<li><strong>Pending Entries（待处理条目）</strong>：消费者组中尚未被确认的消息。</li>
+<li><strong>Acknowledge（确认）</strong>：消费者确认已成功处理某条消息。</li>
+</ul>
+<p>通过这些机制，<code>Redis Streams</code> 实现了高可靠性、负载均衡和消息持久化。</p>
+<h3 id="优缺点-2"><a href="#优缺点-2" class="headerlink" title="优缺点"></a>优缺点</h3><p><strong>优点</strong>：</p>
+<ul>
+<li><strong>持久化</strong>：消息被持久化存储，确保在 Redis 重启后消息不会丢失。</li>
+<li><strong>消费者组</strong>：支持多个消费者组，每个组独立消费消息，实现负载均衡。</li>
+<li><strong>消息确认</strong>：消费者可以确认已处理的消息，支持消息的重试机制，确保消息不丢失。</li>
+<li><strong>消息ID</strong>：每条消息有唯一的 <code>ID</code>，支持按时间范围或特定 <code>ID</code> 查询消息。</li>
+<li><strong>回溯和历史查询</strong>：支持消费组可以从任意位置开始消费，甚至回溯历史消息。</li>
+</ul>
+<p><strong>缺点</strong>：</p>
+<ul>
+<li><strong>使用复杂度较高</strong>：相比 <code>Redis List</code> 和 <code>Pub/Sub</code>，<code>Redis Streams</code> 的概念和使用方式更为复杂，学习曲线较陡。</li>
+<li><strong>资源消耗</strong>：虽然 Redis 本身高效，但 <code>Redis Streams</code> 的持久化和消费者组机制可能会增加一定的资源消耗。</li>
+<li><strong>不适合实时广播</strong>：<code>Redis Streams</code> 更适用于工作队列模式，而非实时广播场景。</li>
+</ul>
+<h3 id="适用场景-2"><a href="#适用场景-2" class="headerlink" title="适用场景"></a>适用场景</h3><ul>
+<li><strong>复杂的任务队列</strong>：需要消息确认和重试机制，确保任务不丢失。需要负载均衡，多个消费者组共同处理任务。</li>
+<li><strong>事件驱动架构</strong>：微服务之间的事件传递，确保每个事件被至少一个服务处理。</li>
+<li><strong>日志收集和处理</strong>：实时收集和处理大量日志数据，确保数据不丢失。</li>
+<li><strong>实时数据处理</strong>：需要处理实时数据流，如实时分析、监控等。</li>
+<li><strong>金融交易系统</strong>：需要高可靠性和顺序保证的交易消息处理。</li>
+</ul>
+<h3 id="单消费者"><a href="#单消费者" class="headerlink" title="单消费者"></a>单消费者</h3><p>生产者往指定的流中推送消息，消费者则可以从流中读取消息。</p>
+<h4 id="XADD"><a href="#XADD" class="headerlink" title="XADD"></a>XADD</h4><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 向指定的 Stream 中添加消息</span><br>XADD key [NOMKSTREAM] [MAXLEN|MINID [=|~] threshold [LIMIT count]] *|id field value [field value ...]<br><br><span class="hljs-comment"># 示例</span><br>XADD mystream * field1 value1 field2 value2<br>XADD mystream MAXLEN ~ 1000 * field1 value1<br>XADD mystream MINID ~ 1680000000000-0 * field1 value1<br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li><strong>key</strong>：流的名称。</li>
+<li><strong>NOMKSTREAM</strong>：如果流不存在，不自动创建；默认是自动创建流。</li>
+<li><strong>MAXLEN|MINID</strong>：控制流的长度。<ul>
+<li><strong>MAXLEN</strong>：通过指定消息数量限制流的长度。</li>
+<li><strong>MINID</strong>：按消息 <code>ID</code> 删除早于指定 <code>ID</code> 的消息。</li>
+<li>**=**：严格删除，确保不超过指定限制。</li>
+<li>**~**：近似删除（默认），性能更高但结果不精确。</li>
+</ul>
+</li>
+<li><strong>threshold</strong>：长度或 <code>ID</code> 的限制值。</li>
+<li><strong>LIMIT count</strong>：限制每次删除的消息数量（与 <code>MAXLEN|MINID</code> 配合使用）。</li>
+<li>*****：由 Redis 自动生成消息 <code>ID</code>（时间戳 + 序列号）。</li>
+<li><strong>id</strong>：用户自定义的消息 <code>ID</code>。</li>
+<li><strong>field value</strong>：消息内容，由键值对组成。</li>
+</ul>
+<h4 id="XREAD"><a href="#XREAD" class="headerlink" title="XREAD"></a>XREAD</h4><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 从一个或多个 Stream 中读取消息</span><br>XREAD [COUNT count] [BLOCK milliseconds] STREAMS key [key ...] id [id ...]<br><br><span class="hljs-comment"># 示例</span><br>XREAD COUNT 10 STREAMS mystream 0<br>XREAD BLOCK 5000 STREAMS mystream $<br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li><p><strong>COUNT count</strong>：一次读取的最大消息数量。</p>
+</li>
+<li><p><strong>BLOCK milliseconds</strong>：阻塞等待的时间（毫秒），如果没有新消息立即返回，<code>0</code> 表示无限等待。</p>
+</li>
+<li><p>**STREAMS key [key …]**：指定要读取的 <code>Redis Streams</code>。</p>
+</li>
+<li><p>**id [id …]**：指定起始读取的消息 <code>ID</code>。</p>
+</li>
+</ul>
+<ul>
+<li><strong>0</strong>：从第一个消息开始。</li>
+<li>**$**：从最新的消息开始。</li>
+</ul>
+<p>Java 程序伪代码</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-comment">// 循环处理</span><br><span class="hljs-keyword">while</span> (<span class="hljs-keyword">true</span>) &#123;<br>	<span class="hljs-comment">// 读取最新的一条消息，阻塞两秒</span><br>	Object msg = redis.execute(<span class="hljs-string">&quot;XREAD COUNT 1 BLOCK 2000 STREAMS mystream $&quot;</span>)<br>	<span class="hljs-keyword">if</span> (msg != <span class="hljs-keyword">null</span>) &#123;<br>		<span class="hljs-keyword">continue</span>;<br>	&#125;<br>    <span class="hljs-comment">// 处理消息</span><br>    handleMessage(msg);<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>问题</strong>：如果在处理消息的过程中，生产者连发消息，那单消费者只处理最新的一条会导致漏处理消息。</p>
+<h3 id="消费者组"><a href="#消费者组" class="headerlink" title="消费者组"></a>消费者组</h3><p>消费者组可以将多个消费者划分到同一个组中，监听同一个队列，可以实现：</p>
+<ol>
+<li><strong>消息分流</strong>：队列中的消息会被分流到组内不同消费者，而不重复消费，加快消息处理的速度。</li>
+<li><strong>消费标示</strong>：消费者组会维护一个标识，记录最后一个被处理的消息，每次消费都从未被处理的消息开始。</li>
+<li><strong>消费确认</strong>：消费者获取消息后，消息处于 <code>Pending</code> 状态，并存入一个 <code>Pending Entries List</code>。当处理完成后需要通过 <code>XACK</code> 确认消息，标记为已处理，从 <code>Pending Entries List</code> 中移除。</li>
+</ol>
+<h4 id="XGROUP"><a href="#XGROUP" class="headerlink" title="XGROUP"></a>XGROUP</h4><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 为 Stream 创建消费者组。</span><br>XGROUP CREATE key group id|$ [MKSTREAM] [ENTRIESREAD entries-read]<br><br><span class="hljs-comment"># 示例</span><br>XGROUP CREATE mystream mygroup 0 MKSTREAM<br>XGROUP CREATE mystream mygroup $ MKSTREAM<br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li><p><strong>key</strong>：流的名称。</p>
+</li>
+<li><p><strong>group</strong>：消费者组名称。</p>
+</li>
+<li><p>**id|$**：消费者组从该 <code>ID</code> 开始消费。</p>
+<ul>
+<li><p><strong>id</strong>：指定消息 <code>ID</code>。</p>
+</li>
+<li><p>**$**：从最新的消息开始消费。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>MKSTREAM</strong>：如果流不存在，自动创建流。</p>
+</li>
+<li><p><strong>ENTRIESREAD entries-read</strong>：指定已读取条目数，用于恢复某些消费状态。</p>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 为现有的消费者组创建一个消费者</span><br>XGROUP CREATECONSUMER key group consumer<br><br><span class="hljs-comment"># 示例</span><br>XGROUP CREATECONSUMER mystream mygroup consumer1<br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li><strong>key</strong>：流的名称。</li>
+<li><strong>group</strong>：消费者组名称。</li>
+<li><strong>consumer</strong>：消费者名称。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 从消费者组中删除一个消费者</span><br>XGROUP DELCONSUMER key group consumer<br><br><span class="hljs-comment"># 示例</span><br>XGROUP DELCONSUMER mystream mygroup consumer1<br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li><strong>key</strong>：流的名称。</li>
+<li><strong>group</strong>：消费者组名称。</li>
+<li><strong>consumer</strong>：消费者名称。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 删除一个消费者组</span><br>XGROUP DESTROY key group<br><br><span class="hljs-comment"># 示例</span><br>XGROUP DESTROY mystream mygroup<br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li><strong>key</strong>：流的名称。</li>
+<li><strong>group</strong>：消费者组名称。</li>
+</ul>
+<h4 id="XREADGROUP"><a href="#XREADGROUP" class="headerlink" title="XREADGROUP"></a>XREADGROUP</h4><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 从消费者组中读取消息</span><br>XREADGROUP GROUP group consumer [COUNT count] [BLOCK milliseconds] [NOACK] STREAMS key [key ...] id [id ...]<br><br><span class="hljs-comment"># 示例</span><br>XREADGROUP GROUP mygroup consumer1 COUNT 10 BLOCK 5000 STREAMS mystream &gt;<br>XREADGROUP GROUP mygroup consumer1 STREAMS mystream 0<br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li><p><strong>GROUP group consumer</strong>：指定消费者组和消费者名称。</p>
+</li>
+<li><p><strong>COUNT count</strong>：一次读取的最大消息数量。</p>
+</li>
+<li><p><strong>BLOCK milliseconds</strong>：阻塞等待时间（毫秒）。</p>
+</li>
+<li><p><strong>NOACK</strong>：不等待确认，消息不会进入 <code>Pending Entries List（PEL）</code>。</p>
+</li>
+<li><p>**STREAMS key [key …]**：指定要读取的 <code>Redis Streams</code>。</p>
+</li>
+<li><p>**id [id …]**：</p>
+</li>
+</ul>
+<ul>
+<li>**&gt;**：从未被消费的消息开始读取。</li>
+<li><strong>其他 ID</strong>：从指定 <code>ID</code> 开始读取。</li>
+</ul>
+<h4 id="XACK"><a href="#XACK" class="headerlink" title="XACK"></a>XACK</h4><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 确认消息已被成功处理（从消费者组的 Pending Entries List 中移除消息）</span><br>XACK key group id [id ...]<br><br><span class="hljs-comment"># 示例</span><br>XACK mystream mygroup 1640345568000-0<br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li><strong>key</strong>：流的名称。</li>
+<li><strong>group</strong>：消费者组的名称。</li>
+<li><strong>id</strong>：要确认的消息 <code>ID</code>，可以同时指定多个。</li>
+</ul>
+<h4 id="XPENDING"><a href="#XPENDING" class="headerlink" title="XPENDING"></a>XPENDING</h4><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 查看 Redis Stream 中指定消费者组的待确认消息（Pending Entries List，PEL）</span><br>XPENDING key group [[IDLE min-idle-time] start end count [consumer]]<br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li><strong>key</strong>：流的名称。</li>
+<li><strong>group</strong>：消费者组的名称。</li>
+<li><strong>IDLE min-idle-time</strong>：仅返回在 PEL 中等待超过指定时间（毫秒）的消息。</li>
+<li><strong>start</strong>：查询起始的消息 <code>ID</code>，<code>-</code> 表示最早的消息。</li>
+<li><strong>end</strong>：查询结束的消息 <code>ID</code>，<code>+</code> 表示最新的消息。</li>
+<li><strong>count</strong>：限制返回的消息数量。</li>
+<li><strong>consumer</strong>：指定消费者，查询该消费者的待确认消息。</li>
+</ul>
+<h3 id="代码示例-2"><a href="#代码示例-2" class="headerlink" title="代码示例"></a>代码示例</h3><p>使用 <code>RedisTemplate</code> 操作 <code>Redis Streams</code>，向指定流中添加消息，同时启用消费者线程将流中的消息取出进行消费（创建订单）</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Resource</span><br><span class="hljs-keyword">private</span> RedisTemplate&lt;String, String&gt; redisTemplate;<br><br><span class="hljs-comment">// 异步处理线程池</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();<br><br><span class="hljs-meta">@PostConstruct</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">init</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-comment">// 启动异步保存线程</span><br>    EXECUTOR.submit(<span class="hljs-keyword">new</span> OrderSaveStreamConsumer(redisTemplate));<br>&#125;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 异步保存</span><br><span class="hljs-comment"> */</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">asyncSave</span><span class="hljs-params">(String soNo)</span> </span>&#123;<br>    redisTemplate.opsForStream().add(<span class="hljs-string">&quot;stream.orders&quot;</span>, <span class="hljs-keyword">new</span> HashMap&lt;String, String&gt;(<span class="hljs-number">1</span>) &#123;&#123;<br>            put(<span class="hljs-string">&quot;soNo&quot;</span>, soNo);<br>        &#125;&#125;);<br>&#125;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 订单保存流消费者</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">@AllArgsConstructor</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">OrderSaveStreamConsumer</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Runnable</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> String STREAM_KEY = <span class="hljs-string">&quot;stream.orders&quot;</span>;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> String GROUP_NAME = <span class="hljs-string">&quot;order.group&quot;</span>;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> RedisTemplate&lt;String, String&gt; redisTemplate;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-comment">// 创建消费组</span><br>        <span class="hljs-keyword">if</span> (!redisTemplate.hasKey(STREAM_KEY)) &#123;<br>            redisTemplate.opsForStream().createGroup(STREAM_KEY, GROUP_NAME);<br>        &#125;<br>        <span class="hljs-comment">// 消费</span><br>        <span class="hljs-keyword">while</span> (<span class="hljs-keyword">true</span>) &#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                <span class="hljs-comment">// 获取 Streams 中的订单号（XREADGROUP GROUP order.group consumer-1 STREAMS stream.orders &gt;）</span><br>                List&lt;MapRecord&lt;String, Object, Object&gt;&gt; list = redisTemplate.opsForStream().read(<br>                        Consumer.from(GROUP_NAME, <span class="hljs-string">&quot;consumer-1&quot;</span>),<br>                        StreamOffset.create(STREAM_KEY, ReadOffset.lastConsumed())<br>                );<br>                <span class="hljs-keyword">if</span> (CollUtil.isEmpty(list)) &#123;<br>                    <span class="hljs-keyword">continue</span>;<br>                &#125;<br>                <span class="hljs-comment">// 处理订单</span><br>                <span class="hljs-keyword">for</span> (MapRecord&lt;String, Object, Object&gt; entries : list) &#123;<br>                    String messageId = entries.getId().getValue();<br>                    entries.getValue().forEach((k, v) -&gt; &#123;<br>                        <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;soNo&quot;</span>.equals(k.toString())) &#123;<br>                            SpringUtil.getBean(SalesOrderServiceImpl.class).doSave(v.toString());<br>                        &#125;<br>                    &#125;);<br>                    <span class="hljs-comment">// 消息确认</span><br>                    redisTemplate.opsForStream().acknowledge(STREAM_KEY, GROUP_NAME, messageId);<br>                &#125;<br>            &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>                log.error(<span class="hljs-string">&quot;处理销售订单异常&quot;</span>, e);<br>                <span class="hljs-comment">// 根据需要，可以实现重试机制或将失败的消息重新放回队列</span><br>            &#125;<br>        &#125;<br>    &#125;<br>&#125;<br><br><span class="hljs-meta">@PreDestroy</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">destroy</span><span class="hljs-params">()</span> </span>&#123;<br>    EXECUTOR.shutdown();<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>可使用 <code>Redisson</code> 替代 <code>RedisTemplate</code> 操作 <code>Redis Stream</code></p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Resource</span><br><span class="hljs-keyword">private</span> RedissonClient redissonClient;<br><br><span class="hljs-comment">// 异步处理线程池</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();<br><br><span class="hljs-meta">@PostConstruct</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">init</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-comment">// 启动异步保存线程</span><br>    EXECUTOR.submit(<span class="hljs-keyword">new</span> OrderSaveStreamConsumer(redissonClient));<br>&#125;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 异步保存</span><br><span class="hljs-comment"> */</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">asyncSave</span><span class="hljs-params">(String soNo)</span> </span>&#123;<br>    <span class="hljs-comment">// 使用 Redisson 发送订单号至 Streams 队列</span><br>    redissonClient.getStream(<span class="hljs-string">&quot;stream.orders&quot;</span>).add(<span class="hljs-string">&quot;soNo&quot;</span>, soNo);<br>&#125;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 订单保存流消费者</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">@AllArgsConstructor</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">OrderSaveStreamConsumer</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Runnable</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> String STREAM_KEY = <span class="hljs-string">&quot;stream.orders&quot;</span>;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> String GROUP_NAME = <span class="hljs-string">&quot;order.group&quot;</span>;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> RedissonClient redissonClient;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-comment">// 创建消费组</span><br>        RStream&lt;Object, Object&gt; initialStream = redissonClient.getStream(STREAM_KEY);<br>        <span class="hljs-keyword">if</span> (initialStream.size() == <span class="hljs-number">0</span>) &#123;<br>            initialStream.createGroup(GROUP_NAME);<br>        &#125;<br>        <span class="hljs-comment">// 消费</span><br>        <span class="hljs-keyword">while</span> (<span class="hljs-keyword">true</span>) &#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                <span class="hljs-comment">// 获取 Streams 中的订单号（XREADGROUP GROUP order.group consumer-1 STREAMS stream.orders &gt;）</span><br>                Map&lt;StreamMessageId, Map&lt;Object, Object&gt;&gt; streamMessageIdMapMap = initialStream.readGroup(GROUP_NAME, <span class="hljs-string">&quot;consumer-1&quot;</span>);<br>                streamMessageIdMapMap.forEach((streamMessageId, map) -&gt; &#123;<br>                    map.forEach((k, v) -&gt; &#123;<br>                        <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;soNo&quot;</span>.equals(k.toString())) &#123;<br>                            SpringUtil.getBean(SalesOrderServiceImpl.class).doSave(v.toString());<br>                        &#125;<br>                    &#125;);<br>                    initialStream.ack(GROUP_NAME, streamMessageId);<br>                &#125;);<br>            &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>                log.error(<span class="hljs-string">&quot;处理销售订单异常&quot;</span>, e);<br>                <span class="hljs-comment">// 根据需要，可以实现重试机制或将失败的消息重新放回队列</span><br>            &#125;<br>        &#125;<br>    &#125;<br>&#125;<br><br><span class="hljs-meta">@PreDestroy</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">destroy</span><span class="hljs-params">()</span> </span>&#123;<br>    EXECUTOR.shutdown();<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="对比其他MQ"><a href="#对比其他MQ" class="headerlink" title="对比其他MQ"></a>对比其他MQ</h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th><strong>Redis (List/PubSub/Streams)</strong></th>
+<th><strong>RabbitMQ</strong></th>
+<th><strong>Kafka</strong></th>
+<th><strong>RocketMQ</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>消息模型</strong></td>
+<td>List：工作队列；Pub/Sub：广播；Streams：可靠消息 &amp; 消费者组</td>
+<td>AMQP 协议，队列交换机模式，丰富路由规则</td>
+<td>发布/订阅模型，分区+副本，多用于日志流处理</td>
+<td>与 Kafka 类似，支持主题+分区 &amp; 多种协议</td>
+</tr>
+<tr>
+<td><strong>消息持久化</strong></td>
+<td>Pub/Sub 无持久化；List/Streams 支持持久化</td>
+<td>高度可配置，默认持久化</td>
+<td>按日志存储，天然持久化且不可修改</td>
+<td>同样按日志存储，支持多级存储</td>
+</tr>
+<tr>
+<td><strong>消息确认与重试</strong></td>
+<td>List 无确认；Pub/Sub 无确认；Streams 有确认 &amp; 重试</td>
+<td>拥有完备的 ACK &amp; 重发机制</td>
+<td>有 Consumer Group，手动提交偏移量</td>
+<td>有 ACK，支持消息重试，支持死信队列</td>
+</tr>
+<tr>
+<td><strong>消费者组 &amp; 负载均衡</strong></td>
+<td>Streams 支持消费者组；List、Pub/Sub 不支持</td>
+<td>有队列绑定，多消费者可负载均衡</td>
+<td>有 Consumer Group，自动负载均衡</td>
+<td>Topic + Consumer Group, 负载均衡</td>
+</tr>
+<tr>
+<td><strong>消息路由功能</strong></td>
+<td>较简单（Streams 没有高级路由），List &amp; Pub/Sub 几乎无路由功能</td>
+<td>复杂路由规则（topic、direct、fanout 等）</td>
+<td>简单（按 topic + partition）</td>
+<td>相对灵活（Topic、Tag、Key 等），略低于 RabbitMQ</td>
+</tr>
+<tr>
+<td><strong>吞吐量 &amp; 性能</strong></td>
+<td>基于内存，单机性能较高，分布式扩展需要 Redis Cluster；</td>
+<td>轻量但单机吞吐量中等，集群方式提升吞吐量</td>
+<td>高吞吐量，专为海量日志和流处理设计</td>
+<td>与 Kafka 类似，吞吐量较高</td>
+</tr>
+<tr>
+<td><strong>应用场景</strong></td>
+<td>中小型异步处理、高速缓存消息、简易通知；Streams 可做可靠队列</td>
+<td>需要灵活路由、强大队列功能和扩展性</td>
+<td>大规模日志分析、流数据处理、事件驱动体系</td>
+<td>与 Kafka 类似，国内金融、电商常用</td>
+</tr>
+<tr>
+<td><strong>学习成本</strong></td>
+<td>List/PubSub 简单；Streams 较复杂</td>
+<td>较高（AMQP 概念相对丰富）</td>
+<td>较高（分区、副本、偏移量等概念）</td>
+<td>较高（类似 Kafka 但细节有所差异）</td>
+</tr>
+</tbody></table>
+<p><strong>选择建议</strong>：</p>
+<ul>
+<li>如果仅需要简单异步和高性能，对消息的可靠性和复杂路由要求不高，可首选 <code>Redis List</code> 或 <code>Pub/Sub</code>。</li>
+<li>如果需要消息持久化、确认、重试等较高可靠性保障，又希望借助 Redis 的高性能和易部署，可用 <code>Redis Streams</code>。</li>
+<li>如果对消息路由、高可用集群、巨量日志处理等要求高，或需要复杂的消息模式（<code>RPC</code>、事务消息、定时消息等），则可考虑 <code>RabbitMQ / Kafka / RocketMQ</code> 等专业消息队列系统。</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过对 Java 内存队列和 Redis 不同消息队列实现（<code>List</code>、<code>Pub/Sub</code>、<code>Redis Streams</code>）的对比，可以发现 Redis 天然支持跨进程、可持久化且能在分布式环境下灵活扩展，适合在生产级别的高并发场景中使用。<code>Redis List</code> 适用于轻量、简单的异步处理；<code>Pub/Sub</code> 强调实时广播；而 <code>Redis Streams</code> 则在消息确认、消费者组和重试机制方面更进一步，适合对可靠性要求更高的复杂场景。</p>
+<p>在实际项目中，如何选择合适的 Redis 消息队列方案，取决于对消息可靠性、吞吐量、延迟以及系统复杂度的综合考量。如果你需要更丰富的消息路由与高可靠性保证，也可以考虑专业的消息队列系统（<code>RabbitMQ</code>、<code>Kafka</code>、<code>RocketMQ</code> 等）。但对于中小型或对延迟要求较高的项目而言，Redis 依然是一个高效而简洁的解决方案。</p>
+<p>由于篇幅原因，以下几个方向的内容今后再重新整理：</p>
+<ol>
+<li><strong>幂等性和重试</strong>：探索如何结合 Redis 的 <code>XPENDING</code>、<code>XCLAIM</code> 等命令实现安全可靠的消息重试。</li>
+<li><strong>高可用与可观测性</strong>：借助 Redis 集群、哨兵模式，以及监控工具（<code>Grafana</code> + <code>Prometheus</code>）构建全面的可视化监控体系。</li>
+<li><strong>与其他消息队列对比</strong>：根据业务需求，从事务支持、消息路由、消费模式等角度对比 <code>RabbitMQ</code>、<code>Kafka</code>、<code>RocketMQ</code> 等系统的优劣点。</li>
+</ol>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Redis/">Redis</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Redis/">Redis</a>
+                    
+                      <a class="hover-with-bg" href="/tags/NoSQL/">NoSQL</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Redis%E5%AE%9E%E6%88%98/">Redis实战</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/12/25/redis-practice-id/">
+                        <span class="hidden-mobile">Redis实战——分布式业务ID生成器</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

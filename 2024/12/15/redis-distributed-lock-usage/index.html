@@ -1,0 +1,1170 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言前面我们基于Redis实现的分布式锁能处理最基本的互斥，但还有许多的功能没有实现，如可重入、可重试、自旋等，在企业开发环境下，通常会引入Redisson这个成熟的框架来完善这些功能。本文将详细介绍Redisson的分布式锁功能，包括不同类型的锁的特性、应用场景以及如何在Spring Boot项目中实现和配置这些锁。 Redisson分布式锁支持Redisson是一个在Java环境下使用Redi">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis——Redisson分布式锁">
+<meta property="og:url" content="http://example.com/2024/12/15/redis-distributed-lock-usage/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="前言前面我们基于Redis实现的分布式锁能处理最基本的互斥，但还有许多的功能没有实现，如可重入、可重试、自旋等，在企业开发环境下，通常会引入Redisson这个成熟的框架来完善这些功能。本文将详细介绍Redisson的分布式锁功能，包括不同类型的锁的特性、应用场景以及如何在Spring Boot项目中实现和配置这些锁。 Redisson分布式锁支持Redisson是一个在Java环境下使用Redi">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png">
+<meta property="article:published_time" content="2024-12-15T14:58:51.000Z">
+<meta property="article:modified_time" content="2024-12-15T14:58:51.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="Redis">
+<meta property="article:tag" content="NoSQL">
+<meta property="article:tag" content="Redisson">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png">
+  
+  
+  <title>Redis——Redisson分布式锁 - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Redis——Redisson分布式锁">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2024-12-15 22:58" pubdate>
+        2024年12月15日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      19k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      33 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Redis——Redisson分布式锁</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：2 个月前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前面我们基于Redis实现的分布式锁能处理最基本的互斥，但还有许多的功能没有实现，如可重入、可重试、自旋等，在企业开发环境下，通常会引入<code>Redisson</code>这个成熟的框架来完善这些功能。本文将详细介绍<code>Redisson</code>的分布式锁功能，包括不同类型的锁的特性、应用场景以及如何在Spring Boot项目中实现和配置这些锁。</p>
+<h2 id="Redisson分布式锁支持"><a href="#Redisson分布式锁支持" class="headerlink" title="Redisson分布式锁支持"></a>Redisson分布式锁支持</h2><p><code>Redisson</code>是一个在Java环境下使用Redis实现分布式数据结构和同步机制的库，其中包括多种类型的分布式锁，这些分布式锁支持为企业提供了一种简单、可靠且高效的方式来同步分布式应用中的操作。</p>
+<h3 id="高性能"><a href="#高性能" class="headerlink" title="高性能"></a><strong>高性能</strong></h3><p><code>Redisson</code>基于Redis，后者是一个高性能的内存数据存储。通过<code>Redisson</code>实现的分布式锁能够快速响应和处理锁请求，特别适用于高并发的环境。</p>
+<h3 id="高可用性和可靠性"><a href="#高可用性和可靠性" class="headerlink" title="高可用性和可靠性"></a>高可用性和可靠性</h3><p><code>Redisson</code>可通过使用多个Redis节点和复制机制来保证锁服务的高可用性。即使部分Redis节点发生故障，也能保持锁服务的连续性。</p>
+<h3 id="简易性"><a href="#简易性" class="headerlink" title="简易性"></a>简易性</h3><p><code>Redisson</code>提供了与Java标准锁接口相似的API，使得开发者可以很容易地在项目中使用它来实现分布式锁，无需担心底层的复杂实现。</p>
+<h3 id="灵活性和扩展性"><a href="#灵活性和扩展性" class="headerlink" title="灵活性和扩展性"></a>灵活性和扩展性</h3><p><code>Redisson</code>支持多种配置选项，能够满足不同场景下的分布式锁需求，支持从简单的单Redis节点配置到复杂的集群模式。</p>
+<h3 id="成熟的社区和文档"><a href="#成熟的社区和文档" class="headerlink" title="成熟的社区和文档"></a>成熟的社区和文档</h3><p><code>Redisson</code>有一个活跃的开发和支持社区。详尽的文档和社区支持使得企业能够解决在实现和运行分布式锁过程中遇到的问题。</p>
+<h2 id="Spring-Boot集成Redisson锁"><a href="#Spring-Boot集成Redisson锁" class="headerlink" title="Spring Boot集成Redisson锁"></a>Spring Boot集成Redisson锁</h2><h3 id="集成方式选择"><a href="#集成方式选择" class="headerlink" title="集成方式选择"></a>集成方式选择</h3><p><code>Redisson</code>作为Redis的高级客户端，提供了丰富的分布式数据结构和工具，如分布式锁、分布式集合、分布式计数器等。尽管<code>Redisson</code>提供了<code>redisson-spring-boot-starter</code>，许多开发者和文章却更倾向于单独集成<code>Redisson</code>，而对于操作Redis数据库则优先考虑<code>spring-boot-starter-data-redis</code>。主要出于以下方面的考虑：</p>
+<h4 id="职责分离与关注点分离"><a href="#职责分离与关注点分离" class="headerlink" title="职责分离与关注点分离"></a>职责分离与关注点分离</h4><p>通过职责分离，项目可以更清晰地管理不同类型的Redis操作，避免混淆和潜在的配置冲突。</p>
+<ul>
+<li><strong>RedisTemplate</strong>：Spring Boot自带的<code>RedisTemplate</code>专注于标准的Redis操作，如存储、读取、删除数据等。它经过广泛优化，适用于大多数常见的缓存和数据操作场景。</li>
+<li><strong>Redisson</strong>：作为高级Redis客户端，<code>Redisson</code>提供了分布式锁、分布式集合、发布/订阅等高级功能。这些功能通常不在标准的<code>RedisTemplate</code>的使用范畴内。</li>
+</ul>
+<h4 id="避免依赖冲突与配置复杂性"><a href="#避免依赖冲突与配置复杂性" class="headerlink" title="避免依赖冲突与配置复杂性"></a>避免依赖冲突与配置复杂性</h4><p>提高系统的稳定性和可维护性，减少因配置冲突引发的问题。</p>
+<ul>
+<li><strong>多客户端共存</strong>：在同一个项目中同时使用<code>RedisTemplate</code>和<code>Redisson</code>时，自动配置可能会导致bean冲突或配置覆盖问题。单独集成<code>Redisson</code>可以避免这种情况。</li>
+<li><strong>自定义配置</strong>：手动集成<code>Redisson</code>允许开发者对其进行更精细的配置，满足特定的业务需求，而不受Starter预设配置的限制。</li>
+</ul>
+<h4 id="性能与资源优化"><a href="#性能与资源优化" class="headerlink" title="性能与资源优化"></a>性能与资源优化</h4><p>提升整体系统的性能和响应速度，尤其在高并发和复杂业务场景下。</p>
+<ul>
+<li><strong>优化针对性</strong>：<code>RedisTemplate</code>是针对标准Redis操作高度优化的，而<code>Redisson</code>的高级功能可能需要不同的资源和优化策略。分离两者的使用可以更好地优化每个客户端的性能表现。</li>
+</ul>
+<h4 id="灵活性与可扩展性"><a href="#灵活性与可扩展性" class="headerlink" title="灵活性与可扩展性"></a>灵活性与可扩展性</h4><p>提高系统的灵活性，便于根据业务需求进行独立调整和优化。</p>
+<ul>
+<li><strong>独立管理</strong>：单独集成<code>Redisson</code>使其成为独立的组件，便于单独管理、扩展和升级，而不影响<code>RedisTemplate</code>的正常使用。</li>
+</ul>
+<h3 id="集成及配置"><a href="#集成及配置" class="headerlink" title="集成及配置"></a>集成及配置</h3><p>本文使用更常见的单独集成<code>Redisson</code>，而对于Redis存取等基本操作仍然采用<code>RedisTemplate</code>。</p>
+<ol>
+<li><p>添加<code>Redisson</code>依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.redisson<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>redisson<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>$&#123;redisson.version&#125;<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></div></td></tr></table></figure></li>
+<li><p>配置<code>RedissonClient</code></p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Configuration</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RedissonConfig</span> </span>&#123;<br><br>    <span class="hljs-meta">@Bean(destroyMethod = &quot;shutdown&quot;)</span>   <span class="hljs-comment">// 应用关闭时关闭 RedissonClient，释放资源</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> RedissonClient <span class="hljs-title">redissonClient</span><span class="hljs-params">()</span> </span>&#123;<br>        Config config = <span class="hljs-keyword">new</span> Config();<br>        config.useSingleServer()<br>              .setAddress(<span class="hljs-string">&quot;redis://127.0.0.1:6379&quot;</span>)<br>              .setPassword(<span class="hljs-string">&quot;yourRedisPassword&quot;</span>) <span class="hljs-comment">// 如果没有密码，可以省略</span><br>              .setDatabase(<span class="hljs-number">0</span>)<br>              .setConnectionPoolSize(<span class="hljs-number">64</span>)<br>              .setConnectionMinimumIdleSize(<span class="hljs-number">24</span>)<br>              .setTimeout(<span class="hljs-number">3000</span>)<br>              .setRetryAttempts(<span class="hljs-number">3</span>)<br>              .setRetryInterval(<span class="hljs-number">1500</span>);<br>        <span class="hljs-keyword">return</span> Redisson.create(config);<br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>常用配置详解</p>
+<ol>
+<li><p>连接配置</p>
+<ul>
+<li><p><strong>address</strong>：Redis服务器地址，格式为<code>redis://host:port</code>或<code>rediss://host:port</code>（启用SSL）。</p>
+</li>
+<li><p><strong>password</strong>：Redis认证密码。</p>
+</li>
+<li><p><strong>database</strong>：使用的Redis数据库编号（默认为0）。</p>
+</li>
+<li><p><strong>connectionPoolSize</strong>：连接池的最大连接数。</p>
+</li>
+<li><p><strong>connectionMinimumIdleSize</strong>：连接池的最小空闲连接数。</p>
+</li>
+<li><p><strong>idleConnectionTimeout</strong>：空闲连接超时时间（毫秒）。</p>
+</li>
+<li><p><strong>connectTimeout</strong>：连接超时时间（毫秒）。</p>
+</li>
+<li><p><strong>timeout</strong>：命令执行超时时间（毫秒）。</p>
+</li>
+<li><p><strong>retryAttempts</strong>：重试次数。</p>
+</li>
+<li><p><strong>retryInterval</strong>：重试间隔时间（毫秒）。</p>
+</li>
+<li><p><strong>subscriptionsPerConnection</strong>：每个连接的订阅数量。</p>
+</li>
+</ul>
+</li>
+<li><p>锁相关配置</p>
+<ul>
+<li><strong>lockWatchdogTimeout</strong>：锁看门狗超时时间（毫秒），默认30秒。用于自动续期，防止锁被意外释放。</li>
+</ul>
+</li>
+<li><p>集群和哨兵配置</p>
+<ul>
+<li><p><strong>scanInterval</strong>：集群状态扫描间隔时间（毫秒）。</p>
+</li>
+<li><p><strong>masterName</strong>：哨兵模式下的主节点名称。</p>
+</li>
+</ul>
+</li>
+<li><p>高级配置</p>
+<ul>
+<li><p><strong>codec</strong>：自定义序列化编解码器，如 <code>org.redisson.codec.JsonJacksonCodec</code>。</p>
+</li>
+<li><p><strong>threads</strong>：<code>Redisson</code>客户端内部线程池的线程数量。</p>
+</li>
+<li><p><strong>nettyThreads</strong>：<code>Netty</code>客户端内部线程池的线程数量。</p>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><p>下面将展示最基础的可重入锁的使用：创建订单时以用户id为锁粒度进行加锁</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-comment">// 注入RedissonClient Bean</span><br><span class="hljs-meta">@Resource</span><br><span class="hljs-keyword">private</span> RedissonClient redissonClient;<br><br><span class="hljs-meta">@Override</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">createOrder</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> InterruptedException </span>&#123;<br>    <span class="hljs-comment">// 获取锁</span><br>    RLock lock = redissonClient.getLock(<span class="hljs-string">&quot;createOrder&quot;</span> + getUserId());<br>    <span class="hljs-comment">// 尝试获取锁，最多等待10秒，超时时间为20秒</span><br>    <span class="hljs-keyword">long</span> waitTime = <span class="hljs-number">10000</span>;<br>    <span class="hljs-keyword">long</span> leaseTime = <span class="hljs-number">20000</span>;<br>    <span class="hljs-keyword">boolean</span> locked = lock.tryLock(waitTime, leaseTime, TimeUnit.MILLISECONDS);<br>    <span class="hljs-comment">// 如果获取锁失败，直接返回</span><br>    <span class="hljs-keyword">if</span> (!locked) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;获取锁失败&quot;</span>);<br>    &#125;<br>    <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-comment">// 获取锁成功，模拟创建订单</span><br>    &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>        e.printStackTrace();<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;创建订单失败&quot;</span>);<br>    &#125; <span class="hljs-keyword">finally</span> &#123;<br>        <span class="hljs-comment">// 创建订单结束后，释放锁</span><br>        lock.unlock();<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="使用注意事项"><a href="#使用注意事项" class="headerlink" title="使用注意事项"></a>使用注意事项</h3><ol>
+<li><strong>锁的粒度设计</strong>：合理设计锁的粒度，过大的锁可能导致性能瓶颈，过小的锁可能增加复杂性。例如，针对具体资源加锁，而不是全局加锁。</li>
+<li><strong>锁的持有时间</strong>：设置合适的锁持有时间，避免因业务处理时间过长导致锁被自动释放，从而引发数据不一致问题。可以结合业务逻辑动态调整锁持有时间。</li>
+<li><strong>自动续期机制</strong>：未指定锁的释放时间情况下，<code>Redisson</code>提供了锁的自动续期功能，确保在业务处理时间较长时锁不会被意外释放。但需要注意，当业务逻辑异常终止时，<code>Redisson</code>仍会尝试续期，可能导致锁无法及时释放。可以通过合理的异常处理和锁释放机制来规避。</li>
+<li><strong>异常处理</strong>：在使用<code>Redisson</code>进行加锁和解锁时，需妥善处理异常，确保在任何情况下锁都能被正确释放，防止死锁。例如，在<code>finally</code>块中释放锁。</li>
+<li><strong>网络分区问题</strong>：在分布式环境中，网络分区可能导致锁状态不一致。建议结合Redis的高可用机制（如哨兵、集群）进行部署，确保Redis服务的稳定性和可用性。</li>
+<li><strong>资源释放</strong>：确保在应用关闭时，正确关闭<code>RedissonClient</code>实例，释放资源。可以通过在配置类中指定<code>destroyMethod = &quot;shutdown&quot;</code>来自动关闭。</li>
+<li><strong>性能监控</strong>：监控<code>Redisson</code>和Redis的性能，避免因锁竞争激烈导致系统性能下降。可以通过Redis的监控工具（如<code>Redis Monitor</code>、<code>Redis Sentinel</code>）和<code>Redisson</code>的统计功能进行监控。</li>
+<li><strong>安全性</strong>：在生产环境中，确保Redis服务的安全，设置强密码，限制访问来源，使用<code>SSL/TLS</code>加密等，防止未经授权的访问和恶意操作。</li>
+<li><strong>版本兼容性</strong>：确保<code>Redisson</code>与Spring Boot及Redis服务器版本的兼容性，避免因版本不匹配导致的问题。</li>
+</ol>
+<h2 id="Redisson分布式锁类型"><a href="#Redisson分布式锁类型" class="headerlink" title="Redisson分布式锁类型"></a>Redisson分布式锁类型</h2><h3 id="可重入锁（Reentrant-Lock）"><a href="#可重入锁（Reentrant-Lock）" class="headerlink" title="可重入锁（Reentrant Lock）"></a>可重入锁（Reentrant Lock）</h3><h4 id="概念"><a href="#概念" class="headerlink" title="概念"></a><strong>概念</strong></h4><p>可重入锁（Reentrant Lock）是一种允许同一个线程多次获得同一把锁的同步机制。在获取可重入锁时，如果当前线程已经持有该锁，则可以再次获取而不会造成死锁。每次获取锁，内部计数器都会增加，释放锁时计数器减少，直到计数器为零，锁才会被真正释放。</p>
+<p>在分布式环境中，可重入锁不仅需要在单个线程内重入，还需要在分布式系统的多个进程或节点之间保持一致性，确保同一时间只有一个客户端能够持有锁。</p>
+<h4 id="特性"><a href="#特性" class="headerlink" title="特性"></a><strong>特性</strong></h4><ul>
+<li><strong>可重入性</strong>：允许同一个客户端多次获取同一把锁，锁计数器会随之增加。</li>
+<li><strong>自动续期</strong>：<code>Redisson</code>自动续期锁的持有时间，避免因业务处理时间过长而锁被释放。</li>
+<li><strong>公平性</strong>：支持公平锁，确保锁的请求按照先后顺序被处理，防止“饥饿”现象。</li>
+<li><strong>挂起锁等待</strong>：当锁被占用时，客户端可以选择等待锁释放或立即返回。</li>
+<li><strong>锁的可见性</strong>：通过Redis的监控和日志功能，可以实时查看锁的状态和持有者。</li>
+</ul>
+<h4 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a><strong>应用场景</strong></h4><ol>
+<li><strong>分布式缓存更新</strong>：在分布式环境下，确保只有一个实例负责更新缓存，避免缓存击穿或雪崩。</li>
+<li><strong>订单生成</strong>：确保同一订单号在生成过程中不被重复创建，避免数据不一致。</li>
+<li><strong>资源分配</strong>：在分布式系统中，确保对有限资源的独占访问，如分布式文件系统的文件写操作。</li>
+<li><strong>分布式任务调度</strong>：确保定时任务在分布式环境下只被一个节点执行，避免重复执行。</li>
+<li><strong>分布式事务管理</strong>：在分布式事务中，确保事务的原子性和一致性，防止并发操作导致的数据不一致。</li>
+</ol>
+<h4 id="常用API"><a href="#常用API" class="headerlink" title="常用API"></a>常用API</h4><p><strong>Redisson</strong></p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>RLock getLock(String name)</td>
+<td>获取指定名称的分布式可重入锁。</td>
+</tr>
+<tr>
+<td>RLock getFairLock(String name)</td>
+<td>获取公平的指定名称的分布式可重入锁。</td>
+</tr>
+</tbody></table>
+<p><strong>RLock</strong></p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>void lock()</td>
+<td>加锁，阻塞直到获取到锁。<br />当需要确保某段代码在分布式环境下的互斥执行时使用。</td>
+</tr>
+<tr>
+<td>void lock(long leaseTime, TimeUnit unit)</td>
+<td>加锁，并设置锁的自动释放时间。<br />当需要限制锁的持有时间，防止锁被永久占用。</td>
+</tr>
+<tr>
+<td>boolean tryLock()</td>
+<td>尝试获取锁，立即返回结果（是否成功获取锁）<br />非阻塞地尝试获取锁，适用于快速失败的场景。</td>
+</tr>
+<tr>
+<td>boolean tryLock(long waitTime, long leaseTime, TimeUnit unit)</td>
+<td>在指定的等待时间内尝试获取锁，成功后设置锁的自动释放时间。<br />需要在一定时间内尝试获取锁，避免长时间阻塞。</td>
+</tr>
+<tr>
+<td>void unlock()</td>
+<td>释放锁。<br />在完成锁定的业务逻辑后，必须释放锁以允许其他线程获取。</td>
+</tr>
+<tr>
+<td>boolean isLocked()</td>
+<td>检查锁是否被任何线程持有。<br />监控锁的状态，进行相关逻辑处理。</td>
+</tr>
+<tr>
+<td>boolean isHeldByCurrentThread()</td>
+<td>检查当前线程是否持有锁。<br />确保锁的释放操作由持有锁的线程执行，防止非法释放。</td>
+</tr>
+<tr>
+<td>void lockInterruptibly()</td>
+<td>获取锁，允许线程在等待锁的过程中被中断。<br />需要响应线程中断信号的场景，防止线程长时间阻塞。</td>
+</tr>
+<tr>
+<td>boolean forceUnlock()</td>
+<td>强制释放锁，不管当前线程是否持有锁。<br />在特殊情况下需要强制释放锁，如系统异常恢复。</td>
+</tr>
+<tr>
+<td>RFuture&lt;Boolean&gt; forceUnlockAsync()</td>
+<td>异步方式强制释放锁。<br />需要非阻塞地强制释放锁。</td>
+</tr>
+<tr>
+<td>RFuture&lt;Void&gt; unlockAsync()</td>
+<td>异步释放锁。<br />在高性能场景下，避免阻塞当前线程。</td>
+</tr>
+<tr>
+<td>RFuture&lt;Void&gt; lockAsync()</td>
+<td>异步获取锁。<br />需要非阻塞地尝试获取锁。</td>
+</tr>
+<tr>
+<td>RFuture&lt;Boolean&gt; tryLockAsync()</td>
+<td>异步尝试获取锁。<br />需要非阻塞地尝试获取锁，并在获取后执行操作。</td>
+</tr>
+</tbody></table>
+<h4 id="代码示例-1"><a href="#代码示例-1" class="headerlink" title="代码示例"></a><strong>代码示例</strong></h4><p>以用户为锁粒度，对创建订单进行加锁处理：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Resource</span><br><span class="hljs-keyword">private</span> RedissonClient redissonClient;<br><br><span class="hljs-meta">@Override</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">createOrder</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> InterruptedException </span>&#123;<br>    <span class="hljs-comment">// 获取锁</span><br>    <span class="hljs-comment">// RLock lock = redissonClient.getLock(&quot;createOrder&quot; + getUserId());</span><br>    <span class="hljs-comment">// 获取公平锁</span><br>    RLock lock = redissonClient.getFairLock(<span class="hljs-string">&quot;createOrder&quot;</span> + getUserId());<br>    <span class="hljs-comment">// 尝试获取锁，最多等待10秒，超时时间为20秒</span><br>    <span class="hljs-keyword">long</span> waitTime = <span class="hljs-number">10000</span>;<br>    <span class="hljs-keyword">long</span> leaseTime = <span class="hljs-number">20000</span>;<br>    <span class="hljs-keyword">boolean</span> locked = lock.tryLock(waitTime, leaseTime, TimeUnit.MILLISECONDS);<br>    <span class="hljs-comment">// 如果获取锁失败，直接返回</span><br>    <span class="hljs-keyword">if</span> (!locked) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;获取锁失败&quot;</span>);<br>    &#125;<br>    <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-comment">// 获取锁成功，模拟创建订单</span><br>    &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>        e.printStackTrace();<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;更新失败&quot;</span>);<br>    &#125; <span class="hljs-keyword">finally</span> &#123;<br>        <span class="hljs-comment">// 创建订单结束后，释放锁</span><br>        lock.unlock();<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="读写锁（Read-Write-Lock）"><a href="#读写锁（Read-Write-Lock）" class="headerlink" title="读写锁（Read/Write Lock）"></a>读写锁（Read/Write Lock）</h3><h4 id="概念-1"><a href="#概念-1" class="headerlink" title="概念"></a>概念</h4><p>读写锁（Read/Write Lock）是一种同步机制，允许多个线程同时读共享资源，但在写入时必须独占访问权。具体而言：</p>
+<ul>
+<li><strong>读锁（Read Lock）</strong>：允许多个线程同时持有，适用于读取操作。当没有线程持有写锁时，多个线程可以并行地获取读锁。</li>
+<li><strong>写锁（Write Lock）</strong>：独占锁，只有一个线程可以持有写锁，同时在写锁被持有期间，其他线程无法获取读锁或写锁。</li>
+</ul>
+<p>读写锁的目的在于保持数据的一致性和防止脏读，特别是分布式系统中，读写操作可能发生在不同的节点上，这种机制就尤为重要。</p>
+<h4 id="特性-1"><a href="#特性-1" class="headerlink" title="特性"></a>特性</h4><ul>
+<li><strong>读写分离</strong>：支持同时多个线程获取读锁，但写锁是排他的。</li>
+<li><strong>可重入性</strong>：同一线程可以多次获取读锁或写锁，计数器会相应增加。</li>
+<li><strong>分布式支持</strong>：锁的状态存储在Redis中，可在不同的应用实例间共享。</li>
+<li><strong>自动续期</strong>：锁持有期间会自动续期，防止锁意外过期。</li>
+<li><strong>公平锁支持</strong>：可配置为公平锁，按照请求的顺序获取锁。</li>
+<li><strong>高可用性</strong>：通过Redis的高可用机制（如哨兵模式、集群模式）支持锁服务的高可用。</li>
+</ul>
+<h4 id="应用场景-1"><a href="#应用场景-1" class="headerlink" title="应用场景"></a>应用场景</h4><ol>
+<li><strong>分布式缓存更新</strong>：在缓存更新时，防止多个线程同时写入，使用写锁；读操作则可以并发进行，使用读锁。</li>
+<li><strong>配置中心</strong>：当读取配置时，可以并发读取；当更新配置时，需要获取写锁，防止读操作读取到不一致的数据。</li>
+<li><strong>实时数据分析与统计</strong>：获取统计数据时使用读锁，更新统计数据时使用写锁，确保统计数据在更新过程中，读取操作获取到的数据是一致且准确的，避免统计结果出现偏差。</li>
+<li><strong>共享资源管理</strong>：获取资源时使用读锁，更新资源时使用写锁，确保资源状态在修改过程中保持一致，防止读取到不完整或错误的资源状态。</li>
+</ol>
+<h4 id="常用API-1"><a href="#常用API-1" class="headerlink" title="常用API"></a>常用API</h4><p><strong>Redisson</strong></p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>RReadWriteLock getReadWriteLock(String name)</td>
+<td>获取指定名称的分布式读写锁。</td>
+</tr>
+</tbody></table>
+<p><strong>RReadWriteLock</strong></p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>RLock readLock()</td>
+<td>返回用于分布式读写锁读取的锁。</td>
+</tr>
+<tr>
+<td>RLock writeLock()</td>
+<td>返回用于分布式读写锁写入的锁。</td>
+</tr>
+</tbody></table>
+<p><strong>RLock</strong></p>
+<p>详见可重入锁。</p>
+<h4 id="代码示例-2"><a href="#代码示例-2" class="headerlink" title="代码示例"></a>代码示例</h4><p>为了确保订单数据的一致性，在更新订单时使用写锁，读取订单时使用读锁：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Resource</span><br><span class="hljs-keyword">private</span> RedissonClient redissonClient;<br><br><span class="hljs-meta">@Override</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">update</span><span class="hljs-params">(Long id)</span> <span class="hljs-keyword">throws</span> InterruptedException </span>&#123;<br>    <span class="hljs-comment">// 使用写锁</span><br>    RLock lock = redissonClient.getReadWriteLock(<span class="hljs-string">&quot;order&quot;</span> + id).writeLock();<br>    <span class="hljs-keyword">boolean</span> locked = lock.tryLock(<span class="hljs-number">10000</span>, <span class="hljs-number">30000</span>, TimeUnit.MILLISECONDS);<br>    <span class="hljs-comment">// 如果获取锁失败，直接返回</span><br>    <span class="hljs-keyword">if</span> (!locked) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;获取锁失败&quot;</span>);<br>    &#125;<br>    <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-comment">// 获取锁成功，模拟更新订单</span><br>    &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>        e.printStackTrace();<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;更新订单失败&quot;</span>);<br>    &#125; <span class="hljs-keyword">finally</span> &#123;<br>        <span class="hljs-comment">// 更新订单结束后，释放锁</span><br>        lock.unlock();<br>    &#125;<br>&#125;<br><br><span class="hljs-meta">@Override</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">getById</span><span class="hljs-params">(Long id)</span> <span class="hljs-keyword">throws</span> InterruptedException </span>&#123;<br>    <span class="hljs-comment">// 使用读锁</span><br>    RLock lock = redissonClient.getReadWriteLock(<span class="hljs-string">&quot;order&quot;</span> + id).readLock();<br>    <span class="hljs-keyword">boolean</span> locked = lock.tryLock(<span class="hljs-number">5000</span>, <span class="hljs-number">30000</span>, TimeUnit.MILLISECONDS);<br>    <span class="hljs-comment">// 如果获取锁失败，直接返回</span><br>    <span class="hljs-keyword">if</span> (!locked) &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;<br>    &#125;<br>    <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-comment">// 获取锁成功，模拟查询订单</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;订单信息&quot;</span>;<br>    &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>        e.printStackTrace();<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;<br>    &#125; <span class="hljs-keyword">finally</span> &#123;<br>        <span class="hljs-comment">// 查询订单结束后，释放锁</span><br>        lock.unlock();<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="信号量（Semaphore）"><a href="#信号量（Semaphore）" class="headerlink" title="信号量（Semaphore）"></a>信号量（Semaphore）</h3><h4 id="概念-2"><a href="#概念-2" class="headerlink" title="概念"></a>概念</h4><p>信号量（Semaphore）是一种用于控制多个线程对共享资源的访问的同步工具。它通过维护一个计数器来表示可用资源的数量。信号量有两种类型：</p>
+<ol>
+<li><strong>计数信号量（Counting Semaphore）</strong>：允许多个线程同时访问特定数量的资源。</li>
+<li><strong>二元信号量（Binary Semaphore）</strong>：类似于互斥锁（<code>Mutex</code>），只允许一个线程访问资源。</li>
+</ol>
+<p>在分布式系统中，信号量需要跨多个进程或节点共享和管理，确保资源的有效利用和访问控制。</p>
+<h4 id="特性-2"><a href="#特性-2" class="headerlink" title="特性"></a>特性</h4><ul>
+<li><strong>分布式支持</strong>：信号量的状态在Redis中共享，多个应用实例或节点可以共同管理和使用信号量。</li>
+<li><strong>动态许可管理</strong>：允许动态调整信号量的许可数量，适应业务需求的变化。</li>
+<li><strong>公平性配置</strong>：支持公平信号量，确保线程按请求顺序获取许可，避免“饥饿”现象。</li>
+<li><strong>高可用性</strong>：通过Redis的高可用部署（如哨兵模式、集群模式），确保信号量服务的持续可用。</li>
+<li><strong>线程安全</strong>：Redisson的信号量实现是线程安全的，适用于高并发场景。</li>
+<li><strong>阻塞与非阻塞操作</strong>：支持阻塞获取许可（<code>acquire</code>）和非阻塞尝试获取许可（<code>tryAcquire</code>）。</li>
+</ul>
+<h4 id="应用场景-2"><a href="#应用场景-2" class="headerlink" title="应用场景"></a>应用场景</h4><ol>
+<li><strong>API限流</strong>：限制单位时间内的API调用次数，保护后端服务不被过载。</li>
+<li><strong>任务队列控制</strong>：控制任务队列中的并发任务数量，防止系统资源耗尽。</li>
+<li><strong>资源池管理</strong>：控制同时资源池中的资源数量，优化系统资源利用。</li>
+<li><strong>分布式锁辅助工具</strong>：与分布式锁结合使用，控制多个服务实例对关键资源的访问。</li>
+</ol>
+<h4 id="常用API-2"><a href="#常用API-2" class="headerlink" title="常用API"></a>常用API</h4><p><strong>Redisson</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">API</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">RSemaphore getSemaphore(String name)</td>
+<td>获取指定名称的分布式信号量对象。</td>
+</tr>
+</tbody></table>
+<p><strong>RSemaphore</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">API</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">void trySetPermits(int permits)</td>
+<td>尝试设置信号量的许可数量，仅在信号量未初始化时有效。</td>
+</tr>
+<tr>
+<td align="left">void setPermits(int permits)</td>
+<td>设置信号量的许可数量，覆盖当前许可数量。</td>
+</tr>
+<tr>
+<td align="left">void acquire()</td>
+<td>获取一个许可，阻塞直到许可可用。</td>
+</tr>
+<tr>
+<td align="left">void acquire(int permits)</td>
+<td>获取指定数量的许可，阻塞直到所有许可可用。</td>
+</tr>
+<tr>
+<td align="left">boolean tryAcquire()</td>
+<td>尝试获取一个许可，立即返回结果。</td>
+</tr>
+<tr>
+<td align="left">boolean tryAcquire(int permits)</td>
+<td>尝试获取指定数量的许可，立即返回结果。</td>
+</tr>
+<tr>
+<td align="left">boolean tryAcquire(long timeout, TimeUnit unit)</td>
+<td>在指定的等待时间内尝试获取一个许可。</td>
+</tr>
+<tr>
+<td align="left">boolean tryAcquire(int permits, long timeout, TimeUnit unit)</td>
+<td>在指定的等待时间内尝试获取指定数量的许可。</td>
+</tr>
+<tr>
+<td align="left">void release()</td>
+<td>释放一个许可，增加信号量的许可数量。</td>
+</tr>
+<tr>
+<td align="left">void release(int permits)</td>
+<td>释放指定数量的许可，增加信号量的许可数量。</td>
+</tr>
+<tr>
+<td align="left">int availablePermits()</td>
+<td>获取当前可用的许可数量。</td>
+</tr>
+<tr>
+<td align="left">int drainPermits()</td>
+<td>移除并返回当前可用的所有许可数量。</td>
+</tr>
+<tr>
+<td align="left">void reducePermits(int reduction)</td>
+<td>减少信号量的许可数量。</td>
+</tr>
+<tr>
+<td align="left">void setFair(boolean fair)</td>
+<td>设置信号量是否为公平信号量。公平信号量按照请求顺序分配许可，非公平信号量则不保证顺序。</td>
+</tr>
+<tr>
+<td align="left">void addListener(SemaphoreListener listener)</td>
+<td>添加许可变化监听器，监控许可的获取和释放。</td>
+</tr>
+</tbody></table>
+<h4 id="代码示例-3"><a href="#代码示例-3" class="headerlink" title="代码示例"></a>代码示例</h4><p>对订单导出进行限流（注意需要先初始化信号量）：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Resource</span><br><span class="hljs-keyword">private</span> RedissonClient redissonClient;<br><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> String ORDER_EXPORT_SEMAPHORE_KEY = <span class="hljs-string">&quot;orderExport&quot;</span>;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 初始化信号量</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">@PostConstruct</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">initializeSemaphore</span><span class="hljs-params">()</span> </span>&#123;<br>    RSemaphore semaphore = redissonClient.getSemaphore(ORDER_EXPORT_SEMAPHORE_KEY);<br>    semaphore.trySetPermits(<span class="hljs-number">10</span>);<br>&#125;<br><br><span class="hljs-meta">@Override</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">export</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> InterruptedException </span>&#123;<br>    <span class="hljs-comment">// 信号量控制导出并发量</span><br>    RSemaphore semaphore = redissonClient.getSemaphore(ORDER_EXPORT_SEMAPHORE_KEY);<br>    <span class="hljs-keyword">boolean</span> acquire = semaphore.tryAcquire(<span class="hljs-number">10000</span>, TimeUnit.MILLISECONDS);<br>    <span class="hljs-comment">// 并发量数量超限</span><br>    <span class="hljs-keyword">if</span> (!acquire) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;并发量数量超限&quot;</span>);<br>    &#125;<br>    <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-comment">// 模拟导出操作</span><br>    &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>        e.printStackTrace();<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;导出失败&quot;</span>);<br>    &#125; <span class="hljs-keyword">finally</span> &#123;<br>        <span class="hljs-comment">// 释放信号量</span><br>        semaphore.release();<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><ol>
+<li><strong>初始化信号量</strong>：建议在组件初始化完成后，自动完成信号量的初始化。使用<code>trySetPermits</code>方法仅在信号量未初始化时设置许可数量，避免重复设置导致许可数量不准确。</li>
+<li><strong>许可数量</strong>：根据业务需求合理设置许可数量。</li>
+<li><strong>确保释放许可</strong>：无论业务逻辑是否成功执行，逻辑执行完成以后必须释放许可，防止许可被永久占用。</li>
+<li><strong>公平性配置</strong>：根据业务需求选择是否启用公平信号量。公平信号量按照请求顺序分配许可，避免“饥饿”现象，但可能带来性能开销。</li>
+</ol>
+<h3 id="多锁（MultiLock）"><a href="#多锁（MultiLock）" class="headerlink" title="多锁（MultiLock）"></a>多锁（MultiLock）</h3><h4 id="概念-3"><a href="#概念-3" class="headerlink" title="概念"></a>概念</h4><p>多锁（MultiLock）是指在执行一个操作时，需要同时获取多个独立的锁，以确保这些操作的原子性和一致性。多锁通常用于需要同时访问或修改多个共享资源的场景，通过获取所有相关锁，可以防止部分操作成功而其他操作失败，避免数据不一致和资源冲突。</p>
+<h4 id="特性-3"><a href="#特性-3" class="headerlink" title="特性"></a>特性</h4><ul>
+<li><strong>原子性获取</strong>：<code>MultiLock</code>能够原子性地获取多个锁，确保在所有锁都成功获取之前，无法执行相关操作。</li>
+<li><strong>容错性</strong>：在获取过程中，如果某一个锁无法获取，<code>MultiLock</code>会释放已获取的锁，避免死锁和资源占用。</li>
+<li><strong>可重入性</strong>：支持可重入锁特性，允许同一线程多次获取同一锁。</li>
+<li><strong>灵活性</strong>：可以组合任意数量和类型的锁（如单个锁、读写锁、公平锁等），满足不同业务需求。</li>
+<li><strong>高可用性</strong>：基于Redis的高可用机制（如哨兵模式、集群模式），确保多锁服务的稳定性和可靠性。</li>
+<li><strong>自动续期</strong>：支持锁的自动续期，防止在长时间业务处理中锁被错误释放。</li>
+</ul>
+<h4 id="应用场景-3"><a href="#应用场景-3" class="headerlink" title="应用场景"></a>应用场景</h4><ol>
+<li><strong>复杂业务流程同步</strong>：在执行需要多个步骤的业务流程时，锁定相关资源，确保流程的完整性和数据的一致性。</li>
+<li><strong>配置更新系统</strong>：在更新分布式配置时，同时锁定多个配置节点，确保配置的同步和一致性。</li>
+</ol>
+<h4 id="常用API-3"><a href="#常用API-3" class="headerlink" title="常用API"></a>常用API</h4><p><strong>Redisson</strong></p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>RLock getMultiLock(RLock… locks)</td>
+<td>通过多个RLock对象获取一个多锁对象。</td>
+</tr>
+</tbody></table>
+<p><strong>RLock</strong></p>
+<p>详见可重入锁。</p>
+<h4 id="代码示例-4"><a href="#代码示例-4" class="headerlink" title="代码示例"></a>代码示例</h4><p>更新订单涉及订单以及用户，因此使用多锁重构更新订单方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Resource</span><br><span class="hljs-keyword">private</span> RedissonClient redissonClient;<br><br><span class="hljs-meta">@Override</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">update</span><span class="hljs-params">(Long id)</span> <span class="hljs-keyword">throws</span> InterruptedException </span>&#123;<br>    <span class="hljs-comment">// 订单锁及用户锁</span><br>    RLock orderLock = redissonClient.getLock(<span class="hljs-string">&quot;order&quot;</span> + id);<br>    RLock userLock = redissonClient.getLock(<span class="hljs-string">&quot;user&quot;</span> + getUserId());<br>    <span class="hljs-comment">// 尝试获取多个锁</span><br>    RLock multiLock = redissonClient.getMultiLock(orderLock, userLock);<br>    <span class="hljs-keyword">boolean</span> locked = multiLock.tryLock();<br>    <span class="hljs-comment">// 如果获取锁失败，抛出异常</span><br>    <span class="hljs-keyword">if</span> (!locked) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;获取锁失败&quot;</span>);<br>    &#125;<br>    <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-comment">// 模拟更新订单</span><br>    &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>        e.printStackTrace();<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;更新订单失败&quot;</span>);<br>    &#125; <span class="hljs-keyword">finally</span> &#123;<br>        <span class="hljs-comment">// 释放多个锁</span><br>        multiLock.unlock();<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="选择"><a href="#选择" class="headerlink" title="选择"></a>选择</h4><p>在分布式系统中，选择不同的锁策略取决于业务需求和资源管理的复杂性。以下是两种常见的多锁应用策略及其区别：</p>
+<ol>
+<li><strong>同时锁定所有资源（使用<code>MultiLock</code>）</strong><ul>
+<li><strong>适用场景</strong>：<ul>
+<li><strong>跨资源操作</strong>：需要同时访问或修改多个资源，确保操作的原子性。</li>
+<li><strong>资源依赖操作</strong>：操作之间存在资源依赖关系，必须同时获取相关资源的锁。</li>
+</ul>
+</li>
+<li><strong>优点</strong>：<ul>
+<li><strong>原子性保障</strong>：确保所有资源在操作过程中保持一致性。</li>
+<li><strong>避免部分成功</strong>：防止部分操作成功而其他操作失败，保持数据的一致性。</li>
+</ul>
+</li>
+<li><strong>缺点</strong>：<ul>
+<li><strong>锁竞争增加</strong>：需要同时获取多个锁，可能增加锁竞争的概率，影响系统性能。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>分别锁定各个资源（单独使用多个<code>RLock</code>）</strong><ul>
+<li><strong>适用场景</strong>：<ul>
+<li><strong>独立资源操作</strong>：多个资源之间操作相互独立，可以分别锁定。</li>
+<li><strong>高并发读写</strong>：在需要高并发访问的场景下，分别锁定资源以提高并发性能。</li>
+</ul>
+</li>
+<li><strong>优点</strong>：<ul>
+<li><strong>更高的并发性</strong>：可以独立管理各个资源的锁，减少锁的粒度，提高系统的并发性能。</li>
+<li><strong>灵活性</strong>：可以针对不同资源采用不同的锁策略（不单单是<code>RLock</code>），满足多样化的业务需求。</li>
+</ul>
+</li>
+<li><strong>缺点</strong>：<ul>
+<li><strong>复杂性增加</strong>：需要管理多个锁的获取与释放，增加了代码的复杂性。</li>
+<li><strong>一致性保障困难</strong>：在需要跨资源一致性的场景下，难以保证所有操作的原子性。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="红锁（RedLock）"><a href="#红锁（RedLock）" class="headerlink" title="红锁（RedLock）"></a>红锁（RedLock）</h3><h4 id="概念-4"><a href="#概念-4" class="headerlink" title="概念"></a>概念</h4><p>红锁是由Redis提出的一个分布式锁算法。它要求使用多个独立的Redis节点来完成分布式锁的获取和释放，具备比传统单节点锁更高的可靠性和容错性。RedLock的核心思想是通过多个Redis实例来共同保证锁的有效性。</p>
+<p>具体来说，RedLock锁定机制的步骤如下：</p>
+<ol>
+<li>客户端尝试在多个独立的Redis实例上获取锁。</li>
+<li>如果至少有多数（通常是 N/2 + 1）Redis实例成功获得锁，那么就认为获得锁成功。</li>
+<li>如果客户端能够成功获取到锁，则开始执行保护的资源操作。</li>
+<li>若无法获得锁，则可以选择等待或立即返回。</li>
+</ol>
+<h4 id="特性-4"><a href="#特性-4" class="headerlink" title="特性"></a>特性</h4><ul>
+<li><strong>高可用性</strong>：由于使用多个Redis实例，红锁能够避免单点故障。如果某个Redis实例不可用，其他实例仍可保证锁的正常工作。</li>
+<li><strong>可靠性</strong>：相较于基于单一Redis实例的分布式锁，红锁可以在网络延迟、节点宕机等异常情况下提供更强的保证。</li>
+<li><strong>容错性</strong>：即使某些Redis节点发生故障，红锁依然能够有效地工作。</li>
+</ul>
+<h4 id="常用API-4"><a href="#常用API-4" class="headerlink" title="常用API"></a>常用API</h4><p><strong>Redisson</strong></p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>RLock getRedLock(RLock… locks)</td>
+<td>通过多个RLock对象获取一个红锁对象。</td>
+</tr>
+</tbody></table>
+<p><strong>RLock</strong></p>
+<p>详见可重入锁。</p>
+<h4 id="代码示例-5"><a href="#代码示例-5" class="headerlink" title="代码示例"></a>代码示例</h4><p>配置多个<code>RedissonClient</code></p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 创建RedissonClient连接到第一个Redis节点</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">@Bean(name = &quot;redissonClient1&quot;)</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> RedissonClient <span class="hljs-title">redissonClient1</span><span class="hljs-params">()</span> </span>&#123;<br>    Config config = <span class="hljs-keyword">new</span> Config();<br>    config.useSingleServer()<br>          .setAddress(<span class="hljs-string">&quot;redis://127.0.0.1:6379&quot;</span>)<br>          .setPassword(<span class="hljs-string">&quot;password1&quot;</span>) <span class="hljs-comment">// 如果没有密码，可以省略</span><br>          .setTimeout(<span class="hljs-number">3000</span>)<br>          .setRetryAttempts(<span class="hljs-number">3</span>)<br>          .setRetryInterval(<span class="hljs-number">1500</span>);<br>    <span class="hljs-keyword">return</span> Redisson.create(config);<br>&#125;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 创建RedissonClient连接到第二个Redis节点</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">@Bean(name = &quot;redissonClient2&quot;)</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> RedissonClient <span class="hljs-title">redissonClient2</span><span class="hljs-params">()</span> </span>&#123;<br>    Config config = <span class="hljs-keyword">new</span> Config();<br>    config.useSingleServer()<br>          .setAddress(<span class="hljs-string">&quot;redis://127.0.0.1:6380&quot;</span>)<br>          .setPassword(<span class="hljs-string">&quot;password2&quot;</span>) <span class="hljs-comment">// 如果没有密码，可以省略</span><br>          .setTimeout(<span class="hljs-number">3000</span>)<br>          .setRetryAttempts(<span class="hljs-number">3</span>)<br>          .setRetryInterval(<span class="hljs-number">1500</span>);<br>    <span class="hljs-keyword">return</span> Redisson.create(config);<br>&#125;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 创建RedissonClient连接到第三个Redis节点</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">@Bean(name = &quot;redissonClient3&quot;)</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> RedissonClient <span class="hljs-title">redissonClient3</span><span class="hljs-params">()</span> </span>&#123;<br>    Config config = <span class="hljs-keyword">new</span> Config();<br>    config.useSingleServer()<br>          .setAddress(<span class="hljs-string">&quot;redis://127.0.0.1:6381&quot;</span>)<br>          .setPassword(<span class="hljs-string">&quot;password3&quot;</span>) <span class="hljs-comment">// 如果没有密码，可以省略</span><br>          .setTimeout(<span class="hljs-number">3000</span>)<br>          .setRetryAttempts(<span class="hljs-number">3</span>)<br>          .setRetryInterval(<span class="hljs-number">1500</span>);<br>    <span class="hljs-keyword">return</span> Redisson.create(config);<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>业务代码中使用多个<code>RedissonClient</code></p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Resource(name = &quot;redissonClient1&quot;)</span><br><span class="hljs-keyword">private</span> RedissonClient redissonClient1;<br><br><span class="hljs-meta">@Resource(name = &quot;redissonClient2&quot;)</span><br><span class="hljs-keyword">private</span> RedissonClient redissonClient2;<br><br><span class="hljs-meta">@Resource(name = &quot;redissonClient3&quot;)</span><br><span class="hljs-keyword">private</span> RedissonClient redissonClient3;<br><br><span class="hljs-meta">@Override</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">update</span><span class="hljs-params">(Long id)</span> <span class="hljs-keyword">throws</span> InterruptedException </span>&#123;<br>    <span class="hljs-comment">// 配置多个RedissonClient连接不同Redis节点</span><br>    RLock orderLock1 = redissonClient1.getLock(<span class="hljs-string">&quot;order&quot;</span> + id);<br>    RLock orderLock2 = redissonClient2.getLock(<span class="hljs-string">&quot;order&quot;</span> + id);<br>    RLock orderLock3 = redissonClient3.getLock(<span class="hljs-string">&quot;order&quot;</span> + id);<br>    <span class="hljs-comment">// 尝试获取多个锁</span><br>    RLock rLock = redissonClient.getRedLock(orderLock1, orderLock2, orderLock3);<br>    <span class="hljs-keyword">boolean</span> locked = rLock.tryLock();<br>    <span class="hljs-comment">// 如果获取锁失败，抛出异常</span><br>    <span class="hljs-keyword">if</span> (!locked) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;获取锁失败&quot;</span>);<br>    &#125;<br>    <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-comment">// 模拟更新订单</span><br>    &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>        e.printStackTrace();<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;更新订单失败&quot;</span>);<br>    &#125; <span class="hljs-keyword">finally</span> &#123;<br>        <span class="hljs-comment">// 释放锁</span><br>        rLock.unlock();<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="对比多锁"><a href="#对比多锁" class="headerlink" title="对比多锁"></a>对比多锁</h4><p>看起来红锁和多锁类似，也能够支持多个锁的同时加锁，但它们的实现原理、适用场景和容错能力有很大的区别。</p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>多锁</th>
+<th>红锁</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>锁粒度</strong></td>
+<td>是针对多个RLock 对象进行的组合锁，多个锁在同一 Redis 实例中。</td>
+<td>是针对多个Redis 实例进行的分布式锁。</td>
+</tr>
+<tr>
+<td><strong>容错性</strong></td>
+<td>无容错性，仅对单一Redis实例提供锁保护，多个锁操作的失败会导致整体回滚。</td>
+<td>容错性高，通过多个Redis实例来保证锁的高可用性。</td>
+</tr>
+<tr>
+<td><strong>应用场景</strong></td>
+<td>适用于单个Redis实例中对多个资源加锁的场景，主要用于资源的组合加锁。</td>
+<td>适用于需要分布式高可用锁，且需要跨多个Redis实例管理锁的场景。</td>
+</tr>
+<tr>
+<td><strong>实现复杂度</strong></td>
+<td>简单，通过<code>RLock</code>对象组合进行加锁，适用于同一 Redis 实例。</td>
+<td>相对较复杂，需要多个Redis实例，并且涉及时钟同步和网络延迟。</td>
+</tr>
+<tr>
+<td><strong>性能</strong></td>
+<td>性能较好，只需要在单个Redis实例中加锁。</td>
+<td>相对较差，需要访问多个Redis实例，开销较大。</td>
+</tr>
+<tr>
+<td><strong>使用场景的可靠性要求</strong></td>
+<td>对可靠性要求较低的场景，适合较为简单的组合锁需求。</td>
+<td>高可靠性、高可用性要求的分布式场景。</td>
+</tr>
+</tbody></table>
+<h3 id="FencedLock"><a href="#FencedLock" class="headerlink" title="FencedLock"></a>FencedLock</h3><h4 id="概念-5"><a href="#概念-5" class="headerlink" title="概念"></a>概念</h4><p><code>FencedLock</code>是<code>Redisson</code>提供的分布式锁，旨在防止由于客户端崩溃或网络分区而导致的锁的错误释放。它与普通的<code>RLock</code>类似，但加入了锁版本控制，使得即使客户端崩溃或断开连接，其他客户端也不会误释放该锁。</p>
+<p>其核心概念是锁版本（Fence），每次获取锁时，都会生成一个唯一的版本号，并且只有持有最新版本的锁的客户端才能成功释放锁。如果客户端持有的锁版本过期或已被其他客户端更新，则无法释放锁，从而避免了死锁或资源竞争。</p>
+<h4 id="特性-5"><a href="#特性-5" class="headerlink" title="特性"></a>特性</h4><ul>
+<li><strong>锁版本控制</strong>：<code>FencedLock</code>为每个锁引入了版本号，每次客户端获得锁时，都会得到一个唯一的版本号。客户端在释放锁时，需要确保自己持有的是最新版本的锁。</li>
+<li><strong>客户端崩溃保护</strong>：当客户端崩溃或者因为某些原因失去连接时，<code>FencedLock</code>通过fence（栅栏机制）防止其他客户端释放锁，避免了可能的锁误释放问题。</li>
+<li><strong>避免误释放锁</strong>：通过检查锁的版本，<code>FencedLock</code>确保只有当前持有锁的客户端能够释放锁。如果锁的版本号不同，释放锁会失败，从而避免了锁的误释放。</li>
+<li><strong>适用于高并发和长时间持锁的场景</strong>：<code>FencedLock</code>特别适用于需要长时间持锁并且对锁的可靠性有高要求的场景。例如在高并发的环境下，确保锁在分布式系统中的安全性和一致性。</li>
+</ul>
+<h4 id="应用场景-4"><a href="#应用场景-4" class="headerlink" title="应用场景"></a>应用场景</h4><ol>
+<li><strong>高并发任务</strong>：在需要对共享资源进行并发访问控制的场景中，如分布式队列的消费，或者多个线程需要协调对某个数据库表的访问时，<code>FencedLock</code>可以确保锁的可靠性，避免由于节点宕机或者崩溃导致的锁的误释放。</li>
+<li><strong>长时间任务</strong>：如果锁持有的时间比较长，例如批量处理任务、定时任务等，<code>FencedLock</code>可以确保在任务执行过程中，不会出现因为客户端崩溃或其他原因导致锁释放的问题。</li>
+<li><strong>分布式系统中的资源访问</strong>：在多节点的分布式环境中，如果不同的节点要访问某些共享资源，使用<code>FencedLock</code>可以有效避免锁丢失的情况，从而保证系统的稳定性和一致性。</li>
+<li><strong>防止死锁</strong>：<code>FencedLock</code>可以避免在客户端崩溃时，由于其他客户端误释放锁而导致的死锁现象。</li>
+</ol>
+<h4 id="常用API-5"><a href="#常用API-5" class="headerlink" title="常用API"></a>常用API</h4><p><strong>Redisson</strong></p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>RFencedLock getFencedLock(String name)</td>
+<td>获取指定名称的FencedLock对象。</td>
+</tr>
+</tbody></table>
+<p><strong>RFencedLock</strong></p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Long getToken()</td>
+<td>返回当前FencedLock令牌。</td>
+</tr>
+<tr>
+<td>Long lockAndGetToken()</td>
+<td>阻塞地获取锁并返回当前FencedLock令牌。</td>
+</tr>
+<tr>
+<td>Long lockAndGetToken(long leaseTime, TimeUnit unit)</td>
+<td>阻塞地获取锁，并设置锁地超时时间并返回当前FencedLock令牌。</td>
+</tr>
+<tr>
+<td>Long tryLockAndGetToken()</td>
+<td>尝试获取FencedLock，立刻返回结果。</td>
+</tr>
+<tr>
+<td>Long tryLockAndGetToken(long waitTime, TimeUnit unit)</td>
+<td>尝试获取FencedLock，并设置锁地自动释放时间，立刻返回结果。</td>
+</tr>
+<tr>
+<td>Long tryLockAndGetToken(long waitTime, long leaseTime, TimeUnit unit)</td>
+<td>尝试获取FencedLock，并设置锁地自动释放时间，等待指定时间后返回结果。</td>
+</tr>
+</tbody></table>
+<p><strong>RLock</strong></p>
+<p>详见可重入锁。</p>
+<h4 id="代码示例-6"><a href="#代码示例-6" class="headerlink" title="代码示例"></a>代码示例</h4><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Resource</span><br><span class="hljs-keyword">private</span> RedissonClient redissonClient;<br><br><span class="hljs-meta">@Override</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">update</span><span class="hljs-params">(Long id)</span> <span class="hljs-keyword">throws</span> InterruptedException </span>&#123;<br>    RFencedLock orderLock = redissonClient.getFencedLock(<span class="hljs-string">&quot;order&quot;</span> + id);<br>    Long token = orderLock.tryLockAndGetToken(<span class="hljs-number">10000</span>, <span class="hljs-number">30000</span>, TimeUnit.MILLISECONDS);<br>    <span class="hljs-comment">// 如果获取锁失败，抛出异常</span><br>    <span class="hljs-keyword">if</span> (token == <span class="hljs-keyword">null</span>) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;获取锁失败&quot;</span>);<br>    &#125;<br>    <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-comment">// 模拟更新订单</span><br>    &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>        e.printStackTrace();<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;更新订单失败&quot;</span>);<br>    &#125; <span class="hljs-keyword">finally</span> &#123;<br>        <span class="hljs-comment">// 释放锁</span><br>        orderLock.unlock();<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="对比RLock"><a href="#对比RLock" class="headerlink" title="对比RLock"></a>对比RLock</h4><p><strong>RLock</strong>：<code>Redisson</code>提供的一个常见的可重入分布式锁。它通过Redis来管理锁状态，当客户端持有锁时，其他客户端无法获取该锁。通常，它是基于Redis的键值对实现的，因此会有一些失效时间（TTL）来防止死锁。</p>
+<p><strong>RFencedLock</strong>：<code>Redisson</code>提供的一种更安全、更可靠的锁实现，引入了锁版本（Fence）和栅栏机制。它的主要目的是避免因为客户端崩溃或异常退出，导致锁无法正常释放的问题。即使Redis节点失败或客户端崩溃，其他客户端也能基于锁版本进行可靠的获取和释放。</p>
+<p><strong>Redis集群或分布式架构</strong>：在Redis是分布式架构（如Redis集群或主从复制）时，推荐使用<code>RFencedLock</code>，因为它具备更高的可靠性和容错性，能够处理Redis节点故障和网络分区等问题，确保分布式锁的安全性和一致性。</p>
+<p><strong>Redis单节点架构</strong>：对于Redis单节点环境，使用<code>RLock</code>完全足够，它足够简单高效，可以很好地满足大多数分布式锁需求。并且，<code>RLock</code>在单节点环境下没有额外的性能开销，锁的获取和释放速度较快。</p>
+<h3 id="自旋锁（Spin-Lock）"><a href="#自旋锁（Spin-Lock）" class="headerlink" title="自旋锁（Spin Lock）"></a>自旋锁（Spin Lock）</h3><h4 id="概念-6"><a href="#概念-6" class="headerlink" title="概念"></a>概念</h4><p>自旋锁是一种轻量级锁，它的基本原理是在尝试获取锁时，如果锁已经被占用，当前线程不会被阻塞，而是会持续地检查锁的状态，直到获取到锁为止。这种方式的优点是避免了上下文切换的开销，适用于锁持有时间非常短且锁竞争不激烈的场景。</p>
+<h4 id="特性-6"><a href="#特性-6" class="headerlink" title="特性"></a>特性</h4><ul>
+<li><strong>轻量级</strong>：实现相对轻量，没有阻塞机制，适合锁持有时间短，竞争不激烈的场景。</li>
+<li><strong>避免线程阻塞</strong>：与传统的阻塞锁不同，自旋锁会不断地尝试获取锁，直到锁被释放，这避免了线程的上下文切换。</li>
+<li><strong>适用于低竞争场景</strong>：当锁竞争较少时，自旋锁能够提供更好的性能，避免了进入等待队列的延迟。</li>
+<li><strong>分布式锁实现</strong>：基于Redis实现，可以跨进程、跨机器共享同一个锁，确保分布式环境下的同步。</li>
+<li><strong>减少上下文切换</strong>：自旋锁避免了线程的阻塞，减少了上下文切换的性能开销。</li>
+</ul>
+<h4 id="应用场景-5"><a href="#应用场景-5" class="headerlink" title="应用场景"></a>应用场景</h4><ul>
+<li><strong>高并发、低锁竞争的场景</strong>：在锁的竞争较少且操作迅速的环境中，自旋锁可以避免线程阻塞，提高性能。比如某些高吞吐量的消息队列或数据缓存的操作。</li>
+<li><strong>锁占用时间极短的场景</strong>：当锁的持有时间非常短（如几毫秒），传统的阻塞锁会造成较大性能损失，而自旋锁可以避免这种损失。比如频繁的缓存更新、短小的临界区操作等。</li>
+<li><strong>低延迟要求的应用</strong>：在对低延迟要求较高的系统中，自旋锁能够减少等待时间，尤其是当锁的竞争较少时。比如在线支付系统、实时数据处理等场景。</li>
+<li><strong>小规模并发环境</strong>：在并发线程较少的环境中，自旋锁的性能表现较好。自旋不会带来过多的 CPU 资源浪费。比如在小规模的微服务架构中，较少的线程竞争可以使用自旋锁。</li>
+</ul>
+<h4 id="常用API-6"><a href="#常用API-6" class="headerlink" title="常用API"></a>常用API</h4><p><strong>Redisson</strong></p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>RLock getSpinLock(String name)</td>
+<td>获取指定名称的自旋锁对象。</td>
+</tr>
+</tbody></table>
+<p><strong>RLock</strong></p>
+<p>详见可重入锁。</p>
+<h4 id="代码示例-7"><a href="#代码示例-7" class="headerlink" title="代码示例"></a>代码示例</h4><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Resource</span><br><span class="hljs-keyword">private</span> RedissonClient redissonClient;<br><br><span class="hljs-meta">@Override</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">update</span><span class="hljs-params">(Long id)</span> <span class="hljs-keyword">throws</span> InterruptedException </span>&#123;<br>    <span class="hljs-comment">// 自旋锁</span><br>    RLock cacheLock = redissonClient.getSpinLock(<span class="hljs-string">&quot;order&quot;</span> + id);<br>    <span class="hljs-keyword">boolean</span> locked = cacheLock.tryLock(<span class="hljs-number">1000</span>, <span class="hljs-number">10000</span>, TimeUnit.MILLISECONDS);<br>    <span class="hljs-comment">// 如果获取锁失败，抛出异常</span><br>    <span class="hljs-keyword">if</span> (!locked) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;获取锁失败&quot;</span>);<br>    &#125;<br>    <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-comment">// 模拟更新缓存</span><br>    &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>        e.printStackTrace();<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;更新缓存失败&quot;</span>);<br>    &#125; <span class="hljs-keyword">finally</span> &#123;<br>        <span class="hljs-comment">// 释放锁</span><br>        cacheLock.unlock();<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-1"><a href="#注意事项-1" class="headerlink" title="注意事项"></a>注意事项</h4><p>使用自旋锁的前提是锁持有时间极短且竞争不激烈。若锁竞争激烈或持有时间较长，自旋锁会消耗大量CPU资源，得不偿失。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过本文的学习，开发者应能够充分理解<code>Redisson</code>提供的分布式锁的强大功能和灵活应用。文章不仅提供了关于各类型锁的详细信息，还展示了如何在实际项目中应用这些锁来解决复杂的同步问题，从基本的锁配置到高级功能如锁的自动续期和公平性处理。此外，通过提供的代码示例和配置方法，开发者可以快速在自己的项目中集成<code>Redisson</code>分布式锁，提升应用的性能和可靠性。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Redis/">Redis</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Redis/">Redis</a>
+                    
+                      <a class="hover-with-bg" href="/tags/NoSQL/">NoSQL</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Redisson/">Redisson</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/12/19/redis-practice-codes-tokens/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Redis实战——验证码和Token的存储与管理</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/12/13/redis-distributed-lock/">
+                        <span class="hidden-mobile">Redis——分布式锁</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

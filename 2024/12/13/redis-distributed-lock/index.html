@@ -1,0 +1,728 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="引言在分布式系统中，管理并发访问共享资源是一个挑战，需要确保系统的一致性和可靠性。分布式锁提供了一种机制，通过锁定资源来控制跨多个节点的并发访问。Redis，作为高性能的NoSQL数据库，由于其内存操作的特性和灵活的数据结构，被广泛用于实现分布式锁。本文详细介绍了分布式锁的概念、设计原则、实现方式，以及如何利用Redis和Lua脚本来实现高效且安全的分布式锁。 分布式锁简介分布式锁是一种在分布式系">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis——分布式锁">
+<meta property="og:url" content="http://example.com/2024/12/13/redis-distributed-lock/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="引言在分布式系统中，管理并发访问共享资源是一个挑战，需要确保系统的一致性和可靠性。分布式锁提供了一种机制，通过锁定资源来控制跨多个节点的并发访问。Redis，作为高性能的NoSQL数据库，由于其内存操作的特性和灵活的数据结构，被广泛用于实现分布式锁。本文详细介绍了分布式锁的概念、设计原则、实现方式，以及如何利用Redis和Lua脚本来实现高效且安全的分布式锁。 分布式锁简介分布式锁是一种在分布式系">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png">
+<meta property="article:published_time" content="2024-12-13T14:15:41.000Z">
+<meta property="article:modified_time" content="2024-12-13T14:15:41.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="Redis">
+<meta property="article:tag" content="NoSQL">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png">
+  
+  
+  <title>Redis——分布式锁 - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Redis——分布式锁">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2024-12-13 22:15" pubdate>
+        2024年12月13日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      7.4k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      13 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Redis——分布式锁</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：2 个月前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>在分布式系统中，管理并发访问共享资源是一个挑战，需要确保系统的一致性和可靠性。分布式锁提供了一种机制，通过锁定资源来控制跨多个节点的并发访问。Redis，作为高性能的NoSQL数据库，由于其内存操作的特性和灵活的数据结构，被广泛用于实现分布式锁。本文详细介绍了分布式锁的概念、设计原则、实现方式，以及如何利用Redis和Lua脚本来实现高效且安全的分布式锁。</p>
+<h2 id="分布式锁简介"><a href="#分布式锁简介" class="headerlink" title="分布式锁简介"></a>分布式锁简介</h2><p>分布式锁是一种在分布式系统中用于避免多个进程或服务同时访问共享资源的同步机制。它是一种在单体应用中常见的互斥锁（Mutex）的扩展，特别是在需要确保跨多个节点的数据一致性和顺序时。</p>
+<p><img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/distributed-lock.png" alt="分布式锁"></p>
+<h3 id="对比JVM锁"><a href="#对比JVM锁" class="headerlink" title="对比JVM锁"></a>对比JVM锁</h3><table>
+<thead>
+<tr>
+<th></th>
+<th>JVM锁</th>
+<th>分布式锁</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>**应用范围 **</td>
+<td>单个JVM进程内部，如单个应用的多线程环境中</td>
+<td>多个独立进程或服务，如微服务架构、集群应用和任何多个节点协作的场景</td>
+</tr>
+<tr>
+<td><strong>性能</strong></td>
+<td>单个进程内线程调度和内存访问，性能高、延迟低</td>
+<td>受网络状况和锁实现机制的影响较大，网络延迟和外部服务处理速度为性能瓶颈</td>
+</tr>
+<tr>
+<td><strong>容错</strong></td>
+<td>处理单个JVM内的线程，JVM崩溃后锁自然消失，容错性通常没有问题</td>
+<td>需要设计考虑节点故障、网络分区和其他分布式系统问题，确保锁的一致性和可恢复性</td>
+</tr>
+<tr>
+<td><strong>复杂性</strong></td>
+<td>相对简单，只需要理解Java多线程</td>
+<td>设计和维护相对复杂，涉及到网络通信、错误处理、状态同步等分布式系统的问题</td>
+</tr>
+</tbody></table>
+<h3 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h3><ol>
+<li><strong>互斥性</strong>：确保在同一时间内，只有一个进程或服务可以执行关键段（critical section）的代码或操作特定的资源。</li>
+<li><strong>避免死锁</strong>：通过合理设计和使用超时机制，分布式锁可以避免死锁情况的发生。</li>
+<li><strong>保持一致性</strong>：在分布式系统中，不同节点上的进程可能会试图同时修改同一个数据源，使用分布式锁可以保持数据操作的一致性。</li>
+</ol>
+<h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h3><ol>
+<li><strong>电子商务系统中的库存管理</strong>：在高并发环境下，多个用户可能同时尝试购买限量的商品。分布式锁可以确保在处理订单和减库存操作时的数据一致性。</li>
+<li><strong>支付系统</strong>：在处理支付操作时，分布式锁可以保证同一账户的支付操作不会同时进行，避免余额出现错误。</li>
+<li><strong>任务调度</strong>：在分布式任务调度系统中，分布式锁用来保证同一任务不会被多个调度实例同时执行。</li>
+<li><strong>数据聚合</strong>：在一个大数据平台中，多个进程可能需要对同一数据集进行处理和更新，使用分布式锁可以防止数据在更新时发生冲突。</li>
+</ol>
+<h3 id="设计原则"><a href="#设计原则" class="headerlink" title="设计原则"></a>设计原则</h3><ol>
+<li><strong>互斥性：</strong>在任何时刻，只有一个客户端可以持有锁。这是实现并发控制的基本要求，确保共享资源不会被多个进程同时修改，从而避免数据不一致。</li>
+<li><strong>死锁防范：</strong>需要考虑到死锁的可能性并提供解决方案。这通常通过引入锁超时机制来实现，这样可以防止因为某个持锁进程的故障导致资源被无限期锁定。</li>
+<li><strong>高可用：</strong>必须高度可用，任何不可用都可能导致依赖它的应用发生阻塞或失败。通常通过冗余部署（如使用主从复制或多节点集群）来增强锁服务的可用性。</li>
+<li><strong>容错性：</strong>分布式锁应该能够处理节点故障。如果一个持有锁的节点突然崩溃或网络分区，锁服务需要能够检测到这种情况并将锁释放，以免影响系统的整体功能。</li>
+<li><strong>高性能：</strong>锁的获取和释放操作应尽可能高效。设计时需要优化网络交互，减少锁操作的延迟，例如通过减少请求的往返次数、使用更快的序列化机制等</li>
+<li><strong>重入性：</strong>同一个线程可能需要多次获取同一把锁（递归锁定）。分布式锁的设计可考虑支持重入性，使得同一个节点或线程可以安全地多次申请同一资源。</li>
+<li><strong>公平性：</strong>设计分布式锁时可以考虑锁的公平性，即确保按照请求锁的顺序来分配锁。这可以防止某些节点因长时间得不到锁而产生的“饥饿”问题。</li>
+<li><strong>可伸缩性：</strong>随着系统规模的扩大，分布式锁的实现也应能够扩展以处理更高的并发请求，这可能意味着在多个锁服务节点之间有效分配请求，或是合理的资源分区策略。</li>
+<li><strong>安全性：</strong>尤其在公开或不完全受信的环境中，分布式锁的通信应该加密，防止恶意攻击如重放攻击或锁篡改。</li>
+</ol>
+<h3 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h3><h4 id="关系型数据库"><a href="#关系型数据库" class="headerlink" title="关系型数据库"></a>关系型数据库</h4><ul>
+<li><p><strong>优点：</strong></p>
+<ul>
+<li><p><strong>强一致性</strong>：可以通过数据库事务保证操作的原子性和一致性。</p>
+</li>
+<li><p><strong>熟悉度高</strong>：许多开发者对SQL和关系数据库非常熟悉，容易实现和维护。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>缺点：</strong></p>
+<ul>
+<li><p><strong>性能限制</strong>：数据库锁可能在高并发场景下性能较低，因为锁操作需要磁盘I/O，且通常涉及网络延迟。</p>
+</li>
+<li><p><strong>可扩展性问题</strong>：随着请求量的增加，扩展关系数据库通常比较困难和昂贵。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="NoSQL数据库"><a href="#NoSQL数据库" class="headerlink" title="NoSQL数据库"></a>NoSQL数据库</h4><ul>
+<li><strong>优点：</strong><ul>
+<li><strong>高性能</strong>：基于内存操作，响应速度快，适合高并发环境。</li>
+<li><strong>自然的超时机制</strong>：Redis键值可以设置过期时间，自然支持锁的超时释放。</li>
+<li><strong>高可用和扩展性</strong>：通过哨兵模式和集群模式，Redis可以提供高可用性和水平扩展。</li>
+</ul>
+</li>
+<li><strong>缺点：</strong><ul>
+<li><strong>数据持久性问题</strong>：虽然Redis有持久化机制，但在极端情况下仍可能丢失数据。</li>
+<li><strong>锁不是自然的可重入</strong>：需要在客户端实现可重入逻辑。</li>
+</ul>
+</li>
+</ul>
+<h4 id="Zookeeper"><a href="#Zookeeper" class="headerlink" title="Zookeeper"></a>Zookeeper</h4><ul>
+<li><strong>优点：</strong><ul>
+<li><strong>设计用于协调</strong>：ZooKeeper提供原生支持的分布式锁和其他同步原语，非常适合做分布式协调任务。</li>
+<li><strong>强一致性</strong>：ZooKeeper保证跨集群的数据一致性和顺序性。</li>
+<li><strong>容错性高</strong>：通过集群模式运行，能够处理节点失败的情况。</li>
+</ul>
+</li>
+<li><strong>缺点：</strong><ul>
+<li><strong>复杂性高</strong>：比起Redis和MySQL，ZooKeeper的部署和维护更为复杂。</li>
+<li><strong>性能较低</strong>：由于强一致性的保证，性能可能不如基于内存的Redis。</li>
+</ul>
+</li>
+</ul>
+<h4 id="三者对比"><a href="#三者对比" class="headerlink" title="三者对比"></a>三者对比</h4><p>在选择分布式锁的实现技术时，需要考虑锁的性能需求、一致性要求、系统的可用性和容错性。MySQL提供了强一致性但可能在高并发下表现不佳；Redis提供了极高的性能和良好的扩展性，适合需要快速响应的场景；ZooKeeper提供了专门的协调服务，适合需要严格一致性和顺序保证的场景。每种技术都有其适用的场景和局限性，正确的选择应基于具体的应用需求和环境特点。</p>
+<h2 id="基本思路"><a href="#基本思路" class="headerlink" title="基本思路"></a>基本思路</h2><p>基于Redis实现分布式锁主要有两点：</p>
+<ol>
+<li><p>获取锁</p>
+<p>互斥：确保只有一个线程获取锁</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">SETNX lock threadId<br></code></pre></div></td></tr></table></figure>
+
+<p>添加超时时间，避免死锁</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">EXPIRED lock 10<br></code></pre></div></td></tr></table></figure>
+
+<p>注意获取锁和添加超时时间这两步必须是一个原子操作，避免设置超时时间前服务器宕机引发死锁问题，因此可以将两步合并为：</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">SET lock threadId EX 10 NX<br></code></pre></div></td></tr></table></figure></li>
+<li><p>释放锁</p>
+<p>手动释放</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">DEL lock<br></code></pre></div></td></tr></table></figure></li>
+</ol>
+<p><img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-distributed-locks.png" alt="Redis分布式锁简单流程"></p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>根据以上实现思路编写Java程序如下：</p>
+<ol>
+<li><p>创建接口RedisLock，接口包含获取锁以及解锁的方法</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">RedisLock</span> </span>&#123;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 尝试获取锁</span><br><span class="hljs-comment">     *</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> timeout 超时时间</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span> boolean 是否获取到锁</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">boolean</span> <span class="hljs-title">tryLock</span><span class="hljs-params">(<span class="hljs-keyword">long</span> timeout)</span></span>;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 释放锁</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">unlock</span><span class="hljs-params">()</span></span>;<br><br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>创建该接口的一个实现类SimpleRedisLock</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Data</span><br><span class="hljs-meta">@NoArgsConstructor</span><br><span class="hljs-meta">@AllArgsConstructor</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SimpleRedisLock</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">RedisLock</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> String KEY_PREFIX = <span class="hljs-string">&quot;REDIS_LOCK_&quot;</span>;<br><br>    <span class="hljs-comment">// 类的成员变量，用于存储锁的key</span><br>    <span class="hljs-keyword">private</span> String key;<br><br>    <span class="hljs-comment">// 用于操作redis的组件</span><br>    <span class="hljs-keyword">private</span> StringRedisTemplate stringRedisTemplate;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 尝试获取锁</span><br><span class="hljs-comment">     * 1. 获取当前线程的id</span><br><span class="hljs-comment">     * 2. 尝试将当前线程的id存入redis，并设置过期时间</span><br><span class="hljs-comment">     *</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> timeout 超时时间</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span> boolean 是否获取到锁</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">tryLock</span><span class="hljs-params">(<span class="hljs-keyword">long</span> timeout)</span> </span>&#123;<br>        <span class="hljs-keyword">long</span> threadId = Thread.currentThread().getId();<br>        <span class="hljs-keyword">return</span> Boolean.TRUE.equals(stringRedisTemplate.opsForValue()<br>                .setIfAbsent(KEY_PREFIX +key, String.valueOf(threadId), timeout, TimeUnit.MILLISECONDS));<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 释放锁：删除redis中的key</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">unlock</span><span class="hljs-params">()</span> </span>&#123;<br>        stringRedisTemplate.delete(KEY_PREFIX + key);<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>业务：用户同一时间多次下单的场景，使用互斥锁保证只有一个请求成功</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Service</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">OrderServiceImpl</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">OrderService</span> </span>&#123;<br><br>    <span class="hljs-meta">@Resource</span><br>    <span class="hljs-keyword">private</span> StringRedisTemplate stringRedisTemplate;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">createOrder</span><span class="hljs-params">()</span> </span>&#123;<br>        SimpleRedisLock simpleRedisLock = <span class="hljs-keyword">new</span> SimpleRedisLock(<span class="hljs-string">&quot;createOrder&quot;</span> + getUserId(), stringRedisTemplate);<br>        <span class="hljs-keyword">boolean</span> locked = simpleRedisLock.tryLock(<span class="hljs-number">20000</span>);<br>        <span class="hljs-comment">// 如果获取锁失败，直接返回</span><br>        <span class="hljs-keyword">if</span> (!locked) &#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;获取锁失败&quot;</span>;<br>        &#125;<br>        <span class="hljs-comment">// 获取锁成功，模拟创建订单</span><br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;创建订单成功&quot;</span>;<br>        &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>            e.printStackTrace();<br>            <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;创建订单失败&quot;</span>;<br>        &#125; <span class="hljs-keyword">finally</span> &#123;<br>            <span class="hljs-comment">// 创建订单结束后，释放锁</span><br>            simpleRedisLock.unlock();<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getUserId</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-comment">// 模拟获取用户id</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;1&quot;</span>;<br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>运行两个应用实例，用两次HTTP请求模拟同一时间多次下单，请求结果如下</p>
+<p><img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-distributed-lock-test-1.png"></p>
+<p>查看Redis数据库</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">127.0.0.1:6379&gt; keys *<br>1) <span class="hljs-string">&quot;REDIS_LOCK_createOrder1&quot;</span><br>127.0.0.1:6379&gt; get REDIS_LOCK_createOrder1<br><span class="hljs-string">&quot;38&quot;</span><br>127.0.0.1:6379&gt; ttl REDIS_LOCK_createOrder1<br>(<span class="hljs-built_in">integer</span>) 7<br></code></pre></div></td></tr></table></figure></li>
+<li><p>由以上结果可知，OrderServiceImpl#createOrder已满足我们的业务需求，做到了用户同一时间只能下单一次，且从Redis数据库的查询结果也看出了SimpleRedisLock的工具类是按照我们上节提到的思路进行实现的。</p>
+</li>
+</ol>
+<h2 id="改进一"><a href="#改进一" class="headerlink" title="改进一"></a>改进一</h2><p>以上SimpleRedisLock看似已经满足了需求，但在某些极端条件下仍然会出错，如下图所示：</p>
+<p><img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-distributed-lock-disadvantage-1.png" alt="Redis分布式锁弊端一"></p>
+<p>当线程1执行业务期间，锁超时释放，与此同时线程2获取到了相同key的锁，且在线程2的执行期间，线程1执行完成，对锁进行了释放，那么就会出现问题，<strong>线程1解锁了不属于自己的锁</strong>。</p>
+<p>其实解决这个问题很简单，只需要对锁的值进行标记，在释放锁时对锁的值和本线程持有的值进行比较，相同才能解锁，即可解决这个“跨线程解锁”的问题。</p>
+<p>修改SimpleRedisLock如下</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Data</span><br><span class="hljs-meta">@NoArgsConstructor</span><br><span class="hljs-meta">@AllArgsConstructor</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SimpleRedisLock</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">RedisLock</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> String KEY_PREFIX = <span class="hljs-string">&quot;REDIS_LOCK_&quot;</span>;<br><br>    <span class="hljs-comment">// 对锁的值进行设置</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> String LOCK_VALUE = UUID.randomUUID().toString();<br><br>    <span class="hljs-comment">// 用于存储锁的key</span><br>    <span class="hljs-keyword">private</span> String key;<br><br>    <span class="hljs-comment">// 用于操作redis的组件</span><br>    <span class="hljs-keyword">private</span> StringRedisTemplate stringRedisTemplate;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 尝试获取锁</span><br><span class="hljs-comment">     * 1. 获取当前线程的id</span><br><span class="hljs-comment">     * 2. 尝试将当前线程的id存入redis，并设置过期时间</span><br><span class="hljs-comment">     *</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> timeout 超时时间</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span> boolean 是否获取到锁</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">tryLock</span><span class="hljs-params">(<span class="hljs-keyword">long</span> timeout)</span> </span>&#123;<br>        <span class="hljs-comment">// long threadId = Thread.currentThread().getId();  替换为LOCK_VALUE</span><br>        <span class="hljs-keyword">return</span> Boolean.TRUE.equals(stringRedisTemplate.opsForValue()<br>                .setIfAbsent(KEY_PREFIX + key, LOCK_VALUE, timeout, TimeUnit.MILLISECONDS));<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 释放锁：删除redis中的key</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">unlock</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-comment">// 解锁时，判断当前线程是否持有锁，如果持有锁，则删除锁</span><br>        <span class="hljs-keyword">if</span> (LOCK_VALUE.equals(stringRedisTemplate.opsForValue().get(KEY_PREFIX + key))) &#123;<br>            stringRedisTemplate.delete(KEY_PREFIX + key);<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;解锁失败&quot;</span>);<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>修改的核心逻辑为：</strong>添加成员变量LOCK_VALUE（取值为UUID），拿到互斥锁时需要将该值设置为Redis KEY的VALUE，分布式锁解锁时需要拿出Redis中对应分布式锁的VALUE值，与持有者的LOCK_VALUE进行比较，值相等时才能进行解锁，否则抛出异常（业务代码需要做对应处理）。</p>
+<p>修复后，分布式锁的流程如下：</p>
+<p><img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-distributed-lock-improvement-1.png" alt="Redis分布式锁改进一"></p>
+<h2 id="改进二"><a href="#改进二" class="headerlink" title="改进二"></a>改进二</h2><p>刚才我们解决了锁超时释放后、前一个线程解锁当前正在运行的线程的锁的问题。</p>
+<p>现在还有一个极端情况：解锁逻辑中，线程A判断完Redis中锁的VALUE值与持有者的LOCK_VALUE值相等后，本来可以解锁，但是系统突然阻塞了（FULL GC）且阻塞时间极长，分布式锁都超时释放了，此时又有另一个线程B拿到了相同KEY的锁，且在执行业务期间，线程A停止阻塞解锁了分布式锁，如下图所示：</p>
+<p><img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-distributed-lock-disadvantage-2.png" alt="Redis分布式锁弊端二"></p>
+<p>不难看出，这个问题的根因是<strong>比较持有者与Redis的锁值、释放锁这两步动作不是一个原子操作</strong>。因此下一步我们要实现的是解锁逻辑中的原子操作。</p>
+<h2 id="调用Lua脚本"><a href="#调用Lua脚本" class="headerlink" title="调用Lua脚本"></a>调用Lua脚本</h2><p>Redis提供了执行Lua脚本的功能，这是一种强大的机制，用于处理多个操作需要在单个原子事务中执行的情况。</p>
+<h3 id="为什么使用Lua脚本"><a href="#为什么使用Lua脚本" class="headerlink" title="为什么使用Lua脚本"></a>为什么使用Lua脚本</h3><ol>
+<li><strong>原子性</strong>：Lua脚本在执行时不会被其他命令中断，确保了脚本中所有操作的原子性。这是因为Redis是单线程的，一旦开始执行脚本，就会执行到结束，中间不会插入其他操作。</li>
+<li><strong>减少网络开销</strong>：通过将多个命令封装在一个脚本中发送，可以减少客户端与服务器之间的通信次数。这对于网络延迟敏感的应用尤其重要。</li>
+<li><strong>复杂逻辑处理</strong>：Lua脚本提供了比简单的Redis命令更复杂的逻辑处理能力，允许进行条件判断、循环处理等。</li>
+</ol>
+<h3 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h3><ul>
+<li><strong>复杂的事务</strong>：需要执行多个操作，这些操作要么全部完成，要么全部不做。</li>
+<li><strong>性能优化</strong>：减少多次网络往返带来的延迟。</li>
+<li><strong>安全性</strong>：例如，在分布式锁的实现中，确保只有锁的持有者才能释放锁。</li>
+</ul>
+<h3 id="分布式锁整合"><a href="#分布式锁整合" class="headerlink" title="分布式锁整合"></a>分布式锁整合</h3><p>以下是一个使用Lua脚本来安全释放Redis锁的例子。这个脚本检查锁是否由调用者持有，如果是，则释放锁：</p>
+<figure class="highlight lua"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs lua"><span class="hljs-keyword">if</span> redis.call(<span class="hljs-string">&quot;get&quot;</span>, KEYS[<span class="hljs-number">1</span>]) == ARGV[<span class="hljs-number">1</span>] <span class="hljs-keyword">then</span><br>    <span class="hljs-keyword">return</span> redis.call(<span class="hljs-string">&quot;del&quot;</span>, KEYS[<span class="hljs-number">1</span>])<br><span class="hljs-keyword">else</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span><br><span class="hljs-keyword">end</span><br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li><code>KEYS[1]</code> 表示锁KEY的名称。</li>
+<li><code>ARGV[1]</code> 表示调用者认为的锁的值。</li>
+<li>如果锁的当前值与提供的值匹配，则删除该键（释放锁），否则不执行任何操作。</li>
+</ul>
+<p>同时改进SimpleRedisLock的解锁逻辑：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Override</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">unlock</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>    <span class="hljs-comment">// 获取lua脚本</span><br>    ClassPathResource unlockLuaRes = <span class="hljs-keyword">new</span> ClassPathResource(<span class="hljs-string">&quot;redis_unlock.lua&quot;</span>);<br>    String unlockScriptStr = StreamUtils.copyToString(unlockLuaRes.getInputStream(), StandardCharsets.UTF_8);<br>    DefaultRedisScript&lt;Long&gt; unlockScript = <span class="hljs-keyword">new</span> DefaultRedisScript&lt;&gt;(unlockScriptStr, Long.class);<br>    <br>    <span class="hljs-comment">// 执行lua脚本</span><br>    Long result = stringRedisTemplate.execute(unlockScript, Collections.singletonList(KEY_PREFIX + key), LOCK_VALUE);<br>    <span class="hljs-keyword">if</span> (result == <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;释放锁失败&quot;</span>);<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>以上代码中，修改了在Java程序中取值判断，将<strong>取值</strong>、<strong>判断</strong>、<strong>删除</strong>都整合到Lua脚本中，实现了三步操作的原子性。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>文章通过对分布式锁的全面介绍和深入的技术分析，提供了实现高效和安全分布式锁的详细方法。特别是通过Redis和Lua脚本实现的锁，不仅保证了操作的原子性，还解决了如锁超时和异常解锁的常见问题。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Redis/">Redis</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Redis/">Redis</a>
+                    
+                      <a class="hover-with-bg" href="/tags/NoSQL/">NoSQL</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/12/15/redis-distributed-lock-usage/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Redis——Redisson分布式锁</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/12/04/redis-base/">
+                        <span class="hidden-mobile">Redis——基础篇</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

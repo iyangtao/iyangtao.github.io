@@ -1,0 +1,628 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="随着容器化技术的兴起，Docker已成为现代软件开发和部署的核心工具之一。Docker提供了一种高效的方式来打包、分发和运行应用，无论是在本地开发环境还是在复杂的生产环境中。本文将介绍Docker的基本命令，帮助新用户快速掌握如何使用Docker来创建和管理容器。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker基础命令">
+<meta property="og:url" content="http://example.com/2022/04/22/docker-commands/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="随着容器化技术的兴起，Docker已成为现代软件开发和部署的核心工具之一。Docker提供了一种高效的方式来打包、分发和运行应用，无论是在本地开发环境还是在复杂的生产环境中。本文将介绍Docker的基本命令，帮助新用户快速掌握如何使用Docker来创建和管理容器。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/docker-default-meta-image-1110x583.png">
+<meta property="article:published_time" content="2022-04-22T12:12:45.000Z">
+<meta property="article:modified_time" content="2022-04-22T12:12:45.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="Docker">
+<meta property="article:tag" content="容器">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/docker-default-meta-image-1110x583.png">
+  
+  
+  <title>Docker基础命令 - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/docker-default-meta-image-1110x583.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Docker基础命令">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-04-22 20:12" pubdate>
+        2022年4月22日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      4k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      7 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Docker基础命令</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：3 年前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <p>随着容器化技术的兴起，Docker已成为现代软件开发和部署的核心工具之一。Docker提供了一种高效的方式来打包、分发和运行应用，无论是在本地开发环境还是在复杂的生产环境中。本文将介绍Docker的基本命令，帮助新用户快速掌握如何使用Docker来创建和管理容器。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  </p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>官方文档地址:<a target="_blank" rel="noopener" href="https://www.docker.com/get-started">https://www.docker.com/get-started</a></p>
+<p>中文参考手册:<a target="_blank" rel="noopener" href="https://docker_practice.gitee.io/zh-cn/">https://docker_practice.gitee.io/zh-cn/</a></p>
+<p>远程仓库：<a target="_blank" rel="noopener" href="https://hub.docker.com/">https://hub.docker.com/</a></p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 卸载旧版本</span><br>sudo yum remove docker \<br>                  docker-client \<br>                  docker-client-latest \<br>                  docker-common \<br>                  docker-latest \<br>                  docker-latest-logrotate \<br>                  docker-logrotate \<br>                  docker-engine<br><br><span class="hljs-comment"># 设置yum源</span><br>sudo yum install -y yum-utils<br>sudo yum-config-manager \<br>    --add-repo \<br>    https://download.docker.com/linux/centos/docker-ce.repo<br><br><span class="hljs-comment"># 安装最新版</span><br>sudo yum install docker-ce docker-ce-cli containerd.io<br><br><span class="hljs-comment"># 查看版本列表</span><br>yum list docker-ce --showduplicates | sort -r<br><br><span class="hljs-comment"># 安装指定版本</span><br>sudo yum install docker-ce-&lt;VERSION_STRING&gt; docker-ce-cli-&lt;VERSION_STRING&gt; containerd.io<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="生命周期理解"><a href="#生命周期理解" class="headerlink" title="生命周期理解"></a>生命周期理解</h2><p><img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/docker-commands-link.png"></p>
+<h2 id="镜像"><a href="#镜像" class="headerlink" title="镜像"></a>镜像</h2><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 镜像搜索</span><br>docker search [名称]<br><br><span class="hljs-comment"># 获取镜像</span><br>docker pull [选项] [Docker Registry 地址[:端口号]/]仓库名[:标签]<br><br><span class="hljs-comment"># 查看镜像列表</span><br>docker images [选项] [名称]<br>	-a：列出所有镜像（包含中间映像层）<br>	-q：只显示镜像id<br>	名称：只搜索相关的images，相当于过滤条件<br>	-f：其他过滤<br><br><span class="hljs-comment"># 查看docker占用空间</span><br>docker system df<br><br><span class="hljs-comment"># 查看虚悬(旧)镜像</span><br>docker images -f dangling=<span class="hljs-literal">true</span><br><br><span class="hljs-comment"># 虚悬镜像删除</span><br>docker image prune<br><br><span class="hljs-comment"># 删除镜像</span><br>docker rmi [选项] 镜像名:tag | 镜像id<br>	-f：强制删除<br>	<br><span class="hljs-comment"># 构建镜像</span><br>docker build [选项] PATH<br>	-f：指定Dockerfile路径<br>	-t：指定镜像名及标签<br><br><span class="hljs-comment"># 镜像导入</span><br>docker load -i 名称.tar<br><br><span class="hljs-comment"># 镜像打包</span><br>docker save 镜像名 -o 名称.tar<br><br><span class="hljs-comment"># 镜像推送</span><br>docker push USERNAME/IMAGES_NAME<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="容器基础"><a href="#容器基础" class="headerlink" title="容器基础"></a>容器基础</h2><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 运行容器</span><br>docker run [选项] 镜像名:tag|镜像id<br>	-f：--name 起别名<br>	-d：后台启动<br>	-p：端口映射（【宿主机端口】:【容器内部端口】）<br>	-v [:ro]：数据卷映射（【宿主机路径】:【容器内路径】），ro容器只读不写，路径不存在则自动创建<br>	--mount <span class="hljs-built_in">type</span>=<span class="hljs-built_in">bind</span>,<span class="hljs-built_in">source</span>=宿主机路径(绝对),target=容器路径[,<span class="hljs-built_in">readonly</span>]：挂载目录，路径不存在报错<br>	--network [网桥名]：指定网桥<br><br><span class="hljs-comment"># 启动/关闭/重启/强杀</span><br>docker start 容器名或id<br>docker stop 容器名或id<br>docker restart 容器名或id<br>docker <span class="hljs-built_in">kill</span> 容器名或id<br><br><span class="hljs-comment"># 删除容器</span><br> docker [container] rm [选项] 容器名或id<br> docker container prune   <span class="hljs-comment"># 删除所有终止状态的容器</span><br> 	-f：强制<br><br><span class="hljs-comment"># 组合命令</span><br>docker rm -f $(docker ps -aq)<br><br><span class="hljs-comment"># 容器日志</span><br>docker <span class="hljs-built_in">log</span> [选项] 容器名或id<br>	-f：实时展示<br>	-tf：加入时间戳的实时展示<br>	--tail：只显示尾部日志<br><br><span class="hljs-comment"># 容器内部进程</span><br>docker top 容器名或id<br><br><span class="hljs-comment"># 容器细节</span><br>docker inspect 容器名或id<br><br><span class="hljs-comment"># 进入容器</span><br>docker <span class="hljs-built_in">exec</span> [选项] 容器名或id bash<br>	-i：交互模式<br>	-t：分配一个伪终端<br><br><span class="hljs-comment"># 复制文件</span><br>docker cp 文件|目录 容器名或id:容器内资源路径<br>docker cp 容器名或id:容器内资源路径 主机目录<br><br><span class="hljs-comment"># 容器打包</span><br>docker commit -m <span class="hljs-string">&quot;描述信息&quot;</span> -a <span class="hljs-string">&quot;作者信息&quot;</span> （容器id或者名称） 打包的镜像名称:标签<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h2><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 查看网络信息</span><br>docker network ls<br><br><span class="hljs-comment"># 新建网桥</span><br>docker network create [选项] 网桥名称<br>	-d：网络类型，有 bridge overlay<br>	<br><span class="hljs-comment"># 查看网桥</span><br>docker inspect 网桥名<br><br><span class="hljs-comment"># 删除网桥</span><br>docker network rm 网桥名称<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="Dockerfile"><a href="#Dockerfile" class="headerlink" title="Dockerfile"></a>Dockerfile</h2><table>
+<thead>
+<tr>
+<th><strong>保留字</strong></th>
+<th><strong>作用</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>FROM</strong></td>
+<td><strong>当前镜像是基于哪个镜像的 <code>第一个指令必须是FROM</code></strong></td>
+</tr>
+<tr>
+<td><strong>MAINTAINER</strong></td>
+<td><strong>镜像维护者的姓名和邮箱地址</strong></td>
+</tr>
+<tr>
+<td><strong>RUN</strong></td>
+<td><strong>构建镜像时需要运行的指令</strong></td>
+</tr>
+<tr>
+<td><strong>EXPOSE</strong></td>
+<td><strong>当前容器对外暴露出的端口号</strong></td>
+</tr>
+<tr>
+<td><strong>WORKDIR</strong></td>
+<td><strong>指定在创建容器后，终端默认登录进来的工作目录，一个落脚点</strong></td>
+</tr>
+<tr>
+<td><strong>ENV</strong></td>
+<td><strong>用来在构建镜像过程中设置环境变量</strong></td>
+</tr>
+<tr>
+<td><strong>ADD</strong></td>
+<td><strong>将宿主机目录下的文件拷贝进镜像且ADD命令会自动处理URL和解压tar包</strong></td>
+</tr>
+<tr>
+<td><strong>COPY</strong></td>
+<td><strong>类似于ADD，拷贝文件和目录到镜像中<br/>将从构建上下文目录中&lt;原路径&gt;的文件/目录复制到新的一层的镜像内的&lt;目标路径&gt;位置</strong></td>
+</tr>
+<tr>
+<td><strong>VOLUME</strong></td>
+<td><strong>用来定义容器运行时可以挂载到宿主机的目录，用于数据保存和持久化工作</strong></td>
+</tr>
+<tr>
+<td><strong>CMD</strong></td>
+<td><strong>指定一个容器启动时要运行的命令<br/>Dockerfile中可以有多个CMD指令，但只有最后一个生效，CMD会被docker run之后的参数替换</strong></td>
+</tr>
+<tr>
+<td><strong>ENTRYPOINT</strong></td>
+<td><strong>指定一个容器启动时要运行的命令<br/>ENTRYPOINT的目的和CMD一样，都是在指定容器启动程序及其参数</strong></td>
+</tr>
+</tbody></table>
+<h2 id="Docker-Compose"><a href="#Docker-Compose" class="headerlink" title="Docker Compose"></a>Docker Compose</h2><figure class="highlight yaml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs yaml"><span class="hljs-attr">version:</span> <span class="hljs-string">&#x27;3&#x27;</span><br><span class="hljs-attr">networks:</span> 		<span class="hljs-comment"># 定义网桥</span><br>  <span class="hljs-attr">blog_bridge:</span> <br><span class="hljs-attr">services:</span><br>  <span class="hljs-attr">nginx:</span><br>    <span class="hljs-attr">image:</span> <span class="hljs-string">nginx:latest</span><br>    <span class="hljs-attr">ports:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;80:8080&quot;</span><br>    <span class="hljs-attr">volumes:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">/blog/nginx/html:/usr/share/nginx/html</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">/blog/nginx/nginx.conf:/etc/nginx/nginx.conf</span><br>    <span class="hljs-attr">privileged:</span> <span class="hljs-literal">true</span>  <span class="hljs-comment"># Nginx内部权限</span><br>    <span class="hljs-attr">environment:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">SET_CONTAINER_TIMEZONE=true</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">CONTAINER_TIMEZONE=Asia/Shanghai</span><br>  <span class="hljs-attr">mysql:</span><br>    <span class="hljs-attr">image:</span> <span class="hljs-string">mysql:5.7.27</span><br>    <span class="hljs-attr">ports:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;3306:3306&quot;</span><br>    <span class="hljs-attr">environment:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">MYSQL_ROOT_PASSWORD=root</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">SET_CONTAINER_TIMEZONE=true</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">CONTAINER_TIMEZONE=Asia/Shanghai</span><br>  <span class="hljs-attr">redis:</span><br>    <span class="hljs-attr">image:</span> <span class="hljs-string">redis:latest</span><br>    <span class="hljs-attr">ports:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;6379:6379&quot;</span><br>    <span class="hljs-attr">volumes:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">/blog/redis/redis.conf:/usr/local/etc/redis/redis.conf</span><br>    <span class="hljs-attr">command:</span><br>      <span class="hljs-string">redis-server</span> <span class="hljs-string">/usr/local/etc/redis/redis.conf</span><br>    <span class="hljs-attr">privileged:</span> <span class="hljs-literal">true</span><br>    <span class="hljs-attr">environment:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">SET_CONTAINER_TIMEZONE=true</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">CONTAINER_TIMEZONE=Asia/Shanghai</span><br>  <span class="hljs-attr">rabbitmq:</span><br>    <span class="hljs-attr">image:</span> <span class="hljs-string">daocloud.io/library/rabbitmq:3.8.7</span><br>    <span class="hljs-attr">restart:</span> <span class="hljs-literal">no</span><br>    <span class="hljs-attr">ports:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;5672:5672&quot;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;15672:15672&quot;</span><br>    <span class="hljs-attr">volumes:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">/blog/data:/var/lib/rabbitmq/</span><br>    <span class="hljs-attr">environment:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">SET_CONTAINER_TIMEZONE=true</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">CONTAINER_TIMEZONE=Asia/Shanghai</span><br>  <span class="hljs-attr">blog:</span><br>    <span class="hljs-attr">build:</span> <br>      <span class="hljs-attr">context:</span> <span class="hljs-string">.</span>			   <span class="hljs-comment"># Dockerfile所在目录</span><br>      <span class="hljs-attr">dockerfile:</span> <span class="hljs-string">Dockerfile</span>	<span class="hljs-comment"># 构建文件</span><br>    <span class="hljs-attr">ports:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;8888:8888&quot;</span><br>    <span class="hljs-attr">depends_on:</span>					<span class="hljs-comment"># 依赖于哪些容器</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">mysql</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">redis</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">rabbitmq</span><br>    <span class="hljs-attr">environment:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">SET_CONTAINER_TIMEZONE=true</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">CONTAINER_TIMEZONE=Asia/Shanghai</span><br></code></pre></div></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过本文的介绍，读者应能够理解Docker的核心功能和操作命令，包括如何安装Docker、管理容器的生命周期、操作镜像、配置网络，以及如何使用Dockerfile和Docker Compose来构建和编排多容器应用。掌握这些基础知识将使开发者能够更有效地利用Docker，提升应用的开发、测试和部署效率。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Docker/">Docker</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Docker/">Docker</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%AE%B9%E5%99%A8/">容器</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/08/01/mybatis-base/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">MyBatis简介</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/04/21/git-commands/">
+                        <span class="hidden-mobile">Git基础命令</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

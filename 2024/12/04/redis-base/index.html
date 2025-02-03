@@ -1,0 +1,935 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="引言Redis，作为一种高性能的键值数据库，自2009年诞生以来，因其出色的性能和丰富的数据结构支持，已成为现代数据处理中不可或缺的工具。它的设计为处理高速数据操作和实时应用提供了理想的解决方案。本文将介绍Redis的主要特性、安装过程、基本命令、以及如何通过Java客户端与之交互，帮助读者快速掌握Redis的使用和应用。 简介Redis诞生于2009年，全称为Remote Dictionary">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis——基础篇">
+<meta property="og:url" content="http://example.com/2024/12/04/redis-base/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="引言Redis，作为一种高性能的键值数据库，自2009年诞生以来，因其出色的性能和丰富的数据结构支持，已成为现代数据处理中不可或缺的工具。它的设计为处理高速数据操作和实时应用提供了理想的解决方案。本文将介绍Redis的主要特性、安装过程、基本命令、以及如何通过Java客户端与之交互，帮助读者快速掌握Redis的使用和应用。 简介Redis诞生于2009年，全称为Remote Dictionary">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png">
+<meta property="article:published_time" content="2024-12-04T15:42:34.000Z">
+<meta property="article:modified_time" content="2024-12-04T15:42:34.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="Redis">
+<meta property="article:tag" content="NoSQL">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png">
+  
+  
+  <title>Redis——基础篇 - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Redis——基础篇">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2024-12-04 23:42" pubdate>
+        2024年12月4日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      21k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      35 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Redis——基础篇</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：2 个月前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>Redis，作为一种高性能的键值数据库，自2009年诞生以来，因其出色的性能和丰富的数据结构支持，已成为现代数据处理中不可或缺的工具。它的设计为处理高速数据操作和实时应用提供了理想的解决方案。本文将介绍Redis的主要特性、安装过程、基本命令、以及如何通过Java客户端与之交互，帮助读者快速掌握Redis的使用和应用。</p>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p><code>Redis</code>诞生于2009年，全称为<code>Remote Dictionary Server</code>，即远程词典服务器，是一个开源的高性能键值数据库。因其支持字符串、哈希、列表、集合、有序集合、位图、地理空间索引等多种类型的数据结构，又被称为数据结构服务器。</p>
+<h3 id="特征"><a href="#特征" class="headerlink" title="特征"></a>特征</h3><ul>
+<li><strong>高性能</strong>： Redis将其数据主要存储在内存中，同时大部分操作都是单线程的、避免了不必要的上下文切换和竞态条件，加上搞笑的数据结构和算法，使得它提供极高的性能，能够支持每秒高达数十万次的读写操作。</li>
+<li><strong>持久化</strong>： 尽管是基于内存的，Redis也提供了灵活的持久化选项，如<code>RDB</code>（Redis 数据库文件）快照和<code>AOF（Append Only File）</code>日志，确保数据安全。</li>
+<li><strong>数据结构丰富</strong>： Redis支持多种数据结构，使得它在应对不同场景时非常灵活，比如缓存、消息队列系统、应用排行榜、计数器等。</li>
+<li><strong>发布/订阅消息系统</strong>： Redis支持发布/订阅模式，能够构建实时的消息系统。</li>
+<li><strong>原子操作</strong>： Redis中的大多数操作都是原子性的，这意味着在并发环境中执行时，Redis可以保证这些命令的安全执行。</li>
+<li><strong>事务支持</strong>： Redis支持事务功能，允许通过一系列命令的批量执行来进行复合操作。</li>
+<li><strong>高可用和分布式</strong>： 通过<code>Redis Sentinel</code>提供高可用性，并且通过<code>Redis Cluster</code>提供自动分区的支持。</li>
+<li><strong>多语言客户端</strong>：广泛的客户端支持，几乎所有的编程语言都有成熟的Redis客户端库，使得Redis可以轻松集成到各种应用程序和开发环境中。</li>
+</ul>
+<h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h3><ul>
+<li><strong>缓存系统</strong>： 利用Redis的高速数据访问能力，常用作应用的缓存层，减轻后端数据库的压力，提高数据访问速度。</li>
+<li><strong>会话缓存（Session Cache）</strong>： 在Web应用中广泛用于存储用户会话。</li>
+<li><strong>消息队列系统</strong>： 利用Redis的发布/订阅功能以及列表操作，实现消息队列的功能，支持高并发消息传递。</li>
+<li><strong>实时计数系统</strong>： 如网站访问计数、在线用户统计等，Redis的原子操作非常适合。</li>
+<li><strong>排行榜或计数器</strong>： 利用Redis的有序集合，可以非常方便地实现各类排行榜功能。</li>
+</ul>
+<h2 id="源码安装"><a href="#源码安装" class="headerlink" title="源码安装"></a>源码安装</h2><ol>
+<li><p>安装编译Redis所需的基础工具和开发库</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">sudo yum install -y gcc make<br></code></pre></div></td></tr></table></figure></li>
+<li><p>下载源码压缩包</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">wget http://download.redis.io/releases/redis-6.2.6.tar.gz<br></code></pre></div></td></tr></table></figure></li>
+<li><p>解压源码压缩包</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">tar -zxvf redis-6.2.6.tar.gz<br></code></pre></div></td></tr></table></figure></li>
+<li><p>编译及测试</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">make<br>make <span class="hljs-built_in">test</span><br>make install<br></code></pre></div></td></tr></table></figure></li>
+<li><p>创建配置文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">sudo mkdir /etc/redis<br>sudo cp redis.conf /etc/redis/redis.conf<br></code></pre></div></td></tr></table></figure></li>
+<li><p>可选：编辑配置文件，设置外网访问及后台运行</p>
+<figure class="highlight ini"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs ini">bind 0.0.0.0<br><br>requirepass <span class="hljs-section">[redis连接密码]</span><br><br>daemonize yes<br></code></pre></div></td></tr></table></figure></li>
+<li><p>可选：创建systemd服务文件，确保redis在系统重启后自动启动</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">sudo vim /etc/systemd/system/redis.service<br></code></pre></div></td></tr></table></figure>
+
+<p>粘贴以下内容</p>
+<figure class="highlight ini"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs ini"><span class="hljs-section">[Unit]</span><br><span class="hljs-attr">Description</span>=Redis In-Memory Data Store<br><span class="hljs-attr">After</span>=network.target<br><br><span class="hljs-section">[Service]</span><br><span class="hljs-attr">User</span>=root<br><span class="hljs-attr">Group</span>=root<br><span class="hljs-attr">ExecStart</span>=/usr/local/bin/redis-server /etc/redis/redis.conf<br><span class="hljs-attr">ExecStop</span>=/usr/local/bin/redis-cli shutdown<br><span class="hljs-attr">Restart</span>=always<br><br><span class="hljs-section">[Install]</span><br><span class="hljs-attr">WantedBy</span>=multi-user.target<br></code></pre></div></td></tr></table></figure>
+
+<p>保存并退出，重新加载systemd管理器配置并启动redis服务</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">sudo systemctl daemon-reload<br>sudo systemctl <span class="hljs-built_in">enable</span> redis<br>sudo systemctl start redis<br></code></pre></div></td></tr></table></figure>
+
+<p>需要注意：如果使用systemd来管理Redis服务，应该让systemd完全控制服务的启动、停止和重启，此时redis配置文件中的daemonize应设置为no。如果Redis配置为守护进程模式（即 <code>daemonize yes</code>），这会与systemd的操作发生冲突。因为Redis尝试自己分离出一个守护进程，systemd可能会认为主进程已经退出，这导致systemd认为服务已经“停止”，然后根据配置尝试重新启动它，从而形成一个不断的重启循环。</p>
+</li>
+<li><p>验证</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">sudo systemctl status redis<br><br>redis-cli<br></code></pre></div></td></tr></table></figure></li>
+</ol>
+<h2 id="系统级命令"><a href="#系统级命令" class="headerlink" title="系统级命令"></a>系统级命令</h2><h3 id="redis-server"><a href="#redis-server" class="headerlink" title="redis-server"></a>redis-server</h3><p><strong>命令说明</strong>：用于启动Redis服务器实例的命令行工具，通过多种方式配置和启动Redis服务。</p>
+<p><strong>常用选项</strong>：</p>
+<ul>
+<li><p><code>/path/redis.config</code>：通过指定的配置文件启动。</p>
+</li>
+<li><p><code>--port &lt;port&gt;</code>：设置Redis侦听的端口号。</p>
+</li>
+<li><p><code>--bind &lt;address&gt;</code> ：绑定到一个或多个接口，如果需要多个地址，可以重复这个选项。</p>
+</li>
+<li><p><code>--conf &lt;file&gt;</code>：指定配置文件的路径。</p>
+</li>
+<li><p><code>--loglevel &lt;level&gt;</code>：设置日志级别（debug、verbose、notice、warning）。</p>
+</li>
+<li><p><code>--logfile &lt;filename&gt;</code>：指定日志文件路径。如果设置为<code>stdout</code>，日志将输出到标准输出。</p>
+</li>
+<li><p><code>--daemonize yes</code>：指示Redis以守护进程模式运行。</p>
+</li>
+<li><p><code>--pidfile &lt;file&gt;</code>：设置PID文件的路径，这在以守护进程形式运行时非常有用。</p>
+</li>
+<li><p><code>--protected-mode [yes|no]</code>：设置保护模式，当Redis没有设置密码，并且绑定到公共接口时，拒绝客户端的连接。</p>
+</li>
+<li><p><code>--dir &lt;directory&gt;</code>：指定持久化文件存储的目录。</p>
+</li>
+<li><p><code>--dbfilename &lt;filename&gt;</code>：指定持久化文件的文件名。</p>
+</li>
+<li><p><code>--appendonly [yes|no]</code>：是否开启<code>AOF (Append Only File) </code>持久化模式。</p>
+</li>
+</ul>
+<h3 id="redis-cli"><a href="#redis-cli" class="headerlink" title="redis-cli"></a>redis-cli</h3><p><strong>命令说明</strong>：Redis的命令行接口客户端，它用于与Redis服务器进行交互。通过<code>redis-cli</code>可以执行各种 Redis 命令，查看服务器状态，进行调试，以及管理数据。</p>
+<p><strong>常用选项</strong>：</p>
+<ul>
+<li><code>-h</code>：指定服务器的主机名。</li>
+<li><code>-p</code>：指定服务器的端口。</li>
+<li><code>-a</code>：指定连接密码。</li>
+<li><code>--raw</code>：以原始格式输出（例如，不转义字符串中的特殊字符）。</li>
+<li><code>-c</code>：启用集群模式，允许 <code>redis-cli</code> 在Redis集群节点间自动重定向。</li>
+<li><code>--scan</code>：以迭代方式列出所有的键，可以与<code>-p</code> 和<code>--pattern</code>参数一起使用。</li>
+<li><code>--pipe</code>：使用管道模式，可以通过标准输入批量执行命令。</li>
+<li><code>--stat</code>：提供Redis服务器的统计信息，如每秒命令执行数等。</li>
+<li><code>--bigkeys</code>：找出并报告数据库中的大键。</li>
+<li><code>--help</code>：显示帮助信息，列出所有可用的命令和选项。</li>
+<li><code>--version</code>：显示<code>redis-cli</code>的版本信息。</li>
+</ul>
+<h3 id="redis-benchmark"><a href="#redis-benchmark" class="headerlink" title="redis-benchmark"></a>redis-benchmark</h3><p><strong>命令说明</strong>：Redis提供的一个性能测试工具，用于通过运行特定的命令序列来测试Redis服务器的性能。它可以快速生成大量请求，测量Redis实例在不同负载下的响应速度和处理能力。这个工具对于评估Redis配置的性能、比较不同硬件或软件设置的影响，或者进行压力测试等都非常有用。</p>
+<p><strong>常用选项</strong>：</p>
+<ul>
+<li><code>-n &lt;requests&gt;</code>：设置要执行的请求总数，默认是 100000。</li>
+<li><code>-c &lt;clients&gt;</code>：设置并发客户端的数量，默认是 50。</li>
+<li><code>-t &lt;tests&gt;</code>：指定要运行的测试类型，例如<code>set</code>、<code>get</code>、<code>incr</code>、<code>lpush</code>等等。</li>
+<li><code>-d &lt;size&gt;</code>：数据大小（以字节为单位），用于测试<code>SET/GET</code>等命令，默认是 3 字节。</li>
+<li><code>--csv</code>：输出结果以<code>CSV</code>格式，适合导入到表格或数据库中分析。</li>
+<li><code>-k &lt;0/1&gt;</code>：1（默认）表示保持连接开启<code>（pipelining）</code>，0 表示每个请求后关闭连接。</li>
+<li><code>-P &lt;number&gt;</code>：使用<code>pipelining</code>的方式来增加每个请求的响应时间，默认不启用。</li>
+<li><code>-r</code>：对<code>set</code>、<code>get</code>、<code>incr</code>、<code>lpush</code>、<code>rpop</code>、<code>sadd</code>、<code>spop</code>、<code>lrem</code>、<code>lpop</code>、<code>rpop</code>等命令使用随机 key，避免对同一个 key 的重复操作。</li>
+</ul>
+<h2 id="通用命令"><a href="#通用命令" class="headerlink" title="通用命令"></a>通用命令</h2><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 选择数据库</span><br>select &lt;num&gt;<br><br><span class="hljs-comment"># 查看当前数据库的key数量</span><br>dbsize<br><br><span class="hljs-comment"># 清空当前数据库</span><br>flushdb<br><br><span class="hljs-comment"># 清空所有数据库</span><br>flushall<br><br><span class="hljs-comment"># 查看所有key</span><br>keys *<br><br><span class="hljs-comment"># 查看是否存在key</span><br>exists key<br><br><span class="hljs-comment"># 将key转移到指定的数据库</span><br>move key index<br><br><span class="hljs-comment"># 设置过期时间</span><br>expire key second<br><br><span class="hljs-comment"># 查看key的存活时间</span><br>ttl key<br><br><span class="hljs-comment"># 查看key的类型</span><br><span class="hljs-built_in">type</span> key<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="数据结构及常用命令"><a href="#数据结构及常用命令" class="headerlink" title="数据结构及常用命令"></a>数据结构及常用命令</h2><h3 id="字符串-Strings"><a href="#字符串-Strings" class="headerlink" title="字符串 (Strings)"></a>字符串 (Strings)</h3><ul>
+<li><p><strong>概述</strong>：字符串是Redis中最基本的类型，它可以存储任何形式的字符串（包括二进制数据），最大可以支持存储<code>512MB</code>。</p>
+</li>
+<li><p><strong>用途</strong>：常用于存储文本或二进制数据，如缓存用户的邮箱、序列化的对象、图片或小文件等。</p>
+</li>
+<li><p><strong>操作</strong>：提供设置（SET）、获取（GET）、追加（APPEND）、多键获取（MGET）等操作。</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 设置键key的值为value</span><br><span class="hljs-built_in">set</span> key value<br><br><span class="hljs-comment"># 获取键key对应的值</span><br>get key<br><br><span class="hljs-comment"># 删除键key</span><br>del key<br><br><span class="hljs-comment"># 若键key存在，则对值后面拼接字符串value，若键key不存在，设置键key的值为value</span><br>append key value<br><br><span class="hljs-comment"># 获取键key对应的值的字符串长度</span><br>strlen key<br><br><span class="hljs-comment"># 将键key对应的值自增（只针对Integer类型的值）</span><br>incr key<br><br><span class="hljs-comment"># 将键key对应的值自减（只针对Integer类型的值）</span><br>decr key<br><br><span class="hljs-comment"># 将键key对应的值增加incrment（只针对Integer类型的值）</span><br>incrby key incrment<br><br><span class="hljs-comment"># 将键key对应的值减少decrment（只针对Integer类型的值）</span><br>decrby key decrment<br><br><span class="hljs-comment"># 获取键key对应的值特定范围的内容，下标区间为[start,end]，end为-1代表到字符串结束</span><br>getrange key start end<br><br><span class="hljs-comment"># 设置键key指定下标的内容为value，替换区间为[offset, offset + value.length]</span><br>setrange key offset value<br><br><span class="hljs-comment"># 设置键key的值为value，且过期时间为seconds（秒）</span><br>setex key seconds value<br><br><span class="hljs-comment"># 如果键key不存在，则设置键key对应的值为value，键key存在不进行设置</span><br>setnx key value<br><br><span class="hljs-comment"># 设置多个键值对，如果命令后面出现前面已存在的键key，则会覆盖前面设置的值</span><br>mset key value [key value...]<br><br><span class="hljs-comment"># 获取多个值</span><br>mget key [key]<br><br><span class="hljs-comment"># 如果键key不存在（于数据库中），则设置键key对应的值为value，键key存在不进行设置</span><br>msetnx key value [key value...]<br><br><span class="hljs-comment"># 设置键key对应的值为value，返回上一次设置的值</span><br>getset key value<br></code></pre></div></td></tr></table></figure></li>
+</ul>
+<h3 id="哈希-Hashes"><a href="#哈希-Hashes" class="headerlink" title="哈希 (Hashes)"></a>哈希 (Hashes)</h3><ul>
+<li><p><strong>概述</strong>：哈希是键值对集合，适用于存储对象。</p>
+</li>
+<li><p><strong>用途</strong>：非常适合存储和表示对象（类似于编程语言中的字典）。例如，可以用哈希存储用户的属性，如name、age等。</p>
+</li>
+<li><p><strong>操作</strong>：可以一次性设置或获取多个字段（HSET, HGET, HMSET, HMGET），删除字段（HDEL），检查字段是否存在（HEXISTS）等。</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 设置键值对key，对应的值为键值对&lt;field,value&gt;</span><br>hset key field value<br><br><span class="hljs-comment"># 获取键值对key中键field的值</span><br>hget key field<br><br><span class="hljs-comment"># 设置键值对key的多个键及其对应值</span><br>hmset key filed value [field value ...]<br><br><span class="hljs-comment"># 获取键值对key的多个键的对应值</span><br>hmget key field [filed ...]<br><br><span class="hljs-comment"># 获取键值对key中所有的键及其对应值</span><br>hgetall	key<br><br><span class="hljs-comment"># 删除键值对key中的键field</span><br>hdel key field [field ...]<br><br><span class="hljs-comment"># 获取键值对key中键的数量</span><br>hlen key<br><br><span class="hljs-comment"># 查询键值对key中是否存在键field</span><br>hexists key field<br><br><span class="hljs-comment"># 获取键值对key中的所有键</span><br>hkeys key<br><br><span class="hljs-comment"># 获取键值对key中的所有值</span><br>hvals key<br><br><span class="hljs-comment"># 将键值对key对应的键field对应值增加incrment</span><br>hincrby key field incrment<br><br><span class="hljs-comment"># 如果键值对key中不存在键field，则设置键field的值为value，存在则不进行设置</span><br>hsetnx key field value<br></code></pre></div></td></tr></table></figure></li>
+</ul>
+<h3 id="列表-Lists"><a href="#列表-Lists" class="headerlink" title="列表 (Lists)"></a>列表 (Lists)</h3><ul>
+<li><p><strong>概述</strong>：列表是简单的字符串列表，按插入顺序排序。你可以在列表的头部或尾部添加元素。</p>
+</li>
+<li><p><strong>用途</strong>：适合实现消息队列，通过将元素从列表头部插入，并从尾部移除来模拟队列的操作。</p>
+</li>
+<li><p><strong>操作</strong>：添加元素到头部（LPUSH）或尾部（RPUSH），移除并获取头部（LPOP）或尾部元素（RPOP），修剪（LTRIM）等。</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 往列表key头部添加值value</span><br>lpush key value [value...]<br><br><span class="hljs-comment"># 往列表key尾部添加值value</span><br>rpush key value [value...]<br><br><span class="hljs-comment"># 获取列表key下表范围为[start,stop]的值，stop为-1代表到列表结尾</span><br>lrange key start stop<br><br><span class="hljs-comment"># 弹出列表key的第一个值</span><br>lpop key<br><br><span class="hljs-comment"># 弹出列表key的最后一个值</span><br>rpop key<br><br><span class="hljs-comment"># 获取列表key下标为index的值</span><br>lindex key index<br><br><span class="hljs-comment"># 获取列表key的长度</span><br>llen key<br><br><span class="hljs-comment"># （从头开始）移除列表key中count个与value相等的值</span><br>lrem key count value<br><br><span class="hljs-comment"># 移除列表key中下标[start,stop]以外的值</span><br>ltrim key start stop<br><br><span class="hljs-comment"># 将列表source的最后一个值弹出并添加到列表destination头部</span><br>rpoplpush <span class="hljs-built_in">source</span> destination<br><br><span class="hljs-comment"># 将列表key下标为index处的值设置为value</span><br>lset key index value<br><br><span class="hljs-comment"># 在列表元素pivot前面|后面插入value</span><br>linsert key before|after pivot value<br></code></pre></div></td></tr></table></figure></li>
+</ul>
+<h3 id="集合-Sets"><a href="#集合-Sets" class="headerlink" title="集合 (Sets)"></a>集合 (Sets)</h3><ul>
+<li><p><strong>概述</strong>：集合是字符串的无序集合，它保证内部存储的元素是唯一的。</p>
+</li>
+<li><p><strong>用途</strong>：适合存储没有重复的元素，例如，存储一个用户所有喜欢的标签，集合可以自动去重。</p>
+</li>
+<li><p><strong>操作</strong>：添加（SADD）、移除（SREM）、检查存在性（SISMEMBER）、集合间的运算如交集（SINTER）、并集（SUNION）和差集（SDIFF）等。</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 往集合key中添加元素member</span><br>sadd key member [member...]<br><br><span class="hljs-comment"># 获取集合key中的所有元素</span><br>smenbers key<br><br><span class="hljs-comment"># 查询集合key中是否含有元素member的成员之一</span><br>sismember key member<br><br><span class="hljs-comment"># 获取集合key里面的元素个数</span><br>scard key<br><br><span class="hljs-comment"># 移除集合key中的元素member</span><br>srem key member [member...]<br><br><span class="hljs-comment"># 随机获取集合key中的count个元素，count为空则代表1</span><br>srandmember key [count]<br><br><span class="hljs-comment"># 随机弹出集合key中的count个元素，count为空则代表1</span><br>spop key [count]<br><br><span class="hljs-comment"># 将集合source中的元素member转移到集合destination中</span><br>smove <span class="hljs-built_in">source</span> destination member<br><br><span class="hljs-comment"># 获取存在于集合key1但不存在于集合key2的所有元素</span><br>sdiff key1 [key2...]<br><br><span class="hljs-comment"># 获取集合key1和集合key2的交集</span><br>sinter key1 key2<br><br><span class="hljs-comment"># 获取集合key1和集合key2的并集</span><br>sunion key1 key2<br></code></pre></div></td></tr></table></figure></li>
+</ul>
+<h3 id="有序集合-Sorted-Sets"><a href="#有序集合-Sorted-Sets" class="headerlink" title="有序集合 (Sorted Sets)"></a>有序集合 (Sorted Sets)</h3><ul>
+<li><p><strong>概述</strong>：有序集合类似于集合，但每个元素都会关联一个浮点数分数，Redis正是通过分数来为集合中的元素提供了顺序。</p>
+</li>
+<li><p><strong>用途</strong>：非常适合需要按顺序访问数据的场景，如排行榜、带权重的队列等。</p>
+</li>
+<li><p><strong>操作</strong>：添加元素（ZADD）、删除元素（ZREM）、修改元素的分数（ZINCRBY）、获取元素的排名（ZRANK）等。</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 往有序集合key中添加分数为score的元素member，集合中的元素会根据分数从小到大排序，分数相同则按首字母排序</span><br>zadd key score member [score member ...]<br><br><span class="hljs-comment"># 获取有序集合key中排名为[start,stop]的元素，withscores不为空则可显示对应分数</span><br>zrange key start stop [withscores]<br><br><span class="hljs-comment"># 获取有序集合key中分数为[min,max]的元素，withscores不为空则可显示对应分数，limit可指定从offset处开始截取count个元素，min为-inf表示负无穷，+inf表示正无穷</span><br>zrangebyscore key min max [withscores] [<span class="hljs-built_in">limit</span> offset count]<br><br><span class="hljs-comment"># 移除有序集合key中元素member</span><br>zrem key member [member...]<br><br><span class="hljs-comment"># 获取有序集合key的元素数量</span><br>zcard key<br><br><span class="hljs-comment"># 获取有序集合key中元素member的排位（从小到大顺序，起始为0）</span><br>zrank key member<br><br><span class="hljs-comment"># 获取有序集合key中元素member的排位（从大到小顺序，起始为0）</span><br>zrevrank key member<br></code></pre></div></td></tr></table></figure></li>
+</ul>
+<h3 id="位图-Bitmaps"><a href="#位图-Bitmaps" class="headerlink" title="位图 (Bitmaps)"></a>位图 (Bitmaps)</h3><ul>
+<li><p><strong>概述</strong>：位图本质上不是一种独立的数据结构，它是字符串的一种特殊操作方式，通过位来表示二进制数据。</p>
+</li>
+<li><p><strong>用途</strong>：适合进行大规模的位运算，常用于统计和分析，如用户登录、签到等。</p>
+</li>
+<li><p><strong>操作</strong>：设置位（SETBIT）、获取位（GETBIT）、统计位（BITCOUNT）、位运算（BITOP）等。</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># （以字节为单位分配字符串）设置位图key下标为offset的位的值为value，value默认为0，可设置为1</span><br>setbit key offset value<br><br><span class="hljs-comment"># 获取位图key下标为offset的位的值</span><br>getbit key offset<br><br><span class="hljs-comment"># 获取位图key上位为1的个数，可指定下标范围为[start, end]</span><br>bitcount key [start end]<br><br><span class="hljs-comment"># 对位图key进行操作（operation为and、or、xor、not运算），将结果存储到destkey</span><br>bitop operation destkey key [key ...]<br><br><span class="hljs-comment"># 查询位图key中第一个为bit（0或1）的下标位置，可指定字节的开始与结束范围为[start,end]</span><br>bitpos key bit [start] [end]<br></code></pre></div></td></tr></table></figure></li>
+</ul>
+<h3 id="HyperLogLogs"><a href="#HyperLogLogs" class="headerlink" title="HyperLogLogs"></a>HyperLogLogs</h3><ul>
+<li><p><strong>概述</strong>：HyperLogLog是一种概率型数据结构，用于高效地估计数据集中唯一元素的数量。</p>
+</li>
+<li><p><strong>用途</strong>：非常适合需要统计大量数据的去重数量，而对精确值要求不是非常严格的场景。</p>
+</li>
+<li><p><strong>操作</strong>：添加元素（PFADD）、计数（PFCOUNT）、合并多个HyperLogLog（PFMERGE）等。</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 往集合key中添加元素element</span><br>pfadd key element [element...]<br><br><span class="hljs-comment"># 获取多个集合key的技术估算值</span><br>pfcount key [key...]<br><br><span class="hljs-comment"># 将多个集合sourcekey合并为一个集合destkey</span><br>pfmerge destkey sourcekey [sourcekey...]<br></code></pre></div></td></tr></table></figure></li>
+</ul>
+<h3 id="地理空间索引-Geospatial-Indexes"><a href="#地理空间索引-Geospatial-Indexes" class="headerlink" title="地理空间索引 (Geospatial Indexes)"></a>地理空间索引 (Geospatial Indexes)</h3><ul>
+<li><p><strong>概述</strong>：Redis的地理空间索引是通过有序集合实现的，允许你存储经度和纬度坐标作为元素。</p>
+</li>
+<li><p><strong>用途</strong>：适用于地理位置的存储、查询和半径搜索，如查询某范围内的位置点。</p>
+</li>
+<li><p><strong>操作</strong>：添加地理空间坐标（GEOADD）、查询半径内的元素（GEORADIUS）、获取两点之间的距离（GEODIST）等。</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 往集合key中添加经度为longitudu、纬度为latitude的元素member</span><br>geoadd key longitudu latitude member [longitudu latitude member ...]<br><br><span class="hljs-comment"># 获取集合key中指定元素member的经纬度信息</span><br>geopos key member [member...]<br><br><span class="hljs-comment"># 获取集合key中元素member1和元素member2的距离，单位为空时代表“m”</span><br>geodist key member1 member2 [m|km|ft|mi]<br><br><span class="hljs-comment"># 获取集合key中的元素经纬度字符串</span><br>geohash key member [member...]<br><br><span class="hljs-comment"># 获取集合key中在经度longitude、维度latitude、半径radius[m|km|ft|mi]内的元素，withdist可显示距离，withcoord可显示经纬度，count n可限制数量为n，asc升序或desc降序</span><br>georadius key longitude latitude radius [m|km|ft|mi] [withcoord] [withdist] [withhash] [asc|desc] [count n]<br><br><span class="hljs-comment"># 获取集合key中在元素member半径radius[m|km|ft|mi]内的元素（含自身）</span><br>georadiusbymember key member radius [m|km|ft|mi] [withcoord] [withdist] [withhash] [asc|desc] [count n]<br><br><span class="hljs-comment"># 删除集合key中的元素member（geo并没有删除，底层通过zset实现，因此用zrem）</span><br>zrem key member [member...]<br></code></pre></div></td></tr></table></figure></li>
+</ul>
+<h2 id="Java客户端"><a href="#Java客户端" class="headerlink" title="Java客户端"></a>Java客户端</h2><h3 id="Jedis"><a href="#Jedis" class="headerlink" title="Jedis"></a>Jedis</h3><h4 id="简介-1"><a href="#简介-1" class="headerlink" title="简介"></a>简介</h4><p><code>Jedis</code>是一个比较直接和轻量级的Redis客户端实现，提供了简单直接的API来与Redis进行交互。它支持几乎所有的Redis特性，并且由于其简洁性，是学习和实现Redis操作的好选择。 官方文档地址：<a target="_blank" rel="noopener" href="https://redis.io/docs/latest/develop/connect/clients/java/jedis/">Jedis guide | Docs (redis.io)</a></p>
+<h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><ul>
+<li>轻量级和易于使用。</li>
+<li>支持连接池。</li>
+</ul>
+<h4 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h4><ul>
+<li>不支持异步和非阻塞 I/O。</li>
+<li>多线程环境下管理连接池较为复杂。</li>
+<li>API较为基础，没有分布式护具结构和高级事务处理等功能。</li>
+</ul>
+<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><p>单个连接</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">JedisTest</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> Jedis jedis;<br><br>    <span class="hljs-meta">@BeforeEach</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">before</span><span class="hljs-params">()</span> </span>&#123;<br>        jedis = <span class="hljs-keyword">new</span> Jedis(<span class="hljs-string">&quot;127.0.0.1&quot;</span>, <span class="hljs-number">6379</span>);<br>        <span class="hljs-comment">// jedis.auth(&quot;xxxx&quot;);</span><br>        jedis.select(<span class="hljs-number">0</span>);<br>    &#125;<br><br>    <span class="hljs-meta">@Test</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">testString</span><span class="hljs-params">()</span> </span>&#123;<br>        String result = jedis.set(<span class="hljs-string">&quot;name&quot;</span>, <span class="hljs-string">&quot;yang&quot;</span>);<br>        System.out.println(<span class="hljs-string">&quot;result = &quot;</span> + result);<br>        String name = jedis.get(<span class="hljs-string">&quot;name&quot;</span>);<br>        System.out.println(<span class="hljs-string">&quot;name = &quot;</span> + name);<br>    &#125;<br><br>    <span class="hljs-meta">@AfterEach</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">after</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">if</span> (jedis != <span class="hljs-keyword">null</span>) &#123;<br>            jedis.close();<br>        &#125;<br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>运行程序，控制台输出如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">result = OK<br>name = yang<br></code></pre></div></td></tr></table></figure>
+
+<p>Jedis也支持连接池，示例</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">JedisConnectionFactory</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> JedisPool JEDIS_POOL;<br><br>    <span class="hljs-keyword">static</span> &#123;<br>        JedisPoolConfig jedisPoolConfig = <span class="hljs-keyword">new</span> JedisPoolConfig();<br>        <span class="hljs-comment">// 最大连接数</span><br>        jedisPoolConfig.setMaxTotal(<span class="hljs-number">10</span>);<br>        <span class="hljs-comment">// 最大空闲连接</span><br>        jedisPoolConfig.setMaxIdle(<span class="hljs-number">5</span>);<br>        <span class="hljs-comment">// 最小空闲链接</span><br>        jedisPoolConfig.setMinIdle(<span class="hljs-number">0</span>);<br>        <span class="hljs-comment">// 等待时长</span><br>        jedisPoolConfig.setMaxWaitMillis(<span class="hljs-number">1000</span>);<br>        JEDIS_POOL = <span class="hljs-keyword">new</span> JedisPool(jedisPoolConfig, <span class="hljs-string">&quot;127.0.0.1&quot;</span>, <span class="hljs-number">6379</span>, <span class="hljs-number">1000</span>);<br>    &#125;<br><br>    <span class="hljs-comment">// 获取连接资源</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Jedis <span class="hljs-title">getJedis</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> JEDIS_POOL.getResource();<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        Jedis jedis = JedisConnectionFactory.getJedis();<br>        String result = jedis.set(<span class="hljs-string">&quot;name&quot;</span>, <span class="hljs-string">&quot;yang2&quot;</span>);<br>        System.out.println(<span class="hljs-string">&quot;result = &quot;</span> + result);<br>        String name = jedis.get(<span class="hljs-string">&quot;name&quot;</span>);<br>        System.out.println(<span class="hljs-string">&quot;name = &quot;</span> + name);<br>        jedis.close();<br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>运行程序，控制台输出如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">result = OK<br>name = yang2<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="lettuce"><a href="#lettuce" class="headerlink" title="lettuce"></a>lettuce</h3><h4 id="简介-2"><a href="#简介-2" class="headerlink" title="简介"></a>简介</h4><p><code>Lettuce</code>是一个高级Redis客户端，提供异步、基于事件的API，并且内部使用Netty实现非阻塞通信。Lettuce可以在多个线程间共享单个连接，而不是使用传统的连接池。</p>
+<h4 id="优点-1"><a href="#优点-1" class="headerlink" title="优点"></a><strong>优点</strong></h4><ul>
+<li>支持同步、异步和反应式编程模型。</li>
+<li>内部使用Netty，实现了高效的非阻塞I/O。</li>
+<li>允许连接多路复用，大大减少线程和连接的使用。</li>
+<li>支持自动重连和命令重试。</li>
+</ul>
+<h4 id="缺点-1"><a href="#缺点-1" class="headerlink" title="缺点"></a>缺点</h4><ul>
+<li>使用了异步网络应用框架Netty，在处理大量并发连接时可能会消耗更多系统资源。</li>
+<li>API和配置相对复杂，尤其是高级功能的配置和优化。</li>
+<li>要求开发者在错误处理和回调管理上更加小心，否则可能导致难以追踪的错误和内存泄漏。</li>
+</ul>
+<h3 id="Redisson"><a href="#Redisson" class="headerlink" title="Redisson"></a>Redisson</h3><h4 id="简介-3"><a href="#简介-3" class="headerlink" title="简介"></a>简介</h4><p><code>Redisson</code>是Redis的高级客户端之一，提供了丰富的Redis对象和服务，如分布式锁、集合、映射、有序集合、发布/订阅、Bloom filter 等高级功能。</p>
+<h4 id="优点-2"><a href="#优点-2" class="headerlink" title="优点"></a>优点</h4><ul>
+<li>提供了许多Jedis和Lettuce中不包含的高级分布式Java对象和服务。</li>
+<li>支持同步、异步和反应式接口。</li>
+<li>内置Redis命令的高级抽象。</li>
+<li>非常适合需要利用Redis提供分布式数据结构和服务的应用程序。</li>
+</ul>
+<h4 id="缺点-2"><a href="#缺点-2" class="headerlink" title="缺点"></a>缺点</h4><ul>
+<li>由于提供了大量高级功能和抽象，Redisson可能会比其他更轻量级的客户端使用更多的内存。</li>
+<li>一些高级特性，如分布式锁或数据结构，可能引入额外的性能开销，特别是在高负载或大规模部署情况下。</li>
+</ul>
+<h3 id="三者对比"><a href="#三者对比" class="headerlink" title="三者对比"></a>三者对比</h3><h4 id="性能和并发处理"><a href="#性能和并发处理" class="headerlink" title="性能和并发处理"></a>性能和并发处理</h4><ul>
+<li><code>Lettuce</code>和<code>Redisson</code>提供异步处理能力，对于需要处理高并发请求的应用更加合适。</li>
+<li><code>Jedis</code>由于其同步的实现方式，适合简单的应用场景，对于复杂的或高并发的场景则可能成为瓶颈。</li>
+</ul>
+<h4 id="API丰富度"><a href="#API丰富度" class="headerlink" title="API丰富度"></a>API丰富度</h4><ul>
+<li><code>Redisson</code>提供的API最为丰富，支持大量的分布式数据结构和服务。</li>
+<li><code>Lettuce</code>和<code>Jedis</code>提供的API较为基础，主要围绕Redis的核心功能。</li>
+</ul>
+<h4 id="连接管理"><a href="#连接管理" class="headerlink" title="连接管理"></a>连接管理</h4><ul>
+<li><code>Lettuce</code>提供连接多路复用，减少了连接总数的需求。</li>
+<li><code>Jedis</code>依赖于传统的连接池来管理多个连接。</li>
+<li><code>Redisson</code>支持连接池和单个连接的多路复用。</li>
+</ul>
+<h2 id="SpringDataRedis"><a href="#SpringDataRedis" class="headerlink" title="SpringDataRedis"></a>SpringDataRedis</h2><p><code>Spring Data Redis</code>是Spring框架为Redis数据库提供的一个高级抽象模块，它简化了在Java应用中使用Redis的方式。通过Spring Data Redis，可以利用Spring框架提供的各种便利功能，如声明式事务支持、简化的数据访问模式和数据存取的透明化，从而使得与Redis的交互更加简单和高效。官方文档地址：<a target="_blank" rel="noopener" href="https://spring.io/projects/spring-data-redis">Spring Data Redis</a></p>
+<h3 id="核心特性"><a href="#核心特性" class="headerlink" title="核心特性"></a>核心特性</h3><ul>
+<li><strong>简化配置</strong>：Spring Data Redis提供了易于使用的配置方式，可以快速集成Redis到Spring应用中。</li>
+<li><strong>模板 API</strong>：<code>RedisTemplate</code> 和 <code>StringRedisTemplate</code> 提供了丰富的方法来操作Redis，包括对<code>keys</code>、<code>strings</code>、<code>lists</code>、<code>sets</code>、<code>hashes</code>等数据结构的操作。</li>
+<li><strong>存储库支持</strong>：类似于其他Spring Data模块，Spring Data Redis支持通过创建接口来定义存储库，用于访问Redis keys`和进行复杂查询。</li>
+<li><strong>对象映射</strong>：通过Spring Data的对象映射特性，可以将对象透明地存储在Redis中，而无需手动转换数据格式。</li>
+<li><strong>事务支持</strong>：支持Redis事务，并能与Spring的声明式事务管理无缝整合。</li>
+<li><strong>发布订阅</strong>：支持Redis的发布/订阅功能，可以在应用中实现消息通信模式。</li>
+<li><strong>高级序列化</strong>：支持多种序列化和反序列化机制，如JDK序列化、JSON序列化等。</li>
+</ul>
+<h3 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h3><ul>
+<li><strong>缓存实现</strong>：利用Redis强大的性能作为应用的缓存，减少数据库访问，提高响应速度。</li>
+<li><strong>会话存储</strong>：在分布式系统中，使用Redis存储会话信息，确保各个节点之间会话的一致性。</li>
+<li><strong>全局锁</strong>：使用Redis实现分布式锁，确保分布式环境下资源同步访问。</li>
+<li><strong>实时消息系统</strong>：利用Redis的发布/订阅功能实现实时消息系统。</li>
+</ul>
+<h3 id="与Jedis、Lettuce的关系"><a href="#与Jedis、Lettuce的关系" class="headerlink" title="与Jedis、Lettuce的关系"></a>与Jedis、Lettuce的关系</h3><h4 id="客户端库作为依赖"><a href="#客户端库作为依赖" class="headerlink" title="客户端库作为依赖"></a>客户端库作为依赖</h4><ul>
+<li><strong>Jedis</strong>：在Spring Data Redis的早期版本中，Jedis是主要使用的客户端。它是一个简单且直接的客户端库，提供了同步的API来与Redis进行交互。Spring Data Redis通过封装Jedis提供了一套更为简洁和Spring风格的操作方式。</li>
+<li><strong>Lettuce</strong>：随着对响应式编程的支持和需求的增加，Lettuce成为了Spring Data Redis的首选客户端。Lettuce提供非阻塞和异步的API，且基于Netty实现、支持连接多路复用，适合需要高并发处理的场景。Spring Data Redis利用Lettuce提供了包括响应式编程在内的高级特性。</li>
+</ul>
+<h4 id="配置与抽象层"><a href="#配置与抽象层" class="headerlink" title="配置与抽象层"></a>配置与抽象层</h4><ul>
+<li>在Spring Data Redis中，可以自由选择使用Jedis或Lettuce作为底层连接库。Spring提供了统一的配置接口和操作模板（如<code>RedisTemplate</code>和响应式的<code>ReactiveRedisTemplate</code>），这些模板抽象出了底层客户端的具体实现细节，使得开发者可以不必关心底层连接库是使用的Jedis还是Lettuce。</li>
+<li>开发者在使用Spring Data Redis时，可以通过简单的配置更改所使用的客户端库，而不需要修改业务代码，这提供了极大的灵活性和便利性。</li>
+</ul>
+<h4 id="实际开发"><a href="#实际开发" class="headerlink" title="实际开发"></a>实际开发</h4><p>在选择<code>RedisTemplate</code>的底层实现时，可以根据以下几个方面来决定：</p>
+<ol>
+<li><strong>性能需求</strong>：<ul>
+<li>如果应用需要高性能的阻塞操作，且并发需求不高，可以选择Jedis。</li>
+<li>对于需要高并发访问的应用，Lettuce的非阻塞和多路复用特性可能更适合。</li>
+</ul>
+</li>
+<li><strong>并发模型</strong>：<ul>
+<li>在微服务架构中，服务通常需要处理大量并发请求，因此选择支持异步处理的客户端（如Lettuce）会更合适。</li>
+</ul>
+</li>
+<li><strong>功能支持</strong>：<ul>
+<li>根据应用需求选择支持特定功能的客户端，例如，如果需要详细的连接管理、自动重连等高级功能，Lettuce 可能是更好的选择。</li>
+</ul>
+</li>
+<li><strong>资源利用</strong>：<ul>
+<li>考虑到资源利用效率，Lettuce的连接多路复用可以减少连接总数，从而降低资源消耗。</li>
+</ul>
+</li>
+</ol>
+<p><strong>示例：</strong>项目中Redis配置类（使用Lettuce）</p>
+<figure class="highlight properties"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs properties"><span class="hljs-meta">spring.redis.host</span>=<span class="hljs-string">127.0.0.1</span><br><span class="hljs-meta">spring.redis.port</span>=<span class="hljs-string">6379</span><br><span class="hljs-meta">spring.redis.username</span>=<span class="hljs-string">xxx</span><br><span class="hljs-meta">spring.redis.password</span>=<span class="hljs-string">xxx</span><br><span class="hljs-meta">spring.redis.database</span>=<span class="hljs-string">0</span><br><span class="hljs-comment"># 由于Lettuce 自身支持连接多路复用，因此不需要传统意义上的连接池</span><br><span class="hljs-comment">#spring.redis.lettuce.pool.enabled=true</span><br><span class="hljs-comment">#spring.redis.lettuce.pool.max-active=8</span><br><span class="hljs-comment">#spring.redis.lettuce.pool.max-idle=8</span><br><span class="hljs-comment">#spring.redis.lettuce.pool.min-idle=0</span><br><span class="hljs-comment">#spring.redis.lettuce.pool.max-wait=-1</span><br></code></pre></div></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Configuration</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RedisConfig</span> </span>&#123;<br><br>    <span class="hljs-meta">@Bean</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> LettuceConnectionFactory <span class="hljs-title">redisConnectionFactory</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> LettuceConnectionFactory(); <span class="hljs-comment">// Spring Boot默认使用Lettuce，可不用显式配置</span><br>    &#125;<br><br>    <span class="hljs-meta">@Bean</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> RedisTemplate&lt;String, Object&gt; <span class="hljs-title">redisTemplate</span><span class="hljs-params">(LettuceConnectionFactory redisConnectionFactory)</span> </span>&#123;<br>        RedisTemplate&lt;String, Object&gt; redisTemplate = <span class="hljs-keyword">new</span> RedisTemplate&lt;&gt;();<br>        <span class="hljs-comment">// 使用Letture连接工厂</span><br>        redisTemplate.setConnectionFactory(redisConnectionFactory);<br>        <span class="hljs-keyword">return</span> redisTemplate;<br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="常用API"><a href="#常用API" class="headerlink" title="常用API"></a>常用API</h3><p>不同于Jedis将所有的方法都封装到一个类中，Spring Data Redis提供了<code>RedisTemplate</code>工具类，这个类中封装了各种对Redis的操作，把不同数据类型的操作API封装到不同的<code>Operations</code>对象中</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>返回值类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>redisTemplate.opsForValue()</td>
+<td>ValueOperations</td>
+<td>操作String类型数据</td>
+</tr>
+<tr>
+<td>redisTemplate.opsForHash()</td>
+<td>HashOperations</td>
+<td>操作Hash类型数据</td>
+</tr>
+<tr>
+<td>redisTemplate.opsForList()</td>
+<td>ListOperations</td>
+<td>操作List类型数据</td>
+</tr>
+<tr>
+<td>redisTemplate.opsForSet()</td>
+<td>SetOperations</td>
+<td>操作Set类型数据</td>
+</tr>
+<tr>
+<td>redisTemplate.opsForZSet()</td>
+<td>ZSetOperations</td>
+<td>操作SortedSet类型数据</td>
+</tr>
+<tr>
+<td>redisTemplate</td>
+<td></td>
+<td>通用命令</td>
+</tr>
+</tbody></table>
+<p><strong>Demo：</strong>注入一个<code>RedisTemplate</code>对象，先设置键值对，再获取</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@SpringBootTest</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RedisTemplateTest</span> </span>&#123;<br><br>    <span class="hljs-meta">@Resource</span><br>    <span class="hljs-keyword">private</span> RedisTemplate&lt;String, Object&gt; redisTemplate;<br><br>    <span class="hljs-meta">@Test</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">testString</span><span class="hljs-params">()</span> </span>&#123;<br>        redisTemplate.opsForValue().set(<span class="hljs-string">&quot;name&quot;</span>, <span class="hljs-string">&quot;yangtao&quot;</span>);<br>        Object name = redisTemplate.opsForValue().get(<span class="hljs-string">&quot;name&quot;</span>);<br>        System.out.println(<span class="hljs-string">&quot;name = &quot;</span> + name);<br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>运行程序，控制台输出如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">name = yangtao<br></code></pre></div></td></tr></table></figure>
+
+<p>由控制台输出可知，RedisTemplate已正确设置键值对。</p>
+<h3 id="序列化"><a href="#序列化" class="headerlink" title="序列化"></a>序列化</h3><h4 id="序列化器"><a href="#序列化器" class="headerlink" title="序列化器"></a>序列化器</h4><p>上一个DEMO中设置了一个key为<code>name</code>的键值对，但是通过命令行却看不到这个key</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">127.0.0.1:6379&gt; keys *<br>1) <span class="hljs-string">&quot;\xac\xed\x00\x05t\x00\x04name&quot;</span><br></code></pre></div></td></tr></table></figure>
+
+<p>可以看到设置的键并不是<code>name</code>，这是因为<code>RedisTemplate</code>默认的序列化器为JDK的序列化器（通过<code>org.springframework.data.redis.core.AbstractOperations</code>的<code>keySerializer()</code>和<code>valueSerializer()</code>方法可以查看）</p>
+<p><img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-serializer.png" alt="Redis序列化器"></p>
+<p>我们可以将key的序列化器设置为更加常用的字符串序列化器<code>StringRedisSerializer</code>，而对于value通常设置为JSON序列化器<code>GenericJackson2JsonRedisSerializer</code>，Redis的配置类添加配置后如下</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Configuration</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RedisConfig</span> </span>&#123;<br><br>    <span class="hljs-meta">@Bean</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> LettuceConnectionFactory <span class="hljs-title">redisConnectionFactory</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> LettuceConnectionFactory();<br>    &#125;<br><br>    <span class="hljs-meta">@Bean</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> RedisTemplate&lt;String, Object&gt; <span class="hljs-title">redisTemplate</span><span class="hljs-params">(LettuceConnectionFactory redisConnectionFactory)</span> </span>&#123;<br>        RedisTemplate&lt;String, Object&gt; redisTemplate = <span class="hljs-keyword">new</span> RedisTemplate&lt;&gt;();<br>        <span class="hljs-comment">// 使用Letture连接工厂</span><br>        redisTemplate.setConnectionFactory(redisConnectionFactory);<br>        <span class="hljs-comment">// 设置key序列化方式为String，value序列化方式为json</span><br>        redisTemplate.setKeySerializer(<span class="hljs-keyword">new</span> StringRedisSerializer());<br>        redisTemplate.setValueSerializer(redisSerializer());<br>        redisTemplate.setHashKeySerializer(<span class="hljs-keyword">new</span> StringRedisSerializer());<br>        redisTemplate.setHashValueSerializer(redisSerializer());<br>        redisTemplate.afterPropertiesSet();<br>        <span class="hljs-keyword">return</span> redisTemplate;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> RedisSerializer&lt;Object&gt; <span class="hljs-title">redisSerializer</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-comment">// 创建JSON序列化器</span><br>        ObjectMapper objectMapper = <span class="hljs-keyword">new</span> ObjectMapper();<br>        <span class="hljs-comment">// 设置可见度</span><br>        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);<br>        objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> GenericJackson2JsonRedisSerializer(objectMapper);<br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>再次运行测试程序，这次<code>RedisTemplate</code>会使用字符换序列化器和JSON序列化器在redis中存入一个键值对，通过Redis控制台查看如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">127.0.0.1:6379&gt; keys *<br>1) <span class="hljs-string">&quot;\xac\xed\x00\x05t\x00\x04name&quot;</span><br>2) <span class="hljs-string">&quot;name&quot;</span><br>127.0.0.1:6379&gt; get name<br><span class="hljs-string">&quot;\&quot;yangtao\&quot;&quot;</span><br></code></pre></div></td></tr></table></figure>
+
+<h4 id="类标识"><a href="#类标识" class="headerlink" title="类标识"></a>类标识</h4><p>在使用<code>RedisTemplate</code>配置为JSON序列化器存储数据时，存入Redis的数据中包含类的标识信息（<code>@class</code>属性），如运行以下程序后，往Redis中存入一个HashMap对象</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">Map&lt;String, Object&gt; user1 = <span class="hljs-keyword">new</span> HashMap&lt;&gt;();<br>user1.put(<span class="hljs-string">&quot;name&quot;</span>, <span class="hljs-string">&quot;yangtao&quot;</span>);<br>user1.put(<span class="hljs-string">&quot;age&quot;</span>, <span class="hljs-number">18</span>);<br>redisTemplate.opsForValue().set(<span class="hljs-string">&quot;user1&quot;</span>, user1);<br></code></pre></div></td></tr></table></figure>
+
+<p>查看Redis数据库中键user1对应的值</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">127.0.0.1:6379&gt; get user1<br><span class="hljs-string">&quot;[\&quot;java.util.HashMap\&quot;,&#123;\&quot;name\&quot;:\&quot;yangtao\&quot;,\&quot;age\&quot;:18&#125;]&quot;</span><br></code></pre></div></td></tr></table></figure>
+
+<p>从结果可以看到值中包含了对象的类标识<code>java.util.HashMap</code>，这是因为JSON序列化器<code>GenericJackson2JsonRedisSerializer</code>被配置为存储类型信息，这种配置便于反序列化过程中能够精确地恢复出原始对象的类型。</p>
+<p><strong>注意事项：</strong>通过匿名内部类创建的<code>HashMap</code>对象，创建的是<code>HashMap</code>的一个匿名子类的实例，因此这个对象存入Redis后，值标识的类名是外部类信息的名称及其匿名类，如运行以下程序</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">Map&lt;String, Object&gt; user2 = <span class="hljs-keyword">new</span> HashMap&lt;String, Object&gt;() &#123;&#123;<br>    put(<span class="hljs-string">&quot;name&quot;</span>, <span class="hljs-string">&quot;zhangsan&quot;</span>);<br>    put(<span class="hljs-string">&quot;age&quot;</span>, <span class="hljs-number">19</span>);<br>&#125;&#125;;<br>redisTemplate.opsForValue().set(<span class="hljs-string">&quot;user2&quot;</span>, user2);<br>Object user2Obj = redisTemplate.opsForValue().get(<span class="hljs-string">&quot;user2&quot;</span>);<br>System.out.println(<span class="hljs-string">&quot;user2 = &quot;</span> + user2Obj);<br></code></pre></div></td></tr></table></figure>
+
+<p>运行出错，对应的错误日志为：</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">org.springframework.data.redis.serializer.SerializationException: Could not <span class="hljs-built_in">read</span> JSON: Cannot construct instance of `space.yangtao.client.RedisTemplateTest<span class="hljs-variable">$1</span>` (no Creators, like default constructor, exist): no default constructor found<br> at [Source: (byte[])<span class="hljs-string">&quot;[&quot;</span>space.yangtao.client.RedisTemplateTest<span class="hljs-variable">$1</span><span class="hljs-string">&quot;,&#123;&quot;</span>name<span class="hljs-string">&quot;:&quot;</span>zhangsan<span class="hljs-string">&quot;,&quot;</span>age<span class="hljs-string">&quot;:19&#125;]&quot;</span>; line: 1, column: 45]; nested exception is com.fasterxml.jackson.databind.exc.InvalidDefinitionException: Cannot construct instance of `space.yangtao.client.RedisTemplateTest<span class="hljs-variable">$1</span>` (no Creators, like default constructor, exist): no default constructor found<br> at [Source: (byte[])<span class="hljs-string">&quot;[&quot;</span>space.yangtao.client.RedisTemplateTest<span class="hljs-variable">$1</span><span class="hljs-string">&quot;,&#123;&quot;</span>name<span class="hljs-string">&quot;:&quot;</span>zhangsan<span class="hljs-string">&quot;,&quot;</span>age<span class="hljs-string">&quot;:19&#125;]&quot;</span>; line: 1, column: 45]<br></code></pre></div></td></tr></table></figure>
+
+<p>可以看到程序报错的原因为<code>space.yangtao.client.RedisTemplateTest$1</code>（<code>RedisTemplateTest</code>的第一个匿名类）缺少默认的构造器，从Redis中查看对应的值为</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">127.0.0.1:6379&gt; get user2<br><span class="hljs-string">&quot;[\&quot;space.yangtao.client.RedisTemplateTest<span class="hljs-variable">$1</span>\&quot;,&#123;\&quot;name\&quot;:\&quot;zhangsan\&quot;,\&quot;age\&quot;:19&#125;]&quot;</span><br></code></pre></div></td></tr></table></figure>
+
+<p>可以看到值中类标识并不是<code>HashMap</code>，而是<code>RedisTemplateTest</code>的第一个匿名类。</p>
+<p>因此，在使用<code>RedisTemplate</code>操作对象时，要尽量避免使用匿名类创建对象。</p>
+<p>当然，这种问题也有解决方案，那就是类型擦除或手动序列化。</p>
+<h4 id="类型擦除"><a href="#类型擦除" class="headerlink" title="类型擦除"></a>类型擦除</h4><p>配置<code>RedisTemplate</code>的序列化器为<code>Jackson2JsonRedisSerializer</code>，或对<code>GenericJackson2JsonRedisSerializer</code>的<code>ObjectMapper</code>对象进行设置，使其序列化以后不包含类型信息</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">Jackson2JsonRedisSerializer&lt;Object&gt; serializer = <span class="hljs-keyword">new</span> Jackson2JsonRedisSerializer&lt;&gt;(Object.class);<br>template.setValueSerializer(serializer);<br>template.setHashValueSerializer(serializer);<br><br><span class="hljs-comment">// 或</span><br><br>ObjectMapper objectMapper = <span class="hljs-keyword">new</span> ObjectMapper();<br>objectMapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);<br>RedisSerializer&lt;Object&gt; serializer = <span class="hljs-keyword">new</span> GenericJackson2JsonRedisSerializer(objectMapper);<br>template.setValueSerializer(serializer);<br>template.setHashValueSerializer(serializer);<br></code></pre></div></td></tr></table></figure>
+
+<p>类型擦除以后，存入Redis中的值没有类型，程序的反序列化便可成功</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">user2 = &#123;name=zhangsan, age=19&#125;<br></code></pre></div></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">127.0.0.1:6379&gt; get user2<br><span class="hljs-string">&quot;&#123;\&quot;name\&quot;:\&quot;zhangsan\&quot;,\&quot;age\&quot;:19&#125;&quot;</span><br></code></pre></div></td></tr></table></figure>
+
+<p><strong>注意事项：</strong>不存储类型信息可能会在反序列化时导致问题，特别是在处理多态和复杂对象结构时。如果序列化的数据结构比较复杂或涉及继承，不包含类型信息可能会导致反序列化失败或数据不正确。</p>
+<h4 id="手动序列化"><a href="#手动序列化" class="headerlink" title="手动序列化"></a>手动序列化</h4><p>在操作<code>RedisTemplate</code>往Redis存入对象时，可以先将其进行序列化，从Redis取出对象时，再将其反序列化，如</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">Map&lt;String, Object&gt; user3 = <span class="hljs-keyword">new</span> HashMap&lt;String, Object&gt;() &#123;&#123;<br>    put(<span class="hljs-string">&quot;name&quot;</span>, <span class="hljs-string">&quot;lisi&quot;</span>);<br>    put(<span class="hljs-string">&quot;age&quot;</span>, <span class="hljs-number">20</span>);<br>&#125;&#125;;<br>ObjectMapper objectMapper = <span class="hljs-keyword">new</span> ObjectMapper();<br>redisTemplate.opsForValue().set(<span class="hljs-string">&quot;user3&quot;</span>, objectMapper.writeValueAsString(user3));<br>Object user3Obj = redisTemplate.opsForValue().get(<span class="hljs-string">&quot;user3&quot;</span>);<br>System.out.println(<span class="hljs-string">&quot;user3 = &quot;</span> + objectMapper.readValue((String) user3Obj, Map.class));<br></code></pre></div></td></tr></table></figure>
+
+<p>相比于自动序列化，这种方法具有</p>
+<p><strong>优点</strong>：</p>
+<ol>
+<li><strong>灵活性：</strong>开发者可以自由选择什么时候以及如何转换数据，适合特定的需求，如减小数据大小或处理复杂的数据结构。</li>
+<li><strong>减少数据冗余：</strong>手动转换可以避免存储不必要的类型信息，使存储在Redis中的数据更加精简。</li>
+<li><strong>依赖性：</strong>不会依赖序列化库（如Jackson）的更新对存取和更新有兼容性和稳定性有影响。</li>
+</ol>
+<p><strong>缺点</strong>：</p>
+<ol>
+<li><strong>代码复杂性：</strong>需要手动管理数据的序列化和反序列化，增加了代码的复杂度和出错概率。</li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过本文的学习，读者应能够对Redis有一个全面的认识，从其基本概念到复杂的应用实现。Redis不仅支持多种数据结构，如字符串、列表、集合、哈希表、有序集合等，还提供了事务、消息订阅与发布和持久化等高级功能，满足现代应用的各种需求。此外，文章还探讨了如何在Java环境中利用Jedis、Lettuce和Redisson等客户端与Redis交互，以及如何通过Spring Data Redis简化代码和提高开发效率。掌握这些知识将极大地增强开发者在数据处理和应用开发中的能力。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Redis/">Redis</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Redis/">Redis</a>
+                    
+                      <a class="hover-with-bg" href="/tags/NoSQL/">NoSQL</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/12/13/redis-distributed-lock/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Redis——分布式锁</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/10/17/springdoc-javadoc/">
+                        <span class="hidden-mobile">Springdoc——根据JavaDoc生成接口文档</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

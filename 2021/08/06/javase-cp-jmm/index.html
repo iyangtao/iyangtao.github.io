@@ -1,0 +1,763 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="引言在多线程并发环境中，如何确保线程对共享数据的访问和修改是正确而一致的，是一个核心且复杂的问题。Java 内存模型（JMM） 就是为了解决这一问题而引入的抽象约定。本文将带你从 JMM 的基本概念出发，逐步理解并掌握 volatile 关键字的语义，以及 happens-before 规则对并发程序正确性的重大意义。 JMM 概述JMM，全称为 Java 内存模型（Java Memory Mod">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java并发编程——Java内存模型">
+<meta property="og:url" content="http://example.com/2021/08/06/javase-cp-jmm/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="引言在多线程并发环境中，如何确保线程对共享数据的访问和修改是正确而一致的，是一个核心且复杂的问题。Java 内存模型（JMM） 就是为了解决这一问题而引入的抽象约定。本文将带你从 JMM 的基本概念出发，逐步理解并掌握 volatile 关键字的语义，以及 happens-before 规则对并发程序正确性的重大意义。 JMM 概述JMM，全称为 Java 内存模型（Java Memory Mod">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/java-concurrency-programming-logo.png">
+<meta property="article:published_time" content="2021-08-05T17:51:29.000Z">
+<meta property="article:modified_time" content="2021-08-05T17:51:29.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="JavaSE">
+<meta property="article:tag" content="Java并发编程">
+<meta property="article:tag" content="Java内存模型">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/java-concurrency-programming-logo.png">
+  
+  
+  <title>Java并发编程——Java内存模型 - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/java-concurrency-programming-logo.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Java并发编程——Java内存模型">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-08-06 01:51" pubdate>
+        2021年8月6日 凌晨
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      6.9k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      12 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Java并发编程——Java内存模型</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：3 年前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>在多线程并发环境中，如何确保线程对共享数据的访问和修改是正确而一致的，是一个核心且复杂的问题。Java 内存模型（JMM） 就是为了解决这一问题而引入的抽象约定。本文将带你从 <code>JMM</code> 的基本概念出发，逐步理解并掌握 <code>volatile</code> 关键字的语义，以及 <code>happens-before</code> 规则对并发程序正确性的重大意义。</p>
+<h2 id="JMM-概述"><a href="#JMM-概述" class="headerlink" title="JMM 概述"></a>JMM 概述</h2><p><code>JMM</code>，全称为 Java 内存模型（<code>Java Memory Model</code>），是 Java 虚拟机（JVM）中的一种抽象模型，规定了线程如何与内存交互。</p>
+<h3 id="主内存与工作内存"><a href="#主内存与工作内存" class="headerlink" title="主内存与工作内存"></a>主内存与工作内存</h3><p><code>JMM</code> 定义了两种内存区域：</p>
+<ul>
+<li><strong>主内存（Main Memory）</strong>：<ul>
+<li>这是所有线程共享的内存区域。</li>
+<li>所有线程的共享变量都存储在主内存中，线程需要从主内存中读取共享变量，并将修改后的值写回主内存。</li>
+</ul>
+</li>
+<li><strong>工作内存（Working Memory）</strong>：<ul>
+<li>每个线程有自己独立的工作内存（线程本地内存）。</li>
+<li>线程的工作内存存储该线程使用的变量副本（包括共享变量的副本）。线程执行时对变量的操作首先在工作内存中进行，最终通过同步机制与主内存交换数据。</li>
+<li>线程的工作内存并不是一个物理内存区域，而是一个抽象的概念，表示线程在执行时对数据的本地副本。</li>
+</ul>
+</li>
+</ul>
+<h3 id="内存之间的交互"><a href="#内存之间的交互" class="headerlink" title="内存之间的交互"></a>内存之间的交互</h3><ul>
+<li><strong>读取和写入</strong>：线程通过以下操作与主内存交互：<ul>
+<li><strong>写入（write）</strong>：将工作内存中的数据写回到主内存。</li>
+<li><strong>读取（read）</strong>：从主内存读取数据到工作内存。</li>
+</ul>
+</li>
+<li>每个线程对共享变量的操作（如读取、写入）最终会通过工作内存与主内存之间的交换来影响其他线程。</li>
+</ul>
+<h3 id="主要目标"><a href="#主要目标" class="headerlink" title="主要目标"></a>主要目标</h3><ul>
+<li><strong>可见性</strong>：确保一个线程对共享变量的修改能够及时被其他线程看到，避免“脏读”。</li>
+<li><strong>原子性</strong>：保证某些操作是不可中断的，要么完全执行，要么完全不执行，避免竞态条件。</li>
+<li><strong>有序性</strong>：控制线程执行操作的顺序，避免由于CPU和JVM优化造成的指令重排序问题。</li>
+</ul>
+<h3 id="设计哲学"><a href="#设计哲学" class="headerlink" title="设计哲学"></a><strong>设计哲学</strong></h3><ul>
+<li><code>JMM</code> 的设计并不关注如何实现内存管理，而是提供了一种高层的抽象视图来规范线程间的内存交互行为。</li>
+<li>它的设计旨在保证并发程序的正确性，同时尽可能让程序的执行效率得到优化。</li>
+</ul>
+<h2 id="共享变量"><a href="#共享变量" class="headerlink" title="共享变量"></a>共享变量</h2><h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>多个线程可以访问和修改的变量。Java 中的实例字段、静态字段和数组元素都可以作为共享变量。</p>
+<p><strong>问题</strong>：多个线程同时访问共享变量时，可能会出现数据一致性问题，导致线程间的操作相互影响。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SharedVariablesTestClient</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">boolean</span> b = <span class="hljs-keyword">true</span>;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> InterruptedException </span>&#123;<br><br>        <span class="hljs-keyword">new</span> Thread(() -&gt; &#123;<br>            <span class="hljs-keyword">while</span> (b) &#123;<br>            &#125;<br>        &#125;, <span class="hljs-string">&quot;t1&quot;</span>).start();<br><br>        Thread.sleep(<span class="hljs-number">3000</span>);<br>        b = <span class="hljs-keyword">false</span>;<br><br>        System.out.println(<span class="hljs-string">&quot;main: b -&gt; &quot;</span> + b);<br><br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>运行程序后，程序应该会在 3 秒后打印</p>
+<figure class="highlight xl"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xl"><span class="hljs-function"><span class="hljs-title">main</span>: b -&gt;</span> <span class="hljs-literal">false</span><br></code></pre></div></td></tr></table></figure>
+
+<p>但之后程序并没有停止，即线程 <code>t1</code> 中的 <code>while</code> 条件仍然成立，线程 <code>t1</code> 中的变量 <code>b</code> 似乎与主线程的变量 <code>b</code> 值不相同。</p>
+<h3 id="原因分析"><a href="#原因分析" class="headerlink" title="原因分析"></a>原因分析</h3><ol>
+<li><strong>工作内存与主内存的隔离</strong>：<ul>
+<li>每个线程都有自己的工作内存（缓存），主内存是共享的。线程 <code>t1</code> 在执行时可能会从工作内存中读取 <code>b</code> 的值，而不是每次都从主内存中获取最新的值。如果主线程修改了 <code>b</code>，线程 <code>t1</code> 的工作内存并不会立刻被更新。</li>
+</ul>
+</li>
+<li><strong>缺乏可见性保证</strong>：<ul>
+<li>默认情况下，Java 中的普通变量（非 <code>volatile</code>）在多个线程间并没有同步更新机制。虽然主线程修改了 <code>b</code> 的值，但是 <code>t1</code> 线程并没有强制去主内存中读取这个值，它可能一直在使用缓存中的 <code>b</code> 值。由于没有同步机制，这个修改对于线程 <code>t1</code> 是不可见的。</li>
+</ul>
+</li>
+<li><strong>JMM（Java内存模型）</strong>：<ul>
+<li>JMM 规定了如何在多线程中读取和写入共享变量，但默认情况下，它没有保证线程之间的立即可见性。也就是说，线程 <code>t1</code> 对共享变量 <code>b</code> 的读取可能不会反映主线程对 <code>b</code> 的修改，直到线程 <code>t1</code> 再次从主内存读取该变量。</li>
+</ul>
+</li>
+</ol>
+<pre><code class=" mermaid">sequenceDiagram
+    participant t1 as 线程 t1
+    participant main as 主线程
+    participant main_mem as 主内存
+    participant t1_mem as t1 工作内存
+
+    main-&gt;&gt;main_mem: 线程主内存中的 b = true
+    main-&gt;&gt;t1_mem: 线程 t1 工作内存中的 b = true
+    t1-&gt;&gt;t1_mem: t1 读取 b (b = true)
+    t1-&gt;&gt;t1: t1 执行 while 循环 (b = true)
+    main-&gt;&gt;main: 主线程阻塞 3 秒
+    main-&gt;&gt;main_mem: 主线程将 b 修改为 false
+    main-&gt;&gt;main: 打印 b = false
+    t1-&gt;&gt;t1_mem: t1 检查工作内存中的 b (b = true)
+    t1-&gt;&gt;t1: t1 继续执行 while 循环 (b = true)
+    note right of t1: 直到下一次读取主内存中的 b，t1 才能看到主线程的修改
+</code></pre>
+
+<p><strong>总结</strong>：在多线程程序中，线程间的共享数据可能会因为工作内存和主内存之间的交互机制而出现数据不一致的情况。例如：</p>
+<ul>
+<li>一个线程修改了某个共享变量的值，但由于缓存和优化机制，其他线程可能并不能立即看到该修改。</li>
+<li>线程执行过程中，CPU 可能对指令进行重排序，导致线程执行的顺序与代码的书写顺序不一致，可能引发错误。</li>
+</ul>
+<h2 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h2><h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p><code>volatile</code> 是 Java 中的一个关键字，用于修饰变量，表示该变量在多个线程中是共享的。使用 <code>volatile</code> 修饰的变量具有特殊的内存语义，可以在一定程度上保证变量的可见性和有序性，但不保证操作的原子性。</p>
+<h3 id="作用和特性"><a href="#作用和特性" class="headerlink" title="作用和特性"></a>作用和特性</h3><h4 id="保证可见性"><a href="#保证可见性" class="headerlink" title="保证可见性"></a>保证可见性</h4><p>可见性指的是当一个线程修改了共享变量的值，其他线程能够立即看到这个修改。默认情况下，线程可能会将变量缓存在自己的工作内存中，导致其他线程无法及时感知到这个变化。使用 <code>volatile</code> 关键字可以确保对变量的写操作对所有线程立即可见。</p>
+<h4 id="保证有序性"><a href="#保证有序性" class="headerlink" title="保证有序性"></a>保证有序性</h4><p>有序性指的是程序执行的顺序与代码书写的顺序是否一致。编译器和处理器可能会对指令进行重排序以优化性能，这可能导致程序执行的顺序与预期不符。<code>volatile</code> 关键字禁止特定类型的指令重排序，确保变量的读写操作按照代码的顺序执行，从而增强程序的可预测性。</p>
+<h4 id="不保证原子性"><a href="#不保证原子性" class="headerlink" title="不保证原子性"></a>不保证原子性</h4><p>原子性指的是一个操作在执行过程中不可被中断，要么全部执行，要么完全不执行。<code>volatile</code> 并不保证操作的原子性，例如自增操作（<code>i++</code>）不是原子性的，即使 <code>i</code> 被声明为 <code>volatile</code>，多个线程同时对其进行操作仍然可能导致竞态条件。</p>
+<h4 id="性能较好"><a href="#性能较好" class="headerlink" title="性能较好"></a>性能较好</h4><p><code>volatile</code> 是一种轻量级的同步机制，如果仅需可见性，而无需保证复合操作的原子性，相比于 <code>synchronized</code>，它对性能的开销较小。它不需要获取和释放锁，因此适用于需要保证可见性的简单场景。</p>
+<h3 id="工作原理"><a href="#工作原理" class="headerlink" title="工作原理"></a>工作原理</h3><h4 id="影响Java-内存模型-JMM"><a href="#影响Java-内存模型-JMM" class="headerlink" title="影响Java 内存模型 (JMM)"></a>影响Java 内存模型 (JMM)</h4><p><code>volatile</code> 关键字通过以下方式影响 JMM 的行为：</p>
+<ol>
+<li><strong>可见性保证</strong>：对 <code>volatile</code> 变量的写操作会立即刷新到主内存，读操作则会从主内存中重新读取。</li>
+<li><strong>禁止指令重排序</strong>：在 <code>volatile</code> 变量前后的指令不会被重排序，以确保操作的有序性。</li>
+</ol>
+<h4 id="内存屏障-Memory-Barriers"><a href="#内存屏障-Memory-Barriers" class="headerlink" title="内存屏障 (Memory Barriers)"></a>内存屏障 (Memory Barriers)</h4><p>内存屏障是一种低级别的指令，用于限制 CPU 和编译器对指令的重排序。<code>volatile</code> 关键字在实现上依赖于内存屏障，通过在读写 <code>volatile</code> 变量时插入内存屏障，确保操作的顺序性和可见性。</p>
+<p>具体来说：</p>
+<ul>
+<li><strong>写屏障（Write Barrier）</strong>：在写 <code>volatile</code> 变量之前，会插入一个写屏障，确保在此屏障之前的所有写操作在此屏障之后的写操作之前完成。</li>
+<li><strong>读屏障（Read Barrier）</strong>：在读 <code>volatile</code> 变量之后，会插入一个读屏障，确保在此屏障之前的所有读操作在此屏障之后的读操作之前完成。</li>
+</ul>
+<p>这种屏障机制有效地防止了编译器和 CPU 对 <code>volatile</code> 变量的相关操作进行重排序。</p>
+<h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h3><h4 id="标志位"><a href="#标志位" class="headerlink" title="标志位"></a>标志位</h4><p><code>volatile</code> 常用于定义标志位，控制线程的执行。例如，使用 <code>volatile</code> 来控制线程的停止与启动。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">VolatileFlagExample</span> </span>&#123;<br>    <br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">volatile</span> <span class="hljs-keyword">boolean</span> running = <span class="hljs-keyword">true</span>;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> InterruptedException </span>&#123;<br>        Thread worker = <span class="hljs-keyword">new</span> Thread(() -&gt; &#123;<br>            <span class="hljs-keyword">while</span> (running) &#123;<br>                <span class="hljs-comment">// 执行任务</span><br>            &#125;<br>            System.out.println(<span class="hljs-string">&quot;Worker 线程停止。&quot;</span>);<br>        &#125;);<br>        worker.start();<br><br>        Thread.sleep(<span class="hljs-number">3000</span>);<br>        running = <span class="hljs-keyword">false</span>;<br>        System.out.println(<span class="hljs-string">&quot;主线程设置 running 为 false。&quot;</span>);<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>代码解析</strong>：</p>
+<ol>
+<li>定义静态变量 <code>running</code>，作为 <code>worker</code> 线程的运行条件。</li>
+<li>主线程睡眠 3 秒后，将 <code>worker</code> 线程的运行条件 <code>running</code> 置为 <code>false</code>。</li>
+<li>由于 <code>running</code> 使用了 <code>volatile</code> 修饰，保证了可见性，所以 <code>worker</code> 线程的读操作会从主内存中读取到最新的值。</li>
+</ol>
+<h4 id="双重检查锁定"><a href="#双重检查锁定" class="headerlink" title="双重检查锁定"></a>双重检查锁定</h4><p><code>volatile</code> 关键字在双重检查锁定（<code>Double-Checked Locking</code>）模式中至关重要，确保实例在初始化时的可见性和有序性。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Singleton</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">volatile</span> Singleton instance;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">Singleton</span><span class="hljs-params">()</span> </span>&#123;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title">getInstance</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">if</span> (instance == <span class="hljs-keyword">null</span>) &#123;<br>            <span class="hljs-keyword">synchronized</span> (Singleton.class) &#123;<br>                <span class="hljs-keyword">if</span> (instance == <span class="hljs-keyword">null</span>) &#123;<br>                    instance = <span class="hljs-keyword">new</span> Singleton();<br>                &#125;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> instance;<br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>代码解析</strong>：</p>
+<ol>
+<li>定义静态变量 <code>instance</code>。</li>
+<li>私有化 <code>Singleton</code> 类的构造器。</li>
+<li>第一次检查 <code>instance == null</code>，判断是否已有实例，有则返回，同时避免每次都进入同步块。</li>
+<li><code>synchronized</code> 代码块确保在多线程环境下只有一个线程可以执行实例的创建逻辑。</li>
+<li>第二次检查 <code>instance == null</code>，判断其他线程未创建实例（通过 <code>volatile</code> 保证线程之间的可见性）。</li>
+</ol>
+<h3 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h3><table>
+<thead>
+<tr>
+<th></th>
+<th>volatile</th>
+<th>synchronized</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>可见性</strong></td>
+<td>保证</td>
+<td>锁机制保证</td>
+</tr>
+<tr>
+<td><strong>原子性</strong></td>
+<td>不保证</td>
+<td>可保证</td>
+</tr>
+<tr>
+<td><strong>性能</strong></td>
+<td>轻量，开销小</td>
+<td>涉及锁，开销大</td>
+</tr>
+<tr>
+<td><strong>适用场景</strong></td>
+<td>状态标志位和单一变量的简单同步</td>
+<td>对多个变量或复杂操作进行原子性同步</td>
+</tr>
+</tbody></table>
+<h2 id="3种关键特性保证"><a href="#3种关键特性保证" class="headerlink" title="3种关键特性保证"></a>3种关键特性保证</h2><h3 id="原子性（Atomicity）"><a href="#原子性（Atomicity）" class="headerlink" title="原子性（Atomicity）"></a>原子性（Atomicity）</h3><ul>
+<li><strong>synchronized</strong>：同步机制保证了在同一时间只有一个线程能够执行同步块中的代码，从而保证了操作的原子性。</li>
+</ul>
+<h3 id="可见性（Visibility）"><a href="#可见性（Visibility）" class="headerlink" title="可见性（Visibility）"></a>可见性（Visibility）</h3><ul>
+<li><strong>volatile</strong>：对 <code>volatile</code> 变量的写操作会立即对其他线程可见。<code>volatile</code> 变量的读取总是从主内存中获取，而不是从线程的本地缓存中获取，写操作会直接写回到主内存，保证了修改的及时可见性。</li>
+<li><strong>synchronized</strong>：当一个线程获取了锁并修改了共享变量，其他线程在释放锁之前无法读取该变量，从而确保了变量对其他线程的可见性。</li>
+<li><strong>final</strong>：对于 <code>final</code> 修饰的变量，特别是对象的引用，保证了构造完成后它们的可见性。<code>final</code> 变量的初始化具有特别的内存访问语义，确保了它在构造函数完成后，对其他线程可见。</li>
+</ul>
+<h3 id="有序性（Ordering）"><a href="#有序性（Ordering）" class="headerlink" title="有序性（Ordering）"></a>有序性（Ordering）</h3><ul>
+<li><p><strong>volatile</strong>：<code>volatile</code> 关键字禁止特定类型的指令重排序，确保变量的读写操作按照代码的顺序执行。</p>
+</li>
+<li><p><strong>synchronized</strong>：<code>synchronized</code> 语句中的操作会在锁的获取和释放时加上内存屏障，保证同步块中的代码按顺序执行。</p>
+</li>
+</ul>
+<h2 id="happens-before原则"><a href="#happens-before原则" class="headerlink" title="happens-before原则"></a>happens-before原则</h2><h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><p>在 Java 内存模型中，<code>happens-before</code> 是用来描述操作之间的执行顺序的一种规则。它是为了保证多线程环境中操作的有序性，并确保正确的可见性和同步。具体来说，<code>happens-before</code> 原则表示在一个线程中的某个操作（例如变量的写入）与另一个线程中的某个操作（例如变量的读取）之间有一个明确的先后关系，前者“发生在”后者之前。</p>
+<ul>
+<li><strong>如果操作A happens-before 操作B</strong>，则可以确保操作A对其他线程的可见性以及操作B在执行时的正确性。简单来说，操作A的结果会在操作B之前对其他线程可见。</li>
+</ul>
+<h3 id="规则"><a href="#规则" class="headerlink" title="规则"></a>规则</h3><h4 id="1-程序顺序规则（Program-Order-Rule）"><a href="#1-程序顺序规则（Program-Order-Rule）" class="headerlink" title="1. 程序顺序规则（Program Order Rule）"></a>1. 程序顺序规则（Program Order Rule）</h4><ul>
+<li>在单个线程内，代码执行顺序是线性的，即一个操作在另一个操作之前发生。</li>
+<li><strong>举例</strong>：在同一线程内，如果你执行 <code>a = 1; b = 2;</code>，那么 <code>a = 1</code> 发生在 <code>b = 2</code> 之前。</li>
+</ul>
+<h4 id="2-监视器锁规则（Monitor-Lock-Rule）"><a href="#2-监视器锁规则（Monitor-Lock-Rule）" class="headerlink" title="2. 监视器锁规则（Monitor Lock Rule）"></a>2. <strong>监视器锁规则（Monitor Lock Rule）</strong></h4><ul>
+<li>一个线程释放的锁 <code>happens-before</code> 另一个线程获取该锁。</li>
+<li><strong>举例</strong>：如果线程A执行 <code>lock.lock()</code> 获取锁，并且线程B执行 <code>lock.lock()</code> 获取同一个锁，则线程A释放锁的操作发生在线程B获取锁的操作之前。</li>
+</ul>
+<h4 id="3-volatile-变量规则（Volatile-Variable-Rule）"><a href="#3-volatile-变量规则（Volatile-Variable-Rule）" class="headerlink" title="3. volatile 变量规则（Volatile Variable Rule）"></a>3. <strong>volatile 变量规则（Volatile Variable Rule）</strong></h4><ul>
+<li>对 <code>volatile</code> 变量的写操作 <code>happens-before</code> 任何后续对该变量的读操作。</li>
+<li><strong>举例</strong>：如果线程A将 <code>volatile</code> 变量 <code>x</code> 设置为 <code>true</code>，那么在线程B读取 <code>x</code> 时，线程B能看到线程A的最新值。</li>
+</ul>
+<h4 id="4-传递性规则（Transitivity-Rule）"><a href="#4-传递性规则（Transitivity-Rule）" class="headerlink" title="4. 传递性规则（Transitivity Rule）"></a>4. <strong>传递性规则（Transitivity Rule）</strong></h4><ul>
+<li>如果 <code>A happens-before B</code>，且 <code>B happens-before C</code>，则 <code>A happens-before C</code>。</li>
+<li><strong>举例</strong>：如果 <code>a = 1</code> happens-before <code>b = 2</code>，并且 <code>b = 2</code> happens-before <code>c = 3</code>，则 <code>a = 1</code> happens-before <code>c = 3</code>。</li>
+</ul>
+<h4 id="5-线程启动规则（Thread-Start-Rule）"><a href="#5-线程启动规则（Thread-Start-Rule）" class="headerlink" title="5. 线程启动规则（Thread Start Rule）"></a>5. <strong>线程启动规则（Thread Start Rule）</strong></h4><ul>
+<li>线程的 <code>start()</code> 操作 <code>happens-before</code> 线程中的任何后续操作。</li>
+<li><strong>举例</strong>：如果线程A调用 <code>threadB.start()</code> 启动线程B，那么线程A在 <code>start()</code> 之后的操作会 <code>happens-before</code> 线程B中的操作。</li>
+</ul>
+<h4 id="6-线程中断规则（Thread-Interrupt-Rule）"><a href="#6-线程中断规则（Thread-Interrupt-Rule）" class="headerlink" title="6. 线程中断规则（Thread Interrupt Rule）"></a>6. <strong>线程中断规则（Thread Interrupt Rule）</strong></h4><ul>
+<li>对线程的中断操作 <code>happens-before</code> 线程检测到中断的操作。</li>
+<li><strong>举例</strong>：如果线程A执行 <code>threadB.interrupt()</code> 中断线程B，那么线程B中的 <code>InterruptedException</code> 或 <code>Thread.interrupted()</code> 操作会在 <code>interrupt()</code> 操作之后发生。</li>
+</ul>
+<h4 id="7-线程结束规则（Thread-Join-Rule）"><a href="#7-线程结束规则（Thread-Join-Rule）" class="headerlink" title="7. 线程结束规则（Thread Join Rule）"></a>7. <strong>线程结束规则（Thread Join Rule）</strong></h4><ul>
+<li>线程的 <code>join()</code> 操作 <code>happens-before</code> 线程结束的任何后续操作。</li>
+<li><strong>举例</strong>：如果线程A调用 <code>threadB.join()</code> 等待线程B执行完成，那么线程B的结束会 <code>happens-before</code> 线程A接下来执行的操作。</li>
+</ul>
+<h4 id="8-写-读规则（Write-Read-Rule）"><a href="#8-写-读规则（Write-Read-Rule）" class="headerlink" title="8. 写-读规则（Write-Read Rule）"></a>8. <strong>写-读规则（Write-Read Rule）</strong></h4><ul>
+<li>对一个变量的写操作 <code>happens-before</code> 对同一个变量的后续读操作，如果写和读操作之间有同步机制（如 <code>synchronized</code> 或 <code>volatile</code>）。</li>
+<li><strong>举例</strong>：线程A对 <code>volatile</code> 变量 <code>x</code> 写入值后，线程B读取 <code>x</code> 时，线程B一定能看到线程A的最新写入值。</li>
+</ul>
+<h3 id="重要性"><a href="#重要性" class="headerlink" title="重要性"></a>重要性</h3><ul>
+<li><strong>保证线程间的可见性</strong>： 在多线程程序中，线程可能会在自己的工作内存中缓存变量，导致一个线程对变量的修改对另一个线程不可见。<code>happens-before</code> 的原则保证了某些操作的可见性，避免了线程之间的数据不一致。</li>
+<li><strong>避免数据竞争和竞态条件</strong>： <code>happens-before</code> 确保线程间操作的顺序性和同步，避免了由于不确定的操作顺序而产生的数据竞争问题。</li>
+<li><strong>保证程序的正确性</strong>： 通过 <code>happens-before</code> 规则，JMM确保了在并发执行时，不同线程之间的执行顺序是正确的，从而避免了执行结果不一致的问题。</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Java 内存模型是并发编程的基础，它将复杂的 CPU 缓存、编译器优化和指令重排序等底层细节，抽象出可见性、原子性和有序性等关键问题，并以 <code>happens-before</code> 规则给予统一的解决方案。通过为共享变量加上 <code>volatile</code> 关键字，可以确保线程间的可见性，部分禁止指令重排序，但无法满足复杂场景对原子性的需求；而像 <code>synchronized</code> 或其它锁机制则进一步强化了原子性，但也带来了更高的性能开销。在实际开发中，需要结合程序对并发程度、性能和安全的要求，来选择合适的同步手段。理解好 <code>JMM</code>，以及如何合理利用 <code>volatile</code> 与 <code>happens-before</code> 规则，将是写出高质量并发程序的关键。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/">Java并发编程</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/JavaSE/">JavaSE</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/">Java并发编程</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/">Java内存模型</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/08/09/javase-cp-nonlock/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Java并发编程——无锁</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/08/05/javase-cp-monitor/">
+                        <span class="hidden-mobile">Java并发编程——管程Monitor</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

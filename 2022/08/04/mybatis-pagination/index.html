@@ -1,0 +1,636 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="引言在现代Web开发中，有效的数据管理和呈现是至关重要的，尤其是当涉及到大量数据时。分页是一种常用的技术，用于提高数据处理的效率和用户界面的响应性。MyBatis作为一个强大的持久层框架，提供了多种分页实现方法，本文将探讨MyBatis中常见的分页技术，旨在帮助开发者根据应用需求选择最合适的分页解决方案。 手动实现分页最基本的方法是在SQL查询中手动实现分页逻辑。这通常涉及到修改SQL语句以包含数">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MyBatis分页">
+<meta property="og:url" content="http://example.com/2022/08/04/mybatis-pagination/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="引言在现代Web开发中，有效的数据管理和呈现是至关重要的，尤其是当涉及到大量数据时。分页是一种常用的技术，用于提高数据处理的效率和用户界面的响应性。MyBatis作为一个强大的持久层框架，提供了多种分页实现方法，本文将探讨MyBatis中常见的分页技术，旨在帮助开发者根据应用需求选择最合适的分页解决方案。 手动实现分页最基本的方法是在SQL查询中手动实现分页逻辑。这通常涉及到修改SQL语句以包含数">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/mybatis.jpg">
+<meta property="article:published_time" content="2022-08-04T11:34:01.000Z">
+<meta property="article:modified_time" content="2022-08-04T11:34:01.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="MyBatis">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/mybatis.jpg">
+  
+  
+  <title>MyBatis分页 - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/mybatis.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="MyBatis分页">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-08-04 19:34" pubdate>
+        2022年8月4日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      4.5k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      8 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">MyBatis分页</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：2 年前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>在现代Web开发中，有效的数据管理和呈现是至关重要的，尤其是当涉及到大量数据时。分页是一种常用的技术，用于提高数据处理的效率和用户界面的响应性。MyBatis作为一个强大的持久层框架，提供了多种分页实现方法，本文将探讨MyBatis中常见的分页技术，旨在帮助开发者根据应用需求选择最合适的分页解决方案。</p>
+<h2 id="手动实现分页"><a href="#手动实现分页" class="headerlink" title="手动实现分页"></a>手动实现分页</h2><p>最基本的方法是在SQL查询中手动实现分页逻辑。这通常涉及到修改SQL语句以包含数据库特定的分页语法。</p>
+<ul>
+<li><p><strong>MySQL/PostgreSQL</strong>：使用<code>LIMIT</code>和<code>OFFSET</code>关键字。</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> users <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> id LIMIT <span class="hljs-number">10</span> <span class="hljs-keyword">OFFSET</span> <span class="hljs-number">20</span><br></code></pre></div></td></tr></table></figure></li>
+<li><p><strong>Oracle</strong>：使用<code>ROWNUM</code>或在Oracle 12c及以上使用<code>FETCH NEXT</code></p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> ( <span class="hljs-keyword">SELECT</span> a.<span class="hljs-operator">*</span>, ROWNUM rnum <span class="hljs-keyword">FROM</span> (<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> users <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> id) a <span class="hljs-keyword">WHERE</span> ROWNUM <span class="hljs-operator">&lt;=</span> <span class="hljs-number">30</span> ) <span class="hljs-keyword">WHERE</span> rnum <span class="hljs-operator">&gt;</span> <span class="hljs-number">20</span><br></code></pre></div></td></tr></table></figure></li>
+<li><p><strong>SQL Server</strong>：使用<code>OFFSET-FETCH</code>子句。</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> users <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> id <span class="hljs-keyword">OFFSET</span> <span class="hljs-number">20</span> <span class="hljs-keyword">ROWS</span> <span class="hljs-keyword">FETCH</span> NEXT <span class="hljs-number">10</span> <span class="hljs-keyword">ROWS</span> <span class="hljs-keyword">ONLY</span><br></code></pre></div></td></tr></table></figure></li>
+</ul>
+<p>这种方法虽然直接且容易理解，但它要求开发者对不同数据库的分页机制有足够的了解，并且在数据库切换时需要修改SQL代码。</p>
+<h2 id="PageHelper"><a href="#PageHelper" class="headerlink" title="PageHelper"></a>PageHelper</h2><p><code>PageHelper</code>是MyBatis社区提供的一个分页插件，这是一个非常流行的MyBatis分页插件，通过拦截器自动修改SQL实现分页，可以让开发者忽略手动编写分页SQL。</p>
+<p><code>PageHelper</code>支持多种数据库，无需担心不同数据库分页语法的差异。</p>
+<p><strong>DEMO</strong>：</p>
+<ol>
+<li><p>引入依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>com.github.pagehelper<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>pagehelper<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>5.3.3<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></div></td></tr></table></figure></li>
+<li><p>在MyBatis核心配置文件中添加拦截器</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">plugins</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">plugin</span> <span class="hljs-attr">interceptor</span>=<span class="hljs-string">&quot;com.github.pagehelper.PageInterceptor&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">plugin</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">plugins</span>&gt;</span><br></code></pre></div></td></tr></table></figure></li>
+<li><p>在Mapper文件中定义查询方法</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getAll&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.StudentPO&quot;</span>&gt;</span><br>    select * from tt_student order by id desc<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br></code></pre></div></td></tr></table></figure></li>
+<li><p>对应的接口方法为</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function">List&lt;StudentPO&gt; <span class="hljs-title">getAll</span><span class="hljs-params">()</span></span>;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>调用<code>PageHelper</code>的<code>startPage</code>方法，设置分页信息，同时将查询结果封装到一个<code>PageInfo</code>对象中</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">SqlSession session = SqlSessionUtil.getSession();<br>StudentMapper studentMapper = session.getMapper(StudentMapper.class);<br><span class="hljs-keyword">int</span> pageNum = <span class="hljs-number">1</span>;	<span class="hljs-comment">// 页码</span><br><span class="hljs-keyword">int</span> pageSize = <span class="hljs-number">2</span>;	<span class="hljs-comment">// 每页记录数</span><br>PageHelper.startPage(pageNum, pageSize);<br>PageInfo&lt;StudentPO&gt; studentPOPageInfo = <span class="hljs-keyword">new</span> PageInfo&lt;&gt;(studentMapper.getAll(), <span class="hljs-number">10</span>);<br>log.info(<span class="hljs-string">&quot;PageHelper分页查询：&#123;&#125;&quot;</span>, studentPOPageInfo);<br></code></pre></div></td></tr></table></figure></li>
+<li><p>运行结果如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">...<br>22:38:11.834 [main] DEBUG space.yangtao.mapper.StudentMapper.getAll_COUNT - ==&gt;  Preparing: SELECT count(0) FROM tt_student<br>22:38:11.849 [main] DEBUG space.yangtao.mapper.StudentMapper.getAll_COUNT - ==&gt; Parameters: <br>22:38:11.861 [main] TRACE space.yangtao.mapper.StudentMapper.getAll_COUNT - &lt;==    Columns: count(0)<br>22:38:11.861 [main] TRACE space.yangtao.mapper.StudentMapper.getAll_COUNT - &lt;==        Row: 3<br>22:38:11.861 [main] DEBUG space.yangtao.mapper.StudentMapper.getAll_COUNT - &lt;==      Total: 1<br>22:38:11.862 [main] DEBUG space.yangtao.mapper.StudentMapper - Cache Hit Ratio [space.yangtao.mapper.StudentMapper]: 0.0<br>22:38:11.863 [main] DEBUG space.yangtao.mapper.StudentMapper.getAll - ==&gt;  Preparing: select * from tt_student order by id desc LIMIT ?, ?<br>22:38:11.863 [main] DEBUG space.yangtao.mapper.StudentMapper.getAll - ==&gt; Parameters: 2(Long), 2(Integer)<br>22:38:11.864 [main] TRACE space.yangtao.mapper.StudentMapper.getAll - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>22:38:11.865 [main] TRACE space.yangtao.mapper.StudentMapper.getAll - &lt;==        Row: 1, 1, zhangsan, 180.0, 男, 1990-01-01, 2024-07-01 22:10:22<br>22:38:11.866 [main] DEBUG space.yangtao.mapper.StudentMapper.getAll - &lt;==      Total: 1<br>22:38:11.866 [main] INFO  space.yangtao.client.StudentMapperTest - PageHelper分页查询：PageInfo&#123;pageNum=2, pageSize=2, size=1, startRow=3, endRow=3, total=3, pages=2, list=Page&#123;count=<span class="hljs-literal">true</span>, pageNum=2, pageSize=2, startRow=2, endRow=4, total=3, pages=2, reasonable=<span class="hljs-literal">false</span>, pageSizeZero=<span class="hljs-literal">false</span>&#125;[StudentPO(id=1, name=zhangsan, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Mon Jul 01 22:10:22 CST 2024)], prePage=1, nextPage=0, isFirstPage=<span class="hljs-literal">false</span>, isLastPage=<span class="hljs-literal">true</span>, hasPreviousPage=<span class="hljs-literal">true</span>, hasNextPage=<span class="hljs-literal">false</span>, navigatePages=8, navigateFirstPage=1, navigateLastPage=2, navigatepageNums=[1, 2]&#125;<br>...<br></code></pre></div></td></tr></table></figure></li>
+</ol>
+<p>由日志可知，<code>PageHelper</code>已经帮我们自动设置了<code>limit</code>参数，同时看到返回的分页对象中除了需要的列表外，还含有其他一些可能用到的属性，如当前页、页大小、页码、总数、前一页、后一页、是否最后一页等。</p>
+<h2 id="RowBounds"><a href="#RowBounds" class="headerlink" title="RowBounds"></a>RowBounds</h2><p>MyBatis也提供了一个<code>RowBounds</code>类用于支持分页，通过在Mapper方法中使用<code>RowBounds</code>参数，可以进行物理分页。</p>
+<p>使用示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">List&lt;StudentPO&gt; studentPOPageInfo = studentMapper.getAll(<span class="hljs-keyword">new</span> RowBounds(<span class="hljs-number">20</span>, <span class="hljs-number">10</span>)); <span class="hljs-comment">// 跳过前20条，然后取10条数据 </span><br></code></pre></div></td></tr></table></figure>
+
+<p><code>RowBounds</code>的一个缺点是它是通过在内存中过滤记录实现的，即首先拉取所有记录然后在内存中进行分页，这在数据量较大时会影响性能。</p>
+<h2 id="Web环境下的选择"><a href="#Web环境下的选择" class="headerlink" title="Web环境下的选择"></a>Web环境下的选择</h2><p>简单总结下以上各个分页方案：</p>
+<ol>
+<li><strong>手动实现</strong>：<ul>
+<li><strong>优点</strong>：<ul>
+<li><strong>控制性强</strong>：完全控制SQL查询，可以针对性地优化查询。</li>
+<li><strong>灵活性高</strong>：可以根据具体需求调整SQL，满足复杂的分页需求。</li>
+</ul>
+</li>
+<li><strong>缺点</strong>：<ul>
+<li><strong>代码复杂</strong>：需要手动编写用于计算总数的查询以及分页的查询，增加了开发的复杂性。</li>
+<li><strong>维护成本高</strong>：每次分页逻辑调整或数据库迁移都需要手动修改SQL。</li>
+<li><strong>性能问题</strong>：如果处理不当，可能会因为两次查询（一次获取总数，一次获取分页数据）而导致性能下降。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>PageHelper</strong>：<ul>
+<li><strong>优点</strong>：<ul>
+<li><strong>简单易用</strong>：通过简单的 API 调用实现分页，无需修改原有 SQL。</li>
+<li><strong>自动化</strong>：自动处理总页数、总记录数的计算，对开发者透明。</li>
+<li><strong>高效</strong>：通常只需要进行一次额外的查询来获取总记录数，且插件内部可以有优化措施。</li>
+</ul>
+</li>
+<li><strong>缺点</strong>：<ul>
+<li><strong>依赖第三方</strong>：增加了对外部库的依赖，可能需要关注其兼容性和更新。</li>
+<li><strong>适应性问题</strong>：虽然支持多种数据库，但在一些特殊的分页需求下可能需要调整默认行为。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>RowBounds</strong>：<ul>
+<li><strong>优点</strong>：<ul>
+<li><strong>内置支持</strong>：无需额外引入库或工具，MyBatis内置支持。</li>
+<li><strong>简单使用</strong>：通过传递RowBounds对象为查询方法提供偏移量和限制即可实现分页。</li>
+</ul>
+</li>
+<li><strong>缺点</strong>：<ul>
+<li><strong>效率低</strong>：RowBounds 是通过在数据库查询全部数据后，在内存中进行分页，这在数据量大时效率极低。</li>
+<li><strong>不返回额外信息</strong>：不提供如总记录数等额外的分页信息，需要额外的查询和逻辑来实现。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>综合考虑<code>Web</code>环境下分页的需求，使用分页插件（如<code>PageHelper</code>）通常是最合适的选择，因为它既提供了开箱即用的分页功能，又能有效地返回必需的分页信息，同时保持了代码的简洁性和易维护性。如果对性能有极致要求，建议采用数据库自带的物理分页功能，并优化SQL查询。对于简单应用，<code>RowBounds</code>提供了快速实现分页的方法，尽管它在大数据量处理上效率不高。除此之外，使用分页时还需要限制每页的最大记录数、优化查询相关索引、同时充分利用缓存，以保证应用的稳定和高效。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/MyBatis/">MyBatis</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/MyBatis/">MyBatis</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/08/05/mybatis-cache/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">MyBatis缓存</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/08/03/mybatis-core-features-2/">
+                        <span class="hidden-mobile">MyBatis核心功能二</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

@@ -1,0 +1,613 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="引言在多线程编程中，如何保证数据的一致性与安全性往往是一大挑战。不可变对象在这方面提供了一种极其简洁有效的思路：如果一个对象从创建到销毁都不能被修改，那么不同线程之间自然无需为它的读写发生竞争。本文将由浅入深地讲解不可变对象在 Java 中的定义及实现方式，并结合实际应用场景，说明它为何在高并发下能带来显著的安全与性能优势。 定义不可变对象是指一旦创建后，其内部状态（即成员变量）无法被修改的对象。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java并发编程——不可变设计">
+<meta property="og:url" content="http://example.com/2021/08/11/javase-cp-final/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="引言在多线程编程中，如何保证数据的一致性与安全性往往是一大挑战。不可变对象在这方面提供了一种极其简洁有效的思路：如果一个对象从创建到销毁都不能被修改，那么不同线程之间自然无需为它的读写发生竞争。本文将由浅入深地讲解不可变对象在 Java 中的定义及实现方式，并结合实际应用场景，说明它为何在高并发下能带来显著的安全与性能优势。 定义不可变对象是指一旦创建后，其内部状态（即成员变量）无法被修改的对象。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/java-concurrency-programming-logo.png">
+<meta property="article:published_time" content="2021-08-11T07:55:59.000Z">
+<meta property="article:modified_time" content="2021-08-11T07:55:59.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="JavaSE">
+<meta property="article:tag" content="Java并发编程">
+<meta property="article:tag" content="不可变设计">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/java-concurrency-programming-logo.png">
+  
+  
+  <title>Java并发编程——不可变设计 - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/java-concurrency-programming-logo.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Java并发编程——不可变设计">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-08-11 15:55" pubdate>
+        2021年8月11日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      4k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      7 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Java并发编程——不可变设计</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：3 年前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>在多线程编程中，如何保证数据的一致性与安全性往往是一大挑战。不可变对象在这方面提供了一种极其简洁有效的思路：如果一个对象从创建到销毁都不能被修改，那么不同线程之间自然无需为它的读写发生竞争。本文将由浅入深地讲解不可变对象在 Java 中的定义及实现方式，并结合实际应用场景，说明它为何在高并发下能带来显著的安全与性能优势。</p>
+<h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>不可变对象是指一旦创建后，其内部状态（即成员变量）无法被修改的对象。在 Java 中，实现不可变对象通常需要遵循以下原则：</p>
+<ol>
+<li><strong>所有字段为 final</strong>：确保字段在构造后不可更改。</li>
+<li><strong>类被声明为 final</strong>：防止子类修改行为。</li>
+<li><strong>不提供修改状态的方法</strong>：如 <code>setter</code> 方法。</li>
+<li><strong>确保对可变字段的深拷贝</strong>：防止通过引用修改内部状态。</li>
+</ol>
+<p><strong>示例</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ImmutablePerson</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> String name;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> age;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">ImmutablePerson</span><span class="hljs-params">(String name, <span class="hljs-keyword">int</span> age)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.name = name;<br>        <span class="hljs-keyword">this</span>.age = age;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getName</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> name;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">getAge</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> age;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="并发编程中的优势"><a href="#并发编程中的优势" class="headerlink" title="并发编程中的优势"></a>并发编程中的优势</h2><h3 id="线程安全"><a href="#线程安全" class="headerlink" title="线程安全"></a>线程安全</h3><p>不可变对象天然线程安全。由于其状态不可更改，多个线程可以安全地共享同一个不可变对象，而无需额外的同步机制。这大大简化了并发编程中的复杂性，避免了竞争条件和数据不一致的问题。</p>
+<h3 id="无需同步"><a href="#无需同步" class="headerlink" title="无需同步"></a>无需同步</h3><p>传统的可变对象在多线程环境下需要通过 <code>synchronized</code> 关键字或其他同步机制来确保线程安全，而不可变对象则不需要。这不仅减少了代码的复杂性，还提高了性能，因为同步通常会带来额外的开销。</p>
+<h3 id="简化缓存和共享"><a href="#简化缓存和共享" class="headerlink" title="简化缓存和共享"></a>简化缓存和共享</h3><p>由于不可变对象不可更改，它们可以安全地缓存和共享。例如，Java 的 <code>String</code> 类就是不可变的，这使得字符串常量池的实现成为可能，提升了性能和内存利用率。</p>
+<h3 id="避免死锁和竞态条件"><a href="#避免死锁和竞态条件" class="headerlink" title="避免死锁和竞态条件"></a>避免死锁和竞态条件</h3><p>使用不可变对象可以避免许多并发编程中常见的问题，如死锁和竞态条件，因为多个线程无法改变对象的状态，从而减少了资源竞争的可能性。</p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><h3 id="使用-final-关键字"><a href="#使用-final-关键字" class="headerlink" title="使用 final 关键字"></a>使用 final 关键字</h3><p>将类声明为 <code>final</code>，防止被继承和修改。将所有字段声明为 <code>private final</code>，确保字段在构造后不可更改。</p>
+<h3 id="防御性拷贝"><a href="#防御性拷贝" class="headerlink" title="防御性拷贝"></a>防御性拷贝</h3><p>对于包含可变对象的字段，需要在构造方法中进行深拷贝，并在 <code>getter</code> 方法中返回副本，防止外部修改内部状态。</p>
+<p><strong>示例</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ImmutablePerson</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> String name;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Date birthDate;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">ImmutablePerson</span><span class="hljs-params">(String name, Date birthDate)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.name = name;<br>        <span class="hljs-keyword">this</span>.birthDate = <span class="hljs-keyword">new</span> Date(birthDate.getTime()); <span class="hljs-comment">// 深拷贝</span><br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getName</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> name;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> Date <span class="hljs-title">getBirthDate</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Date(birthDate.getTime()); <span class="hljs-comment">// 返回副本</span><br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="不提供修改方法"><a href="#不提供修改方法" class="headerlink" title="不提供修改方法"></a>不提供修改方法</h3><p>不提供任何会修改对象状态的方法，如 <code>setter</code> 方法，确保对象一旦创建后状态不变。</p>
+<h3 id="使用不可变集合"><a href="#使用不可变集合" class="headerlink" title="使用不可变集合"></a>使用不可变集合</h3><p>Java 提供了一些不可变集合，如 <code>List.of()</code>, <code>Set.of()</code>, <code>Map.of()</code>（自 Java 9 起）。使用这些不可变集合可以确保集合内容在创建后不可更改。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">List&lt;String&gt; immutableList = List.of(<span class="hljs-string">&quot;A&quot;</span>, <span class="hljs-string">&quot;B&quot;</span>, <span class="hljs-string">&quot;C&quot;</span>);<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><h3 id="共享对象"><a href="#共享对象" class="headerlink" title="共享对象"></a>共享对象</h3><p>在多线程环境下，可以安全地共享不可变对象，避免每个线程都创建自己的副本，从而节省内存和提升性能。</p>
+<p>示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SharedResource</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> ImmutablePerson PERSON = <span class="hljs-keyword">new</span> ImmutablePerson(<span class="hljs-string">&quot;Alice&quot;</span>, <span class="hljs-number">30</span>);<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> ImmutablePerson <span class="hljs-title">getPerson</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> PERSON;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>多个线程可以调用 <code>SharedResource.getPerson()</code> 安全地获取同一个 <code>ImmutablePerson</code> 实例，而无需担心线程安全问题。</p>
+<h3 id="函数式编程"><a href="#函数式编程" class="headerlink" title="函数式编程"></a>函数式编程</h3><p>不可变对象是函数式编程的核心，Java 8 引入的函数式接口和流（<code>Streams</code>）等特性鼓励使用不可变设计，提升代码的可读性和可维护性。</p>
+<p>示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">List&lt;String&gt; names = List.of(<span class="hljs-string">&quot;Alice&quot;</span>, <span class="hljs-string">&quot;Bob&quot;</span>, <span class="hljs-string">&quot;Charlie&quot;</span>);<br>List&lt;String&gt; upperCaseNames = names.stream()<br>                                   .map(String::toUpperCase)<br>                                   .collect(Collectors.toList());<br></code></pre></div></td></tr></table></figure>
+
+<p>在这个例子中，原始的 <code>names</code> 列表是不可变的，流操作生成的新列表 <code>upperCaseNames</code> 也是不可变的，确保了线程安全。</p>
+<h3 id="缓存和备忘录模式"><a href="#缓存和备忘录模式" class="headerlink" title="缓存和备忘录模式"></a>缓存和备忘录模式</h3><p>不可变对象适合用于缓存，因为它们可以安全地被多个线程共享而无需同步。例如，Java 的 <code>String</code> 类在实现字符串常量池时就利用了不可变性。</p>
+<h3 id="无锁编程"><a href="#无锁编程" class="headerlink" title="无锁编程"></a>无锁编程</h3><p>在高性能并发应用中，无锁编程是提升吞吐量的关键技术。不可变对象通过消除对同步的需求，天然支持无锁编程。</p>
+<p><strong>示例</strong>：使用 <code>AtomicReference</code> 来管理不可变对象</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">import</span> java.util.concurrent.atomic.AtomicReference;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">LockFreeCounter</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> AtomicReference&lt;ImmutableCounter&gt; counterRef = <br>        <span class="hljs-keyword">new</span> AtomicReference&lt;&gt;(<span class="hljs-keyword">new</span> ImmutableCounter(<span class="hljs-number">0</span>));<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">increment</span><span class="hljs-params">()</span> </span>&#123;<br>        ImmutableCounter current;<br>        ImmutableCounter updated;<br>        <span class="hljs-keyword">do</span> &#123;<br>            current = counterRef.get();<br>            updated = <span class="hljs-keyword">new</span> ImmutableCounter(current.getValue() + <span class="hljs-number">1</span>);<br>        &#125; <span class="hljs-keyword">while</span> (!counterRef.compareAndSet(current, updated));<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">getValue</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> counterRef.get().getValue();<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">final</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ImmutableCounter</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> value;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">ImmutableCounter</span><span class="hljs-params">(<span class="hljs-keyword">int</span> value)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.value = value;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">getValue</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> value;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>在这个例子中，<code>ImmutableCounter</code> 是不可变的，通过 <code>AtomicReference</code> 实现了线程安全的无锁计数器。</p>
+<h2 id="性能考量"><a href="#性能考量" class="headerlink" title="性能考量"></a>性能考量</h2><h3 id="减少同步开销"><a href="#减少同步开销" class="headerlink" title="减少同步开销"></a>减少同步开销</h3><p>由于不可变对象无需同步机制，避免了因锁竞争带来的性能瓶颈，特别是在高并发场景下，显著提升了系统的吞吐量。</p>
+<h3 id="提升缓存命中率"><a href="#提升缓存命中率" class="headerlink" title="提升缓存命中率"></a>提升缓存命中率</h3><p>不可变对象可以安全地被缓存和共享，提升了缓存命中率，减少了内存的重复使用。</p>
+<h3 id="优化内存管理"><a href="#优化内存管理" class="headerlink" title="优化内存管理"></a>优化内存管理</h3><p>由于不可变对象不会改变状态，垃圾回收器可以更高效地管理内存，减少了内存碎片。</p>
+<h3 id="增加对象创建的成本"><a href="#增加对象创建的成本" class="headerlink" title="增加对象创建的成本"></a>增加对象创建的成本</h3><p>需要注意的是，不可变对象在需要频繁创建新实例的场景下，可能会带来一定的性能开销。因此，在设计时需要权衡不可变性带来的好处与对象创建的成本，比如在读少写多的场景下，不可变设计可能会导致过多实例被创建，带来 <code>GC</code> 压力。</p>
+<h2 id="最佳实践"><a href="#最佳实践" class="headerlink" title="最佳实践"></a>最佳实践</h2><h3 id="尽量使用现有的不可变类"><a href="#尽量使用现有的不可变类" class="headerlink" title="尽量使用现有的不可变类"></a>尽量使用现有的不可变类</h3><p>Java 提供了许多不可变类，如 <code>String</code>、<code>Integer</code>、<code>LocalDate</code> 等，优先使用它们可以减少自定义不可变类的工作量。</p>
+<h3 id="合理设计不可变类"><a href="#合理设计不可变类" class="headerlink" title="合理设计不可变类"></a>合理设计不可变类</h3><p>确保不可变类的构造方法能够完全初始化所有字段，并避免在构造过程中泄露 <code>this</code> 引用。</p>
+<h3 id="结合其他线程安全机制"><a href="#结合其他线程安全机制" class="headerlink" title="结合其他线程安全机制"></a>结合其他线程安全机制</h3><p>在某些复杂场景下，可以将不可变对象与 <code>volatile</code> 或 <code>Atomic</code> 类结合使用，以实现更高效的并发控制。</p>
+<h3 id="使用不可变集合-1"><a href="#使用不可变集合-1" class="headerlink" title="使用不可变集合"></a>使用不可变集合</h3><p>尽量使用 Java 提供的不可变集合（如 <code>List.of()</code>, <code>Set.of()</code>），避免手动创建不可变集合，以减少错误。</p>
+<h3 id="避免过度使用"><a href="#避免过度使用" class="headerlink" title="避免过度使用"></a>避免过度使用</h3><p>虽然不可变对象有诸多优势，但在某些需要频繁修改状态的场景下，过度使用不可变对象可能导致性能下降。因此，应根据具体需求合理选择。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>不可变是 Java 并发编程里十分重要的设计思想之一。在多线程环境中，不可变对象具有天然线程安全、无需同步、容易共享等优势，可以显著简化程序逻辑并规避锁竞争、死锁等问题。但与此同时，也要意识到不可变对象在需要高频修改的场景下可能导致额外的对象创建开销。实际系统中，可以将不可变设计与其他并发模式结合使用，以平衡程序的可维护性和性能。通过合理地使用不可变对象（尤其是结合如 <code>AtomicReference</code> 这样的原子类），我们能够写出更简洁、更安全且运行效率更佳的并发程序。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/">Java并发编程</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/JavaSE/">JavaSE</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/">Java并发编程</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E4%B8%8D%E5%8F%AF%E5%8F%98%E8%AE%BE%E8%AE%A1/">不可变设计</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/08/15/javase-cp-aqs/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Java并发编程——AQS</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/08/09/javase-cp-nonlock/">
+                        <span class="hidden-mobile">Java并发编程——无锁</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

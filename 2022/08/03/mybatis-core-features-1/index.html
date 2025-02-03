@@ -1,0 +1,847 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="引言MyBatis作为一个强大的持久层框架，提供了面向接口编程的方法，通过动态代理技术，自动地生成接口实现，本文将对这一特点进行详细介绍。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MyBatis核心功能一">
+<meta property="og:url" content="http://example.com/2022/08/03/mybatis-core-features-1/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="引言MyBatis作为一个强大的持久层框架，提供了面向接口编程的方法，通过动态代理技术，自动地生成接口实现，本文将对这一特点进行详细介绍。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/mybatis.jpg">
+<meta property="article:published_time" content="2022-08-03T12:52:53.000Z">
+<meta property="article:modified_time" content="2022-08-03T12:52:53.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="MyBatis">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/mybatis.jpg">
+  
+  
+  <title>MyBatis核心功能一 - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/mybatis.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="MyBatis核心功能一">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-08-03 20:52" pubdate>
+        2022年8月3日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      54k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      90 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">MyBatis核心功能一</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：3 年前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>MyBatis作为一个强大的持久层框架，提供了面向接口编程的方法，通过动态代理技术，自动地生成接口实现，本文将对这一特点进行详细介绍。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  </p>
+<h2 id="面向接口编程"><a href="#面向接口编程" class="headerlink" title="面向接口编程"></a>面向接口编程</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>面向接口编程是一种常用的设计模式，在MyBatis中，可以定义一个Java接口，其中的每个方法对应于SQL映射文件中的一个SQL语句。MyBatis利用<strong>动态代理技术</strong>在运行时自动生成这些接口的实现类。开发者只需调用接口方法，即可执行对应的SQL操作。这种方法将接口定义与具体的SQL操作分离，使得代码更加整洁、易于管理和扩展。</p>
+<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><ol>
+<li><strong>接口定义</strong>：首先定义一个接口，声明所需的数据库操作，如插入、查询、更新和删除。</li>
+<li><strong>映射文件</strong>：为接口中的每个方法提供相应的SQL语句映射。这些映射定义在Mapper文件中，或通过注解直接在接口方法上指定。</li>
+<li><strong>SqlSessionFactory</strong>：通过配置信息，MyBatis构建一个<code>SqlSessionFactory</code>实例，这是创建SQL会话的工厂。</li>
+<li><strong>SqlSession</strong>：从<code>SqlSessionFactory</code>获取<code>SqlSession</code>，它是执行SQL命令的实际对象。</li>
+<li><strong>动态代理</strong>：当调用接口方法时，MyBatis会通过动态代理拦截这些调用，并根据方法名称匹配Mapper文件或注解中定义的 SQL 语句，执行数据库操作。</li>
+</ol>
+<h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><ul>
+<li><strong>解耦合</strong>：接口和SQL映射的分离使得业务逻辑和数据库操作代码解耦，提高了代码的可维护性。</li>
+<li><strong>简洁性</strong>：开发者只需通过调用接口方法来执行数据库操作，无需关心底层的SQL详情，代码更简洁。</li>
+<li><strong>易于维护</strong>：SQL语句集中管理，在Mapper文件或接口注解中修改SQL语句即可，无需修改业务代码。</li>
+<li><strong>灵活性</strong>：易于实现和切换不同的数据库操作逻辑，只需更改SQL映射即可，不影响业务逻辑层。</li>
+<li><strong>类型安全</strong>：由于使用Java接口，所有的操作都是类型安全的，减少了运行时错误。</li>
+</ul>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><ol>
+<li><p>以<code>tt_vehicle</code>为示例表，定义<code>DAO</code>接口<code>VehicleMapper.class</code>，这个接口包含了的各种操作如下</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">VehicleMapper</span> </span>&#123;<br><br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">addVehicle</span><span class="hljs-params">(VehiclePO vehiclePO)</span></span>;<br><br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">deleteVehicle</span><span class="hljs-params">(<span class="hljs-keyword">long</span> id)</span></span>;<br><br>    <span class="hljs-function">VehiclePO <span class="hljs-title">getVehicleById</span><span class="hljs-params">(<span class="hljs-keyword">long</span> id)</span></span>;<br><br>    <span class="hljs-function">List&lt;VehiclePO&gt; <span class="hljs-title">getAllVehicles</span><span class="hljs-params">()</span></span>;<br><br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">updateVehicle</span><span class="hljs-params">(VehiclePO vehiclePO)</span></span>;<br><br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>定义对应的Mapper文件<code>VehicleMapper.xml</code>，接口与Mapper文件之间通过<code>namespace</code>进行关联（<code>Mapper</code>文件的<code>namespace</code>=接口的全限定类名），SQL语句标签的<code>id</code>=接口方法名</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;</span><br><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-meta-keyword">mapper</span></span><br><span class="hljs-meta">        <span class="hljs-meta-keyword">PUBLIC</span> <span class="hljs-meta-string">&quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;</span></span><br><span class="hljs-meta">        <span class="hljs-meta-string">&quot;https://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">mapper</span> <span class="hljs-attr">namespace</span>=<span class="hljs-string">&quot;space.yangtao.mapper.VehicleMapper&quot;</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">insert</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;addVehicle&quot;</span> <span class="hljs-attr">parameterType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.VehiclePO&quot;</span>&gt;</span><br>        insert into tt_vehicle (product_name, vin, production_date, guide_price)<br>        values (#&#123;productName&#125;, #&#123;vin&#125;, #&#123;productionDate&#125;, #&#123;guidePrice&#125;)<br>    <span class="hljs-tag">&lt;/<span class="hljs-name">insert</span>&gt;</span><br>    <br>    <span class="hljs-tag">&lt;<span class="hljs-name">delete</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;deleteVehicle&quot;</span> <span class="hljs-attr">parameterType</span>=<span class="hljs-string">&quot;long&quot;</span>&gt;</span><br>        delete from tt_vehicle where id = #&#123;id&#125;<br>    <span class="hljs-tag">&lt;/<span class="hljs-name">delete</span>&gt;</span><br>    <br>    <span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getVehicleById&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.VehiclePO&quot;</span>&gt;</span><br>        select id              as id,<br>               product_name    as productName,<br>               vin             as vin,<br>               production_date as productionDate,<br>               guide_price     as guidePrice<br>        from tt_vehicle<br>        where id = #&#123;id&#125;<br>    <span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br>    <br>    <span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getAllVehicles&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.VehiclePO&quot;</span>&gt;</span><br>        select id              as id,<br>               product_name    as productName,<br>               vin             as vin,<br>               production_date as productionDate,<br>               guide_price     as guidePrice<br>        from tt_vehicle<br>    <span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br>    <br>    <span class="hljs-tag">&lt;<span class="hljs-name">update</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;updateVehicle&quot;</span> <span class="hljs-attr">parameterType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.VehiclePO&quot;</span>&gt;</span><br>        update tt_vehicle<br>        set product_name = #&#123;productName&#125;,<br>            vin = #&#123;vin&#125;,<br>            production_date = #&#123;productionDate&#125;,<br>            guide_price = #&#123;guidePrice&#125;<br>        where id = #&#123;id&#125;<br>    <span class="hljs-tag">&lt;/<span class="hljs-name">update</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">mapper</span>&gt;</span><br></code></pre></div></td></tr></table></figure></li>
+<li><p>使用时，不再通过<code>SqlSession</code>对象调用Mapper文件中的方法，而是通过<code>SqlSession</code>获取到对应的<strong>接口的代理对象</strong>，通过调用代理对象的方法，实现对Mapper文件中对应SQL的调用</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@TestMethodOrder(MethodOrderer.OrderAnnotation.class)</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">VehicleMapperTest</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> Logger log = LoggerFactory.getLogger(VehicleMapperTest.class);<br><br>    <span class="hljs-meta">@Test</span><br>    <span class="hljs-meta">@Order(1)</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">testAddVehicle</span><span class="hljs-params">()</span> </span>&#123;<br>        log.info(<span class="hljs-string">&quot;--- testAddVehicle start ---&quot;</span>);<br>        VehiclePO audiA6L = <span class="hljs-keyword">new</span> VehiclePO()<br>                .setProductName(<span class="hljs-string">&quot;Audi A6L&quot;</span>)<br>                .setVin(<span class="hljs-string">&quot;LVIN1&quot;</span>)<br>                .setProductionDate(LocalDate.now())<br>                .setGuidePrice(<span class="hljs-keyword">new</span> BigDecimal(<span class="hljs-string">&quot;450000&quot;</span>));<br>        VehiclePO bwm530Li = <span class="hljs-keyword">new</span> VehiclePO()<br>                .setProductName(<span class="hljs-string">&quot;BMW 530Li&quot;</span>)<br>                .setVin(<span class="hljs-string">&quot;LVIN2&quot;</span>)<br>                .setProductionDate(LocalDate.now())<br>                .setGuidePrice(<span class="hljs-keyword">new</span> BigDecimal(<span class="hljs-string">&quot;600000&quot;</span>));<br>        VehiclePO benzE300L = <span class="hljs-keyword">new</span> VehiclePO()<br>                .setProductName(<span class="hljs-string">&quot;Benz E300L&quot;</span>)<br>                .setVin(<span class="hljs-string">&quot;LVIN3&quot;</span>)<br>                .setProductionDate(LocalDate.now())<br>                .setGuidePrice(<span class="hljs-keyword">new</span> BigDecimal(<span class="hljs-string">&quot;500000&quot;</span>));<br>        SqlSession session = SqlSessionUtil.getSession();<br>        session.getMapper(VehicleMapper.class).addVehicle(audiA6L);<br>        session.getMapper(VehicleMapper.class).addVehicle(bwm530Li);<br>        session.getMapper(VehicleMapper.class).addVehicle(benzE300L);<br>        session.commit();<br>        log.info(<span class="hljs-string">&quot;--- testAddVehicle end ---&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-meta">@Test</span><br>    <span class="hljs-meta">@Order(2)</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">testGetVehicleById</span><span class="hljs-params">()</span> </span>&#123;<br>        log.info(<span class="hljs-string">&quot;--- testGetVehicleById start ---&quot;</span>);<br>        SqlSession session = SqlSessionUtil.getSession();<br>        VehiclePO vehiclePO = session.getMapper(VehicleMapper.class).getVehicleById(<span class="hljs-number">1L</span>);<br>        System.out.println(vehiclePO);<br>        log.info(<span class="hljs-string">&quot;--- testGetVehicleById end ---&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-meta">@Test</span><br>    <span class="hljs-meta">@Order(3)</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">testUpdateVehicle</span><span class="hljs-params">()</span> </span>&#123;<br>        log.info(<span class="hljs-string">&quot;--- testUpdateVehicle start ---&quot;</span>);<br>        VehiclePO vehiclePO = <span class="hljs-keyword">new</span> VehiclePO()<br>                .setId(<span class="hljs-number">1L</span>)<br>                .setProductName(<span class="hljs-string">&quot;Audi A6L&quot;</span>)<br>                .setVin(<span class="hljs-string">&quot;LVIN1&quot;</span>)<br>                .setProductionDate(LocalDate.now())<br>                .setGuidePrice(<span class="hljs-keyword">new</span> BigDecimal(<span class="hljs-string">&quot;450000&quot;</span>));<br>        SqlSession session = SqlSessionUtil.getSession();<br>        session.getMapper(VehicleMapper.class).updateVehicle(vehiclePO);<br>        session.commit();<br>        log.info(<span class="hljs-string">&quot;--- testUpdateVehicle end ---&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-meta">@Test</span><br>    <span class="hljs-meta">@Order(4)</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">testDeleteVehicle</span><span class="hljs-params">()</span> </span>&#123;<br>        log.info(<span class="hljs-string">&quot;--- testDeleteVehicle start ---&quot;</span>);<br>        SqlSession session = SqlSessionUtil.getSession();<br>        session.getMapper(VehicleMapper.class).deleteVehicle(<span class="hljs-number">1L</span>);<br>        session.commit();<br>        log.info(<span class="hljs-string">&quot;--- testDeleteVehicle end ---&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-meta">@Test</span><br>    <span class="hljs-meta">@Order(5)</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">testGetAllVehicles</span><span class="hljs-params">()</span> </span>&#123;<br>        log.info(<span class="hljs-string">&quot;--- testGetAllVehicles start ---&quot;</span>);<br>        SqlSession session = SqlSessionUtil.getSession();<br>        session.getMapper(VehicleMapper.class).getAllVehicles().forEach(System.out::println);<br>        log.info(<span class="hljs-string">&quot;--- testGetAllVehicles end ---&quot;</span>);<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>运行程序，控制台输出日志如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">21:01:57.345 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Opening JDBC Connection<br>21:01:58.177 [main] DEBUG o.apache.ibatis.datasource.pooled.PooledDataSource - Created connection 34073107.<br>21:01:58.177 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Setting autocommit to <span class="hljs-literal">false</span> on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@207ea13]<br>21:01:58.179 [main] DEBUG space.yangtao.mapper.VehicleMapper.addVehicle - ==&gt;  Preparing: insert into tt_vehicle (product_name, vin, production_date, guide_price) values (?, ?, ?, ?)<br>21:01:58.197 [main] DEBUG space.yangtao.mapper.VehicleMapper.addVehicle - ==&gt; Parameters: Audi A6L(String), LVIN1(String), 2024-07-18(LocalDate), 450000(BigDecimal)<br>21:01:58.204 [main] DEBUG space.yangtao.mapper.VehicleMapper.addVehicle - &lt;==    Updates: 1<br>21:01:58.213 [main] DEBUG space.yangtao.mapper.VehicleMapper.addVehicle - ==&gt;  Preparing: insert into tt_vehicle (product_name, vin, production_date, guide_price) values (?, ?, ?, ?)<br>21:01:58.214 [main] DEBUG space.yangtao.mapper.VehicleMapper.addVehicle - ==&gt; Parameters: BMW 530Li(String), LVIN2(String), 2024-07-18(LocalDate), 600000(BigDecimal)<br>21:01:58.215 [main] DEBUG space.yangtao.mapper.VehicleMapper.addVehicle - &lt;==    Updates: 1<br>21:01:58.215 [main] DEBUG space.yangtao.mapper.VehicleMapper.addVehicle - ==&gt;  Preparing: insert into tt_vehicle (product_name, vin, production_date, guide_price) values (?, ?, ?, ?)<br>21:01:58.215 [main] DEBUG space.yangtao.mapper.VehicleMapper.addVehicle - ==&gt; Parameters: Benz E300L(String), LVIN3(String), 2024-07-18(LocalDate), 500000(BigDecimal)<br>21:01:58.216 [main] DEBUG space.yangtao.mapper.VehicleMapper.addVehicle - &lt;==    Updates: 1<br>21:01:58.216 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Committing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@207ea13]<br>21:01:58.218 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Resetting autocommit to <span class="hljs-literal">true</span> on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@207ea13]<br>21:01:58.218 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Closing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@207ea13]<br>21:01:58.219 [main] DEBUG o.apache.ibatis.datasource.pooled.PooledDataSource - Returned connection 34073107 to pool.<br>21:01:58.219 [main] INFO  space.yangtao.client.VehicleMapperTest - --- testAddVehicle end ---<br>21:01:58.223 [main] INFO  space.yangtao.client.VehicleMapperTest - --- testGetVehicleById start ---<br>21:01:58.224 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Opening JDBC Connection<br>21:01:58.224 [main] DEBUG o.apache.ibatis.datasource.pooled.PooledDataSource - Checked out connection 34073107 from pool.<br>21:01:58.224 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Setting autocommit to <span class="hljs-literal">false</span> on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@207ea13]<br>21:01:58.225 [main] DEBUG space.yangtao.mapper.VehicleMapper.getVehicleById - ==&gt;  Preparing: select id as id, product_name as productName, vin as vin, production_date as productionDate, guide_price as guidePrice from tt_vehicle <span class="hljs-built_in">where</span> id = ?<br>21:01:58.226 [main] DEBUG space.yangtao.mapper.VehicleMapper.getVehicleById - ==&gt; Parameters: 1(Long)<br>21:01:58.235 [main] TRACE space.yangtao.mapper.VehicleMapper.getVehicleById - &lt;==    Columns: id, productName, vin, productionDate, guidePrice<br>21:01:58.236 [main] TRACE space.yangtao.mapper.VehicleMapper.getVehicleById - &lt;==        Row: 1, Audi A6L, LVIN1, 2024-07-18, 450000.00<br>21:01:58.238 [main] DEBUG space.yangtao.mapper.VehicleMapper.getVehicleById - &lt;==      Total: 1<br>VehiclePO(id=1, productName=Audi A6L, vin=LVIN1, productionDate=2024-07-18, guidePrice=450000.00)<br>21:01:58.240 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Resetting autocommit to <span class="hljs-literal">true</span> on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@207ea13]<br>21:01:58.240 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Closing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@207ea13]<br>21:01:58.240 [main] DEBUG o.apache.ibatis.datasource.pooled.PooledDataSource - Returned connection 34073107 to pool.<br>21:01:58.240 [main] INFO  space.yangtao.client.VehicleMapperTest - --- testGetVehicleById end ---<br>21:01:58.241 [main] INFO  space.yangtao.client.VehicleMapperTest - --- testUpdateVehicle start ---<br>21:01:58.242 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Opening JDBC Connection<br>21:01:58.242 [main] DEBUG o.apache.ibatis.datasource.pooled.PooledDataSource - Checked out connection 34073107 from pool.<br>21:01:58.242 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Setting autocommit to <span class="hljs-literal">false</span> on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@207ea13]<br>21:01:58.242 [main] DEBUG space.yangtao.mapper.VehicleMapper.updateVehicle - ==&gt;  Preparing: update tt_vehicle <span class="hljs-built_in">set</span> product_name = ?, vin = ?, production_date = ?, guide_price = ? <span class="hljs-built_in">where</span> id = ?<br>21:01:58.242 [main] DEBUG space.yangtao.mapper.VehicleMapper.updateVehicle - ==&gt; Parameters: Audi A6L(String), LVIN1(String), 2024-07-18(LocalDate), 450000(BigDecimal), 1(Long)<br>21:01:58.243 [main] DEBUG space.yangtao.mapper.VehicleMapper.updateVehicle - &lt;==    Updates: 1<br>21:01:58.243 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Committing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@207ea13]<br>21:01:58.244 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Resetting autocommit to <span class="hljs-literal">true</span> on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@207ea13]<br>21:01:58.244 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Closing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@207ea13]<br>21:01:58.244 [main] DEBUG o.apache.ibatis.datasource.pooled.PooledDataSource - Returned connection 34073107 to pool.<br>21:01:58.244 [main] INFO  space.yangtao.client.VehicleMapperTest - --- testUpdateVehicle end ---<br>21:01:58.245 [main] INFO  space.yangtao.client.VehicleMapperTest - --- testDeleteVehicle start ---<br>21:01:58.245 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Opening JDBC Connection<br>21:01:58.245 [main] DEBUG o.apache.ibatis.datasource.pooled.PooledDataSource - Checked out connection 34073107 from pool.<br>21:01:58.245 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Setting autocommit to <span class="hljs-literal">false</span> on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@207ea13]<br>21:01:58.246 [main] DEBUG space.yangtao.mapper.VehicleMapper.deleteVehicle - ==&gt;  Preparing: delete from tt_vehicle <span class="hljs-built_in">where</span> id = ?<br>21:01:58.246 [main] DEBUG space.yangtao.mapper.VehicleMapper.deleteVehicle - ==&gt; Parameters: 1(Long)<br>21:01:58.247 [main] DEBUG space.yangtao.mapper.VehicleMapper.deleteVehicle - &lt;==    Updates: 1<br>21:01:58.247 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Committing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@207ea13]<br>21:01:58.249 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Resetting autocommit to <span class="hljs-literal">true</span> on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@207ea13]<br>21:01:58.250 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Closing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@207ea13]<br>21:01:58.250 [main] DEBUG o.apache.ibatis.datasource.pooled.PooledDataSource - Returned connection 34073107 to pool.<br>21:01:58.250 [main] INFO  space.yangtao.client.VehicleMapperTest - --- testDeleteVehicle end ---<br>21:01:58.251 [main] INFO  space.yangtao.client.VehicleMapperTest - --- testGetAllVehicles start ---<br>21:01:58.251 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Opening JDBC Connection<br>21:01:58.251 [main] DEBUG o.apache.ibatis.datasource.pooled.PooledDataSource - Checked out connection 34073107 from pool.<br>21:01:58.252 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Setting autocommit to <span class="hljs-literal">false</span> on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@207ea13]<br>21:01:58.252 [main] DEBUG space.yangtao.mapper.VehicleMapper.getAllVehicles - ==&gt;  Preparing: select id as id, product_name as productName, vin as vin, production_date as productionDate, guide_price as guidePrice from tt_vehicle<br>21:01:58.253 [main] DEBUG space.yangtao.mapper.VehicleMapper.getAllVehicles - ==&gt; Parameters: <br>21:01:58.253 [main] TRACE space.yangtao.mapper.VehicleMapper.getAllVehicles - &lt;==    Columns: id, productName, vin, productionDate, guidePrice<br>21:01:58.253 [main] TRACE space.yangtao.mapper.VehicleMapper.getAllVehicles - &lt;==        Row: 2, BMW 530Li, LVIN2, 2024-07-18, 600000.00<br>21:01:58.253 [main] TRACE space.yangtao.mapper.VehicleMapper.getAllVehicles - &lt;==        Row: 3, Benz E300L, LVIN3, 2024-07-18, 500000.00<br>21:01:58.253 [main] DEBUG space.yangtao.mapper.VehicleMapper.getAllVehicles - &lt;==      Total: 2<br>VehiclePO(id=2, productName=BMW 530Li, vin=LVIN2, productionDate=2024-07-18, guidePrice=600000.00)<br>VehiclePO(id=3, productName=Benz E300L, vin=LVIN3, productionDate=2024-07-18, guidePrice=500000.00)<br>21:01:58.255 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Resetting autocommit to <span class="hljs-literal">true</span> on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@207ea13]<br>21:01:58.255 [main] DEBUG org.apache.ibatis.transaction.jdbc.JdbcTransaction - Closing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@207ea13]<br>21:01:58.255 [main] DEBUG o.apache.ibatis.datasource.pooled.PooledDataSource - Returned connection 34073107 to pool.<br>21:01:58.255 [main] INFO  space.yangtao.client.VehicleMapperTest - --- testGetAllVehicles end ---<br></code></pre></div></td></tr></table></figure>
+
+<p>由日志可以看出，SqlSession通过接口的动态代理对象已经实现了对Mapper文件中的SQL执行，并且在编码时分层清晰且可维护性高。</p>
+</li>
+</ol>
+<h2 id="占位符"><a href="#占位符" class="headerlink" title="占位符"></a>占位符</h2><h3 id="场景一"><a href="#场景一" class="headerlink" title="场景一"></a>场景一</h3><p><code>VehicleMapper.xml</code>中定义两个测试方法，都是以<code>VIN</code>为条件，分别用<code>#&#123;&#125;</code>和<code>$&#123;&#125;</code>传递参数</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;testD&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.VehiclePO&quot;</span>&gt;</span><br>    select id from tt_vehicle where vin = #&#123;vin&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;testE&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.VehiclePO&quot;</span>&gt;</span><br>    select id from tt_vehicle where vin = $&#123;vin&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+
+<p><code>VehicleMapper.class</code>中定义对应的接口方法</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function">List&lt;VehiclePO&gt; <span class="hljs-title">testD</span><span class="hljs-params">(String vin)</span></span>;<br><br><span class="hljs-function">List&lt;VehiclePO&gt; <span class="hljs-title">testE</span><span class="hljs-params">(String vin)</span></span>;<br></code></pre></div></td></tr></table></figure>
+
+<p>运行测试程序</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">SqlSession session = SqlSessionUtil.getSession();<br>VehicleMapper vehicleMapper = session.getMapper(VehicleMapper.class);<br>vehicleMapper.testD(<span class="hljs-string">&quot;LVIN1&quot;</span>);<br>vehicleMapper.testE(<span class="hljs-string">&quot;LVIN1&quot;</span>);<br></code></pre></div></td></tr></table></figure>
+
+<p>控制台输出日志如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">...<br>21:03:22.737 [main] DEBUG space.yangtao.mapper.VehicleMapper.testD - ==&gt;  Preparing: select id from tt_vehicle <span class="hljs-built_in">where</span> vin = ?<br>21:03:22.760 [main] DEBUG space.yangtao.mapper.VehicleMapper.testD - ==&gt; Parameters: LVIN1(String)<br>21:03:22.775 [main] DEBUG space.yangtao.mapper.VehicleMapper.testD - &lt;==      Total: 0<br>21:03:22.790 [main] DEBUG space.yangtao.mapper.VehicleMapper.testE - ==&gt;  Preparing: select id from tt_vehicle <span class="hljs-built_in">where</span> vin = LVIN1<br>21:03:22.790 [main] DEBUG space.yangtao.mapper.VehicleMapper.testE - ==&gt; Parameters: <br><br>org.apache.ibatis.exceptions.PersistenceException: <br><span class="hljs-comment">### Error querying database.  Cause: java.sql.SQLSyntaxErrorException: Unknown column &#x27;LVIN1&#x27; in &#x27;where clause&#x27;</span><br><span class="hljs-comment">### The error may exist in space/yangtao/mapper/VehicleMapper.xml</span><br><span class="hljs-comment">### The error may involve defaultParameterMap</span><br><span class="hljs-comment">### The error occurred while setting parameters</span><br><span class="hljs-comment">### SQL: select id from tt_vehicle where vin = LVIN1</span><br><span class="hljs-comment">### Cause: java.sql.SQLSyntaxErrorException: Unknown column &#x27;LVIN1&#x27; in &#x27;where clause&#x27;</span><br></code></pre></div></td></tr></table></figure>
+
+<p>由日志可知，方法执行<code>testD</code>方法时报错了，从日志的<code>SQL</code>条件看，两条语句中，使用<code>#&#123;&#125;</code>语句将<code>#&#123;&#125;</code>替换为了<code>?</code>，并通过预处理语句设置参数值，而<code>$&#123;&#125;</code>语句不使用预处理语句，而是直接将<code>$&#123;&#125;</code>替换为了参数值，SQL语句中对于字符串参数没有加引号<code>&#39;&#39;</code>，因此报错。</p>
+<h3 id="场景二"><a href="#场景二" class="headerlink" title="场景二"></a>场景二</h3><p><code>VehicleMapper.xml</code>中定义两个测试方法，查询参数为排序方式</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;testF&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.VehiclePO&quot;</span>&gt;</span><br>    select id from tt_vehicle order by production_date $&#123;order&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;testG&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.VehiclePO&quot;</span>&gt;</span><br>    select id from tt_vehicle order by production_date #&#123;order&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+
+<p><code>VehicleMapper.class</code>中定义对应的接口方法</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function">List&lt;VehiclePO&gt; <span class="hljs-title">testF</span><span class="hljs-params">(String vin)</span></span>;<br><br><span class="hljs-function">List&lt;VehiclePO&gt; <span class="hljs-title">testG</span><span class="hljs-params">(String vin)</span></span>;<br></code></pre></div></td></tr></table></figure>
+
+<p>运行测试程序</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">SqlSession session = SqlSessionUtil.getSession();<br>VehicleMapper vehicleMapper = session.getMapper(VehicleMapper.class);<br>vehicleMapper.testF(<span class="hljs-string">&quot;asc&quot;</span>);<br>vehicleMapper.testG(<span class="hljs-string">&quot;asc&quot;</span>);<br></code></pre></div></td></tr></table></figure>
+
+<p>控制台输出日志如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">...<br>21:06:25.044 [main] DEBUG space.yangtao.mapper.VehicleMapper.testF - ==&gt;  Preparing: select id from tt_vehicle order by production_date asc<br>21:06:25.063 [main] DEBUG space.yangtao.mapper.VehicleMapper.testF - ==&gt; Parameters: <br>21:06:25.080 [main] TRACE space.yangtao.mapper.VehicleMapper.testF - &lt;==    Columns: id<br>21:06:25.081 [main] TRACE space.yangtao.mapper.VehicleMapper.testF - &lt;==        Row: 2<br>21:06:25.082 [main] TRACE space.yangtao.mapper.VehicleMapper.testF - &lt;==        Row: 3<br>21:06:25.082 [main] DEBUG space.yangtao.mapper.VehicleMapper.testF - &lt;==      Total: 2<br>21:06:25.083 [main] DEBUG space.yangtao.mapper.VehicleMapper.testG - ==&gt;  Preparing: select id from tt_vehicle order by production_date ?<br>21:06:25.083 [main] DEBUG space.yangtao.mapper.VehicleMapper.testG - ==&gt; Parameters: asc(String)<br><br>org.apache.ibatis.exceptions.PersistenceException: <br><span class="hljs-comment">### Error querying database.  Cause: java.sql.SQLSyntaxErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near &#x27;&#x27;asc&#x27;&#x27; at line 1</span><br><span class="hljs-comment">### The error may exist in space/yangtao/mapper/VehicleMapper.xml</span><br><span class="hljs-comment">### The error may involve defaultParameterMap</span><br><span class="hljs-comment">### The error occurred while setting parameters</span><br><span class="hljs-comment">### SQL: select id from tt_vehicle order by production_date ?</span><br><span class="hljs-comment">### Cause: java.sql.SQLSyntaxErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near &#x27;&#x27;asc&#x27;&#x27; at line 1</span><br></code></pre></div></td></tr></table></figure>
+
+<p>由日志可知，方法在执行<code>testG</code>方法时报错了，从日志的<code>SQL</code>看，使用<code>$&#123;&#125;</code>传参的语句正确的实现了预想的功能，而<code>#&#123;&#125;</code>传参的语句使用了预处理，将MySQL关键字<code>asc</code>当成了参数，导致执行报错。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ol>
+<li><p><strong>预处理与直接替换</strong></p>
+<ul>
+<li><p><code>#&#123;&#125;</code>：使用预处理，安全地绑定变量。</p>
+</li>
+<li><p><code>$&#123;&#125;</code>：直接进行字符串替换，存在<code>SQL</code>注入的风险。</p>
+</li>
+</ul>
+</li>
+</ol>
+<ol start="2">
+<li><p><strong>应用场景</strong></p>
+<ul>
+<li><p><code>#&#123;&#125;</code>：对于大多数需要动态数据绑定的场景。</p>
+</li>
+<li><p><code>$&#123;&#125;</code>：可用于那些动态构建<code>SQL</code>语句的场景，如动态表名或动态列名或排序方式，但必须非常小心处理变量值，确保安全性。</p>
+</li>
+</ul>
+</li>
+</ol>
+<ol start="3">
+<li><p><strong>SQL 注入防御</strong></p>
+<ul>
+<li><p><code>#&#123;&#125;</code>：因为使用了预处理和参数绑定，能有效防止<code>SQL</code>注入。</p>
+</li>
+<li><p><code>$&#123;&#125;</code>：由于缺乏预处理，用户输入如果不被适当清理和限制，可能会引起<code>SQL</code>注入问题。</p>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="取别名"><a href="#取别名" class="headerlink" title="取别名"></a>取别名</h2><h3 id="简介-1"><a href="#简介-1" class="headerlink" title="简介"></a>简介</h3><p>在 MyBatis 中，<code>&lt;typeAliases&gt;</code>标签用于定义Java类型的别名，以便在配置文件和映射文件中简化对Java类的引用。通过使用别名，可以避免在XML配置中反复写出长的类名，从而使配置文件更加简洁易读。</p>
+<h3 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h3><ul>
+<li><strong>简化类名</strong>：为长的完全限定类名（FQCN）提供一个简短的名称，使得配置文件中的引用更加简洁。</li>
+<li><strong>提高可读性</strong>：通过使用别名，配置文件的可读性得到提高，配置更加直观。</li>
+<li><strong>配置灵活性</strong>：允许开发者自定义别名，根据项目的需要，映射任意的类名。</li>
+</ul>
+<h3 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h3><p>在<code>mybatis-config.xml</code>中，在<code>&lt;typeAliases&gt;</code>标签下取别名，别名可以在<code>Mapper</code>文件中使用</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">typeAliases</span>&gt;</span><br>    <br>    <span class="hljs-comment">&lt;!-- 单个自定义别名 --&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">typeAlias</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.VehiclePO&quot;</span> <span class="hljs-attr">alias</span>=<span class="hljs-string">&quot;VehiclePO&quot;</span>/&gt;</span><br>    <br>    <span class="hljs-comment">&lt;!-- 默认的别名机制，类的简名ownerPO，不区分大小写 --&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">typeAlias</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.OwnerPO&quot;</span>/&gt;</span><br>    <br>    <span class="hljs-comment">&lt;!-- 包下所有类批量起别名，规则为默认别名机制 --&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">package</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;space.yangtao.domain&quot;</span>/&gt;</span><br>    <br><span class="hljs-tag">&lt;/<span class="hljs-name">typeAliases</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+
+<p><strong>注意</strong>：</p>
+<ul>
+<li>别名默认不区分大小写，但可以在设置中，通过<code>caseSensitiveAliases</code>开启别名大小写敏感。</li>
+<li>如果不同的类使用相同的简单名称，自动扫描可能会引发冲突，此时需要为冲突的类指定具体的别名。</li>
+<li>使用别名时，确保别名的唯一性和一致性，避免在项目中引起混淆。</li>
+<li><code>namespace</code>不能取别名。</li>
+</ul>
+<h2 id="获取主键"><a href="#获取主键" class="headerlink" title="获取主键"></a>获取主键</h2><p>在许多开发场景中，插入一条数据库后，通常会希望的到新插入行自动生成的主键值，MyBatis中通过设置<code>Mapper</code>文件中对应的<code>insert</code>标签即可实现，如</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">insert</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;addVehicle&quot;</span> </span><br><span class="hljs-tag">        <span class="hljs-attr">parameterType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.VehiclePO&quot;</span> </span><br><span class="hljs-tag">        <span class="hljs-attr">useGeneratedKeys</span>=<span class="hljs-string">&quot;true&quot;</span> </span><br><span class="hljs-tag">        <span class="hljs-attr">keyProperty</span>=<span class="hljs-string">&quot;id&quot;</span>&gt;</span><br>    insert into tt_vehicle (product_name, vin, production_date, guide_price)<br>    values (#&#123;productName&#125;, #&#123;vin&#125;, #&#123;productionDate&#125;, #&#123;guidePrice&#125;)<br><span class="hljs-tag">&lt;/<span class="hljs-name">insert</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li><code>useGeneratedKeys</code>：是否使用自动生成的主键</li>
+<li><code>keyProperty</code>：生成的主键值赋值给对象的哪个属性</li>
+</ul>
+<p>运行测试程序</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">SqlSession session = SqlSessionUtil.getSession();<br>VehicleMapper vehicleMapper = session.getMapper(VehicleMapper.class);<br>VehiclePO vehiclePO = <span class="hljs-keyword">new</span> VehiclePO()<br>        .setProductName(<span class="hljs-string">&quot;Audi A6L&quot;</span>)<br>        .setVin(<span class="hljs-string">&quot;LVIN1&quot;</span>)<br>        .setProductionDate(LocalDate.now())<br>        .setGuidePrice(<span class="hljs-keyword">new</span> BigDecimal(<span class="hljs-string">&quot;450000&quot;</span>));<br>vehicleMapper.addVehicle(vehiclePO);<br>log.info(<span class="hljs-string">&quot;Generated key: &#123;&#125;&quot;</span>, vehiclePO.getId());<br></code></pre></div></td></tr></table></figure>
+
+<p>控制台输出日志如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">...<br>21:13:16.484 [main] DEBUG space.yangtao.mapper.VehicleMapper.addVehicle - ==&gt;  Preparing: insert into tt_vehicle (product_name, vin, production_date, guide_price) values (?, ?, ?, ?)<br>21:13:16.504 [main] DEBUG space.yangtao.mapper.VehicleMapper.addVehicle - ==&gt; Parameters: Audi A6L(String), LVIN1(String), 2024-07-18(LocalDate), 450000(BigDecimal)<br>21:13:16.507 [main] DEBUG space.yangtao.mapper.VehicleMapper.addVehicle - &lt;==    Updates: 1<br>21:13:16.515 [main] INFO  space.yangtao.client.VehicleMapperTest - Generated key: 4<br>...<br></code></pre></div></td></tr></table></figure>
+
+<p>由日志可知新插入数据的主键<code>ID</code>为4，经核查也与数据库中对应的主键<code>ID</code>一致。</p>
+<p><strong>拓展</strong>：本方式适用于支持自动生成主键的数据库（如MySQL的<code>AUTO_INCREMENT</code>）。对于不支持自动生成主键的数据库，需要使用<code>selectKey</code>标签来获取主键。</p>
+<h2 id="参数处理"><a href="#参数处理" class="headerlink" title="参数处理"></a>参数处理</h2><p>创建测试表<code>tt_student</code>，同时插入3条测试数据</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">CREATE TABLE `tt_student`<br>(<br>    `id`          bigint      NOT NULL AUTO_INCREMENT COMMENT &#x27;主键ID&#x27;,<br>    `name`        varchar(50) NOT NULL COMMENT &#x27;姓名&#x27;,<br>    `height`      double      NOT NULL COMMENT &#x27;身高（cm）&#x27;,<br>    `gender`      char        NOT NULL COMMENT &#x27;性别&#x27;,<br>    `birthday`    date        NOT NULL COMMENT &#x27;出生日期&#x27;,<br>    `create_time` datetime    NOT NULL default current_timestamp COMMENT &#x27;创建时间&#x27;,<br>    PRIMARY KEY (`id`)<br>) ENGINE = InnoDB<br>  AUTO_INCREMENT = 1<br>  DEFAULT CHARSET = utf8mb4 COMMENT =&#x27;学生表&#x27;;<br><br>INSERT INTO mybatis_db.tt_student (id, name, height, gender, birthday, create_time) VALUES (1, &#x27;zhangsan&#x27;, 176.1, &#x27;男&#x27;, &#x27;1990-01-01&#x27;, &#x27;2022-07-01 22:10:22&#x27;);<br>INSERT INTO mybatis_db.tt_student (id, name, height, gender, birthday, create_time) VALUES (2, &#x27;zhangsan1&#x27;, 180, &#x27;男&#x27;, &#x27;1990-01-01&#x27;, &#x27;2022-07-01 21:10:22&#x27;);<br>INSERT INTO mybatis_db.tt_student (id, name, height, gender, birthday, create_time) VALUES (3, &#x27;zhangsan2&#x27;, 180, &#x27;男&#x27;, &#x27;1990-01-01&#x27;, &#x27;2022-07-01 21:10:22&#x27;);<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="简单类型自动转换"><a href="#简单类型自动转换" class="headerlink" title="简单类型自动转换"></a>简单类型自动转换</h3><ul>
+<li>基本数据类型：byte、short、int、long、float、double、char</li>
+<li>基本数据类型包装类：Byte、Short、Integer、Long、Float、Double、Character</li>
+<li>字符串类型：String</li>
+<li>日期：java.util.Date、java.sql.Date、java.time.LocalDate、java.time.LocalDateTime</li>
+</ul>
+<p>在Mapper文件<code>StudentMapper.xml</code>中定义表<code>tt_student</code>对应的方法</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getById&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.StudentPO&quot;</span>&gt;</span><br>    select * from tt_student where id = #&#123;id&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getByName&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.StudentPO&quot;</span>&gt;</span><br>    select * from tt_student where name = #&#123;name&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getByHeight&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.StudentPO&quot;</span>&gt;</span><br>    select * from tt_student where height = #&#123;height&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getByGender&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.StudentPO&quot;</span>&gt;</span><br>    select * from tt_student where gender = #&#123;gender&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getByBirthday&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.StudentPO&quot;</span>&gt;</span><br>    select * from tt_student where birthday = #&#123;birthday&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getByCreateTime&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.StudentPO&quot;</span>&gt;</span><br>    select * from tt_student where create_Time = #&#123;createTime&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+
+<p>编写对应的接口方法</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function">StudentPO <span class="hljs-title">getById</span><span class="hljs-params">(Long id)</span></span>;<br><br><span class="hljs-function">List&lt;StudentPO&gt; <span class="hljs-title">getByName</span><span class="hljs-params">(String name)</span></span>;<br><br><span class="hljs-function">List&lt;StudentPO&gt; <span class="hljs-title">getByHeight</span><span class="hljs-params">(<span class="hljs-keyword">double</span> height)</span></span>;<br><br><span class="hljs-function">List&lt;StudentPO&gt; <span class="hljs-title">getByGender</span><span class="hljs-params">(<span class="hljs-keyword">char</span> gender)</span></span>;<br><br><span class="hljs-function">List&lt;StudentPO&gt; <span class="hljs-title">getByBirthday</span><span class="hljs-params">(Date birthday)</span></span>;<br><br><span class="hljs-function">List&lt;StudentPO&gt; <span class="hljs-title">getByCreateTime</span><span class="hljs-params">(Date createTime)</span></span>;<br><br><span class="hljs-function">List&lt;StudentPO&gt; <span class="hljs-title">getByBirthday2</span><span class="hljs-params">(LocalDate birthday)</span></span>;<br><br><span class="hljs-function">List&lt;StudentPO&gt; <span class="hljs-title">getByCreateTime2</span><span class="hljs-params">(LocalDateTime createTime2)</span></span>;<br></code></pre></div></td></tr></table></figure>
+
+<p>运行测试程序</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">SqlSession session = SqlSessionUtil.getSession();<br>StudentMapper studentMapper = session.getMapper(StudentMapper.class);<br>log.info(<span class="hljs-string">&quot;Long查询          students -&gt; &#123;&#125;&quot;</span>, studentMapper.getById(<span class="hljs-number">1L</span>));<br>log.info(<span class="hljs-string">&quot;String查询        students -&gt; &#123;&#125;&quot;</span>, studentMapper.getByName(<span class="hljs-string">&quot;zhangsan&quot;</span>));<br>log.info(<span class="hljs-string">&quot;double查询        students -&gt; &#123;&#125;&quot;</span>, studentMapper.getByHeight(<span class="hljs-number">176.1</span>));<br>log.info(<span class="hljs-string">&quot;char查询          students -&gt; &#123;&#125;&quot;</span>, studentMapper.getByGender(<span class="hljs-string">&#x27;男&#x27;</span>));<br>log.info(<span class="hljs-string">&quot;Date查询          students -&gt; &#123;&#125;&quot;</span>, studentMapper.getByBirthday(<span class="hljs-keyword">new</span> SimpleDateFormat(<span class="hljs-string">&quot;yyyy-MM-dd&quot;</span>).parse(<span class="hljs-string">&quot;1990-01-01&quot;</span>)));<br>log.info(<span class="hljs-string">&quot;Date查询          students -&gt; &#123;&#125;&quot;</span>, studentMapper.getByCreateTime(<span class="hljs-keyword">new</span> SimpleDateFormat(<span class="hljs-string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>).parse(<span class="hljs-string">&quot;2022-07-01 22:10:22&quot;</span>)));<br>log.info(<span class="hljs-string">&quot;LocalDate查询     students -&gt; &#123;&#125;&quot;</span>, studentMapper.getByBirthday2(LocalDate.of(<span class="hljs-number">1990</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>)));<br>log.info(<span class="hljs-string">&quot;LocalDateTime查询 students -&gt; &#123;&#125;&quot;</span>, studentMapper.getByCreateTime2(LocalDate.of(<span class="hljs-number">2022</span>, <span class="hljs-number">7</span>, <span class="hljs-number">1</span>).atTime(<span class="hljs-number">21</span>, <span class="hljs-number">10</span>, <span class="hljs-number">22</span>)));<br>session.close();<br></code></pre></div></td></tr></table></figure>
+
+<p>控制台输出日志如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">...<br>21:23:33.807 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ?<br>21:23:33.825 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt; Parameters: 1(Long)<br>21:23:33.837 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:23:33.838 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==        Row: 1, 1, zhangsan, 176.1, 男, 1990-01-01, 2022-07-01 22:10:22<br>21:23:33.839 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - &lt;==      Total: 1<br>21:23:33.840 [main] INFO  space.yangtao.client.StudentMapperTest - Long查询          students -&gt; StudentPO(id=1, name=zhangsan, height=176.1, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=null)<br>21:23:33.841 [main] DEBUG space.yangtao.mapper.StudentMapper - Cache Hit Ratio [space.yangtao.mapper.StudentMapper]: 0.0<br>21:23:33.841 [main] DEBUG space.yangtao.mapper.StudentMapper.getByName - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> name = ?<br>21:23:33.841 [main] DEBUG space.yangtao.mapper.StudentMapper.getByName - ==&gt; Parameters: zhangsan(String)<br>21:23:33.842 [main] TRACE space.yangtao.mapper.StudentMapper.getByName - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:23:33.842 [main] TRACE space.yangtao.mapper.StudentMapper.getByName - &lt;==        Row: 1, 1, zhangsan, 176.1, 男, 1990-01-01, 2022-07-01 22:10:22<br>21:23:33.842 [main] DEBUG space.yangtao.mapper.StudentMapper.getByName - &lt;==      Total: 1<br>21:23:33.843 [main] INFO  space.yangtao.client.StudentMapperTest - String查询        students -&gt; [StudentPO(id=1, name=zhangsan, height=176.1, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=null)]<br>21:23:33.843 [main] DEBUG space.yangtao.mapper.StudentMapper - Cache Hit Ratio [space.yangtao.mapper.StudentMapper]: 0.0<br>21:23:33.843 [main] DEBUG space.yangtao.mapper.StudentMapper.getByHeight - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> height = ?<br>21:23:33.843 [main] DEBUG space.yangtao.mapper.StudentMapper.getByHeight - ==&gt; Parameters: 176.1(Double)<br>21:23:33.844 [main] TRACE space.yangtao.mapper.StudentMapper.getByHeight - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:23:33.844 [main] TRACE space.yangtao.mapper.StudentMapper.getByHeight - &lt;==        Row: 1, 1, zhangsan, 176.1, 男, 1990-01-01, 2022-07-01 22:10:22<br>21:23:33.846 [main] DEBUG space.yangtao.mapper.StudentMapper.getByHeight - &lt;==      Total: 1<br>21:23:33.846 [main] INFO  space.yangtao.client.StudentMapperTest - double查询        students -&gt; [StudentPO(id=1, name=zhangsan, height=176.1, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=null)]<br>21:23:33.846 [main] DEBUG space.yangtao.mapper.StudentMapper - Cache Hit Ratio [space.yangtao.mapper.StudentMapper]: 0.0<br>21:23:33.846 [main] DEBUG space.yangtao.mapper.StudentMapper.getByGender - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> gender = ?<br>21:23:33.846 [main] DEBUG space.yangtao.mapper.StudentMapper.getByGender - ==&gt; Parameters: 男(String)<br>21:23:33.847 [main] TRACE space.yangtao.mapper.StudentMapper.getByGender - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:23:33.847 [main] TRACE space.yangtao.mapper.StudentMapper.getByGender - &lt;==        Row: 1, 1, zhangsan, 176.1, 男, 1990-01-01, 2022-07-01 22:10:22<br>21:23:33.847 [main] TRACE space.yangtao.mapper.StudentMapper.getByGender - &lt;==        Row: 2, 2, zhangsan1, 180.0, 男, 1990-01-01, 2022-07-01 21:10:22<br>21:23:33.848 [main] TRACE space.yangtao.mapper.StudentMapper.getByGender - &lt;==        Row: 3, 2, zhangsan2, 180.0, 男, 1990-01-01, 2022-07-01 21:10:22<br>21:23:33.848 [main] DEBUG space.yangtao.mapper.StudentMapper.getByGender - &lt;==      Total: 3<br>21:23:33.848 [main] INFO  space.yangtao.client.StudentMapperTest - char查询          students -&gt; [StudentPO(id=1, name=zhangsan, height=176.1, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=null), StudentPO(id=2, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=null), StudentPO(id=3, name=zhangsan2, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=null)]<br>21:23:33.848 [main] DEBUG space.yangtao.mapper.StudentMapper - Cache Hit Ratio [space.yangtao.mapper.StudentMapper]: 0.0<br>21:23:33.849 [main] DEBUG space.yangtao.mapper.StudentMapper.getByBirthday - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> birthday = ?<br>21:23:33.855 [main] DEBUG space.yangtao.mapper.StudentMapper.getByBirthday - ==&gt; Parameters: 1990-01-01 00:00:00.0(Timestamp)<br>21:23:33.856 [main] TRACE space.yangtao.mapper.StudentMapper.getByBirthday - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:23:33.856 [main] TRACE space.yangtao.mapper.StudentMapper.getByBirthday - &lt;==        Row: 1, 1, zhangsan, 176.1, 男, 1990-01-01, 2022-07-01 22:10:22<br>21:23:33.857 [main] TRACE space.yangtao.mapper.StudentMapper.getByBirthday - &lt;==        Row: 2, 2, zhangsan1, 180.0, 男, 1990-01-01, 2022-07-01 21:10:22<br>21:23:33.857 [main] TRACE space.yangtao.mapper.StudentMapper.getByBirthday - &lt;==        Row: 3, 2, zhangsan2, 180.0, 男, 1990-01-01, 2022-07-01 21:10:22<br>21:23:33.858 [main] DEBUG space.yangtao.mapper.StudentMapper.getByBirthday - &lt;==      Total: 3<br>21:23:33.858 [main] INFO  space.yangtao.client.StudentMapperTest - Date查询          students -&gt; [StudentPO(id=1, name=zhangsan, height=176.1, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=null), StudentPO(id=2, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=null), StudentPO(id=3, name=zhangsan2, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=null)]<br>21:23:33.858 [main] DEBUG space.yangtao.mapper.StudentMapper - Cache Hit Ratio [space.yangtao.mapper.StudentMapper]: 0.0<br>21:23:33.858 [main] DEBUG space.yangtao.mapper.StudentMapper.getByCreateTime - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> create_Time = ?<br>21:23:33.858 [main] DEBUG space.yangtao.mapper.StudentMapper.getByCreateTime - ==&gt; Parameters: 2022-07-01 22:10:22.0(Timestamp)<br>21:23:33.859 [main] TRACE space.yangtao.mapper.StudentMapper.getByCreateTime - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:23:33.860 [main] TRACE space.yangtao.mapper.StudentMapper.getByCreateTime - &lt;==        Row: 1, 1, zhangsan, 176.1, 男, 1990-01-01, 2022-07-01 22:10:22<br>21:23:33.861 [main] DEBUG space.yangtao.mapper.StudentMapper.getByCreateTime - &lt;==      Total: 1<br>21:23:33.861 [main] INFO  space.yangtao.client.StudentMapperTest - Date查询          students -&gt; [StudentPO(id=1, name=zhangsan, height=176.1, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=null)]<br>21:23:33.861 [main] DEBUG space.yangtao.mapper.StudentMapper - Cache Hit Ratio [space.yangtao.mapper.StudentMapper]: 0.0<br>21:23:33.861 [main] DEBUG space.yangtao.mapper.StudentMapper.getByBirthday2 - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> birthday = ?<br>21:23:33.862 [main] DEBUG space.yangtao.mapper.StudentMapper.getByBirthday2 - ==&gt; Parameters: 1990-01-01(LocalDate)<br>21:23:33.863 [main] TRACE space.yangtao.mapper.StudentMapper.getByBirthday2 - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:23:33.863 [main] TRACE space.yangtao.mapper.StudentMapper.getByBirthday2 - &lt;==        Row: 1, 1, zhangsan, 176.1, 男, 1990-01-01, 2022-07-01 22:10:22<br>21:23:33.863 [main] TRACE space.yangtao.mapper.StudentMapper.getByBirthday2 - &lt;==        Row: 2, 2, zhangsan1, 180.0, 男, 1990-01-01, 2022-07-01 21:10:22<br>21:23:33.863 [main] TRACE space.yangtao.mapper.StudentMapper.getByBirthday2 - &lt;==        Row: 3, 2, zhangsan2, 180.0, 男, 1990-01-01, 2022-07-01 21:10:22<br>21:23:33.863 [main] DEBUG space.yangtao.mapper.StudentMapper.getByBirthday2 - &lt;==      Total: 3<br>21:23:33.863 [main] INFO  space.yangtao.client.StudentMapperTest - LocalDate查询     students -&gt; [StudentPO(id=1, name=zhangsan, height=176.1, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=null), StudentPO(id=2, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=null), StudentPO(id=3, name=zhangsan2, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=null)]<br>21:23:33.864 [main] DEBUG space.yangtao.mapper.StudentMapper - Cache Hit Ratio [space.yangtao.mapper.StudentMapper]: 0.0<br>21:23:33.864 [main] DEBUG s.yangtao.mapper.StudentMapper.getByCreateTime2 - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> create_Time = ?<br>21:23:33.865 [main] DEBUG s.yangtao.mapper.StudentMapper.getByCreateTime2 - ==&gt; Parameters: 2022-07-01T21:10:22(LocalDateTime)<br>21:23:33.866 [main] TRACE s.yangtao.mapper.StudentMapper.getByCreateTime2 - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:23:33.866 [main] TRACE s.yangtao.mapper.StudentMapper.getByCreateTime2 - &lt;==        Row: 2, 2, zhangsan1, 180.0, 男, 1990-01-01, 2022-07-01 21:10:22<br>21:23:33.866 [main] TRACE s.yangtao.mapper.StudentMapper.getByCreateTime2 - &lt;==        Row: 3, 2, zhangsan2, 180.0, 男, 1990-01-01, 2022-07-01 21:10:22<br>21:23:33.866 [main] DEBUG s.yangtao.mapper.StudentMapper.getByCreateTime2 - &lt;==      Total: 2<br>21:23:33.866 [main] INFO  space.yangtao.client.StudentMapperTest - LocalDateTime查询 students -&gt; [StudentPO(id=2, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=null), StudentPO(id=3, name=zhangsan2, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=null)]<br>...<br></code></pre></div></td></tr></table></figure>
+
+<p>根据日志可知，MyBatis自身有类型推断机制，对于简单数据类型和常用的时间日期类型可自动转换映射。</p>
+<p>除了类型推断，还可以在Mapper中通过<code>parameterType</code>指定参数类型，如</p>
+<ol>
+<li><p>通过全限定类名指定类型</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getById&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.StudentPO&quot;</span> <span class="hljs-attr">parameterType</span>=<span class="hljs-string">&quot;java.lang.Long&quot;</span>&gt;</span><br>    select * from tt_student where id = #&#123;id&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br></code></pre></div></td></tr></table></figure></li>
+<li><p>通过MyBatis的默认别名转换</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-comment">&lt;!-- java.lang.String类型的默认别名为string --&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getByName&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.StudentPO&quot;</span> <span class="hljs-attr">parameterType</span>=<span class="hljs-string">&quot;string&quot;</span>&gt;</span><br>    select * from tt_student where name = #&#123;name&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br><br><span class="hljs-comment">&lt;!-- Java基本数据类型double的默认别名为_double --&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getByHeight&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.StudentPO&quot;</span> <span class="hljs-attr">parameterType</span>=<span class="hljs-string">&quot;_double&quot;</span>&gt;</span><br>    select * from tt_student where height = #&#123;height&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br></code></pre></div></td></tr></table></figure></li>
+<li><p>在<code>#&#123;&#125;</code>中通过属性<code>javaType</code>指定Java的参数类型，通过属性<code>jdbcType</code>指定MySQL表字段的参数类型</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getByGender&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.StudentPO&quot;</span>&gt;</span><br>    select * from tt_student where gender = #&#123;gender, javaType=Character, jdbcType=C23 AR&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span>123456789 -<br></code></pre></div></td></tr></table></figure></li>
+</ol>
+<h3 id="对象或Map类型参数"><a href="#对象或Map类型参数" class="headerlink" title="对象或Map类型参数"></a>对象或Map类型参数</h3><p>在MyBatis Mapper中还支持将所有的参数都封装到一个实体对象或Map数据结构中，其中对象属性名或Map的key必须与<code>#&#123;param&#125;</code>中的参数名一致。</p>
+<p>在Mapper中定义查询语句</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getByObj&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.StudentPO&quot;</span>&gt;</span><br>    select * from tt_student where id = #&#123;id&#125; and name = #&#123;name&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getByMap&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.StudentPO&quot;</span>&gt;</span><br>    select * from tt_student where id = #&#123;id&#125; and name = #&#123;name&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+
+<p>定义对应的接口方法</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function">List&lt;StudentPO&gt; <span class="hljs-title">getByObj</span><span class="hljs-params">(StudentPO studentPO)</span></span>;<br><br><span class="hljs-function">List&lt;StudentPO&gt; <span class="hljs-title">getByMap</span><span class="hljs-params">(Map&lt;String, Object&gt; map)</span></span>;<br></code></pre></div></td></tr></table></figure>
+
+<p>运行测试程序</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">SqlSession session = SqlSessionUtil.getSession();<br>StudentMapper studentMapper = session.getMapper(StudentMapper.class);<br>StudentPO zhangsan = <span class="hljs-keyword">new</span> StudentPO().setId(<span class="hljs-number">1L</span>).setName(<span class="hljs-string">&quot;zhangsan&quot;</span>);<br>log.info(<span class="hljs-string">&quot;Obj查询 students -&gt; &#123;&#125;&quot;</span>, studentMapper.getByObj(zhangsan));<br>HashMap&lt;String, Object&gt; params = <span class="hljs-keyword">new</span> HashMap&lt;String, Object&gt;() &#123;&#123;<br>    put(<span class="hljs-string">&quot;id&quot;</span>, <span class="hljs-number">1L</span>);<br>    put(<span class="hljs-string">&quot;name&quot;</span>, <span class="hljs-string">&quot;zhangsan&quot;</span>);<br>&#125;&#125;;<br>log.info(<span class="hljs-string">&quot;Map查询 students -&gt; &#123;&#125;&quot;</span>, studentMapper.getByMap(params));<br></code></pre></div></td></tr></table></figure>
+
+<p>控制台输出日志如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">...<br>21:42:00.498 [main] DEBUG space.yangtao.mapper.StudentMapper.getByObj - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ? and name = ?<br>21:42:00.515 [main] DEBUG space.yangtao.mapper.StudentMapper.getByObj - ==&gt; Parameters: 1(Long), zhangsan(String)<br>21:42:00.527 [main] TRACE space.yangtao.mapper.StudentMapper.getByObj - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:42:00.528 [main] TRACE space.yangtao.mapper.StudentMapper.getByObj - &lt;==        Row: 1, 1, zhangsan, 176.1, 男, 1990-01-01, 2022-07-01 22:10:22<br>21:42:00.530 [main] DEBUG space.yangtao.mapper.StudentMapper.getByObj - &lt;==      Total: 1<br>21:42:00.531 [main] INFO  space.yangtao.client.StudentMapperTest - Obj查询 students -&gt; [StudentPO(id=1, name=zhangsan, height=176.1, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=null)]<br>21:42:00.533 [main] DEBUG space.yangtao.mapper.StudentMapper - Cache Hit Ratio [space.yangtao.mapper.StudentMapper]: 0.0<br>21:42:00.533 [main] DEBUG space.yangtao.mapper.StudentMapper.getByMap - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ? and name = ?<br>21:42:00.533 [main] DEBUG space.yangtao.mapper.StudentMapper.getByMap - ==&gt; Parameters: 1(Long), zhangsan(String)<br>21:42:00.534 [main] TRACE space.yangtao.mapper.StudentMapper.getByMap - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:42:00.534 [main] TRACE space.yangtao.mapper.StudentMapper.getByMap - &lt;==        Row: 1, 1, zhangsan, 176.1, 男, 1990-01-01, 2022-07-01 22:10:22<br>21:42:00.535 [main] DEBUG space.yangtao.mapper.StudentMapper.getByMap - &lt;==      Total: 1<br>21:42:00.535 [main] INFO  space.yangtao.client.StudentMapperTest - Map查询 students -&gt; [StudentPO(id=1, name=zhangsan, height=176.1, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=null)]<br>...<br></code></pre></div></td></tr></table></figure>
+
+<p>由日志可知，Mapper已正确接收接口传递的参数。</p>
+<h3 id="多参数"><a href="#多参数" class="headerlink" title="多参数"></a>多参数</h3><p>在mapper中定义查询方法如下，其中参数占位符为<code>#&#123;id&#125;</code>和<code>#&#123;name&#125;</code></p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getByMultipleParams&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.StudentPO&quot;</span>&gt;</span><br>    select * from tt_student where id = #&#123;id&#125; and name = #&#123;name&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+
+<p>定义对应的接口方法</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function">List&lt;StudentPO&gt; <span class="hljs-title">getByMultipleParams</span><span class="hljs-params">(Long id, String name)</span></span>;<br></code></pre></div></td></tr></table></figure>
+
+<p>运行测试程序</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">SqlSession session = SqlSessionUtil.getSession();<br>StudentMapper studentMapper = session.getMapper(StudentMapper.class);<br>log.info(<span class="hljs-string">&quot;多个参数查询 students -&gt; &#123;&#125;&quot;</span>, studentMapper.getByMultipleParams(<span class="hljs-number">1L</span>, <span class="hljs-string">&quot;zhangsan&quot;</span>));<br></code></pre></div></td></tr></table></figure>
+
+<p>控制台输出日志如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">org.apache.ibatis.exceptions.PersistenceException: <br><span class="hljs-comment">### Error querying database.  Cause: org.apache.ibatis.binding.BindingException: Parameter &#x27;id&#x27; not found. Available parameters are [arg1, arg0, param1, param2]</span><br><span class="hljs-comment">### Cause: org.apache.ibatis.binding.BindingException: Parameter &#x27;id&#x27; not found. Available parameters are [arg1, arg0, param1, param2]</span><br></code></pre></div></td></tr></table></figure>
+
+<p>程序运行出现异常，由日志可知异常原因是没有找到名为<code>id</code>的参数，支持的参数有<code>arg1</code>、<code>arg0</code>、<code>param1</code>、<code>param2</code>，因此修改Mapper文件如下</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getByMultipleParams&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.StudentPO&quot;</span>&gt;</span><br>    select * from tt_student where id = #&#123;arg0&#125; and name = #&#123;arg1&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+
+<p>再次运行，控制台输出日志如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">...<br>21:46:20.044 [main] DEBUG s.yangtao.mapper.StudentMapper.getByMultipleParams - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ? and name = ?<br>21:46:20.062 [main] DEBUG s.yangtao.mapper.StudentMapper.getByMultipleParams - ==&gt; Parameters: 1(Long), zhangsan(String)<br>21:46:20.074 [main] TRACE s.yangtao.mapper.StudentMapper.getByMultipleParams - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:46:20.075 [main] TRACE s.yangtao.mapper.StudentMapper.getByMultipleParams - &lt;==        Row: 1, 1, zhangsan, 176.1, 男, 1990-01-01, 2022-07-01 22:10:22<br>21:46:20.076 [main] DEBUG s.yangtao.mapper.StudentMapper.getByMultipleParams - &lt;==      Total: 1<br>21:46:20.077 [main] INFO  space.yangtao.client.StudentMapperTest - 多个参数查询 students -&gt; [StudentPO(id=1, name=zhangsan, height=176.1, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=null)]<br>...<br></code></pre></div></td></tr></table></figure>
+
+<p>由日志可知，方法执行成功，查找到了需要的数据，此外<code>arg0</code>和<code>arg1</code>还可以分别替换为<code>param1</code>和<code>param2</code>，如</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getByMultipleParams&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.StudentPO&quot;</span>&gt;</span><br>    select * from tt_student where id = #&#123;param1&#125; and name = #&#123;param2&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+
+<p>之所以要通过指定的参数，是因为MyBatis底层会自动将多个简单参数封装到一个Map型数据结构中，逻辑类似于</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">Map&lt;String, Object&gt; params = <span class="hljs-keyword">new</span> HashMap&lt;String, Object&gt;() &#123;&#123;<br>    put(<span class="hljs-string">&quot;arg0&quot;</span>, 第一个参数值);<br>    put(<span class="hljs-string">&quot;param1&quot;</span>, 第一个参数值);<br>    put(<span class="hljs-string">&quot;arg1&quot;</span>, 第二个参数值);<br>    put(<span class="hljs-string">&quot;param2&quot;</span>, 第二个参数值);<br>&#125;&#125;;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="Param命名参数"><a href="#Param命名参数" class="headerlink" title="@Param命名参数"></a>@Param命名参数</h3><p>上面提到的多参数，MyBatis默认创建key为<code>arg0... param1...</code>的Map型数据结构，MyBatis提供了<code>@Param</code>注解，用于指定Mapper接口参数的名称，方便在SQl语句中引用这些参数。</p>
+<p>定义SQL如下，其中参数占位符为<code>#&#123;id&#125;</code>和<code>#&#123;name&#125;</code></p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getByParamAnno&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.StudentPO&quot;</span>&gt;</span><br>    select * from tt_student where id = #&#123;id&#125; and name = #&#123;name&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+
+<p>定义对应的接口方法</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function">List&lt;StudentPO&gt; <span class="hljs-title">getByParamAnno</span><span class="hljs-params">(<span class="hljs-meta">@Param(&quot;id&quot;)</span> Long id, <span class="hljs-meta">@Param(&quot;name&quot;)</span> String name)</span></span>;<br></code></pre></div></td></tr></table></figure>
+
+<p>运行测试程序</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">SqlSession session = SqlSessionUtil.getSession();<br>StudentMapper studentMapper = session.getMapper(StudentMapper.class);<br>log.info(<span class="hljs-string">&quot;Param注解查询 students -&gt; &#123;&#125;&quot;</span>, studentMapper.getByParamAnno(<span class="hljs-number">1L</span>, <span class="hljs-string">&quot;zhangsan&quot;</span>));<br></code></pre></div></td></tr></table></figure>
+
+<p>控制台输出日志如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">...<br>21:50:05.710 [main] DEBUG space.yangtao.mapper.StudentMapper.getByParamAnno - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ? and name = ?<br>21:50:05.728 [main] DEBUG space.yangtao.mapper.StudentMapper.getByParamAnno - ==&gt; Parameters: 1(Long), zhangsan(String)<br>21:50:05.743 [main] TRACE space.yangtao.mapper.StudentMapper.getByParamAnno - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:50:05.744 [main] TRACE space.yangtao.mapper.StudentMapper.getByParamAnno - &lt;==        Row: 1, 1, zhangsan, 176.1, 男, 1990-01-01, 2022-07-01 22:10:22<br>21:50:05.745 [main] DEBUG space.yangtao.mapper.StudentMapper.getByParamAnno - &lt;==      Total: 1<br>21:50:05.747 [main] INFO  space.yangtao.client.StudentMapperTest - Param注解查询 students -&gt; [StudentPO(id=1, name=zhangsan, height=176.1, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=null)]<br>...<br></code></pre></div></td></tr></table></figure>
+
+<p>由日志可知，<code>@Param</code>已经将MyBatis默认的参数命名替换成了<code>id</code>和<code>name</code>。</p>
+<p>除此之外，<code>@Param</code>还可以应用于实体对象以及Map类型参数，甚至还可以使接口同时支持多个这种复杂参数。</p>
+<p>在Mapper中指定了id对应参数为<code>#&#123;map1.id&#125;</code>，name对应参数为<code>#&#123;map2.name&#125;</code></p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getByMapAndObj&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.StudentPO&quot;</span>&gt;</span><br>    select * from tt_student where id = #&#123;map.id&#125; and name = #&#123;obj.name&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+
+<p>对应的接口方法中也指定参数的<code>@Param</code>值</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function">List&lt;StudentPO&gt; <span class="hljs-title">getByMapAndObj</span><span class="hljs-params">(<span class="hljs-meta">@Param(&quot;map&quot;)</span> Map&lt;String, Object&gt; map1, <span class="hljs-meta">@Param(&quot;obj&quot;)</span> StudentPO studentPO)</span></span>;<br></code></pre></div></td></tr></table></figure>
+
+<p>测试测试程序</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">SqlSession session = SqlSessionUtil.getSession();<br>StudentMapper studentMapper = session.getMapper(StudentMapper.class);<br>HashMap&lt;String, Object&gt; map = <span class="hljs-keyword">new</span> HashMap&lt;String, Object&gt;() &#123;&#123;<br>    put(<span class="hljs-string">&quot;id&quot;</span>, <span class="hljs-number">1L</span>);<br>&#125;&#125;;<br>StudentPO studentPO = <span class="hljs-keyword">new</span> StudentPO().setName(<span class="hljs-string">&quot;zhangsan&quot;</span>);<br>log.info(<span class="hljs-string">&quot;多个复杂参数查询 students -&gt; &#123;&#125;&quot;</span>, studentMapper.getByMapAndObj(map, studentPO));<br></code></pre></div></td></tr></table></figure>
+
+<p>控制台输出日志如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">...<br>21:52:37.851 [main] DEBUG space.yangtao.mapper.StudentMapper.getByMapAndObj - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ? and name = ?<br>21:52:37.871 [main] DEBUG space.yangtao.mapper.StudentMapper.getByMapAndObj - ==&gt; Parameters: 1(Long), zhangsan(String)<br>21:52:37.885 [main] TRACE space.yangtao.mapper.StudentMapper.getByMapAndObj - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:52:37.886 [main] TRACE space.yangtao.mapper.StudentMapper.getByMapAndObj - &lt;==        Row: 1, 1, zhangsan, 176.1, 男, 1990-01-01, 2022-07-01 22:10:22<br>21:52:37.888 [main] DEBUG space.yangtao.mapper.StudentMapper.getByMapAndObj - &lt;==      Total: 1<br>21:52:37.889 [main] INFO  space.yangtao.client.StudentMapperTest - 多个复杂参数查询 students -&gt; [StudentPO(id=1, name=zhangsan, height=176.1, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=null)]<br>...<br></code></pre></div></td></tr></table></figure>
+
+<p>由日志可知，<code>@Param</code>注解支持为多个参数进行不同的命名。</p>
+<p>在实际开发中，对于复杂参数，应明确使用<code>@Param</code>参数注解，特别是在团队协作和代码审查时，有助于避免参数混淆。</p>
+<h2 id="返回值处理"><a href="#返回值处理" class="headerlink" title="返回值处理"></a>返回值处理</h2><h3 id="单个对象"><a href="#单个对象" class="headerlink" title="单个对象"></a>单个对象</h3><p>单个对象可以通过实体对象或Map接收Mapper SQL的返回值。</p>
+<p>在mapper中定义查询方法</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getById&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.StudentPO&quot;</span> <span class="hljs-attr">parameterType</span>=<span class="hljs-string">&quot;java.lang.Long&quot;</span>&gt;</span><br>    select * from tt_student where id = #&#123;id&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getById2&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;map&quot;</span> <span class="hljs-attr">parameterType</span>=<span class="hljs-string">&quot;java.lang.Long&quot;</span>&gt;</span><br>    select * from tt_student where id = #&#123;id&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+
+<p>定义对应的接口方法</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function">StudentPO <span class="hljs-title">getById</span><span class="hljs-params">(Long id)</span></span>;<br><br><span class="hljs-function">Map&lt;String, Object&gt; <span class="hljs-title">getById2</span><span class="hljs-params">(Long id)</span></span>;<br></code></pre></div></td></tr></table></figure>
+
+<p>运行测试程序</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">SqlSession session = SqlSessionUtil.getSession();<br>StudentMapper studentMapper = session.getMapper(StudentMapper.class);<br>log.info(<span class="hljs-string">&quot;单个实体对象接收返回值：&#123;&#125;&quot;</span>, studentMapper.getById(<span class="hljs-number">1L</span>));<br>log.info(<span class="hljs-string">&quot;单个Map对象接收返回值：&#123;&#125;&quot;</span>, studentMapper.getById2(<span class="hljs-number">1L</span>));<br></code></pre></div></td></tr></table></figure>
+
+<p>控制台输出日志如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">...<br>21:55:37.437 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ?<br>21:55:37.454 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt; Parameters: 1(Long)<br>21:55:37.469 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:55:37.471 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==        Row: 1, 1, zhangsan, 176.1, 男, 1990-01-01, 2022-07-01 22:10:22<br>21:55:37.472 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - &lt;==      Total: 1<br>21:55:37.474 [main] INFO  space.yangtao.client.StudentMapperTest - 单个实体对象接收返回值：StudentPO(id=1, name=zhangsan, height=176.1, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=null)<br>21:55:37.474 [main] DEBUG space.yangtao.mapper.StudentMapper - Cache Hit Ratio [space.yangtao.mapper.StudentMapper]: 0.0<br>21:55:37.474 [main] DEBUG space.yangtao.mapper.StudentMapper.getById2 - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ?<br>21:55:37.474 [main] DEBUG space.yangtao.mapper.StudentMapper.getById2 - ==&gt; Parameters: 1(Long)<br>21:55:37.475 [main] TRACE space.yangtao.mapper.StudentMapper.getById2 - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:55:37.476 [main] TRACE space.yangtao.mapper.StudentMapper.getById2 - &lt;==        Row: 1, 1, zhangsan, 176.1, 男, 1990-01-01, 2022-07-01 22:10:22<br>21:55:37.478 [main] DEBUG space.yangtao.mapper.StudentMapper.getById2 - &lt;==      Total: 1<br>21:55:37.478 [main] INFO  space.yangtao.client.StudentMapperTest - 单个Map对象接收返回值：&#123;birthday=1990-01-01, gender=男, create_time=2022-07-01T22:10:22, class_id=1, name=zhangsan, id=1, height=176.1&#125;<br>...<br></code></pre></div></td></tr></table></figure>
+
+<p>由日志可知，实体类和Map结构都能接收单行数据。</p>
+<h3 id="多个对象"><a href="#多个对象" class="headerlink" title="多个对象"></a>多个对象</h3><p>如果SQL查询可能存在多行，则在接口中需要通过集合来接收，如List数据结构</p>
+<p>在mapper定义查询方法</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getByIds&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.StudentPO&quot;</span>&gt;</span><br>    select * from tt_student where id in ($&#123;id&#125;)<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getByIds2&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;map&quot;</span>&gt;</span><br>    select * from tt_student where id in ($&#123;id&#125;)<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+
+<p>定义对应的接口方法</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function">List&lt;StudentPO&gt; <span class="hljs-title">getByIds</span><span class="hljs-params">(String ids)</span></span>;<br><br>List&lt;Map&lt;String, Object&gt;&gt; getByIds2(String ids);<br></code></pre></div></td></tr></table></figure>
+
+<p>运行测试程序</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">SqlSession session = SqlSessionUtil.getSession();<br>StudentMapper studentMapper = session.getMapper(StudentMapper.class);<br>String ids = <span class="hljs-string">&quot;1, 2&quot;</span>;<br>log.info(<span class="hljs-string">&quot;多个实体对象接收返回值：&#123;&#125;&quot;</span>, studentMapper.getByIds(ids));<br>log.info(<span class="hljs-string">&quot;多个Map对象接收返回值：&#123;&#125;&quot;</span>, studentMapper.getByIds2(ids));<br></code></pre></div></td></tr></table></figure>
+
+<p>控制台输出日志如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">...<br>21:58:05.240 [main] DEBUG space.yangtao.mapper.StudentMapper.getByIds - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id <span class="hljs-keyword">in</span> (1, 2)<br>21:58:05.256 [main] DEBUG space.yangtao.mapper.StudentMapper.getByIds - ==&gt; Parameters: <br>21:58:05.269 [main] TRACE space.yangtao.mapper.StudentMapper.getByIds - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:58:05.270 [main] TRACE space.yangtao.mapper.StudentMapper.getByIds - &lt;==        Row: 1, 1, zhangsan, 176.1, 男, 1990-01-01, 2022-07-01 22:10:22<br>21:58:05.272 [main] TRACE space.yangtao.mapper.StudentMapper.getByIds - &lt;==        Row: 2, 2, zhangsan1, 180.0, 男, 1990-01-01, 2022-07-01 21:10:22<br>21:58:05.272 [main] DEBUG space.yangtao.mapper.StudentMapper.getByIds - &lt;==      Total: 2<br>21:58:05.273 [main] INFO  space.yangtao.client.StudentMapperTest - 多个实体对象接收返回值：[StudentPO(id=1, name=zhangsan, height=176.1, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=null), StudentPO(id=2, name=zhangsan1, height=180.0, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=null)]<br>21:58:05.274 [main] DEBUG space.yangtao.mapper.StudentMapper - Cache Hit Ratio [space.yangtao.mapper.StudentMapper]: 0.0<br>21:58:05.274 [main] DEBUG space.yangtao.mapper.StudentMapper.getByIds2 - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id <span class="hljs-keyword">in</span> (1, 2)<br>21:58:05.274 [main] DEBUG space.yangtao.mapper.StudentMapper.getByIds2 - ==&gt; Parameters: <br>21:58:05.275 [main] TRACE space.yangtao.mapper.StudentMapper.getByIds2 - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>21:58:05.276 [main] TRACE space.yangtao.mapper.StudentMapper.getByIds2 - &lt;==        Row: 1, 1, zhangsan, 176.1, 男, 1990-01-01, 2022-07-01 22:10:22<br>21:58:05.277 [main] TRACE space.yangtao.mapper.StudentMapper.getByIds2 - &lt;==        Row: 2, 2, zhangsan1, 180.0, 男, 1990-01-01, 2022-07-01 21:10:22<br>21:58:05.277 [main] DEBUG space.yangtao.mapper.StudentMapper.getByIds2 - &lt;==      Total: 2<br>21:58:05.277 [main] INFO  space.yangtao.client.StudentMapperTest - 多个Map对象接收返回值：[&#123;birthday=1990-01-01, gender=男, create_time=2022-07-01T22:10:22, class_id=1, name=zhangsan, id=1, height=176.1&#125;, &#123;birthday=1990-01-01, gender=男, create_time=2022-07-01T21:10:22, class_id=2, name=zhangsan1, id=2, height=180.0&#125;]<br>...<br></code></pre></div></td></tr></table></figure>
+
+<p>由日志可知，对于多行数据，Java的接口方法可以使用集合类数据结构接收，如List，List的泛型可为实体类或Map。</p>
+<h3 id="Map-lt-Object-Map-lt-String-Object-gt-gt"><a href="#Map-lt-Object-Map-lt-String-Object-gt-gt" class="headerlink" title="Map&lt;Object, Map&lt;String, Object&gt;&gt;"></a>Map&lt;Object, Map&lt;String, Object&gt;&gt;</h3><p>在日常中可能会遇到需要将SQL查询的结果封装成Map&lt;Object, Map&lt;String, Object&gt;&gt;这种结构，其中Map的key为指定列的值，value为行。</p>
+<p>例如将列id作为查询结果的key，行封装为Map作为value</p>
+<p>mapper中定义方法</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getIdMap&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;map&quot;</span>&gt;</span><br>    select * from tt_student where id in ($&#123;id&#125;)<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+
+<p>定义对应的接口方法，此时需要使用<code>@MapKey</code>注解定义返回结果的key值取的列名称（此处为<code>id</code>）</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@MapKey(&quot;id&quot;)</span><br>Map&lt;Integer, Map&lt;String, Object&gt;&gt; getIdMap(String ids);<br></code></pre></div></td></tr></table></figure>
+
+<p>运行测试程序</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">SqlSession session = SqlSessionUtil.getSession();<br>StudentMapper studentMapper = session.getMapper(StudentMapper.class);<br>String ids = <span class="hljs-string">&quot;1, 2&quot;</span>;<br>log.info(<span class="hljs-string">&quot;getIdMap：&#123;&#125;&quot;</span>, studentMapper.getIdMap(ids));<br></code></pre></div></td></tr></table></figure>
+
+<p>控制台输出日志如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">...<br>22:02:38.523 [main] DEBUG space.yangtao.mapper.StudentMapper.getIdMap - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id <span class="hljs-keyword">in</span> (1, 2)<br>22:02:38.544 [main] DEBUG space.yangtao.mapper.StudentMapper.getIdMap - ==&gt; Parameters: <br>22:02:38.565 [main] TRACE space.yangtao.mapper.StudentMapper.getIdMap - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>22:02:38.566 [main] TRACE space.yangtao.mapper.StudentMapper.getIdMap - &lt;==        Row: 1, 1, zhangsan, 176.1, 男, 1990-01-01, 2022-07-01 22:10:22<br>22:02:38.569 [main] TRACE space.yangtao.mapper.StudentMapper.getIdMap - &lt;==        Row: 2, 2, zhangsan1, 180.0, 男, 1990-01-01, 2022-07-01 21:10:22<br>22:02:38.569 [main] DEBUG space.yangtao.mapper.StudentMapper.getIdMap - &lt;==      Total: 2<br>22:02:38.571 [main] INFO  space.yangtao.client.StudentMapperTest - getIdMap：&#123;1=&#123;birthday=1990-01-01, gender=男, create_time=2022-07-01T22:10:22, class_id=1, name=zhangsan, id=1, height=176.1&#125;, 2=&#123;birthday=1990-01-01, gender=男, create_time=2022-07-01T21:10:22, class_id=2, name=zhangsan1, id=2, height=180.0&#125;&#125;<br>...<br></code></pre></div></td></tr></table></figure>
+
+<p>由日志可知，<code>@MapKey</code>注解可以将查询的结果封装成Map&lt;Object, Map&lt;String, Object&gt;&gt;结构对象。</p>
+<h3 id="resultMap"><a href="#resultMap" class="headerlink" title="resultMap"></a>resultMap</h3><p>前面提到过，如果数据库中的列名与实体对象中的字段名对应不上，可以在Mapper文件中为SQL字段取别名。除此之外，还可以通过<code>resultMap</code>进行结果映射</p>
+<p>在Mapper中定义<code>resultMap</code>以及对应的查询方法，并在标签<code>resultMap</code>中将数据库字段<code>create_time</code>映射到了实体类的<code>createTime</code>属性</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">resultMap</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;studentRm&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.StudentPO&quot;</span>&gt;</span><br>    <span class="hljs-comment">&lt;!-- 主键id配置，可以提高效率 --&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">id</span> <span class="hljs-attr">column</span>=<span class="hljs-string">&quot;id&quot;</span> <span class="hljs-attr">property</span>=<span class="hljs-string">&quot;id&quot;</span>/&gt;</span><br>    <span class="hljs-comment">&lt;!-- result配置，column为数据库字段名，property为实体类属性名，两者如果一致则可以省略 --&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">&quot;name&quot;</span> <span class="hljs-attr">property</span>=<span class="hljs-string">&quot;name&quot;</span>/&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">&quot;height&quot;</span> <span class="hljs-attr">property</span>=<span class="hljs-string">&quot;height&quot;</span>/&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">&quot;gender&quot;</span> <span class="hljs-attr">property</span>=<span class="hljs-string">&quot;gender&quot;</span>/&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">&quot;birthday&quot;</span> <span class="hljs-attr">property</span>=<span class="hljs-string">&quot;birthday&quot;</span>/&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">&quot;create_time&quot;</span> <span class="hljs-attr">property</span>=<span class="hljs-string">&quot;createTime&quot;</span>/&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">resultMap</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getByResultMap&quot;</span> <span class="hljs-attr">resultMap</span>=<span class="hljs-string">&quot;studentRm&quot;</span>&gt;</span><br>    select * from tt_student where id = #&#123;id&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+
+<p>定义对应的接口方法</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function">StudentPO <span class="hljs-title">getByResultMap</span><span class="hljs-params">(Long id)</span></span>;<br></code></pre></div></td></tr></table></figure>
+
+<p>运行测试程序</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">SqlSession session = SqlSessionUtil.getSession();<br>StudentMapper studentMapper = session.getMapper(StudentMapper.class);<br>log.info(<span class="hljs-string">&quot;resultMap查询：&#123;&#125;&quot;</span>, studentMapper.getByResultMap(<span class="hljs-number">1L</span>));<br></code></pre></div></td></tr></table></figure>
+
+<p>控制台输出日志如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">...<br>22:19:35.024 [main] DEBUG space.yangtao.mapper.StudentMapper.getByResultMap - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ?<br>22:19:35.046 [main] DEBUG space.yangtao.mapper.StudentMapper.getByResultMap - ==&gt; Parameters: 1(Long)<br>22:19:35.059 [main] TRACE space.yangtao.mapper.StudentMapper.getByResultMap - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>22:19:35.062 [main] TRACE space.yangtao.mapper.StudentMapper.getByResultMap - &lt;==        Row: 1, 1, zhangsan, 176.1, 男, 1990-01-01, 2022-07-01 22:10:22<br>22:19:35.063 [main] DEBUG space.yangtao.mapper.StudentMapper.getByResultMap - &lt;==      Total: 1<br>22:19:35.064 [main] INFO  space.yangtao.client.StudentMapperTest - resultMap查询：StudentPO(id=1, name=zhangsan, height=176.1, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>...<br></code></pre></div></td></tr></table></figure>
+
+<p>由日志可知，方法的返回结果createTime字段正确取值为SQL中create_time字段的值，resultMap已成功为两个字段进行映射。</p>
+<h3 id="驼峰命名自动映射"><a href="#驼峰命名自动映射" class="headerlink" title="驼峰命名自动映射"></a>驼峰命名自动映射</h3><p>如果MyBatis开启了驼峰命名自动自动映射、且实体类属性符合驼峰命名规范、SQL字段符合单词小写、单词之间采用下划线分割，那么Java实体类中的属性能与SQL的字段进行映射。</p>
+<p>全局配置文件<code>mybatis-config.xml</code>的<code>setting</code>标签中开启命名自动映射</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">settings</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">setting</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;mapUnderscoreToCamelCase&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;true&quot;</span>/&gt;</span><br>    &lt;.../&gt;<br><span class="hljs-tag">&lt;/<span class="hljs-name">settings</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+
+<p>Mapper中对应的SQL为</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getById&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;space.yangtao.domain.po.StudentPO&quot;</span> <span class="hljs-attr">parameterType</span>=<span class="hljs-string">&quot;java.lang.Long&quot;</span>&gt;</span><br>    select * from tt_student where id = #&#123;id&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+
+<p>对应的接口方法为</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function">StudentPO <span class="hljs-title">getById</span><span class="hljs-params">(Long id)</span></span>;<br></code></pre></div></td></tr></table></figure>
+
+<p>此时实体类属性createTime与SQL字段create_time符合驼峰命名自动映射条件</p>
+<p>运行测试程序</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">SqlSession session = SqlSessionUtil.getSession();<br>StudentMapper studentMapper = session.getMapper(StudentMapper.class);<br>log.info(<span class="hljs-string">&quot;自动映射查询：&#123;&#125;&quot;</span>, studentMapper.getById(<span class="hljs-number">1L</span>));<br></code></pre></div></td></tr></table></figure>
+
+<p>控制台输出日志如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">...<br>22:27:43.693 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt;  Preparing: select * from tt_student <span class="hljs-built_in">where</span> id = ?<br>22:27:43.710 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - ==&gt; Parameters: 1(Long)<br>22:27:43.722 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==    Columns: id, class_id, name, height, gender, birthday, create_time<br>22:27:43.723 [main] TRACE space.yangtao.mapper.StudentMapper.getById - &lt;==        Row: 1, 1, zhangsan, 176.1, 男, 1990-01-01, 2022-07-01 22:10:22<br>22:27:43.725 [main] DEBUG space.yangtao.mapper.StudentMapper.getById - &lt;==      Total: 1<br>22:27:43.726 [main] INFO  space.yangtao.client.StudentMapperTest - 自动映射查询：StudentPO(id=1, name=zhangsan, height=176.1, gender=男, birthday=Mon Jan 01 00:00:00 CST 1990, createTime=Fri Jul 01 22:10:22 CST 2022)<br>...<br></code></pre></div></td></tr></table></figure>
+
+<p>由日志可知，驼峰命名自动映射已为实体属性createTime与数据库字段create_time进行了映射。</p>
+<h2 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a>总结</h2><p>MyBatis面向接口编程不仅提高了开发效率，也提升了代码的可维护性和可扩展性。通过将SQL操作封装在接口中，MyBatis使得SQL语句的管理变得更加集中和系统化，极大地降低了数据库操作的复杂性。本文详细说明了如何有效地利用MyBatis提供的这一功能，是理解和应用MyBatis核心功能的重要资源。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/MyBatis/">MyBatis</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/MyBatis/">MyBatis</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/08/03/mybatis-core-features-2/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">MyBatis核心功能二</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/08/02/mybatis-config/">
+                        <span class="hidden-mobile">MyBatis配置</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

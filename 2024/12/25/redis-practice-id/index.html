@@ -1,0 +1,630 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="引言在分布式系统中，为了保证订单、流水等业务单号的唯一性、高可用、高性能和有序递增，我们通常会选择分布式ID生成方案。本文将结合一个“业务单号”案例，演示如何使用RedisAtomicLong来生成符合业务需求的可读单号，并与常见的Snowflake算法做简单对比。 规则在实际业务场景中，单号除了需要具备唯一性，还希望包含一些能够体现业务维度的信息，方便快速识别或手动对账。例如，一个典型的销售订单">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis实战——分布式业务ID生成器">
+<meta property="og:url" content="http://example.com/2024/12/25/redis-practice-id/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="引言在分布式系统中，为了保证订单、流水等业务单号的唯一性、高可用、高性能和有序递增，我们通常会选择分布式ID生成方案。本文将结合一个“业务单号”案例，演示如何使用RedisAtomicLong来生成符合业务需求的可读单号，并与常见的Snowflake算法做简单对比。 规则在实际业务场景中，单号除了需要具备唯一性，还希望包含一些能够体现业务维度的信息，方便快速识别或手动对账。例如，一个典型的销售订单">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png">
+<meta property="article:published_time" content="2024-12-25T12:53:48.000Z">
+<meta property="article:modified_time" content="2024-12-25T12:53:48.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="Redis">
+<meta property="article:tag" content="NoSQL">
+<meta property="article:tag" content="Redis实战">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png">
+  
+  
+  <title>Redis实战——分布式业务ID生成器 - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Redis实战——分布式业务ID生成器">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2024-12-25 20:53" pubdate>
+        2024年12月25日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      6.1k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      11 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Redis实战——分布式业务ID生成器</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：1 个月前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>在分布式系统中，为了保证订单、流水等业务单号的唯一性、高可用、高性能和有序递增，我们通常会选择分布式ID生成方案。本文将结合一个“业务单号”案例，演示如何使用<code>RedisAtomicLong</code>来生成符合业务需求的可读单号，并与常见的<code>Snowflake</code>算法做简单对比。</p>
+<h2 id="规则"><a href="#规则" class="headerlink" title="规则"></a>规则</h2><p>在实际业务场景中，单号除了需要具备唯一性，还希望包含一些能够体现业务维度的信息，方便快速识别或手动对账。例如，一个典型的销售订单号可能会包含：</p>
+<ul>
+<li><strong>前缀</strong>：业务类型，如销售订单（Sales Order）可简写为<code>SO</code></li>
+<li><strong>业务参数</strong>：如店代码<code>DGDA010</code></li>
+<li><strong>日期</strong>：单号生成日期，常用<code>yyyyMMdd</code>格式，如<code>20240101</code></li>
+<li><strong>序列号</strong>：一天内自增，如<code>00001</code>，长度可配</li>
+</ul>
+<p>因此，一个完整的销售订单号示例会是<code>SODGDA0102024010100001</code></p>
+<ul>
+<li><code>SO</code> —— 销售订单前缀</li>
+<li><code>DGDA010</code> —— 店铺代码</li>
+<li><code>20240101</code> —— 订单日期</li>
+<li><code>00001</code> —— 序列号（当天从 1 开始累加，左补零）</li>
+</ul>
+<p>相比纯数字的全局 ID，这类“业务单号”更方便人工查询和业务审计。</p>
+<h2 id="特征"><a href="#特征" class="headerlink" title="特征"></a>特征</h2><p>一个完善的分布式全局业务ID生成器，应当满足：</p>
+<ol>
+<li><strong>唯一性</strong>：不能产生重复的ID。</li>
+<li><strong>高可用</strong>：在分布式和高并发环境中保持稳定运行。</li>
+<li><strong>高性能</strong>：ID的生成过程不能成为性能瓶颈。</li>
+<li><strong>递增性</strong>：ID有序（如按时间或数值递增），方便做数据分区、排序或日志查询。</li>
+</ol>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>在分布式环境中，保证序列号自增的常见做法有：</p>
+<ol>
+<li><strong>数据库自增主键</strong>：容易成为性能瓶颈和单点故障。</li>
+<li><strong>Snowflake算法</strong>：能够快速生成高并发下的全局唯一 ID，但生成的结果通常是无业务含义的 64 位长整型。</li>
+<li><strong>Redis自增</strong>：基于Redis的<code>INCR</code>命令或<code>RedisAtomicLong</code>，既可以实现分布式场景下的原子性自增，又能灵活拼接业务前缀、参数与日期，生成“可读”的业务单号。</li>
+</ol>
+<h3 id="Snowflake"><a href="#Snowflake" class="headerlink" title="Snowflake"></a>Snowflake</h3><ul>
+<li><strong>高性能</strong>：在内存中本地生成，不依赖外部服务；</li>
+<li><strong>分布式</strong>：可以将机器ID、时间戳等信息组合在一个64位长整型中，轻松实现跨节点唯一；</li>
+<li><strong>不含业务信息</strong>：生成的长整型ID难以让人直接看出其含义，通常需要额外查询或计算才能做分类、分表等。</li>
+</ul>
+<h3 id="RedisAtomicLong"><a href="#RedisAtomicLong" class="headerlink" title="RedisAtomicLong"></a>RedisAtomicLong</h3><p><code>Spring Data Redis</code>提供的一个便捷类，内置了以下优势：</p>
+<ul>
+<li><strong>原子性</strong>：底层基于Redis的<code>INCR</code>命令，多线程同时操作也能保持正确的计数。</li>
+<li><strong>易用性</strong>：提供了<code>incrementAndGet</code>、<code>addAndGet</code>等简洁方法，且支持设置过期时间（<code>expire</code>）。</li>
+<li><strong>可维护性</strong>：把计数器作为Key存在Redis，易于在运维层面做监控或清理。</li>
+<li><strong>可包含业务信息</strong>：能够在“纯数字”之外附带前缀、日期、参数等更多逻辑；</li>
+</ul>
+<p>如果你仅仅需要一个纯数字型ID（如数据库表主键），不关心其“含义”或“格式”，Snowflake算法更轻便，且不需要额外的外部存储；如果你更关注让ID本身表达业务信息（业务单号），则基于<code>RedisAtomicLong</code>的方式通常更简单直观。</p>
+<h2 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h2><p>下方是一段使用<code>Spring Boot + Spring Data Redis</code>示例代码，用于在分布式场景下生成业务单号。代码具备以下特征：</p>
+<ul>
+<li><strong>灵活可定制</strong>：可配置前缀、业务参数、日期、序列号长度、重试机制等。</li>
+<li><strong>自动过期</strong>：每天自动过期，确保不会冗余太多无用数据。</li>
+<li><strong>批量生成</strong>：可一次性生成多个ID，减少对Redis的交互次数。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Slf4j</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BizIdUtil</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(<span class="hljs-string">&quot;yyyyMMdd&quot;</span>);<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * Redis Key 的前缀，避免与其他业务冲突</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> String REDIS_BIZ_ID_LOCK = <span class="hljs-string">&quot;redis_biz_id_lock:&quot;</span>;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> BizIdBuilder <span class="hljs-title">builder</span><span class="hljs-params">(StringRedisTemplate stringRedisTemplate)</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> BizIdBuilder(stringRedisTemplate);<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 获取 BizIdBuilder 实例</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BizIdBuilder</span> </span>&#123;<br><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> StringRedisTemplate stringRedisTemplate;<br><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">BizIdBuilder</span><span class="hljs-params">(StringRedisTemplate stringRedisTemplate)</span> </span>&#123;<br>            <span class="hljs-keyword">this</span>.stringRedisTemplate = stringRedisTemplate;<br>        &#125;<br><br>        <span class="hljs-comment">// 用于缓存 RedisAtomicLong 实例，减少重复创建的开销</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> ConcurrentHashMap&lt;String, RedisAtomicLong&gt; counterMap = <span class="hljs-keyword">new</span> ConcurrentHashMap&lt;&gt;();<br><br>        <span class="hljs-comment">// 前缀</span><br>        <span class="hljs-keyword">private</span> String prefix;<br><br>        <span class="hljs-comment">// 业务参数</span><br>        <span class="hljs-keyword">private</span> List&lt;String&gt; params;<br><br>        <span class="hljs-comment">// 业务参数拼接字符串</span><br>        <span class="hljs-keyword">private</span> String paramsStr;<br><br>        <span class="hljs-comment">// 日期标识（可选，默认为当前日期）</span><br>        <span class="hljs-keyword">private</span> String dateStr = DATE_FORMATTER.format(LocalDate.now());<br><br>        <span class="hljs-comment">// 序列号长度</span><br>        <span class="hljs-keyword">private</span> Integer length = <span class="hljs-number">5</span>;<br><br>        <span class="hljs-comment">// 重试次数</span><br>        <span class="hljs-keyword">private</span> Integer retryTimes = <span class="hljs-number">1</span>;<br><br>        <span class="hljs-comment">// 重试间隔</span><br>        <span class="hljs-keyword">private</span> Integer retryInterval = <span class="hljs-number">100</span>;<br><br>        <span class="hljs-comment">// 重试间隔单位</span><br>        <span class="hljs-keyword">private</span> TimeUnit retryUnit = TimeUnit.MILLISECONDS;<br><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> BizIdBuilder <span class="hljs-title">prefix</span><span class="hljs-params">(String prefix)</span> </span>&#123;<br>            <span class="hljs-keyword">this</span>.prefix = prefix;<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;<br>        &#125;<br><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> BizIdBuilder <span class="hljs-title">params</span><span class="hljs-params">(List&lt;String&gt; params)</span> </span>&#123;<br>            <span class="hljs-keyword">if</span> (CollUtil.isNotEmpty(params)) &#123;<br>                <span class="hljs-keyword">this</span>.paramsStr = String.join(<span class="hljs-string">&quot;&quot;</span>, params);<br>            &#125;<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;<br>        &#125;<br><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> BizIdBuilder <span class="hljs-title">dateStr</span><span class="hljs-params">(String dateStr)</span> </span>&#123;<br>            <span class="hljs-keyword">this</span>.dateStr = dateStr;<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;<br>        &#125;<br><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> BizIdBuilder <span class="hljs-title">length</span><span class="hljs-params">(Integer length)</span> </span>&#123;<br>            <span class="hljs-keyword">this</span>.length = length;<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;<br>        &#125;<br><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> BizIdBuilder <span class="hljs-title">retryTimes</span><span class="hljs-params">(Integer retryTimes)</span> </span>&#123;<br>            <span class="hljs-keyword">this</span>.retryTimes = retryTimes;<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;<br>        &#125;<br><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> BizIdBuilder <span class="hljs-title">retryInterval</span><span class="hljs-params">(Integer retryInterval)</span> </span>&#123;<br>            <span class="hljs-keyword">this</span>.retryInterval = retryInterval;<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;<br>        &#125;<br><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> BizIdBuilder <span class="hljs-title">unit</span><span class="hljs-params">(TimeUnit unit)</span> </span>&#123;<br>            <span class="hljs-keyword">this</span>.retryUnit = unit;<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;<br>        &#125;<br><br>        <span class="hljs-comment">/**</span><br><span class="hljs-comment">         * 生成单个 ID</span><br><span class="hljs-comment">         */</span><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">build</span><span class="hljs-params">()</span> </span>&#123;<br>            <span class="hljs-keyword">return</span> buildBatch(<span class="hljs-number">1</span>).get(<span class="hljs-number">0</span>);<br>        &#125;<br><br>        <span class="hljs-comment">/**</span><br><span class="hljs-comment">         * 批量生成 ID</span><br><span class="hljs-comment">         */</span><br>        <span class="hljs-function"><span class="hljs-keyword">public</span> List&lt;String&gt; <span class="hljs-title">buildBatch</span><span class="hljs-params">(<span class="hljs-keyword">int</span> count)</span> </span>&#123;<br>            String counter = REDIS_BIZ_ID_LOCK + prefix + paramsStr + dateStr;<br>            <span class="hljs-keyword">do</span> &#123;<br>                <span class="hljs-keyword">try</span> &#123;<br>                    <span class="hljs-comment">// 从缓存中获取或创建 RedisAtomicLong</span><br>                    RedisAtomicLong entityIdCounter = counterMap.computeIfAbsent(counter, k -&gt; &#123;<br>                        <span class="hljs-comment">// 注意，这里必须确保 stringRedisTemplate 的连接工厂不为 null</span><br>                        RedisAtomicLong ra = <span class="hljs-keyword">new</span> RedisAtomicLong(counter, Objects.requireNonNull(stringRedisTemplate.getConnectionFactory()));<br>                        <span class="hljs-comment">// 设置过期时间为 1 天，防止冗余过多无用数据</span><br>                        ra.expire(<span class="hljs-number">1</span>, java.util.concurrent.TimeUnit.DAYS);<br>                        <span class="hljs-keyword">return</span> ra;<br>                    &#125;);<br>                    <br>                    <span class="hljs-comment">// 批量递增</span><br>                    <span class="hljs-keyword">long</span> serialNum = entityIdCounter.addAndGet(count);<br>                    <br>                    <span class="hljs-comment">// 检查溢出</span><br>                    StringBuilder maxSerialNum = <span class="hljs-keyword">new</span> StringBuilder();<br>                    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; length; i++) &#123;<br>                        maxSerialNum.append(<span class="hljs-string">&quot;9&quot;</span>);<br>                    &#125;<br>                    <span class="hljs-keyword">if</span> (serialNum &gt; Long.parseLong(maxSerialNum.toString())) &#123;<br>                        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">&quot;序列号已达最大值&quot;</span>);<br>                    &#125;<br>                    <br>                    <span class="hljs-comment">// 最终业务ID</span><br>                    List&lt;String&gt; result = CollUtil.newArrayList();<br>                    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; count; i++) &#123;<br>                        result.add(prefix + paramsStr + dateStr + String.format(<span class="hljs-string">&quot;%0&quot;</span> + length + <span class="hljs-string">&quot;d&quot;</span>, serialNum - count + i + <span class="hljs-number">1</span>));<br>                    &#125;<br>                    <span class="hljs-keyword">return</span> result;<br>                &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>                    log.error(<span class="hljs-string">&quot;&#123;&#125;生成业务ID失败&quot;</span>, counter, e);<br>                &#125;<br>                <br>                <span class="hljs-comment">// 重试间隔</span><br>                <span class="hljs-keyword">try</span> &#123;<br>                    Thread.sleep(retryUnit.toMillis(retryInterval));<br>                &#125; <span class="hljs-keyword">catch</span> (InterruptedException ex) &#123;<br>                    log.error(<span class="hljs-string">&quot;&#123;&#125;线程休眠失败&quot;</span>, counter, ex);<br>                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(counter + <span class="hljs-string">&quot;生成业务ID失败&quot;</span>);<br>                &#125;<br>                <br>            <span class="hljs-comment">// 异常重试</span><br>            &#125; <span class="hljs-keyword">while</span> (retryTimes-- &gt; <span class="hljs-number">0</span>);<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(counter + <span class="hljs-string">&quot;生成业务ID失败，重试次数已用完&quot;</span>);<br>        &#125;<br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>使用示例</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Resource</span><br><span class="hljs-keyword">private</span> StringRedisTemplate stringRedisTemplate;<br><br><span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getOrderBizId</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> BizIdUtil.builder(stringRedisTemplate)<br>            .prefix(<span class="hljs-string">&quot;SO&quot;</span>)						<span class="hljs-comment">// 业务单号前缀</span><br>            .params(Arrays.asList(<span class="hljs-string">&quot;DGDA010&quot;</span>))	  <span class="hljs-comment">// 参数</span><br>            .length(<span class="hljs-number">5</span>)							<span class="hljs-comment">// 序列号长度</span><br>            .retryTimes(<span class="hljs-number">3</span>)						<span class="hljs-comment">// 失败重试次数</span><br>            .retryInterval(<span class="hljs-number">100</span>)					 <span class="hljs-comment">// 失败重试间隔</span><br>            .unit(TimeUnit.MILLISECONDS)		  <span class="hljs-comment">// 重试间隔等待时间单位</span><br>            .build();<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>每次运行都能得到唯一的自增单号，如</p>
+<figure class="highlight dns"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs dns">SODGDA010<span class="hljs-number">2024010100001</span><br>SODGDA010<span class="hljs-number">2024010100002</span><br>SODGDA010<span class="hljs-number">2024010100003</span><br></code></pre></div></td></tr></table></figure>
+
+<h2 id="优化方向"><a href="#优化方向" class="headerlink" title="优化方向"></a>优化方向</h2><h3 id="内存占用"><a href="#内存占用" class="headerlink" title="内存占用"></a>内存占用</h3><p>如果<code>prefix + paramsStr + dateStr</code>可能组合非常多，则会导致Redis中保存大量Key和 <code>RedisAtomicLong</code> 实例。可以考虑：</p>
+<ul>
+<li>设置合理的过期策略（每天自动过期）</li>
+<li>评估业务实际组合量，或者使用更灵活的生成策略</li>
+</ul>
+<h3 id="序列号溢出"><a href="#序列号溢出" class="headerlink" title="序列号溢出"></a>序列号溢出</h3><p>如果序列号长度是5位，意味着同一天最多只能生成99999个订单。如果实际业务量更大，需要适当增加序列号长度或在序列号快到上限时发出告警，并做相应扩容策略。</p>
+<h3 id="高并发下的原子性"><a href="#高并发下的原子性" class="headerlink" title="高并发下的原子性"></a>高并发下的原子性</h3><p><code>RedisAtomicLong</code>的内部操作本质是Redis的<code>INCR</code>命令，保证了计数的原子性。如果需要更复杂的操作（比如提前判断是否溢出、再进行<code>INCR</code>），可以考虑<code>Lua</code>脚本进行一次性判断与递增操作，以避免两次Redis调用中间产生竞态条件。</p>
+<h3 id="重试次数与间隔"><a href="#重试次数与间隔" class="headerlink" title="重试次数与间隔"></a>重试次数与间隔</h3><p>在网络抖动或Redis短暂不可用时，此处的重试逻辑可以提供一定的容错能力。也可以结合更专业的断路器（<code>Circuit Breaker</code>）与熔断策略来提高系统稳定性。</p>
+<h3 id="分布式锁"><a href="#分布式锁" class="headerlink" title="分布式锁"></a>分布式锁</h3><p>如果业务需要在生成 ID 时确保其他关键操作的互斥，可以考虑配合分布式锁（如 Redisson）使用。但本示例只关注生成ID，不涉及到额外的锁。</p>
+<h3 id="批量生成的效率"><a href="#批量生成的效率" class="headerlink" title="批量生成的效率"></a>批量生成的效率</h3><p>对于需要一次性生成大批量ID（如1万条）的场景，可考虑基于 “段式分配” 的思路，即从Redis一次获取一段计数区间（如1～10000），再在应用内自行分配，以减少与Redis的交互次数。此思路实现较为复杂，此处只作思路提示。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过以上思路和示例，就能在分布式场景下生成带业务信息的订单号或流水号，既满足了业务侧对“可读性”的需求，也保证了分布式全局唯一与高并发下的有序性。在实际项目中，可按需进一步扩展，如添加分库分表策略、结合监控报警、或引入更多重试和降级机制，打造更完善的分布式业务ID生成方案。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Redis/">Redis</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Redis/">Redis</a>
+                    
+                      <a class="hover-with-bg" href="/tags/NoSQL/">NoSQL</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Redis%E5%AE%9E%E6%88%98/">Redis实战</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/12/29/redis-async-queue/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Redis实战——消息队列</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/12/25/redis-practice-cache/">
+                        <span class="hidden-mobile">Redis实战——缓存</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

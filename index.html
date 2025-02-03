@@ -1,0 +1,930 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="一名普通的Java程序猿">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Yangtao&#39;s space">
+<meta property="og:url" content="http://example.com/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="一名普通的Java程序猿">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="Yangtao">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 100vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/BannerImg/%E6%B5%B7%E7%8E%8B%E6%98%9F2.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="一名普通的Java程序猿">
+              
+            </span>
+
+            
+          </div>
+
+          
+            <div class="scroll-down-bar">
+              <i class="iconfont icon-arrowdown"></i>
+            </div>
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      <div class="container nopadding-x-md">
+        <div class="py-5" id="board"
+          style=margin-top:0>
+          
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-md-10 m-auto">
+                
+
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/12/29/redis-async-queue/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png" alt="Redis实战——消息队列">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/12/29/redis-async-queue/" target="_blank">
+          Redis实战——消息队列
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/12/29/redis-async-queue/" target="_blank">
+          
+          引言在现代分布式系统中，消息队列起着至关重要的作用。它通过异步通信的方式，实现系统各服务间的解耦和流量削峰。对于初级场景，我们可能在单个 Java 应用中借助阻塞队列来简化异步处理，但随着业务需求的增长和系统架构的演进，跨进程通信、数据持久化、高并发以及分布式部署成为关键要素。此时，Redis 作为一款高性能的内存数据库，提供了多种消息队列实现方式——包括 List、Pub&#x2F;Sub 和 Strea
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-12-29 08:37" pubdate>
+              2024-12-29
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Redis/">Redis</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Redis/">Redis</a>
+            
+              <a href="/tags/NoSQL/">NoSQL</a>
+            
+              <a href="/tags/Redis%E5%AE%9E%E6%88%98/">Redis实战</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/12/25/redis-practice-id/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png" alt="Redis实战——分布式业务ID生成器">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/12/25/redis-practice-id/" target="_blank">
+          Redis实战——分布式业务ID生成器
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/12/25/redis-practice-id/" target="_blank">
+          
+          引言在分布式系统中，为了保证订单、流水等业务单号的唯一性、高可用、高性能和有序递增，我们通常会选择分布式ID生成方案。本文将结合一个“业务单号”案例，演示如何使用RedisAtomicLong来生成符合业务需求的可读单号，并与常见的Snowflake算法做简单对比。 规则在实际业务场景中，单号除了需要具备唯一性，还希望包含一些能够体现业务维度的信息，方便快速识别或手动对账。例如，一个典型的销售订单
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-12-25 20:53" pubdate>
+              2024-12-25
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Redis/">Redis</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Redis/">Redis</a>
+            
+              <a href="/tags/NoSQL/">NoSQL</a>
+            
+              <a href="/tags/Redis%E5%AE%9E%E6%88%98/">Redis实战</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/12/25/redis-practice-cache/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png" alt="Redis实战——缓存">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/12/25/redis-practice-cache/" target="_blank">
+          Redis实战——缓存
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/12/25/redis-practice-cache/" target="_blank">
+          
+          引言在现代软件系统中，缓存已成为提升性能、减少数据库压力和提高响应速度的重要手段。尤其是在高并发、分布式环境中，缓存往往是架构中的“加速器”。Redis由于其高性能、丰富的数据结构以及良好的生态支持，被广泛用作缓存层。本篇文章将围绕“Redis作为缓存”这一主题，详细探讨缓存的概念、适用场景、更新策略、常见问题以及与流行框架的结合。 缓存概念缓存是一个存储层，旨在存储部分数据的副本，以减少从数据库
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-12-25 01:59" pubdate>
+              2024-12-25
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Redis/">Redis</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Redis/">Redis</a>
+            
+              <a href="/tags/NoSQL/">NoSQL</a>
+            
+              <a href="/tags/Redis%E5%AE%9E%E6%88%98/">Redis实战</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/12/19/redis-practice-codes-tokens/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png" alt="Redis实战——验证码和Token的存储与管理">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/12/19/redis-practice-codes-tokens/" target="_blank">
+          Redis实战——验证码和Token的存储与管理
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/12/19/redis-practice-codes-tokens/" target="_blank">
+          
+          引言随着互联网应用的快速发展，用户认证方式也在不断演进。传统的用户名密码登录方式虽然广泛使用，但存在密码泄露、暴力破解等安全隐患。基于验证码的登录方式，尤其是通过邮箱验证码进行登录，因其操作简便、安全性高而受到越来越多应用的青睐。 在微服务架构下，多个服务协同工作，用户认证与授权需要具备高可用性和可扩展性。Redis作为高性能的内存数据存储系统，凭借其快速的数据读写能力和丰富的数据结构，成为实现分
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-12-19 22:18" pubdate>
+              2024-12-19
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Redis/">Redis</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Redis/">Redis</a>
+            
+              <a href="/tags/NoSQL/">NoSQL</a>
+            
+              <a href="/tags/Redis%E5%AE%9E%E6%88%98/">Redis实战</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/12/15/redis-distributed-lock-usage/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png" alt="Redis——Redisson分布式锁">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/12/15/redis-distributed-lock-usage/" target="_blank">
+          Redis——Redisson分布式锁
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/12/15/redis-distributed-lock-usage/" target="_blank">
+          
+          前言前面我们基于Redis实现的分布式锁能处理最基本的互斥，但还有许多的功能没有实现，如可重入、可重试、自旋等，在企业开发环境下，通常会引入Redisson这个成熟的框架来完善这些功能。本文将详细介绍Redisson的分布式锁功能，包括不同类型的锁的特性、应用场景以及如何在Spring Boot项目中实现和配置这些锁。 Redisson分布式锁支持Redisson是一个在Java环境下使用Redi
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-12-15 22:58" pubdate>
+              2024-12-15
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Redis/">Redis</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Redis/">Redis</a>
+            
+              <a href="/tags/NoSQL/">NoSQL</a>
+            
+              <a href="/tags/Redisson/">Redisson</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/12/13/redis-distributed-lock/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png" alt="Redis——分布式锁">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/12/13/redis-distributed-lock/" target="_blank">
+          Redis——分布式锁
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/12/13/redis-distributed-lock/" target="_blank">
+          
+          引言在分布式系统中，管理并发访问共享资源是一个挑战，需要确保系统的一致性和可靠性。分布式锁提供了一种机制，通过锁定资源来控制跨多个节点的并发访问。Redis，作为高性能的NoSQL数据库，由于其内存操作的特性和灵活的数据结构，被广泛用于实现分布式锁。本文详细介绍了分布式锁的概念、设计原则、实现方式，以及如何利用Redis和Lua脚本来实现高效且安全的分布式锁。 分布式锁简介分布式锁是一种在分布式系
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-12-13 22:15" pubdate>
+              2024-12-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Redis/">Redis</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Redis/">Redis</a>
+            
+              <a href="/tags/NoSQL/">NoSQL</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/12/04/redis-base/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png" alt="Redis——基础篇">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/12/04/redis-base/" target="_blank">
+          Redis——基础篇
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/12/04/redis-base/" target="_blank">
+          
+          引言Redis，作为一种高性能的键值数据库，自2009年诞生以来，因其出色的性能和丰富的数据结构支持，已成为现代数据处理中不可或缺的工具。它的设计为处理高速数据操作和实时应用提供了理想的解决方案。本文将介绍Redis的主要特性、安装过程、基本命令、以及如何通过Java客户端与之交互，帮助读者快速掌握Redis的使用和应用。 简介Redis诞生于2009年，全称为Remote Dictionary
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-12-04 23:42" pubdate>
+              2024-12-04
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Redis/">Redis</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Redis/">Redis</a>
+            
+              <a href="/tags/NoSQL/">NoSQL</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/10/17/springdoc-javadoc/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/springdoc-openapi.webp" alt="Springdoc——根据JavaDoc生成接口文档">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/10/17/springdoc-javadoc/" target="_blank">
+          Springdoc——根据JavaDoc生成接口文档
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/10/17/springdoc-javadoc/" target="_blank">
+          
+          在现代应用程序开发中，API文档是非常重要的一部分，它不仅帮助开发者更好地理解接口的使用，也有助于跨团队协作。本文将介绍如何使用Springdoc自动地、无侵入地生成基于Javadoc的API文档，帮助你在开发中更简单地维护API文档。
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-10-17 03:29" pubdate>
+              2024-10-17
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Springdoc/">Springdoc</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Springdoc/">Springdoc</a>
+            
+              <a href="/tags/OpenAPI%EF%BC%8C%E9%A1%B9%E7%9B%AE%E5%8D%8F%E4%BD%9C/">OpenAPI，项目协作</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/09/23/spring-application-web/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/spring-application-web.webp" alt="Spring-ApplicationContext-Web">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/09/23/spring-application-web/" target="_blank">
+          Spring-ApplicationContext-Web
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/09/23/spring-application-web/" target="_blank">
+          
+          我们将以常见的Web应用开发对ApplicationContext进行展开，本篇文章将初步介绍Spring Boot提供了构建两种主要Web应用模型的能力：传统的基于Servlet的模型和新兴的基于响应式编程的模型。本文将探索这两种模型的特点、适用场景以及对应的类图。
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-09-23 23:44" pubdate>
+              2024-09-23
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Spring/">Spring</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Spring/">Spring</a>
+            
+              <a href="/tags/SpringBoot/">SpringBoot</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/09/18/spring-application-context-interface/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/spring-application-context-banner.webp" alt="Spring-ApplicationContext初认识">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/09/18/spring-application-context-interface/" target="_blank">
+          Spring-ApplicationContext初认识
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/09/18/spring-application-context-interface/" target="_blank">
+          
+          Spring的ApplicationContext提供了一个功能丰富的环境。本文将对ApplicationContext做一个初步的介绍，主要是对其实现的接口做一个详细说明。
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-09-18 01:13" pubdate>
+              2024-09-18
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Spring/">Spring</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Spring/">Spring</a>
+            
+              <a href="/tags/SpringBoot/">SpringBoot</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+
+
+  <nav aria-label="navigation">
+    <span class="pagination" id="pagination">
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/#board">2</a><a class="page-number" href="/page/3/#board">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/#board">5</a><a class="extend next" rel="next" href="/page/2/#board"><i class="iconfont icon-arrowright"></i></a>
+    </span>
+  </nav>
+
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

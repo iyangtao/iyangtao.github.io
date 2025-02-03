@@ -1,0 +1,610 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="引言在进行精确计算时，Java的基本浮点类型（如float和double）无法避免精度损失，这对于财务、科学等需要高精度计算的应用是不可接受的。BigDecimal类提供了精确的浮点数计算功能，能够处理这类问题。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BigDecimal">
+<meta property="og:url" content="http://example.com/2021/04/09/javase-bigdecimal/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="引言在进行精确计算时，Java的基本浮点类型（如float和double）无法避免精度损失，这对于财务、科学等需要高精度计算的应用是不可接受的。BigDecimal类提供了精确的浮点数计算功能，能够处理这类问题。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/BigDecimal.png">
+<meta property="article:published_time" content="2021-04-09T13:10:11.000Z">
+<meta property="article:modified_time" content="2021-04-09T13:10:11.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="JavaSE">
+<meta property="article:tag" content="常用API">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/BigDecimal.png">
+  
+  
+  <title>BigDecimal - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/BigDecimal.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="BigDecimal">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-04-09 21:10" pubdate>
+        2021年4月9日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3.2k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      6 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">BigDecimal</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：4 年前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>在进行精确计算时，Java的基本浮点类型（如float和double）无法避免精度损失，这对于财务、科学等需要高精度计算的应用是不可接受的。<code>BigDecimal</code>类提供了精确的浮点数计算功能，能够处理这类问题。                                                                                                                                                                </p>
+<h2 id="精度丢失"><a href="#精度丢失" class="headerlink" title="精度丢失"></a>精度丢失</h2><p>浮点数进行计算会产生丢失精度的现象，这种舍入误差的主要原因是<strong>浮点数值采用二进制系统表示</strong>，而在<strong>二进制系统中无法精确地表示分数 1/10</strong>，从而导致计算误差。</p>
+<p>示例</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">System.out.println(<span class="hljs-number">2.0</span> - <span class="hljs-number">1.9</span>);<br></code></pre></div></td></tr></table></figure>
+
+<p>以上程序运行，控制台打印结果为<code>0.10000000000000009</code>，而不是<code>0.1</code>。</p>
+<p>为解决以上问题，Java专门提供了一个类<code>BigDecimal</code>，用于需要高精度计算的场景。</p>
+<h2 id="BigDecimal"><a href="#BigDecimal" class="headerlink" title="BigDecimal"></a>BigDecimal</h2><h3 id="常用构造方法"><a href="#常用构造方法" class="headerlink" title="常用构造方法"></a>常用构造方法</h3><ul>
+<li><code>BigDecimal(int val)</code></li>
+<li><code>BigDecimal(long val)</code></li>
+<li><code>BigDecimal(String val)</code></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">BigDecimal bd1 = <span class="hljs-keyword">new</span> BigDecimal(<span class="hljs-number">1</span>);<br>BigDecimal bd3 = <span class="hljs-keyword">new</span> BigDecimal(<span class="hljs-number">3L</span>);<br>BigDecimal bd4 = <span class="hljs-keyword">new</span> BigDecimal(<span class="hljs-string">&quot;4.5&quot;</span>);<br></code></pre></div></td></tr></table></figure>
+
+<p>不推荐使用<code>double</code>类型进行构造，因为浮点数无法准确的表示一个数，如1/10，前面已经说过，如</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">BigDecimal bigDecimal = <span class="hljs-keyword">new</span> BigDecimal(<span class="hljs-number">0.1</span>);<br>System.out.println(bigDecimal);<br></code></pre></div></td></tr></table></figure>
+
+<p>输出结果为<code>0.1000000000000000055511151231257827021181583404541015625</code></p>
+<p>如果需要使用浮点数构造<code>BigDecimal</code>，则需要使用另一个构造方法</p>
+<ul>
+<li><code>BigDecimal valueOf(double val)</code></li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs jva">BigDecimal bd5 = BigDecimal.valueOf(0.1);<br>System.out.println(bd5);<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="比较大小"><a href="#比较大小" class="headerlink" title="比较大小"></a>比较大小</h3><p>对于<code>BigDecimal</code>对象，一般使用<code>compareTo</code>方法比较两个数的大小</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">BigDecimal bd1 = <span class="hljs-keyword">new</span> BigDecimal(<span class="hljs-string">&quot;1&quot;</span>);<br>BigDecimal bd2 = <span class="hljs-keyword">new</span> BigDecimal(<span class="hljs-string">&quot;2&quot;</span>);<br>BigDecimal bd3 = <span class="hljs-keyword">new</span> BigDecimal(<span class="hljs-string">&quot;2.0&quot;</span>);<br><br>System.out.println(bd1.compareTo(bd2));     <span class="hljs-comment">// -1：小于</span><br>System.out.println(bd2.compareTo(bd1));     <span class="hljs-comment">// 1 ：大于</span><br>System.out.println(bd2.compareTo(bd3));     <span class="hljs-comment">// 0 ：等于</span><br></code></pre></div></td></tr></table></figure>
+
+<h3 id="常用计算"><a href="#常用计算" class="headerlink" title="常用计算"></a>常用计算</h3><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">BigDecimal bd1 = <span class="hljs-keyword">new</span> BigDecimal(<span class="hljs-string">&quot;4.000&quot;</span>);<br>BigDecimal bd2 = <span class="hljs-keyword">new</span> BigDecimal(<span class="hljs-string">&quot;3&quot;</span>);<br><span class="hljs-comment">// +</span><br>BigDecimal addRes = bd1.add(bd2);<br><span class="hljs-comment">// -</span><br>BigDecimal subRes = bd1.subtract(bd2);<br><span class="hljs-comment">// ×</span><br>BigDecimal mulRes = bd1.multiply(bd2);<br><span class="hljs-comment">// ÷</span><br>BigDecimal divRes = bd1.divide(bd2, RoundingMode.HALF_DOWN);<br><br>System.out.println(addRes);     <span class="hljs-comment">// 7.000</span><br>System.out.println(subRes);     <span class="hljs-comment">// 1.000</span><br>System.out.println(mulRes);     <span class="hljs-comment">// 12.000</span><br>System.out.println(divRes);     <span class="hljs-comment">// 1.333</span><br></code></pre></div></td></tr></table></figure>
+
+<p>注意除法较为特殊，需要指定另外一个参数“舍入规则”，如向正无穷大靠近、向负无穷大靠近、四舍五入，否则遇到无限循环小数时会抛出异常</p>
+<p>其他加减乘方法可指定可不指定舍入规则</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> ArithmeticException(<span class="hljs-string">&quot;Non-terminating decimal expansion; &quot;</span> +<br>                                              <span class="hljs-string">&quot;no exact representable decimal result.&quot;</span>);<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="转换结果"><a href="#转换结果" class="headerlink" title="转换结果"></a>转换结果</h3><p><code>BigDecimal</code>对象可以转换为字符串、整形、浮点型，如</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">BigDecimal bd = <span class="hljs-keyword">new</span> BigDecimal(<span class="hljs-string">&quot;0.1&quot;</span>);<br><span class="hljs-keyword">int</span> i = bd.intValue();<br><span class="hljs-keyword">long</span> l = bd.longValue();<br><span class="hljs-keyword">double</span> v = bd.doubleValue();<br>String s = bd.toString();<br><br>System.out.println(i);      <span class="hljs-comment">// 0</span><br>System.out.println(l);      <span class="hljs-comment">// 0</span><br>System.out.println(v);      <span class="hljs-comment">// 0.1</span><br>System.out.println(s);      <span class="hljs-comment">// 0.1</span><br></code></pre></div></td></tr></table></figure>
+
+<p>注意：浮点型转换为整形时会出现精度损失！</p>
+<h3 id="格式化"><a href="#格式化" class="headerlink" title="格式化"></a>格式化</h3><p>可使用类 <code>DecimalFormat</code> 对 <code>BigDecimal</code> 对象进行格式化以及设置舍入规则</p>
+<p>占位符 <code>0</code> 与占位符 <code>#</code></p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">DecimalFormat df1 = <span class="hljs-keyword">new</span> DecimalFormat(<span class="hljs-string">&quot;00.00&quot;</span>);<br>DecimalFormat df2 = <span class="hljs-keyword">new</span> DecimalFormat(<span class="hljs-string">&quot;#.00&quot;</span>);<br>DecimalFormat df3 = <span class="hljs-keyword">new</span> DecimalFormat(<span class="hljs-string">&quot;##.##&quot;</span>);<br><br>BigDecimal bd = <span class="hljs-keyword">new</span> BigDecimal(<span class="hljs-string">&quot;0.3&quot;</span>);<br>System.out.println(df1.format(bd));		<span class="hljs-comment">// 00.30</span><br>System.out.println(df2.format(bd));		<span class="hljs-comment">// .30</span><br>System.out.println(df3.format(bd));		<span class="hljs-comment">// 0.3</span><br></code></pre></div></td></tr></table></figure>
+
+<p>从以上可以看出，占位符<code>0</code>有多少个，最后的结果就有多少位，而<code>#</code>则只保留有效数字</p>
+<h3 id="实际应用示例"><a href="#实际应用示例" class="headerlink" title="实际应用示例"></a>实际应用示例</h3><p><strong>金钱格式化</strong>：小数点左边3为分隔，只保留有效数字，但最少为一位，右边则是保留两位数字</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">DecimalFormat df4 = <span class="hljs-keyword">new</span> DecimalFormat(<span class="hljs-string">&quot;,##0.00&quot;</span>);<br>df4.setRoundingMode(RoundingMode.UP);<br>BigDecimal bd2 = <span class="hljs-keyword">new</span> BigDecimal(<span class="hljs-string">&quot;1233.230&quot;</span>);<br>BigDecimal bd3 = <span class="hljs-keyword">new</span> BigDecimal(<span class="hljs-string">&quot;13.232&quot;</span>);<br>BigDecimal bd4 = <span class="hljs-keyword">new</span> BigDecimal(<span class="hljs-string">&quot;0.232&quot;</span>);<br>System.out.println(df4.format(bd2));        <span class="hljs-comment">// 1,233.23</span><br>System.out.println(df4.format(bd3));        <span class="hljs-comment">// 13.23</span><br>System.out.println(df4.format(bd4));        <span class="hljs-comment">// 0.23</span><br></code></pre></div></td></tr></table></figure>
+
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><ul>
+<li><strong>性能考虑</strong>：虽然 <code>BigDecimal</code> 提供了高精度，但其运算速度慢于原始类型。在不需要极高精度的场景下，考虑性能和需求之间的平衡。</li>
+<li><strong>内存使用</strong>：<code>BigDecimal</code> 由于其复杂性，相比原始类型会占用更多内存。适当时进行优化，例如在进行大量计算时复用对象。</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><code>BigDecimal</code>是处理需要高度精确数值的理想选择。通过其各种方法，可以进行精确的数学运算，避免了常规浮点类型的局限。虽然<code>BigDecimal</code>的操作相比原生类型更为复杂和耗时，但在精确度至关重要的情况下，这种性能的牺牲是合理的。使用时需要特别注意其与<code>BigInteger</code>的不同，以及如何选择合适的数学运算方法来满足具体需求。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/JavaSE/">JavaSE</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/JavaSE/">JavaSE</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%B8%B8%E7%94%A8API/">常用API</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/05/11/javase-comparator/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Java实现对象的比较</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/03/23/linux-commands/">
+                        <span class="hidden-mobile">Linux常用命令</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

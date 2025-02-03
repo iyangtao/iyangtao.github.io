@@ -1,0 +1,1383 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="引言随着数据分析需求的增加，数据库查询的复杂性也随之提高。MySQL从8.0版本引入的窗口函数，为数据分析提供了更多的灵活性和强大的数据处理能力。窗口函数使得在单个查询中执行多种计算成为可能，大大增强了SQL的表达力。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL窗口函数">
+<meta property="og:url" content="http://example.com/2024/05/26/mysql-window-function/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="引言随着数据分析需求的增加，数据库查询的复杂性也随之提高。MySQL从8.0版本引入的窗口函数，为数据分析提供了更多的灵活性和强大的数据处理能力。窗口函数使得在单个查询中执行多种计算成为可能，大大增强了SQL的表达力。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/mysql-windows-function.webp">
+<meta property="article:published_time" content="2024-05-26T07:00:25.000Z">
+<meta property="article:modified_time" content="2024-05-26T07:00:25.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="MySQL">
+<meta property="article:tag" content="MySQL8">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/mysql-windows-function.webp">
+  
+  
+  <title>MySQL窗口函数 - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/mysql-windows-function.webp') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="MySQL窗口函数">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2024-05-26 15:00" pubdate>
+        2024年5月26日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      9.1k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      16 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">MySQL窗口函数</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：8 个月前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>随着数据分析需求的增加，数据库查询的复杂性也随之提高。MySQL从8.0版本引入的窗口函数，为数据分析提供了更多的灵活性和强大的数据处理能力。窗口函数使得在单个查询中执行多种计算成为可能，大大增强了SQL的表达力。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 </p>
+<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p>MySQL中的窗口函数是一类非常强大的SQL功能，用于在数据记录集的<strong>“窗口”</strong>上进行计算。窗口函数可以在<strong>不改变数据行的返回数量</strong>的情况下，对一组行进行计算。这使得窗口函数特别适用于<strong>需要考虑相对位置或基于整个数据分区进行计算</strong>的复杂查询。</p>
+<h3 id="窗口"><a href="#窗口" class="headerlink" title="窗口"></a>窗口</h3><p>指定在<strong>哪些行</strong>上执行计算，这些行与当前行有某种逻辑关系，如在当前行的前后或与当前行处于相同分组。</p>
+<h3 id="分区"><a href="#分区" class="headerlink" title="分区"></a>分区</h3><p><code>PARTITION BY</code>，窗口函数可以按照一列或多列进行分区，相当于对数据进行<strong>分组</strong>，窗口函数在每个<strong>分组内部独立计算</strong>。</p>
+<h3 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h3><p><code>ORDER BY</code>，在窗口内部数据可以按照一列或多列进行<strong>排序</strong>，这个顺序会影响某些窗口函数的计算结果。</p>
+<h3 id="帧规范"><a href="#帧规范" class="headerlink" title="帧规范"></a>帧规范</h3><p><code>ROWS/RANGE BETWEEN</code>，进一步定义在当前行的上下文中，窗口<strong>包含哪些行</strong>。</p>
+<h2 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h2><figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-operator">&lt;</span>窗口函数名<span class="hljs-operator">&gt;</span>(<span class="hljs-operator">&lt;</span>参数<span class="hljs-operator">&gt;</span>)<br><span class="hljs-keyword">OVER</span> (<br>    [<span class="hljs-keyword">PARTITION</span> <span class="hljs-keyword">BY</span> <span class="hljs-operator">&lt;</span>分组列列表<span class="hljs-operator">&gt;</span>]<br>    [<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> <span class="hljs-operator">&lt;</span>排序列列表<span class="hljs-operator">&gt;</span> [<span class="hljs-keyword">ASC</span><span class="hljs-operator">|</span><span class="hljs-keyword">DESC</span>]]<br>    [<span class="hljs-keyword">ROWS</span> <span class="hljs-keyword">BETWEEN</span> <span class="hljs-operator">&lt;</span><span class="hljs-keyword">start</span><span class="hljs-operator">&gt;</span> <span class="hljs-keyword">AND</span> <span class="hljs-operator">&lt;</span><span class="hljs-keyword">end</span><span class="hljs-operator">&gt;</span> <span class="hljs-operator">|</span> <span class="hljs-keyword">RANGE</span> <span class="hljs-keyword">BETWEEN</span> <span class="hljs-operator">&lt;</span><span class="hljs-keyword">start</span><span class="hljs-operator">&gt;</span> <span class="hljs-keyword">AND</span> <span class="hljs-operator">&lt;</span><span class="hljs-keyword">end</span><span class="hljs-operator">&gt;</span>]<br>)<br></code></pre></div></td></tr></table></figure>
+<p>其中，<code>&lt;start&gt;</code> 和 <code>&lt;end&gt;</code> 的选项包括：</p>
+<ul>
+<li><code>UNBOUNDED PRECEDING</code>：从分区的第一行到当前行。</li>
+<li><code>N PRECEDING</code>：从当前行前的第N行到当前行（N为具体的行数）。</li>
+<li><code>CURRENT ROW</code>：当前行。</li>
+<li><code>N FOLLOWING</code>：从当前行后的第N行到当前行。</li>
+<li><code>UNBOUNDED FOLLOWING</code>：从当前行到分区的最后一行。</li>
+</ul>
+<h2 id="常见的窗口函数"><a href="#常见的窗口函数" class="headerlink" title="常见的窗口函数"></a>常见的窗口函数</h2><p>注：以下说明中的特定窗口均是<code>OVER()</code>子句中的<code>PARTITION BY</code>分组、<code>ORDER BY</code>排序以及<code>ROWS/RANGE BETWEEN</code>限定的范围。</p>
+<h3 id="聚合窗口函数"><a href="#聚合窗口函数" class="headerlink" title="聚合窗口函数"></a>聚合窗口函数</h3><ul>
+<li><p><code>SUM(column_name)</code>：</p>
+<ul>
+<li>计算指定窗口内所有行指定列的<strong>总和</strong>。</li>
+<li>在需要对数据集中的特定窗口（如某个时间段内、某个部门内）计算总和时使用。</li>
+</ul>
+</li>
+<li><p><code>AVG(column_name)</code></p>
+<ul>
+<li>计算指定窗口内所有行指定列的<strong>平均值</strong>。</li>
+<li>在需要对数据集中的特定窗口（如某个时间段内、某个部门内）计算平均值时使用。</li>
+</ul>
+</li>
+<li><p><code>MIN(column_name)</code></p>
+<ul>
+<li>计算指定窗口内所有行指定列的<strong>最小值</strong>。</li>
+<li>在需要找出数据集中特定窗口（如某个时间段内、某个部门内）的最小值时使用。</li>
+</ul>
+</li>
+<li><p><code>MAX(column_name)</code></p>
+<ul>
+<li>计算指定窗口内所有行指定列的<strong>最大值</strong>。</li>
+<li>在需要找出数据集中特定窗口（如某个时间段内、某个部门内）的最大值时使用。</li>
+</ul>
+</li>
+<li><p><code>COUNT(column_name)</code></p>
+<ul>
+<li>计算指定窗口内所有行指定列的<strong>行数</strong>。</li>
+<li>在需要计算数据集中特定窗口（如某个时间段内、某个部门内）的行数时使用。</li>
+</ul>
+</li>
+<li><p><code>VAR_POP(column_name)</code></p>
+<ul>
+<li>计算指定窗口内所有行指定列的<strong>总体方差</strong>。</li>
+<li>在需要分析数据集中特定窗口（如某个时间段内、某个部门内）数据的变异性时使用。</li>
+</ul>
+</li>
+<li><p><code>STDDEV_POP()</code></p>
+<ul>
+<li>计算指定窗口内所有行指定列的<strong>总体标准差</strong>。</li>
+<li>在需要分析数据集中特定窗口（如某个时间段内、某个部门内）数据的标准差，即变异性度量时使用。</li>
+</ul>
+</li>
+</ul>
+<h3 id="排名类窗口函数"><a href="#排名类窗口函数" class="headerlink" title="排名类窗口函数"></a>排名类窗口函数</h3><ul>
+<li><code>ROW_NUMBER()</code><ul>
+<li>为每个窗口分组内的行提供一个唯一的<strong>序列号</strong>，从1开始。如1、2、3、…</li>
+<li>在需要对数据集中特定窗口（如某个时间段内、某个部门内）的行进行唯一编号时使用，常用于排序并提取排名。</li>
+</ul>
+</li>
+<li><code>RANK()</code><ul>
+<li>为指定窗口内的每一行分配一个<strong>排名</strong>。如果存在<strong>相同的值</strong>，它们会获得<strong>相同的排名</strong>，而下一个排名将<strong>跳过之前的重复排名数</strong>。</li>
+<li>在需要对数据集中特定窗口（如某个时间段内、某个部门内）的行进行排名时使用，特别是当存在并列排名的情况时。</li>
+</ul>
+</li>
+<li><code>DENSE_RANK()</code><ul>
+<li>与<code>RANK()</code>类似，但排名<strong>不会跳过任何排名数</strong>。</li>
+<li>在需要对数据集中特定窗口（如某个时间段内、某个部门内）的行进行连续排名时使用，特别是当排名不应因并列而跳号时。</li>
+</ul>
+</li>
+<li><code>PERCENT_RANK()</code><ul>
+<li>计算当前行的<strong>百分比排名</strong>。这个排名是基于当前行在分组中的位置，公式为：**(排名 - 1) / (总行数 - 1)**。如果只有一行，结果是0。</li>
+<li>在需要确定某个值在整个数据集中的相对位置时使用，常用于数据分析，特别是当需要评估数据相对于其它数据的表现时。</li>
+</ul>
+</li>
+<li><code>CUME_DIST()</code><ul>
+<li>计算当前行的<strong>累积分布</strong>，这意味着计算有多少比例的值小于等于当前行的值。公式为：<strong>当前行之前的行数（包括当前行） / 总行数</strong>。</li>
+<li>在需要确定某个值在整个数据集中的累积分布位置时使用，常用于统计分析，尤其是当需要评估一个值相对于集合的位置时。</li>
+</ul>
+</li>
+<li><code>NTILE()</code><ul>
+<li>将窗口内的行分成 <code>n</code> 个<strong>大致相等的组</strong>，并为每一行分配一个组号，从1到 <code>n</code>。如果窗口中的行数不能被 <code>n</code> 整除，那么前面的几个组将包含一个额外的行。</li>
+<li>在需要将数据集分组进行分析时使用，如分位数分析、性能评级或将数据分成多个性能层次。</li>
+</ul>
+</li>
+</ul>
+<h3 id="值获取类窗口函数"><a href="#值获取类窗口函数" class="headerlink" title="值获取类窗口函数"></a>值获取类窗口函数</h3><ul>
+<li><p><code>FIRST_VALUE(column_name)</code></p>
+<ul>
+<li>返回窗口内<strong>第一行</strong>的指定列值。</li>
+<li>在需要获取数据集中特定窗口（如某个时间段内、某个部门内）第一个记录的值时使用，常用于时间序列分析，或当需要参考某个范围内的起始值进行比较时。</li>
+</ul>
+</li>
+<li><p><code>LAST_VALUE(column_name)</code></p>
+<ul>
+<li>返回窗口内<strong>最后一行</strong>的指定列值，使用时要注意定义正确的窗口帧（ROWS/RANGE BETWEEN），否则可能不会得到预期的结果。</li>
+<li>在需要获取数据集中特定窗口（如某个时间段内、某个部门内）最后一个记录的值时使用，常用于时间序列分析，或当需要参考某个范围内的结束值进行比较时。</li>
+</ul>
+</li>
+<li><p><code>NTH_VALUE(column_name, n)</code></p>
+<ul>
+<li>返回窗口内<strong>第 n 行</strong>的指定列值。</li>
+<li>在需要获取数据集中特定窗口（如某个时间段内、某个部门内）特定位置的记录值时使用，常用于需要定位序列中特定点的数据分析。</li>
+</ul>
+</li>
+</ul>
+<h3 id="位移类窗口函数"><a href="#位移类窗口函数" class="headerlink" title="位移类窗口函数"></a>位移类窗口函数</h3><ul>
+<li><p><code>LAG(column_name [, offset, default_value])</code></p>
+<ul>
+<li>返回当前行的指定列在窗口中<strong>前一行</strong>的值，可指定前 <code>offset</code> 行的值并指定一个默认值作为返回。</li>
+<li>在需要访问当前行之前的数据时使用，常用于时间序列数据分析、比较连续记录之间的变化，或计算增长率等。</li>
+</ul>
+</li>
+<li><p><code>LEAD(column_name [, offset, default_value])</code></p>
+<ul>
+<li>返回当前行的指定列在窗口中<strong>后一行</strong>的值，可指定前后 <code>offset</code> 行的值并指定一个默认值作为返回。</li>
+<li>在需要访问当前行之后的数据时使用，常用于预测未来的数据点、比较连续记录之间的变化，或者在数据序列中提前反应趋势和模式。</li>
+</ul>
+</li>
+</ul>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p>前置数据</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-comment">-- 城市GDP信息表</span><br><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> `city_gdp`<br>(<br>    `id`       <span class="hljs-type">int</span>            <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> AUTO_INCREMENT COMMENT <span class="hljs-string">&#x27;主键ID&#x27;</span>,<br>    `<span class="hljs-keyword">year</span>`     <span class="hljs-keyword">year</span>           <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> COMMENT <span class="hljs-string">&#x27;年份&#x27;</span>,<br>    `province` <span class="hljs-type">varchar</span>(<span class="hljs-number">255</span>)   <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> COMMENT <span class="hljs-string">&#x27;省份&#x27;</span>,<br>    `city`     <span class="hljs-type">varchar</span>(<span class="hljs-number">255</span>)   <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> COMMENT <span class="hljs-string">&#x27;城市&#x27;</span>,<br>    `gdp`      <span class="hljs-type">decimal</span>(<span class="hljs-number">12</span>, <span class="hljs-number">2</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> COMMENT <span class="hljs-string">&#x27;人民币（亿）&#x27;</span>,<br>    <span class="hljs-keyword">PRIMARY</span> KEY (`id`)<br>) ENGINE <span class="hljs-operator">=</span> InnoDB<br>  <span class="hljs-keyword">DEFAULT</span> CHARSET <span class="hljs-operator">=</span> utf8mb4<br>  <span class="hljs-keyword">COLLATE</span> <span class="hljs-operator">=</span> utf8mb4_0900_ai_ci COMMENT <span class="hljs-operator">=</span><span class="hljs-string">&#x27;城市GDP&#x27;</span>;<br><br><span class="hljs-comment">-- 数据</span><br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> city_gdp(<span class="hljs-keyword">year</span>, province, city, gdp)<br><span class="hljs-keyword">VALUES</span> (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;广州市&#x27;</span>, <span class="hljs-number">28839</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;深圳市&#x27;</span>, <span class="hljs-number">32387.68</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;佛山市&#x27;</span>, <span class="hljs-number">12698.39</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;东莞市&#x27;</span>, <span class="hljs-number">11200.32</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;惠州市&#x27;</span>, <span class="hljs-number">5401.24</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;珠海市&#x27;</span>, <span class="hljs-number">4045.45</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;福建省&#x27;</span>, <span class="hljs-string">&#x27;福州市&#x27;</span>, <span class="hljs-number">12308.23</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;福建省&#x27;</span>, <span class="hljs-string">&#x27;泉州市&#x27;</span>, <span class="hljs-number">12102.97</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;福建省&#x27;</span>, <span class="hljs-string">&#x27;厦门市&#x27;</span>, <span class="hljs-number">7802.7</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;浙江省&#x27;</span>, <span class="hljs-string">&#x27;杭州市&#x27;</span>, <span class="hljs-number">18753</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;浙江省&#x27;</span>, <span class="hljs-string">&#x27;宁波市&#x27;</span>, <span class="hljs-number">15704.3</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;浙江省&#x27;</span>, <span class="hljs-string">&#x27;温州市&#x27;</span>, <span class="hljs-number">8029.8</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;浙江省&#x27;</span>, <span class="hljs-string">&#x27;绍兴市&#x27;</span>, <span class="hljs-number">7351</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;浙江省&#x27;</span>, <span class="hljs-string">&#x27;嘉兴市&#x27;</span>, <span class="hljs-number">6739.45</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;广州市&#x27;</span>, <span class="hljs-number">30355.73</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;深圳市&#x27;</span>, <span class="hljs-number">34606.4</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;佛山市&#x27;</span>, <span class="hljs-number">13276.14</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;东莞市&#x27;</span>, <span class="hljs-number">11438.13</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;惠州市&#x27;</span>, <span class="hljs-number">5639.68</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;珠海市&#x27;</span>, <span class="hljs-number">4233.2</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;福建省&#x27;</span>, <span class="hljs-string">&#x27;福州市&#x27;</span>, <span class="hljs-number">12928.47</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;福建省&#x27;</span>, <span class="hljs-string">&#x27;泉州市&#x27;</span>, <span class="hljs-number">12172.33</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;福建省&#x27;</span>, <span class="hljs-string">&#x27;厦门市&#x27;</span>, <span class="hljs-number">8066.49</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;浙江省&#x27;</span>, <span class="hljs-string">&#x27;杭州市&#x27;</span>, <span class="hljs-number">20058.98</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;浙江省&#x27;</span>, <span class="hljs-string">&#x27;宁波市&#x27;</span>, <span class="hljs-number">16452.83</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;浙江省&#x27;</span>, <span class="hljs-string">&#x27;温州市&#x27;</span>, <span class="hljs-number">8730.63</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;浙江省&#x27;</span>, <span class="hljs-string">&#x27;绍兴市&#x27;</span>, <span class="hljs-number">7791.14</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;浙江省&#x27;</span>, <span class="hljs-string">&#x27;嘉兴市&#x27;</span>, <span class="hljs-number">7062.45</span>);<br></code></pre></div></td></tr></table></figure>
+<ol>
+<li><p>查询2022年广东省各城市GDP与第1名GDP的差值</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT cg.year,<br>       cg.province,<br>       cg.city,<br>       cg.gdp,<br>       MAX(cg.gdp) OVER (PARTITION BY cg.province)          AS max_gdp,<br>       MAX(cg.gdp) OVER (PARTITION BY cg.province) - cg.gdp AS diff<br>FROM city_gdp cg<br>WHERE cg.province = &#x27;广东省&#x27;<br>  AND cg.year = 2022;<br></code></pre></div></td></tr></table></figure>
+
+<p>查询结果：</p>
+<table>
+<thead>
+<tr>
+<th align="left">year</th>
+<th align="left">province</th>
+<th align="left">city</th>
+<th align="left">gdp</th>
+<th align="left">max_gdp</th>
+<th align="left">diff</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">广州市</td>
+<td align="left">28839.00</td>
+<td align="left">32387.68</td>
+<td align="left">3548.68</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">深圳市</td>
+<td align="left">32387.68</td>
+<td align="left">32387.68</td>
+<td align="left">0.00</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">佛山市</td>
+<td align="left">12698.39</td>
+<td align="left">32387.68</td>
+<td align="left">19689.29</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">东莞市</td>
+<td align="left">11200.32</td>
+<td align="left">32387.68</td>
+<td align="left">21187.36</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">惠州市</td>
+<td align="left">5401.24</td>
+<td align="left">32387.68</td>
+<td align="left">26986.44</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">珠海市</td>
+<td align="left">4045.45</td>
+<td align="left">32387.68</td>
+<td align="left">28342.23</td>
+</tr>
+</tbody></table>
+</li>
+<li><p>查询2022年各城市GDP在省份内的排名</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT cg.year,<br>       cg.province,<br>       cg.city,<br>       cg.gdp,<br>       RANK() OVER (PARTITION BY cg.province ORDER BY cg.gdp DESC) AS rk<br>FROM city_gdp cg<br>WHERE cg.year = 2022;<br></code></pre></div></td></tr></table></figure>
+
+<p>查询结果：</p>
+<table>
+<thead>
+<tr>
+<th align="left">year</th>
+<th align="left">province</th>
+<th align="left">city</th>
+<th align="left">gdp</th>
+<th align="left">rk</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">深圳市</td>
+<td align="left">32387.68</td>
+<td align="left">1</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">广州市</td>
+<td align="left">28839.00</td>
+<td align="left">2</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">佛山市</td>
+<td align="left">12698.39</td>
+<td align="left">3</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">东莞市</td>
+<td align="left">11200.32</td>
+<td align="left">4</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">惠州市</td>
+<td align="left">5401.24</td>
+<td align="left">5</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">珠海市</td>
+<td align="left">4045.45</td>
+<td align="left">6</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">浙江省</td>
+<td align="left">杭州市</td>
+<td align="left">18753.00</td>
+<td align="left">1</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">浙江省</td>
+<td align="left">宁波市</td>
+<td align="left">15704.30</td>
+<td align="left">2</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">浙江省</td>
+<td align="left">温州市</td>
+<td align="left">8029.80</td>
+<td align="left">3</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">浙江省</td>
+<td align="left">绍兴市</td>
+<td align="left">7351.00</td>
+<td align="left">4</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">浙江省</td>
+<td align="left">嘉兴市</td>
+<td align="left">6739.45</td>
+<td align="left">5</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">福建省</td>
+<td align="left">福州市</td>
+<td align="left">12308.23</td>
+<td align="left">1</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">福建省</td>
+<td align="left">泉州市</td>
+<td align="left">12102.97</td>
+<td align="left">2</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">福建省</td>
+<td align="left">厦门市</td>
+<td align="left">7802.70</td>
+<td align="left">3</td>
+</tr>
+</tbody></table>
+</li>
+<li><p>查询2022年广东省各城市GDP与第一名GDP的差值</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> cg.year,<br>       cg.province,<br>       cg.gdp,<br>       cg.city,<br>       <span class="hljs-built_in">NTH_VALUE</span>(cg.gdp, <span class="hljs-number">2</span>)<br>                 <span class="hljs-keyword">OVER</span> (<br>                     <span class="hljs-keyword">PARTITION</span> <span class="hljs-keyword">BY</span> cg.province<br>                     <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> cg.gdp <span class="hljs-keyword">DESC</span><br>                     )          <span class="hljs-keyword">AS</span> sec_gdp,<br>       cg.gdp <span class="hljs-operator">-</span> <span class="hljs-built_in">NTH_VALUE</span>(cg.gdp, <span class="hljs-number">2</span>)<br>                          <span class="hljs-keyword">OVER</span> (<br>                              <span class="hljs-keyword">PARTITION</span> <span class="hljs-keyword">BY</span> cg.province<br>                              <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> cg.gdp <span class="hljs-keyword">DESC</span><br>                              ) <span class="hljs-keyword">AS</span> diff<br><span class="hljs-keyword">FROM</span> city_gdp cg<br><span class="hljs-keyword">WHERE</span> cg.year <span class="hljs-operator">=</span> <span class="hljs-number">2022</span>;<br></code></pre></div></td></tr></table></figure>
+
+<p>查询结果：</p>
+<table>
+<thead>
+<tr>
+<th align="left">year</th>
+<th align="left">province</th>
+<th align="left">gdp</th>
+<th align="left">city</th>
+<th align="left">sec_gdp</th>
+<th align="left">diff</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">32387.68</td>
+<td align="left">深圳市</td>
+<td align="left">null</td>
+<td align="left">null</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">28839.00</td>
+<td align="left">广州市</td>
+<td align="left">28839.00</td>
+<td align="left">0.00</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">12698.39</td>
+<td align="left">佛山市</td>
+<td align="left">28839.00</td>
+<td align="left">-16140.61</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">11200.32</td>
+<td align="left">东莞市</td>
+<td align="left">28839.00</td>
+<td align="left">-17638.68</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">5401.24</td>
+<td align="left">惠州市</td>
+<td align="left">28839.00</td>
+<td align="left">-23437.76</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">4045.45</td>
+<td align="left">珠海市</td>
+<td align="left">28839.00</td>
+<td align="left">-24793.55</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">浙江省</td>
+<td align="left">18753.00</td>
+<td align="left">杭州市</td>
+<td align="left">null</td>
+<td align="left">null</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">浙江省</td>
+<td align="left">15704.30</td>
+<td align="left">宁波市</td>
+<td align="left">15704.30</td>
+<td align="left">0.00</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">浙江省</td>
+<td align="left">8029.80</td>
+<td align="left">温州市</td>
+<td align="left">15704.30</td>
+<td align="left">-7674.50</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">浙江省</td>
+<td align="left">7351.00</td>
+<td align="left">绍兴市</td>
+<td align="left">15704.30</td>
+<td align="left">-8353.30</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">浙江省</td>
+<td align="left">6739.45</td>
+<td align="left">嘉兴市</td>
+<td align="left">15704.30</td>
+<td align="left">-8964.85</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">福建省</td>
+<td align="left">12308.23</td>
+<td align="left">福州市</td>
+<td align="left">null</td>
+<td align="left">null</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">福建省</td>
+<td align="left">12102.97</td>
+<td align="left">泉州市</td>
+<td align="left">12102.97</td>
+<td align="left">0.00</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">福建省</td>
+<td align="left">7802.70</td>
+<td align="left">厦门市</td>
+<td align="left">12102.97</td>
+<td align="left">-4300.27</td>
+</tr>
+</tbody></table>
+<p>可以看到查询结果中第一名所在行的sec_gdp为null，这是因为 <code>NTH_VALUE()</code> 函数的默认行为只考虑从当前行往前到窗口开始的行，此时就需要调整<code>OVER()</code>子句中的窗口帧了，这里我们需要将其调整为从分区的第一行到最后一行，调整后SQL为</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> cg.year,<br>       cg.province,<br>       cg.gdp,<br>       cg.city,<br>       <span class="hljs-built_in">NTH_VALUE</span>(cg.gdp, <span class="hljs-number">2</span>)<br>                 <span class="hljs-keyword">OVER</span> (<br>                     <span class="hljs-keyword">PARTITION</span> <span class="hljs-keyword">BY</span> cg.province<br>                     <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> cg.gdp <span class="hljs-keyword">DESC</span><br>                     <span class="hljs-keyword">RANGE</span> <span class="hljs-keyword">BETWEEN</span> UNBOUNDED PRECEDING <span class="hljs-keyword">AND</span> UNBOUNDED FOLLOWING<br>                     )          <span class="hljs-keyword">AS</span> sec_gdp,<br>       cg.gdp <span class="hljs-operator">-</span> <span class="hljs-built_in">NTH_VALUE</span>(cg.gdp, <span class="hljs-number">2</span>)<br>                          <span class="hljs-keyword">OVER</span> (<br>                              <span class="hljs-keyword">PARTITION</span> <span class="hljs-keyword">BY</span> cg.province<br>                              <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> cg.gdp <span class="hljs-keyword">DESC</span><br>                              <span class="hljs-keyword">RANGE</span> <span class="hljs-keyword">BETWEEN</span> UNBOUNDED PRECEDING <span class="hljs-keyword">AND</span> UNBOUNDED FOLLOWING<br>                              ) <span class="hljs-keyword">AS</span> diff<br><span class="hljs-keyword">FROM</span> city_gdp cg<br><span class="hljs-keyword">WHERE</span> cg.year <span class="hljs-operator">=</span> <span class="hljs-number">2022</span>;<br></code></pre></div></td></tr></table></figure>
+
+<p>查询结果：</p>
+<table>
+<thead>
+<tr>
+<th align="left">year</th>
+<th align="left">province</th>
+<th align="left">gdp</th>
+<th align="left">city</th>
+<th align="left">sec_gdp</th>
+<th align="left">diff</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">32387.68</td>
+<td align="left">深圳市</td>
+<td align="left">28839.00</td>
+<td align="left">3548.68</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">28839.00</td>
+<td align="left">广州市</td>
+<td align="left">28839.00</td>
+<td align="left">0.00</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">12698.39</td>
+<td align="left">佛山市</td>
+<td align="left">28839.00</td>
+<td align="left">-16140.61</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">11200.32</td>
+<td align="left">东莞市</td>
+<td align="left">28839.00</td>
+<td align="left">-17638.68</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">5401.24</td>
+<td align="left">惠州市</td>
+<td align="left">28839.00</td>
+<td align="left">-23437.76</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">广东省</td>
+<td align="left">4045.45</td>
+<td align="left">珠海市</td>
+<td align="left">28839.00</td>
+<td align="left">-24793.55</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">浙江省</td>
+<td align="left">18753.00</td>
+<td align="left">杭州市</td>
+<td align="left">15704.30</td>
+<td align="left">3048.70</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">浙江省</td>
+<td align="left">15704.30</td>
+<td align="left">宁波市</td>
+<td align="left">15704.30</td>
+<td align="left">0.00</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">浙江省</td>
+<td align="left">8029.80</td>
+<td align="left">温州市</td>
+<td align="left">15704.30</td>
+<td align="left">-7674.50</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">浙江省</td>
+<td align="left">7351.00</td>
+<td align="left">绍兴市</td>
+<td align="left">15704.30</td>
+<td align="left">-8353.30</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">浙江省</td>
+<td align="left">6739.45</td>
+<td align="left">嘉兴市</td>
+<td align="left">15704.30</td>
+<td align="left">-8964.85</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">福建省</td>
+<td align="left">12308.23</td>
+<td align="left">福州市</td>
+<td align="left">12102.97</td>
+<td align="left">205.26</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">福建省</td>
+<td align="left">12102.97</td>
+<td align="left">泉州市</td>
+<td align="left">12102.97</td>
+<td align="left">0.00</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">福建省</td>
+<td align="left">7802.70</td>
+<td align="left">厦门市</td>
+<td align="left">12102.97</td>
+<td align="left">-4300.27</td>
+</tr>
+</tbody></table>
+</li>
+<li><p>获取每个年度每个城市的GDP与前一名的GDP差距</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> cg.year,<br>       cg.city,<br>       cg.province,<br>       cg.gdp,<br>       <span class="hljs-built_in">LAG</span>(cg.gdp) <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">PARTITION</span> <span class="hljs-keyword">BY</span> cg.year, cg.province <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> cg.gdp <span class="hljs-keyword">DESC</span>)          <span class="hljs-keyword">AS</span> pre_gdp,<br>       cg.gdp <span class="hljs-operator">-</span> <span class="hljs-built_in">LAG</span>(cg.gdp) <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">PARTITION</span> <span class="hljs-keyword">BY</span> cg.year, cg.province <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> cg.gdp <span class="hljs-keyword">DESC</span>) <span class="hljs-keyword">AS</span> diff<br><span class="hljs-keyword">FROM</span> city_gdp cg;<br></code></pre></div></td></tr></table></figure>
+
+<p>查询结果：</p>
+<table>
+<thead>
+<tr>
+<th align="left">year</th>
+<th align="left">city</th>
+<th align="left">province</th>
+<th align="left">gdp</th>
+<th align="left">pre_gdp</th>
+<th align="left">diff</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">2022</td>
+<td align="left">深圳市</td>
+<td align="left">广东省</td>
+<td align="left">32387.68</td>
+<td align="left">null</td>
+<td align="left">null</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">广州市</td>
+<td align="left">广东省</td>
+<td align="left">28839.00</td>
+<td align="left">32387.68</td>
+<td align="left">-3548.68</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">佛山市</td>
+<td align="left">广东省</td>
+<td align="left">12698.39</td>
+<td align="left">28839.00</td>
+<td align="left">-16140.61</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">东莞市</td>
+<td align="left">广东省</td>
+<td align="left">11200.32</td>
+<td align="left">12698.39</td>
+<td align="left">-1498.07</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">惠州市</td>
+<td align="left">广东省</td>
+<td align="left">5401.24</td>
+<td align="left">11200.32</td>
+<td align="left">-5799.08</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">珠海市</td>
+<td align="left">广东省</td>
+<td align="left">4045.45</td>
+<td align="left">5401.24</td>
+<td align="left">-1355.79</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">杭州市</td>
+<td align="left">浙江省</td>
+<td align="left">18753.00</td>
+<td align="left">null</td>
+<td align="left">null</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">宁波市</td>
+<td align="left">浙江省</td>
+<td align="left">15704.30</td>
+<td align="left">18753.00</td>
+<td align="left">-3048.70</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">温州市</td>
+<td align="left">浙江省</td>
+<td align="left">8029.80</td>
+<td align="left">15704.30</td>
+<td align="left">-7674.50</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">绍兴市</td>
+<td align="left">浙江省</td>
+<td align="left">7351.00</td>
+<td align="left">8029.80</td>
+<td align="left">-678.80</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">嘉兴市</td>
+<td align="left">浙江省</td>
+<td align="left">6739.45</td>
+<td align="left">7351.00</td>
+<td align="left">-611.55</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">福州市</td>
+<td align="left">福建省</td>
+<td align="left">12308.23</td>
+<td align="left">null</td>
+<td align="left">null</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">泉州市</td>
+<td align="left">福建省</td>
+<td align="left">12102.97</td>
+<td align="left">12308.23</td>
+<td align="left">-205.26</td>
+</tr>
+<tr>
+<td align="left">2022</td>
+<td align="left">厦门市</td>
+<td align="left">福建省</td>
+<td align="left">7802.70</td>
+<td align="left">12102.97</td>
+<td align="left">-4300.27</td>
+</tr>
+<tr>
+<td align="left">2023</td>
+<td align="left">深圳市</td>
+<td align="left">广东省</td>
+<td align="left">34606.40</td>
+<td align="left">null</td>
+<td align="left">null</td>
+</tr>
+<tr>
+<td align="left">2023</td>
+<td align="left">广州市</td>
+<td align="left">广东省</td>
+<td align="left">30355.73</td>
+<td align="left">34606.40</td>
+<td align="left">-4250.67</td>
+</tr>
+<tr>
+<td align="left">2023</td>
+<td align="left">佛山市</td>
+<td align="left">广东省</td>
+<td align="left">13276.14</td>
+<td align="left">30355.73</td>
+<td align="left">-17079.59</td>
+</tr>
+<tr>
+<td align="left">2023</td>
+<td align="left">东莞市</td>
+<td align="left">广东省</td>
+<td align="left">11438.13</td>
+<td align="left">13276.14</td>
+<td align="left">-1838.01</td>
+</tr>
+<tr>
+<td align="left">2023</td>
+<td align="left">惠州市</td>
+<td align="left">广东省</td>
+<td align="left">5639.68</td>
+<td align="left">11438.13</td>
+<td align="left">-5798.45</td>
+</tr>
+<tr>
+<td align="left">2023</td>
+<td align="left">珠海市</td>
+<td align="left">广东省</td>
+<td align="left">4233.20</td>
+<td align="left">5639.68</td>
+<td align="left">-1406.48</td>
+</tr>
+<tr>
+<td align="left">2023</td>
+<td align="left">杭州市</td>
+<td align="left">浙江省</td>
+<td align="left">20058.98</td>
+<td align="left">null</td>
+<td align="left">null</td>
+</tr>
+<tr>
+<td align="left">2023</td>
+<td align="left">宁波市</td>
+<td align="left">浙江省</td>
+<td align="left">16452.83</td>
+<td align="left">20058.98</td>
+<td align="left">-3606.15</td>
+</tr>
+<tr>
+<td align="left">2023</td>
+<td align="left">温州市</td>
+<td align="left">浙江省</td>
+<td align="left">8730.63</td>
+<td align="left">16452.83</td>
+<td align="left">-7722.20</td>
+</tr>
+<tr>
+<td align="left">2023</td>
+<td align="left">绍兴市</td>
+<td align="left">浙江省</td>
+<td align="left">7791.14</td>
+<td align="left">8730.63</td>
+<td align="left">-939.49</td>
+</tr>
+<tr>
+<td align="left">2023</td>
+<td align="left">嘉兴市</td>
+<td align="left">浙江省</td>
+<td align="left">7062.45</td>
+<td align="left">7791.14</td>
+<td align="left">-728.69</td>
+</tr>
+<tr>
+<td align="left">2023</td>
+<td align="left">福州市</td>
+<td align="left">福建省</td>
+<td align="left">12928.47</td>
+<td align="left">null</td>
+<td align="left">null</td>
+</tr>
+<tr>
+<td align="left">2023</td>
+<td align="left">泉州市</td>
+<td align="left">福建省</td>
+<td align="left">12172.33</td>
+<td align="left">12928.47</td>
+<td align="left">-756.14</td>
+</tr>
+<tr>
+<td align="left">2023</td>
+<td align="left">厦门市</td>
+<td align="left">福建省</td>
+<td align="left">8066.49</td>
+<td align="left">12172.33</td>
+<td align="left">-4105.84</td>
+</tr>
+</tbody></table>
+</li>
+</ol>
+<h2 id="性能问题"><a href="#性能问题" class="headerlink" title="性能问题"></a>性能问题</h2><h3 id="性能开销"><a href="#性能开销" class="headerlink" title="性能开销"></a>性能开销</h3><ul>
+<li><strong>数据排序</strong>：窗口函数经常需要对数据进行排序，这可以是一个<strong>资源密集型</strong>的操作，尤其是当数据集非常大时。排序操作通常涉及内存和可能的磁盘I/O，这会影响查询的执行时间。</li>
+<li><strong>分区处理</strong>：如果使用 <code>PARTITION BY</code> 子句，数据库需要为每个分区执行函数，这可能导致处理时间增加，尤其是当有大量小分区时。</li>
+<li><strong>计算开销</strong>：某些窗口函数本身（如计算排名或计算移动平均）就需要额外的计算开销。特别是当每个窗口大小较大或窗口函数涉及复杂操作（例如标准差或线性回归）时，这些计算可能变得相当昂贵。</li>
+</ul>
+<h3 id="优化策略"><a href="#优化策略" class="headerlink" title="优化策略"></a>优化策略</h3><ul>
+<li><strong>合理的索引</strong>：对用于 <code>ORDER BY</code> 和 <code>PARTITION BY</code> 的列建立索引可以显著提高窗口函数的性能，因为这可以加速排序和分区的数据检索过程。</li>
+<li><strong>减少数据量</strong>：在使用窗口函数之前通过过滤条件减少处理的数据量可以提高性能。</li>
+<li><strong>精简窗口规格</strong>：尽量使用精简的 <code>ROWS</code> 或 <code>RANGE</code> 规格。例如，如果只需要访问前一行或后一行数据，使用 <code>LAG()</code> 或 <code>LEAD()</code> 而不是更广泛的窗口可能更有效。</li>
+<li><strong>避免冗余计算</strong>：如果可能，尝试重用已经计算过的结果，或者在应用层而不是数据库层面进行某些计算，尤其是在结果集较小的情况下。</li>
+</ul>
+<h3 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h3><ul>
+<li>窗口函数虽然在处理复杂的分析查询时非常强大，但它们可能不适合实时查询或需要高度优化的系统，除非能够很好地控制查询条件和数据量。</li>
+<li>在处理大规模数据、需要高性能和高可用性的场景下，处理数据分析应优先考虑交给应用层实现，应用层往往有并行处理、缓存优化、资源分配、负载均衡等更多优势，虽然可能会涉及更多的开发工作，但通常能为系统提供更好的总体性能和更高的灵活性。</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文详细介绍了MySQL中窗口函数的使用方法和应用场景，窗口函数不仅增强了SQL的功能，也为复杂的数据处理提供了高效的解决方案。当然，在使用时也应当充分考虑数据库性能问题。掌握窗口函数，将使数据库开发者能够更好地处理数据分析任务，提高查询效率和准确性。随着实践的深入，窗口函数无疑将成为每个数据库专业人士必备的技能之一。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/MySQL/">MySQL</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/MySQL/">MySQL</a>
+                    
+                      <a class="hover-with-bg" href="/tags/MySQL8/">MySQL8</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/07/15/spring-cache/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Spring Cache</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/05/25/javase-threadlocal/">
+                        <span class="hidden-mobile">ThreadLocal详解</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
