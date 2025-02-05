@@ -16,24 +16,25 @@
   <meta name="author" content="Yangtao">
   <meta name="keywords" content="">
   
-    <meta name="description" content="在现代软件开发中，版本控制系统是不可或缺的工具，它帮助团队高效地管理源代码的变更和历史。Git，作为一个分布式版本控制系统，因其强大的分支管理和灵活的远程协作能力而广受欢迎。本文汇总了Git的常用命令和操作，旨在帮助开发者快速掌握Git的核心功能，无论是进行日常的代码提交、版本回退、还是进行复杂的分支操作和协作。">
+    <meta name="description" content="引言本文将系统地介绍 Git 在实际开发中常用的命令及其用法，包括仓库初始化、配置管理、远程操作、分支和标签管理、子模块使用等。对于刚入门的读者，本文能帮助快速了解基础操作；对于已经熟悉 Git 的开发者，也可将其当作一份全面的参考手册或速查表。 创建及配置git init作用git init 用于在当前目录下创建一个新的 Git 仓库。执行后，该目录会被 Git 识别为仓库，并创建 .git 目">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Git基础命令">
+<meta property="og:title" content="Git命令">
 <meta property="og:url" content="http://example.com/2022/04/21/git-commands/index.html">
 <meta property="og:site_name" content="Yangtao&#39;s space">
-<meta property="og:description" content="在现代软件开发中，版本控制系统是不可或缺的工具，它帮助团队高效地管理源代码的变更和历史。Git，作为一个分布式版本控制系统，因其强大的分支管理和灵活的远程协作能力而广受欢迎。本文汇总了Git的常用命令和操作，旨在帮助开发者快速掌握Git的核心功能，无论是进行日常的代码提交、版本回退、还是进行复杂的分支操作和协作。">
+<meta property="og:description" content="引言本文将系统地介绍 Git 在实际开发中常用的命令及其用法，包括仓库初始化、配置管理、远程操作、分支和标签管理、子模块使用等。对于刚入门的读者，本文能帮助快速了解基础操作；对于已经熟悉 Git 的开发者，也可将其当作一份全面的参考手册或速查表。 创建及配置git init作用git init 用于在当前目录下创建一个新的 Git 仓库。执行后，该目录会被 Git 识别为仓库，并创建 .git 目">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/git-blog-header_1.png">
 <meta property="article:published_time" content="2022-04-21T13:52:43.000Z">
 <meta property="article:modified_time" content="2022-04-21T13:52:43.000Z">
 <meta property="article:author" content="Yangtao">
-<meta property="article:tag" content="Docker">
-<meta property="article:tag" content="容器">
+<meta property="article:tag" content="Git">
+<meta property="article:tag" content="版本管理">
+<meta property="article:tag" content="命令大全">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/git-blog-header_1.png">
   
   
-  <title>Git基础命令 - Yangtao&#39;s space</title>
+  <title>Git命令 - Yangtao&#39;s space</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
@@ -191,7 +192,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="Git基础命令">
+            <span class="h2" id="subtitle" title="Git命令">
               
             </span>
 
@@ -217,7 +218,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      3.3k 字
+      18k 字
     </span>
   
 
@@ -226,7 +227,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      6 分钟
+      31 分钟
     </span>
   
 
@@ -263,7 +264,7 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">Git基础命令</h1>
+            <h1 style="display: none">Git命令</h1>
             
               <p class="note note-info">
                 
@@ -272,32 +273,469 @@
               </p>
             
             <div class="markdown-body">
-              <p>在现代软件开发中，版本控制系统是不可或缺的工具，它帮助团队高效地管理源代码的变更和历史。Git，作为一个分布式版本控制系统，因其强大的分支管理和灵活的远程协作能力而广受欢迎。本文汇总了Git的常用命令和操作，旨在帮助开发者快速掌握Git的核心功能，无论是进行日常的代码提交、版本回退、还是进行复杂的分支操作和协作。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     </p>
-<h2 id="创建"><a href="#创建" class="headerlink" title="创建"></a>创建</h2><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 初始化本地仓库 </span><br>git init<br><br><span class="hljs-comment"># 将远仓库的内容克隆到本地</span><br>git <span class="hljs-built_in">clone</span> [remote url]<br></code></pre></div></td></tr></table></figure>
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>本文将系统地介绍 <code>Git</code> 在实际开发中常用的命令及其用法，包括仓库初始化、配置管理、远程操作、分支和标签管理、子模块使用等。对于刚入门的读者，本文能帮助快速了解基础操作；对于已经熟悉 <code>Git</code> 的开发者，也可将其当作一份全面的参考手册或速查表。</p>
+<h2 id="创建及配置"><a href="#创建及配置" class="headerlink" title="创建及配置"></a>创建及配置</h2><h3 id="git-init"><a href="#git-init" class="headerlink" title="git init"></a>git init</h3><h4 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h4><p><code>git init</code> 用于在当前目录下创建一个新的 <code>Git</code> 仓库。执行后，该目录会被 <code>Git</code> 识别为仓库，并创建 <code>.git</code> 目录来存储版本控制信息。</p>
+<h4 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 在当前目录创建一个新的 Git 仓库。</span><br>git init<br><br><span class="hljs-comment"># 在指定目录 &lt;directory&gt; 下初始化 Git 仓库。</span><br>git init &lt;directory&gt;<br></code></pre></div></td></tr></table></figure>
 
-<h2 id="提交"><a href="#提交" class="headerlink" title="提交"></a>提交</h2><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 查看本地库状态</span><br>git status<br><br><span class="hljs-comment"># 显示暂存区和工作区的差异</span><br>git diff [file]<br><br><span class="hljs-comment"># 显示暂存区和上一次提交的差异</span><br>git diff --cached [file]<br>git diff --staged [file]<br><br><span class="hljs-comment"># 显示两次提交之间的差异</span><br>git diff [first-branch]...[second-branch]<br><br><span class="hljs-comment"># 添加文件到暂存区 </span><br>git add [file1] [file2] ...  <br><br><span class="hljs-comment"># 添加目录到暂存区</span><br>git add [dir]<br><br><span class="hljs-comment"># 添加所有文件到暂存区</span><br>git add .<br><br><span class="hljs-comment"># 提交到本地库 </span><br>git commit -m [message]<br>git commit [file1] [file2] ... -m [message]<br><br><span class="hljs-comment"># 修改注释</span><br>git commit --amend<br><br><span class="hljs-comment"># 直接提交，跳过add</span><br>git commit -a<br><br><span class="hljs-comment"># 设置提交时的信息</span><br>git config --global user.name <span class="hljs-string">&#x27;username&#x27;</span><br>git config --global user.email <span class="hljs-string">&#x27;email&#x27;</span><br></code></pre></div></td></tr></table></figure>
+<h4 id="参数说明"><a href="#参数说明" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>--bare</code>：创建一个裸仓库（不含工作区的 <code>Git</code> 仓库，通常用于远程仓库）。</li>
+<li><code>--template=&lt;directory&gt;</code>：指定初始化时使用的模板目录。</li>
+<li><code>--separate-git-dir=&lt;git-dir&gt;</code>：指定 <code>.git</code> 目录的存放位置，而非默认的当前目录。</li>
+<li><code>--shared[=&lt;permissions&gt;]</code>：用于多人协作时设置共享权限（适用于团队开发的 <code>Git</code> 服务器）。</li>
+</ul>
+<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 创建一个裸仓库 myrepo.git，适用于远程仓库。</span><br>git init --bare myrepo.git<br><br><span class="hljs-comment"># 将 Git 版本控制信息存储在 /path/to/git-dir，而不影响当前目录结构。</span><br>git init --separate-git-dir=/path/to/git-dir<br></code></pre></div></td></tr></table></figure>
 
-<h2 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h2><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 查看历史记录 </span><br>git reflog<br><br><span class="hljs-comment"># 查看版本详细信息 </span><br>git <span class="hljs-built_in">log</span><br><br><span class="hljs-comment"># 以列表形式查看指定文件的修改记录</span><br>git blame [file]<br></code></pre></div></td></tr></table></figure>
+<h3 id="git-config"><a href="#git-config" class="headerlink" title="git config"></a>git config</h3><h4 id="作用-1"><a href="#作用-1" class="headerlink" title="作用"></a>作用</h4><p><code>git config</code> 用于设置 <code>Git</code> 的用户信息、编辑器、合并策略等全局或局部配置。</p>
+<h4 id="基本用法-1"><a href="#基本用法-1" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 设置 Git 的某个配置项。</span><br>git config [--global|--<span class="hljs-built_in">local</span>|--system] &lt;key&gt; &lt;value&gt;<br><br><span class="hljs-comment"># 查看当前所有的 Git 配置项。</span><br>git config --list<br><br><span class="hljs-comment"># 获取某个配置项的值。</span><br>git config &lt;key&gt;<br><br><span class="hljs-comment"># 删除某个配置项。</span><br>git config --<span class="hljs-built_in">unset</span> &lt;key&gt;<br><br><span class="hljs-comment"># 手动编辑配置文件。</span><br>git config --edit<br></code></pre></div></td></tr></table></figure>
 
-<h2 id="回退"><a href="#回退" class="headerlink" title="回退"></a>回退</h2><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 移动HEAD到上一次提交（HEAD^^则为上上次，类推），但不会改变暂存区和工作目录</span><br>git reset --soft HEAD^<br><br><span class="hljs-comment"># 移动HEAD到上一次提交（默认模式），并且重置暂存区，但不会改变工作目录</span><br>git reset --mixed HEAD^<br><br><span class="hljs-comment"># 移动HEAD到上一次提交，并且重置暂存区和工作目录，完全匹配指定的提交</span><br>git reset --hard HEAD^<br><br><span class="hljs-comment"># 移动HEAD到上一次提交，重置暂存区的同时保持工作目录不变，在遇到无法合并的更改时失败，提示用户解决</span><br>git reset --merge HEAD^<br><br><span class="hljs-comment"># 移动HEAD到上一次提交，重置暂存区的同时保持工作目录不变，在遇到无法合并的更改时失败，终止操作</span><br>git reset --keep HEAD^<br><br><span class="hljs-comment"># 版本穿梭</span><br>git reset --hard &lt;logId&gt;<br></code></pre></div></td></tr></table></figure>
+<h4 id="参数说明-1"><a href="#参数说明-1" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>--local</code>：只对当前 <code>Git</code> 仓库生效（默认），配置存储在 <code>.git/config</code>。</li>
+<li><code>--global</code>：对当前用户所有 <code>Git</code> 仓库生效，配置存储在 <code>~/.gitconfig</code>。</li>
+<li><code>--system</code>：对系统所有用户生效，配置存储在 <code>/etc/gitconfig</code>。</li>
+<li><code>--unset</code>：删除指定的配置项。</li>
+<li><code>--edit</code>：直接编辑 <code>Git</code> 配置文件。</li>
+</ul>
+<h4 id="常见配置项"><a href="#常见配置项" class="headerlink" title="常见配置项"></a>常见配置项</h4><ul>
+<li><code>user.name</code>：设置 <code>Git</code> 用户名。</li>
+<li><code>user.email</code>：设置 <code>Git</code> 用户邮箱。</li>
+<li><code>core.editor</code>：设置默认编辑器。</li>
+<li><code>core.ignorecase</code>：设置是否忽略大小写（<code>Windows</code> 常用）。</li>
+<li><code>core.autocrlf</code>：处理换行符（<code>true</code>：<code>Windows</code>，<code>input</code>：<code>Linux/macOS</code>）。</li>
+<li><code>alias.&lt;shortcut&gt;</code>：创建 <code>Git</code> 命令别名。</li>
+<li><code>diff.tool</code>：设置默认的 <code>diff</code> 工具。</li>
+<li><code>merge.tool</code>：设置默认的合并工具。</li>
+<li><code>push.default</code>：设置 <code>git push</code> 默认行为（如 <code>simple</code> 或 <code>matching</code>）。</li>
+<li><code>credential.helper</code>  设置 <code>Git</code> 认证方式，如 <code>cache</code> 或 <code>store</code>。</li>
+</ul>
+<h4 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 设置 Git 用户名和邮箱，适用于所有仓库。</span><br>git config --global user.name <span class="hljs-string">&quot;Your Name&quot;</span><br>git config --global user.email <span class="hljs-string">&quot;your.email@example.com&quot;</span><br><br><span class="hljs-comment"># 创建 git st 作为 git status 的别名。</span><br>git config --global alias.st status<br><br><span class="hljs-comment"># 将默认编辑器设置为 Vim。</span><br>git config --global core.editor <span class="hljs-string">&quot;vim&quot;</span><br><br><span class="hljs-comment"># 记住 Git 认证信息，避免每次输入密码。</span><br>git config --global credential.helper store<br></code></pre></div></td></tr></table></figure>
 
-<h2 id="撤销"><a href="#撤销" class="headerlink" title="撤销"></a>撤销</h2><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 将文件file回到最近一次git commit或git add时的状态</span><br>git checkout -- &lt;file&gt;<br></code></pre></div></td></tr></table></figure>
+<h2 id="远程"><a href="#远程" class="headerlink" title="远程"></a>远程</h2><h3 id="git-remote"><a href="#git-remote" class="headerlink" title="git remote"></a>git remote</h3><h4 id="作用-2"><a href="#作用-2" class="headerlink" title="作用"></a>作用</h4><p><code>git remote</code> 用于管理本地 <code>Git</code> 仓库和远程仓库的连接信息，例如添加、删除、查看远程仓库。</p>
+<h4 id="基本用法-2"><a href="#基本用法-2" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 查看当前远程仓库的名称及对应的 URL。</span><br>git remote -v<br><br><span class="hljs-comment"># 添加远程仓库。</span><br>git remote add &lt;name&gt; &lt;url&gt;<br><br><span class="hljs-comment"># 删除远程仓库。</span><br>git remote remove &lt;name&gt;<br><br><span class="hljs-comment"># 重命名远程仓库。</span><br>git remote rename &lt;old_name&gt; &lt;new_name&gt;<br><br><span class="hljs-comment"># 修改远程仓库的 URL。</span><br>git remote set-url &lt;name&gt; &lt;new_url&gt;<br><br><span class="hljs-comment"># 查看远程仓库的详细信息，包括 URL、跟踪的分支等。</span><br>git remote show &lt;name&gt;<br></code></pre></div></td></tr></table></figure>
 
-<h2 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h2><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 从暂存区和工作区中删除</span><br>git rm -f &lt;file&gt;<br><br><span class="hljs-comment"># 从暂存区中移除，但保留在工作区</span><br>git rm --cached &lt;file&gt;<br></code></pre></div></td></tr></table></figure>
+<h4 id="参数说明-2"><a href="#参数说明-2" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>-v</code>：显示远程仓库的详细 URL。</li>
+<li><code>add &lt;name&gt; &lt;url&gt;</code>：添加远程仓库。</li>
+<li><code>remove &lt;name&gt;</code>：删除远程仓库。</li>
+<li><code>rename &lt;old&gt; &lt;new&gt;</code>：重命名远程仓库。</li>
+<li><code>set-url &lt;name&gt; &lt;url&gt;</code>：修改远程仓库 URL。</li>
+</ul>
+<h4 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 添加名为 origin 的远程仓库。</span><br>git remote add origin https://github.com/user/repo.git<br><br><span class="hljs-comment"># 删除名为 origin 的远程仓库。</span><br>git remote remove origin<br><br><span class="hljs-comment"># 将 origin 重命名为 upstream。</span><br>git remote rename origin upstream<br></code></pre></div></td></tr></table></figure>
 
-<h2 id="远程"><a href="#远程" class="headerlink" title="远程"></a>远程</h2><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 显示所有远程仓库</span><br>git remote -v<br><br><span class="hljs-comment"># 显示某个远程仓库</span><br>git remote show &lt;remote&gt;<br><br><span class="hljs-comment"># 添加远程仓库</span><br>git remote add &lt;remote&gt; &lt;url&gt;<br><br><span class="hljs-comment"># 删除远程仓库</span><br>git remote rm &lt;name&gt;<br><br><span class="hljs-comment"># 修改仓库名</span><br>git remote rename &lt;oldName&gt; &lt;newName&gt;<br></code></pre></div></td></tr></table></figure>
+<h3 id="git-clone"><a href="#git-clone" class="headerlink" title="git clone"></a>git clone</h3><h4 id="作用-3"><a href="#作用-3" class="headerlink" title="作用"></a>作用</h4><p><code>git clone</code> 用于克隆远程 <code>Git</code> 仓库到本地。</p>
+<h4 id="基本用法-3"><a href="#基本用法-3" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 克隆整个远程仓库到本地。</span><br>git <span class="hljs-built_in">clone</span> &lt;repository_url&gt;<br><br><span class="hljs-comment"># 克隆远程仓库到指定目录 &lt;directory&gt;。</span><br>git <span class="hljs-built_in">clone</span> &lt;repository_url&gt; &lt;directory&gt;<br></code></pre></div></td></tr></table></figure>
 
-<h2 id="分支"><a href="#分支" class="headerlink" title="分支"></a>分支</h2><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 查看本地所有分支 </span><br>git branch                           <br><br><span class="hljs-comment"># 查看远程所有分支</span><br>git branch -r                         <br><br><span class="hljs-comment"># 查看分支信息，附带版本 </span><br>git branch -v                        <br><br><span class="hljs-comment"># 查看本地和远程所有分支 </span><br>git branch -a                        <br><br><span class="hljs-comment"># 创建分支，停留在当前分支</span><br>git branch &lt;newBranch&gt;   <br><br><span class="hljs-comment"># 切换分支</span><br>git checkout &lt;branch&gt;<br>git switch &lt;branch&gt;<br><br><span class="hljs-comment"># 创建并切换到新分支</span><br>git branch -b &lt;newBranch&gt;    <br>git switch -c &lt;newBranch&gt;<br><br><span class="hljs-comment"># 创建远程分支到本地</span><br>git checkout -b &lt;localBranch&gt; &lt;origin&gt;/&lt;originBranch&gt;<br><br><span class="hljs-comment"># 删除本地分支</span><br>git branch -d\D &lt;localBranch&gt;<br><br><span class="hljs-comment"># 将本地分支推送至远程分支</span><br>git branch &lt;localBranch&gt;:&lt;remoteBranch&gt;       <br><br><span class="hljs-comment"># 删除远程分支</span><br>git branch :&lt;remoteBranch&gt;<br><br><span class="hljs-comment"># 重命名分支，如是远程分支，则先删除后推送新分支</span><br>git branch -m\M &lt;oldBranch&gt; &lt;newBranch&gt;   <br><br><span class="hljs-comment"># 将指定的提交复制到当前分支</span><br>git cherry-pick &lt;logId&gt;<br><br><span class="hljs-comment"># 把本地未push的分支提交历史整理成直线</span><br>git rebase<br></code></pre></div></td></tr></table></figure>
+<h4 id="参数说明-3"><a href="#参数说明-3" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>&lt;repository_url&gt;</code>：远程仓库 <code>URL</code>（<code>HTTP/HTTPS/SSH</code>）。</li>
+<li><code>&lt;directory&gt;</code>：指定克隆后的目录名称。</li>
+<li><code>--bare</code>：克隆为裸仓库（无工作区）。</li>
+<li><code>--mirror</code>：完全镜像克隆，包括远程分支、标签等。</li>
+<li><code>--branch &lt;branch&gt;</code>：指定克隆的分支。</li>
+<li><code>--depth &lt;depth&gt;</code>：仅克隆指定深度的提交（加速克隆）。</li>
+<li><code>--single-branch</code>：仅克隆单个分支（默认 <code>main</code>/<code>master</code>）。</li>
+</ul>
+<h4 id="示例-3"><a href="#示例-3" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 克隆 GitHub 仓库到本地。</span><br>git <span class="hljs-built_in">clone</span> https://github.com/user/repo.git<br><br><span class="hljs-comment"># 仅克隆 dev 分支，并限制提交历史为 1 层。</span><br>git <span class="hljs-built_in">clone</span> -b dev --depth 1 https://github.com/user/repo.git<br></code></pre></div></td></tr></table></figure>
 
-<h2 id="暂存"><a href="#暂存" class="headerlink" title="暂存"></a>暂存</h2><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 将当前工作现场“暂存”起来</span><br>git stash<br><br><span class="hljs-comment"># 查看“暂存”的工作现场</span><br>git stash list<br><br><span class="hljs-comment"># 恢复工作现场</span><br>git stash apply &lt;stash@&#123;0&#125;&gt;<br><br><span class="hljs-comment"># 删除暂存列表中的工作现场</span><br>git stash drop &lt;stash@&#123;0&#125;&gt;<br><br><span class="hljs-comment"># 恢复工作现场并将其工暂存列表中删除</span><br>git stash pop &lt;stash@&#123;0&#125;&gt;<br></code></pre></div></td></tr></table></figure>
+<h3 id="git-fetch"><a href="#git-fetch" class="headerlink" title="git fetch"></a>git fetch</h3><h4 id="作用-4"><a href="#作用-4" class="headerlink" title="作用"></a>作用</h4><p><code>git fetch</code> 从远程仓库拉取最新的变更，但不会合并到本地分支。</p>
+<h4 id="基本用法-4"><a href="#基本用法-4" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 拉取远程仓库 &lt;remote&gt; 的所有更新。</span><br>git fetch &lt;remote&gt;<br><br><span class="hljs-comment"># 仅拉取远程 &lt;branch&gt; 分支的更新。</span><br>git fetch &lt;remote&gt; &lt;branch&gt;<br></code></pre></div></td></tr></table></figure>
 
-<h2 id="拉取"><a href="#拉取" class="headerlink" title="拉取"></a>拉取</h2><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 通过远程别名拉取远端仓库数据</span><br>git fetch &lt;shortName&gt;<br><br><span class="hljs-comment"># 将branch分支合并到当前分支</span><br>git merge [branch]<br><br><span class="hljs-comment"># 从远程拉取并合并到本地某个分支</span><br>git pull &lt;shortName&gt; [&lt;remoteBranch&gt;:&lt;localBranch&gt;]<br></code></pre></div></td></tr></table></figure>
+<h4 id="参数说明-4"><a href="#参数说明-4" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>&lt;remote&gt;</code>：远程仓库名称（如 <code>origin</code>）。</li>
+<li><code>&lt;branch&gt;</code>：指定拉取的远程分支。</li>
+<li><code>--all</code>：拉取所有远程仓库的更新。</li>
+<li><code>--prune</code>：删除本地已不存在的远程分支。</li>
+<li><code>--depth &lt;depth&gt;</code>：仅拉取指定深度的提交。</li>
+</ul>
+<h4 id="示例-4"><a href="#示例-4" class="headerlink" title="示例"></a><strong>示例</strong></h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 从 origin 远程仓库拉取所有更新。</span><br>git fetch origin<br><br><span class="hljs-comment"># 同步远程分支，并删除已被删除的远程分支。</span><br>git fetch origin --prune<br></code></pre></div></td></tr></table></figure>
 
-<h2 id="推送"><a href="#推送" class="headerlink" title="推送"></a>推送</h2><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 推送本地分支上的内容到远程仓库 </span><br>git push &lt;remote&gt; [localBranch:]&lt;remoteBranch&gt;<br><br><span class="hljs-comment"># 强制推送</span><br>git push --force &lt;remote&gt; &lt;branch&gt;<br><br><span class="hljs-comment"># 删除远程分支 </span><br>git push origin --delete &lt;remoteBranch&gt;<br><br><span class="hljs-comment"># -u指定默认主机，以后可直接使用git push</span><br>git push -u &lt;remote&gt; &lt;remoteBranch&gt;<br></code></pre></div></td></tr></table></figure>
+<h3 id="git-pull"><a href="#git-pull" class="headerlink" title="git pull"></a>git pull</h3><h4 id="作用-5"><a href="#作用-5" class="headerlink" title="作用"></a>作用</h4><p><code>git pull</code> 等价于 <code>git fetch</code> + <code>git merge</code>，即拉取远程分支的最新代码并合并到当前分支。</p>
+<h4 id="基本用法-5"><a href="#基本用法-5" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 从远程仓库 &lt;remote&gt; 拉取 &lt;branch&gt; 分支的更新并合并。</span><br>git pull &lt;remote&gt; &lt;branch&gt;<br></code></pre></div></td></tr></table></figure>
 
-<h2 id="标签"><a href="#标签" class="headerlink" title="标签"></a>标签</h2><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 打一个新的标签，logId可选，对某次提交进行打标签</span><br>git tag &lt;tagName&gt; &lt;logId&gt;<br><br><span class="hljs-comment"># 查看所有标签</span><br>git tag<br><br><span class="hljs-comment"># 查看指定的标签</span><br>git show &lt;tagName&gt;<br><br><span class="hljs-comment"># 打一个带说明的标签</span><br>git tag -a &lt;tagName&gt; -m &lt;tagDesc&gt;<br><br><span class="hljs-comment"># 删除标签</span><br>git tag -d &lt;tagName&gt;<br><br><span class="hljs-comment"># 推送某个标签到远程</span><br>git push &lt;origin&gt; &lt;tagName&gt;<br><br><span class="hljs-comment"># 推送所有未推送的标签</span><br>git push &lt;origin&gt; --tags<br><br><span class="hljs-comment"># 删除远程标签（删除本地标签再推送）</span><br>git push &lt;origin&gt; :refs/tags/&lt;tagName&gt;<br></code></pre></div></td></tr></table></figure>
+<h4 id="参数说明-5"><a href="#参数说明-5" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>&lt;remote&gt;</code>：远程仓库名称。</li>
+<li><code>&lt;branch&gt;</code>：远程分支名称。</li>
+<li><code>--rebase</code>：使用 <code>rebase</code> 而非 <code>merge</code> 合并更新。</li>
+<li><code>--depth &lt;depth&gt;</code>：限制拉取的提交历史深度。</li>
+<li><code>--no-commit</code>：拉取更新但不自动提交。</li>
+</ul>
+<h4 id="示例-5"><a href="#示例-5" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 从 origin 远程仓库拉取 main 分支的最新代码并合并。</span><br>git pull origin main<br><br><span class="hljs-comment"># 以 rebase 方式拉取并应用远程更新。</span><br>git pull --rebase origin main<br></code></pre></div></td></tr></table></figure>
 
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过本文的介绍，读者可以获得关于Git操作的基础知识，包括如何配置和初始化仓库、管理文件的更改和提交、探索提交历史、撤销错误操作、以及管理远程仓库和标签。掌握这些命令不仅能提高个人的工作效率，也是进行团队协作不可或缺的技能。随着对Git更深入的理解和应用，开发者将能更加自如地使用这一强大的工具来支持更复杂的开发需求。</p>
+<h3 id="git-push"><a href="#git-push" class="headerlink" title="git push"></a>git push</h3><h4 id="作用-6"><a href="#作用-6" class="headerlink" title="作用"></a><strong>作用</strong></h4><p><code>git push</code> 用于将本地分支的提交推送到远程仓库。</p>
+<h4 id="基本用法-6"><a href="#基本用法-6" class="headerlink" title="基本用法"></a><strong>基本用法</strong></h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 将本地 &lt;branch&gt; 推送到远程仓库 &lt;remote&gt;。</span><br>git push &lt;remote&gt; &lt;branch&gt;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-6"><a href="#参数说明-6" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>&lt;remote&gt;</code>：远程仓库名称。</li>
+<li><code>&lt;branch&gt;</code>：要推送的本地分支。</li>
+<li><code>--force</code> (<code>-f</code>)：强制推送，可能导致远程提交丢失。</li>
+<li><code>--delete</code>：删除远程分支。</li>
+<li><code>--set-upstream</code> (<code>-u</code>)：关联本地分支与远程分支。</li>
+<li><code>--all</code>：推送所有分支。</li>
+<li><code>--tags</code>：推送所有标签。</li>
+</ul>
+<h4 id="示例-6"><a href="#示例-6" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 将 main 分支推送到远程 origin 仓库。</span><br>git push origin main<br><br><span class="hljs-comment"># 删除远程 feature-branch 分支。</span><br>git push origin --delete feature-branch<br><br><span class="hljs-comment"># 强制推送 main 分支，覆盖远程内容（需谨慎）。</span><br>git push -f origin main<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="状态"><a href="#状态" class="headerlink" title="状态"></a>状态</h2><h3 id="git-status"><a href="#git-status" class="headerlink" title="git status"></a>git status</h3><h4 id="作用-7"><a href="#作用-7" class="headerlink" title="作用"></a>作用</h4><p><code>git status</code> 用于查看当前 <code>Git</code> 仓库的状态，主要包括：</p>
+<ul>
+<li>工作目录中有哪些文件被修改或未跟踪。</li>
+<li>哪些文件已添加到暂存区但未提交。</li>
+<li>当前所在分支及是否有未提交的更改。</li>
+</ul>
+<h4 id="基本用法-7"><a href="#基本用法-7" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 显示工作区和暂存区的文件状态。</span><br>git status<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="状态说明"><a href="#状态说明" class="headerlink" title="状态说明"></a>状态说明</h4><p>执行 <code>git status</code> 后，可能看到以下几种状态：</p>
+<ul>
+<li><code>Untracked files</code>：未跟踪的文件，即 <code>Git</code> 还未管理的文件（新文件）。</li>
+<li><code>Changes not staged for commit</code>：已被修改但未添加到暂存区的文件。</li>
+<li><code>Changes to be committed</code>：已添加到暂存区但未提交的文件。</li>
+<li><code>Your branch is ahead of &#39;origin/main&#39; by X commits</code>：当前分支比远程分支多 <code>X</code> 个提交，需要 <code>git push</code>。</li>
+<li><code>nothing to commit, working tree clean</code>：没有任何变更，工作目录是干净的。</li>
+</ul>
+<h4 id="参数说明-7"><a href="#参数说明-7" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>-s</code> 或 <code>--short</code>：显示简短格式的状态信息。</li>
+<li><code>-b</code> 或 <code>--branch</code>：显示当前分支信息。</li>
+<li><code>--ignored</code>：也显示被 <code>.gitignore</code> 忽略的文件。</li>
+</ul>
+<h4 id="示例-7"><a href="#示例-7" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 使用简短格式显示状态。</span><br>git status -s<br><br><span class="hljs-comment"># 输出示例：</span><br>M file1.txt  <span class="hljs-comment"># 修改但未暂存</span><br>A  file2.txt  <span class="hljs-comment"># 新增文件已暂存</span><br>?? file3.txt  <span class="hljs-comment"># 未跟踪文件</span><br><br><br><br><span class="hljs-comment"># 显示当前分支信息。</span><br>git status -b<br><br><span class="hljs-comment"># 输出示例：</span><br><span class="hljs-comment">## main</span><br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-diff"><a href="#git-diff" class="headerlink" title="git diff"></a>git diff</h3><h4 id="作用-8"><a href="#作用-8" class="headerlink" title="作用"></a>作用</h4><p><code>git diff</code> 用于比较不同版本的文件，常用于：</p>
+<ul>
+<li>比较工作区和暂存区的文件差异。</li>
+<li>比较暂存区和最新提交之间的差异。</li>
+<li>比较两个分支之间的差异。</li>
+<li>比较某次提交与当前分支的差异。</li>
+</ul>
+<h4 id="基本用法-8"><a href="#基本用法-8" class="headerlink" title="基本用法"></a><strong>基本用法</strong></h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 显示工作区和暂存区之间的差异。</span><br>git diff<br><br><span class="hljs-comment"># 显示暂存区和上次提交之间的差异。</span><br>git diff --cached<br><br><span class="hljs-comment"># 显示工作区和最新提交之间的差异。</span><br>git diff HEAD<br><br><span class="hljs-comment"># 比较两个分支的差异。</span><br>git diff &lt;branch1&gt; &lt;branch2&gt;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-8"><a href="#参数说明-8" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>--staged</code> 或 <code>--cached</code>：比较暂存区和上次提交的差异。</li>
+<li><code>--name-only</code>：只显示有差异的文件名。</li>
+<li><code>--name-status</code>：显示文件的变更类型（新增、删除、修改）。</li>
+<li><code>--color</code>：强制启用颜色高亮。</li>
+<li><code>--word-diff</code>：逐词显示变更内容，而非逐行。</li>
+<li><code>--stat</code>：显示统计信息，如修改行数。</li>
+<li><code>-p</code>：显示补丁格式的详细修改内容。</li>
+</ul>
+<h4 id="示例-8"><a href="#示例-8" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 显示有变更的文件。</span><br>git diff --name-only<br><br><span class="hljs-comment"># 输出示例：</span><br>file1.txt<br>file2.txt<br><br><br><br><span class="hljs-comment"># 显示统计信息。</span><br>git diff --<span class="hljs-built_in">stat</span><br><br><span class="hljs-comment"># 输出示例：</span><br>file1.txt | 10 +++++-----<br>file2.txt |  2 +-<br>2 files changed, 7 insertions(+), 5 deletions(-)<br><br><br><br><span class="hljs-comment"># 比较当前版本和上一个版本的差异。</span><br>git diff HEAD~1 HEAD<br><br><span class="hljs-comment"># 比较 main 和 feature-branch 分支的差异。</span><br>git diff main feature-branch<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h2><h3 id="git-log"><a href="#git-log" class="headerlink" title="git log"></a>git log</h3><h4 id="作用-9"><a href="#作用-9" class="headerlink" title="作用"></a>作用</h4><p><code>git log</code>：用于查看 <code>Git</code> 提交历史，包括提交信息、提交人、时间、哈希值等。</p>
+<h4 id="基本用法-9"><a href="#基本用法-9" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 显示完整的提交历史。</span><br>git <span class="hljs-built_in">log</span><br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-9"><a href="#参数说明-9" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>-p</code>：显示每次提交的详细代码变更（<code>patch</code>）。</li>
+<li><code>--oneline</code>：每条提交仅显示一行（简洁格式）。</li>
+<li><code>--graph</code>：以 ASCII 图形方式展示分支结构。</li>
+<li><code>--decorate</code>：显示分支、标签等附加信息。</li>
+<li><code>--author=&lt;name&gt;</code>：仅显示特定作者的提交。</li>
+<li><code>--since=&lt;date&gt; / --until=&lt;date&gt;</code>：显示特定时间范围内的提交。</li>
+<li><code>--grep=&lt;pattern&gt;</code>：按提交信息搜索。</li>
+<li><code>--stat</code>：显示每次提交修改的文件及变更统计。</li>
+<li><code>--abbrev-commit</code>：仅显示短哈希值。</li>
+</ul>
+<h4 id="示例-9"><a href="#示例-9" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 以图形方式显示所有分支的提交历史。</span><br>git <span class="hljs-built_in">log</span> --oneline --graph --decorate --all<br><br><span class="hljs-comment"># 输出示例：</span><br>f1e2c1b (HEAD -&gt; main, origin/main) 修复bug<br>* d3b4a6d 添加新功能<br>* a1c2b3d 初始化项目<br><br><br><br><span class="hljs-comment"># 查看 Alice 提交的记录。</span><br>git <span class="hljs-built_in">log</span> --author=<span class="hljs-string">&quot;Alice&quot;</span><br><br><span class="hljs-comment"># 查看 2024 年 1 月份的提交记录。</span><br>git <span class="hljs-built_in">log</span> --since=<span class="hljs-string">&quot;2024-01-01&quot;</span> --until=<span class="hljs-string">&quot;2024-02-01&quot;</span><br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-reflog"><a href="#git-reflog" class="headerlink" title="git reflog"></a>git reflog</h3><h4 id="作用-10"><a href="#作用-10" class="headerlink" title="作用"></a>作用</h4><p><code>git reflog</code> 记录所有对分支 <code>HEAD</code> 进行的操作（切换分支、提交、合并、<code>reset</code> 等）。</p>
+<h4 id="基本用法-10"><a href="#基本用法-10" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 显示所有 HEAD 变更历史。</span><br>git reflog<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-10"><a href="#参数说明-10" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>expire=&lt;time&gt;</code>：设定日志保留时间（如 <code>90 days</code>）。</li>
+<li><code>--all</code>：显示所有引用的变更（包括分支、标签等）。</li>
+<li><code>--grep=&lt;pattern&gt;</code>：按提交信息搜索。</li>
+</ul>
+<h4 id="示例-10"><a href="#示例-10" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh">git reflog<br><br><span class="hljs-comment"># 输出示例：</span><br>f1e2c1b (HEAD -&gt; main) HEAD@&#123;0&#125;: commit: 修复bug<br>d3b4a6d HEAD@&#123;1&#125;: checkout: moving from dev to main<br>a1c2b3d HEAD@&#123;2&#125;: commit: 初始化项目<br><br><br><br><span class="hljs-comment"># 清除超过 30 天的引用日志。</span><br>git reflog expire --expire=30.days<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-blame"><a href="#git-blame" class="headerlink" title="git blame"></a>git blame</h3><h4 id="作用-11"><a href="#作用-11" class="headerlink" title="作用"></a>作用</h4><p><code>git blame</code> 用于追踪文件每一行的变更历史，显示是谁在什么时候修改了该行。</p>
+<h4 id="基本用法-11"><a href="#基本用法-11" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 显示文件 &lt;file&gt; 的行级提交信息。</span><br>git blame &lt;file&gt;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-11"><a href="#参数说明-11" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>-L &lt;start&gt;,&lt;end&gt;</code>：仅显示指定行范围的提交信息。</li>
+<li><code>-C</code>：追踪代码块在文件内的移动。</li>
+<li><code>--date</code>：显示日期格式（<code>short</code>, <code>relative</code>, <code>iso</code> 等）。</li>
+<li><code>-w</code>：忽略空白字符的变更。</li>
+</ul>
+<h4 id="示例-11"><a href="#示例-11" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 显示 file.txt 第 10 行到 20 行的修改记录。</span><br>git blame -L 10,20 file.txt<br><br><span class="hljs-comment"># 输出示例：</span><br>f1e2c1b  (Alice  2024-08-10)  10  修复错误<br>d3b4a6d  (Bob    2024-08-05)  11  优化代码<br><br><br><br><span class="hljs-comment"># 以 ISO 日期格式显示提交时间。</span><br>git blame --date=iso file.txt<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-shortlog"><a href="#git-shortlog" class="headerlink" title="git shortlog"></a>git shortlog</h3><h4 id="作用-12"><a href="#作用-12" class="headerlink" title="作用"></a>作用</h4><p><code>git shortlog</code> 按作者分类并统计提交次数。</p>
+<h4 id="基本用法-12"><a href="#基本用法-12" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 显示简要的提交历史。</span><br>git shortlog<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-12"><a href="#参数说明-12" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>-s</code>：仅显示每个作者的提交数量。</li>
+<li><code>-n</code>：按提交数量排序。</li>
+<li><code>-e</code>：显示作者的电子邮件。</li>
+</ul>
+<h4 id="示例-12"><a href="#示例-12" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 按提交数量排序。</span><br>git shortlog -s -n<br><br><span class="hljs-comment"># 输出示例：</span><br>120 Alice<br>85 Bob<br>45 Charlie<br><br><br><br><span class="hljs-comment"># 显示提交数量和邮箱。</span><br>git shortlog -s -e<br><br><span class="hljs-comment"># 输出示例：</span><br>120 Alice &lt;alice@example.com&gt;<br>85 Bob &lt;bob@example.com&gt;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-show"><a href="#git-show" class="headerlink" title="git show"></a>git show</h3><h4 id="作用-13"><a href="#作用-13" class="headerlink" title="作用"></a>作用</h4><p><code>git show</code> 显示特定提交、分支或对象（标签、文件）的详细信息，包括提交信息、变更的代码等。</p>
+<h4 id="基本用法-13"><a href="#基本用法-13" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 显示指定提交的详细信息。</span><br>git show &lt;commit&gt;<br><br><span class="hljs-comment"># 显示指定分支的最新提交详情。</span><br>git show &lt;branch&gt;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-13"><a href="#参数说明-13" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>&lt;commit&gt;</code>：指定提交哈希值。</li>
+<li><code>&lt;branch&gt;</code>：指定分支名，查看最近提交详情。</li>
+<li><code>--stat</code>：仅显示文件变更统计信息。</li>
+<li><code>-p</code>：显示补丁格式（默认）。</li>
+<li><code>--name-only</code>：仅显示修改的文件名。</li>
+<li><code>--name-status</code>：显示文件变更类型（新增、删除、修改）。</li>
+</ul>
+<h4 id="示例-13"><a href="#示例-13" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 显示 f1e2c1b 提交的详细信息，包括提交信息、修改的文件和代码变更。</span><br>git show f1e2c1b<br><br><span class="hljs-comment"># 显示 HEAD 提交的文件变更统计。</span><br>git show --<span class="hljs-built_in">stat</span> HEAD<br><br><span class="hljs-comment"># 输出示例：</span><br>file1.txt | 10 +++++-----<br>file2.txt |  2 +-<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="分支及操作"><a href="#分支及操作" class="headerlink" title="分支及操作"></a>分支及操作</h2><h3 id="git-branch"><a href="#git-branch" class="headerlink" title="git branch"></a>git branch</h3><h4 id="作用-14"><a href="#作用-14" class="headerlink" title="作用"></a>作用</h4><p><code>git branch</code> 用于创建、删除、重命名和查看分支。</p>
+<h4 id="基本用法-14"><a href="#基本用法-14" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 列出所有本地分支。</span><br>git branch<br><br><span class="hljs-comment"># 创建新分支 &lt;branch-name&gt;。</span><br>git branch &lt;branch-name&gt;<br><br><span class="hljs-comment"># 删除本地分支 &lt;branch-name&gt;（已合并的分支）。</span><br>git branch -d &lt;branch-name&gt;<br><br><span class="hljs-comment"># 强制删除本地分支（即使未合并）。</span><br>git branch -D &lt;branch-name&gt;<br><br><span class="hljs-comment"># 重命名分支。</span><br>git branch -m &lt;old-name&gt; &lt;new-name&gt;<br><br><span class="hljs-comment"># 列出远程分支。</span><br>git branch -r<br><br><span class="hljs-comment"># 列出所有分支（本地 + 远程）。</span><br>git branch -a<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-14"><a href="#参数说明-14" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>-d</code>：删除本地已合并的分支。</li>
+<li><code>-D</code>：强制删除分支（即使未合并）。</li>
+<li><code>-m</code>：重命名分支。</li>
+<li><code>-r</code>：查看远程分支。</li>
+<li><code>-a</code>：查看所有分支（本地+远程）。</li>
+</ul>
+<h4 id="示例-14"><a href="#示例-14" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 创建 feature-xyz 分支。</span><br>git branch feature-xyz<br><br><span class="hljs-comment"># 删除 feature-xyz 分支（仅限已合并）。</span><br>git branch -d feature-xyz<br><br><span class="hljs-comment"># 重命名 old-branch 为 new-branch。</span><br>git branch -m old-branch new-branch<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-checkout"><a href="#git-checkout" class="headerlink" title="git checkout"></a>git checkout</h3><blockquote>
+<p>逐步被 <code>git switch</code> 取代，但仍然适用于恢复文件。</p>
+</blockquote>
+<h4 id="作用-15"><a href="#作用-15" class="headerlink" title="作用"></a>作用</h4><p><code>git checkout</code> 主要用于：</p>
+<ul>
+<li>切换分支（已被 <code>git switch</code> 替代）。</li>
+<li>恢复工作区的文件到某个版本。</li>
+</ul>
+<h4 id="基本用法-15"><a href="#基本用法-15" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 切换到 &lt;branch&gt; 分支。</span><br>git checkout &lt;branch&gt;<br><br><span class="hljs-comment"># 从 &lt;old_branch&gt; 分支拉取出 &lt;new_branch&gt; 分支。</span><br>git checkout &lt;new_branch&gt; &lt;old_branch&gt;<br><br><span class="hljs-comment"># 创建并切换到 &lt;new-branch&gt;。</span><br>git checkout -b &lt;new-branch&gt;<br><br><span class="hljs-comment"># 丢弃工作区 &lt;file&gt; 的修改，恢复为上次提交的状态。</span><br>git checkout -- &lt;file&gt;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-15"><a href="#参数说明-15" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>-b</code>：创建并切换到新分支。</li>
+<li><code>--</code>：避免歧义，明确指定文件名。</li>
+</ul>
+<h4 id="示例-15"><a href="#示例-15" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 创建并切换到 feature-xyz 分支。</span><br>git checkout -b feature-xyz<br><br><span class="hljs-comment"># 丢弃 file.txt 的修改。</span><br>git checkout -- file.txt<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-switch"><a href="#git-switch" class="headerlink" title="git switch"></a>git switch</h3><blockquote>
+<p>作为 <code>git checkout</code> 的替代，更简洁安全。</p>
+</blockquote>
+<h4 id="基本用法-16"><a href="#基本用法-16" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 切换到 &lt;branch&gt; 分支。</span><br>git switch &lt;branch&gt;<br><br><span class="hljs-comment"># 创建并切换到 &lt;new-branch&gt;。</span><br>git switch -c &lt;new-branch&gt;<br><br><span class="hljs-comment"># 切换到上一个分支（类似 cd -）。</span><br>git switch -<br><br><span class="hljs-comment"># 进入分离 HEAD 模式（不绑定任何分支）。</span><br>git switch --detach &lt;branch/commit&gt;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-16"><a href="#参数说明-16" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>-c</code>：创建新分支并切换。</li>
+<li><code>--detach</code>：进入分离 <code>HEAD</code> 状态（不会绑定到分支）。</li>
+<li><code>-</code>：上一个分支。</li>
+</ul>
+<h4 id="示例-16"><a href="#示例-16" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 切换到 feature-xyz 分支。</span><br>git switch feature-xyz<br><br><span class="hljs-comment"># 创建并切换到 new-feature 分支。</span><br>git switch -c new-feature<br><br><span class="hljs-comment"># 切换回上一个分支</span><br>git switch -<br><br><span class="hljs-comment"># 进入分离 HEAD 模式，当前处于 HEAD~2（即两次提交前）</span><br>git switch --detach HEAD~2<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-merge"><a href="#git-merge" class="headerlink" title="git merge"></a>git merge</h3><h4 id="作用-16"><a href="#作用-16" class="headerlink" title="作用"></a>作用</h4><p><code>git merge</code> 用于合并指定分支到当前分支。</p>
+<h4 id="基本用法-17"><a href="#基本用法-17" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 将 &lt;branch&gt; 合并到当前分支。</span><br>git merge &lt;branch&gt;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-17"><a href="#参数说明-17" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>--no-ff</code>：禁用 <code>fast-forward</code> 合并，保留 <code>merge commit</code>。</li>
+<li><code>--squash</code>：压缩合并，不自动提交。</li>
+<li><code>--abort</code>：取消正在进行的合并。</li>
+</ul>
+<h4 id="示例-17"><a href="#示例-17" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 合并 feature-xyz 并保留 merge commit。</span><br>git merge feature-xyz --no-ff<br><br><span class="hljs-comment"># 取消正在进行的合并。</span><br>git merge --abort<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-rebase"><a href="#git-rebase" class="headerlink" title="git rebase"></a>git rebase</h3><h4 id="作用-17"><a href="#作用-17" class="headerlink" title="作用"></a>作用</h4><p><code>git rebase</code> 让当前分支的提交叠加到目标分支，使历史更线性。</p>
+<h4 id="基本用法-18"><a href="#基本用法-18" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 将当前分支变基到 &lt;base-branch&gt;。</span><br>git rebase &lt;base-branch&gt;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-18"><a href="#参数说明-18" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>--interactive</code> (<code>-i</code>)：交互式变基，可编辑提交。</li>
+<li><code>--onto &lt;new-base&gt;</code>：将当前分支基于 <code>&lt;new-base&gt;</code> 重新应用。</li>
+<li><code>--abort</code>：取消变基。</li>
+<li><code>--continue</code>：继续变基（解决冲突后）。</li>
+</ul>
+<h4 id="示例-18"><a href="#示例-18" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 交互式变基最近 3 次提交。</span><br>git rebase -i HEAD~3<br><br><span class="hljs-comment"># 取消变基。</span><br>git rebase --abort<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-cherry-pick"><a href="#git-cherry-pick" class="headerlink" title="git cherry-pick"></a>git cherry-pick</h3><h4 id="作用-18"><a href="#作用-18" class="headerlink" title="作用"></a>作用</h4><p><code>git cherry-pick</code> 将某个提交复制到当前分支。</p>
+<h4 id="基本用法-19"><a href="#基本用法-19" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 将指定提交 commit-hash 应用到当前分支。</span><br>git cherry-pick &lt;commit-hash&gt;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-19"><a href="#参数说明-19" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>-n</code>：仅应用变更，不提交。</li>
+<li><code>-x</code>：在提交信息中添加原始提交哈希。</li>
+<li><code>--abort</code>：取消 <code>cherry-pick</code>。</li>
+</ul>
+<h4 id="示例-19"><a href="#示例-19" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 将 a1b2c3d 提交应用到当前分支。</span><br>git cherry-pick a1b2c3d<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-revert"><a href="#git-revert" class="headerlink" title="git revert"></a>git revert</h3><h4 id="作用-19"><a href="#作用-19" class="headerlink" title="作用"></a>作用</h4><p><code>git revert</code> 用于撤销某次提交，同时保留历史记录，不影响之前的提交。</p>
+<h4 id="基本用法-20"><a href="#基本用法-20" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 创建一个新的补丁提交，以撤销 commit-hash。</span><br>git revert &lt;commit-hash&gt;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-20"><a href="#参数说明-20" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>-n</code>：仅应用撤销变更，不提交。</li>
+<li><code>--no-edit</code>：使用默认提交信息。</li>
+<li><code>--abort</code>：取消撤销。</li>
+</ul>
+<h4 id="示例-20"><a href="#示例-20" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 撤销 a1b2c3d，并创建新的提交。</span><br>git revert a1b2c3d<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="暂存与提交"><a href="#暂存与提交" class="headerlink" title="暂存与提交"></a>暂存与提交</h2><h3 id="git-add"><a href="#git-add" class="headerlink" title="git add"></a>git add</h3><h4 id="作用-20"><a href="#作用-20" class="headerlink" title="作用"></a><strong>作用</strong></h4><p><code>git add</code> 将工作区的修改添加到暂存区（<code>Staging Area</code>），等待提交。</p>
+<h4 id="基本用法-21"><a href="#基本用法-21" class="headerlink" title="基本用法"></a><strong>基本用法</strong></h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 将 &lt;file&gt; 添加到暂存区。</span><br>git add &lt;file&gt;<br><br><span class="hljs-comment"># 将所有修改的文件添加到暂存区。</span><br>git add .<br><br><span class="hljs-comment"># 将所有文件（包括新增、修改、删除）添加到暂存区。</span><br>git add -A<br><br><span class="hljs-comment"># 仅添加已修改和已删除的文件，不包括新文件。</span><br>git add -u<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-21"><a href="#参数说明-21" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>.</code>：添加当前目录及子目录所有变更的文件。</li>
+<li><code>-A</code>：添加所有文件（包括新增、修改、删除）。</li>
+<li><code>-u</code>：仅添加已修改和已删除的文件（不包括新文件）。</li>
+<li><code>-p</code>：交互式选择部分变更进行暂存。</li>
+</ul>
+<h4 id="示例-21"><a href="#示例-21" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 添加 file1.txt 和 file2.txt 到暂存区。</span><br>git add file1.txt file2.txt<br><br><span class="hljs-comment"># 逐块选择哪些修改要添加到暂存区。</span><br>git add -p<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-commit"><a href="#git-commit" class="headerlink" title="git commit"></a>git commit</h3><h4 id="作用-21"><a href="#作用-21" class="headerlink" title="作用"></a>作用</h4><p><code>git commit</code> 将暂存区的变更提交到本地版本库。</p>
+<h4 id="基本用法-22"><a href="#基本用法-22" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 提交暂存区的变更，并附带提交信息。</span><br>git commit -m <span class="hljs-string">&quot;提交信息&quot;</span><br><br><span class="hljs-comment"># 跳过 git add，直接提交已跟踪的文件（不包括新文件）。</span><br>git commit -a -m <span class="hljs-string">&quot;提交信息&quot;</span><br><br><span class="hljs-comment"># 修改上一次提交（追加或修改提交信息）。</span><br>git commit --amend<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-22"><a href="#参数说明-22" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>-m &quot;&lt;message&gt;&quot;</code>：直接在命令行输入提交信息。</li>
+<li><code>-a</code>：自动暂存所有已跟踪的文件（省略 <code>git add</code>）。</li>
+<li><code>--amend</code>：修改上一次提交（包括提交信息或文件）。</li>
+<li><code>--no-edit</code>：<code>--amend</code> 时不修改提交信息。</li>
+</ul>
+<h4 id="示例-22"><a href="#示例-22" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 提交修改，并添加提交信息。</span><br>git commit -m <span class="hljs-string">&quot;修复了一个 bug&quot;</span><br><br><span class="hljs-comment"># 修改上次提交的提交信息。</span><br>git commit --amend -m <span class="hljs-string">&quot;修复了 bug 并优化代码&quot;</span><br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-reset"><a href="#git-reset" class="headerlink" title="git reset"></a>git reset</h3><h4 id="作用-22"><a href="#作用-22" class="headerlink" title="作用"></a>作用</h4><p><code>git reset</code> 用于撤销提交、取消暂存或恢复文件到特定状态。</p>
+<h4 id="基本用法-23"><a href="#基本用法-23" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 取消 &lt;file&gt; 的暂存状态，恢复到未暂存状态。</span><br>git reset HEAD &lt;file&gt;<br><br><span class="hljs-comment"># 撤销最近的一次提交，但保留变更（不会修改暂存区和工作区）。</span><br>git reset --soft HEAD~1<br><br><span class="hljs-comment"># 撤销提交，并取消暂存（不会修改工作区）。</span><br>git reset --mixed HEAD~1<br><br><span class="hljs-comment"># 彻底撤销最近一次提交，恢复到该提交前的状态（数据丢失，慎用）。</span><br>git reset --hard HEAD~1<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-23"><a href="#参数说明-23" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>--soft</code>：撤销提交，但保留文件在暂存区。</li>
+<li><code>--mixed</code>（默认）：撤销提交，同时取消暂存，但不修改工作区文件。</li>
+<li><code>--hard</code>：彻底撤销提交、暂存和工作区文件（数据不可恢复）。</li>
+</ul>
+<h4 id="示例-23"><a href="#示例-23" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 撤销最近两次提交，变更仍然保留在暂存区。</span><br>git reset HEAD~2<br><br><span class="hljs-comment"># 回退到上一个提交，并删除所有未提交的修改。</span><br>git reset --hard HEAD~1<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-rm"><a href="#git-rm" class="headerlink" title="git rm"></a>git rm</h3><h4 id="作用-23"><a href="#作用-23" class="headerlink" title="作用"></a>作用</h4><p><code>git rm</code> 用于从 <code>Git</code> 版本控制中删除文件（可选是否删除本地文件）。</p>
+<h4 id="基本用法-24"><a href="#基本用法-24" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 删除文件 &lt;file&gt;，并在下一次提交时生效。</span><br>git rm &lt;file&gt;<br><br><span class="hljs-comment"># 递归删除目录 &lt;directory&gt;。</span><br>git rm -r &lt;directory&gt;<br><br><span class="hljs-comment"># 仅从 Git 仓库中删除 &lt;file&gt;，保留本地文件。</span><br>git rm --cached &lt;file&gt;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-24"><a href="#参数说明-24" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>-r</code>：递归删除目录。</li>
+<li><code>--cached</code>：仅从 <code>Git</code> 版本库中删除文件，保留本地文件。</li>
+<li><code>-f</code>：强制删除文件（即使已修改）。</li>
+</ul>
+<h4 id="示例-24"><a href="#示例-24" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 删除 logs/ 目录及其中的所有文件。</span><br>git rm -r logs/<br><br><span class="hljs-comment"># 将 file.txt 从 Git 版本库中删除，但不删除本地文件。</span><br>git rm --cached file.txt<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-stash"><a href="#git-stash" class="headerlink" title="git stash"></a>git stash</h3><h4 id="作用-24"><a href="#作用-24" class="headerlink" title="作用"></a>作用</h4><p><code>git stash</code> 用于临时存储未提交的修改，以便切换分支或执行其他任务，稍后再恢复。</p>
+<h4 id="基本用法-25"><a href="#基本用法-25" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 将所有未提交的修改暂存起来，并清空工作区。</span><br>git stash<br><br><span class="hljs-comment"># 查看所有暂存的变更。</span><br>git stash list<br><br><span class="hljs-comment"># 恢复最近的暂存，并从 stash 列表中删除。</span><br>git stash pop<br><br><span class="hljs-comment"># 恢复最近的暂存，但不删除 stash 记录。</span><br>git stash apply<br><br><span class="hljs-comment"># 删除最近的 stash 记录。</span><br>git stash drop<br><br><span class="hljs-comment"># 清空所有暂存的变更。</span><br>git stash clear<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-25"><a href="#参数说明-25" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>list</code>：显示所有 <code>stash</code> 记录。</li>
+<li><code>pop</code>：恢复最近的 <code>stash</code> 并删除记录。</li>
+<li><code>apply</code>：恢复 <code>stash</code> 但不删除记录。</li>
+<li><code>drop</code>：删除最近的 <code>stash</code> 记录。</li>
+<li><code>clear</code>：清空所有 <code>stash</code> 记录。</li>
+</ul>
+<h4 id="示例-25"><a href="#示例-25" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 暂存所有未提交的修改。</span><br>git stash<br><br><span class="hljs-comment"># 恢复最近的暂存，并从 stash 列表中删除。</span><br>git stash pop<br><br><span class="hljs-comment"># 查看暂存列表：</span><br>git stash list<br><br><span class="hljs-comment"># 输出示例：</span><br>stash@&#123;0&#125;: WIP on main: 123abc 修复 bug<br>stash@&#123;1&#125;: WIP on feature: 456def 添加新功能<br><br><br><br><span class="hljs-comment"># 删除 `stash@&#123;0&#125;` 记录。</span><br>git stash drop stash@&#123;0&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-restore"><a href="#git-restore" class="headerlink" title="git restore"></a>git restore</h3><h4 id="作用-25"><a href="#作用-25" class="headerlink" title="作用"></a>作用</h4><p><code>git restore</code> 用于恢复工作区中的文件，可以：</p>
+<ul>
+<li>撤销未提交的修改（恢复为上次提交的版本）。</li>
+<li>从暂存区恢复文件（相当于 <code>git reset HEAD &lt;file&gt;</code>）。</li>
+<li>恢复已删除的文件（只要还未提交删除）。</li>
+</ul>
+<h4 id="基本用法-26"><a href="#基本用法-26" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 恢复 &lt;file&gt; 为上次提交的版本（撤销本地修改）。</span><br>git restore &lt;file&gt;<br><br><span class="hljs-comment"># 取消暂存（等效于 git reset HEAD &lt;file&gt;）。</span><br>git restore --staged &lt;file&gt;<br><br><span class="hljs-comment"># 将 &lt;file&gt; 恢复到指定的 &lt;commit&gt; 版本。</span><br>git restore --<span class="hljs-built_in">source</span>=&lt;commit&gt; &lt;file&gt;<br><br><span class="hljs-comment"># 恢复所有文件到上次提交的版本。</span><br>git restore . <br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-26"><a href="#参数说明-26" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>&lt;file&gt;</code>：需要恢复的文件名。</li>
+<li><code>--staged</code>：从暂存区恢复文件到工作区（撤销 <code>git add</code>）。</li>
+<li><code>--source=&lt;commit&gt;</code>：恢复到指定的提交版本（如 <code>HEAD~1</code>、<code>commit-hash</code>）。</li>
+<li><code>.</code>：恢复所有文件。</li>
+</ul>
+<h4 id="示例-26"><a href="#示例-26" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 恢复 file.txt，撤销本地修改（但不会影响暂存区），不会撤销 git add 操作。</span><br>git restore file.txt<br><br><span class="hljs-comment"># 取消 git add file.txt，但文件内容不会丢失，仍然在工作区（未暂存状态）。</span><br>git restore --staged file.txt<br><br><span class="hljs-comment"># 撤销所有未提交的修改。</span><br>git restore .<br><br><span class="hljs-comment"># 恢复 file.txt 到 上一次提交（HEAD~1） 的状态。</span><br>git restore --<span class="hljs-built_in">source</span>=HEAD~1 file.txt<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="标签"><a href="#标签" class="headerlink" title="标签"></a>标签</h2><h3 id="git-tag"><a href="#git-tag" class="headerlink" title="git tag"></a>git tag</h3><h4 id="作用-26"><a href="#作用-26" class="headerlink" title="作用"></a>作用</h4><p><code>git tag</code> 用于创建、删除、查看标签。<code>Git</code> 提供两种类型的标签：</p>
+<ol>
+<li><strong>轻量标签（Lightweight Tag）</strong>：仅作为提交的引用，不包含额外信息。</li>
+<li><strong>附注标签（Annotated Tag）</strong>：包含作者、日期、标签信息，存储在 <code>Git</code> 历史中。</li>
+</ol>
+<h4 id="基本用法-27"><a href="#基本用法-27" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 列出所有标签。</span><br>git tag<br><br><span class="hljs-comment"># 创建轻量标签 &lt;tag-name&gt;。</span><br>git tag &lt;tag-name&gt;<br><br><span class="hljs-comment"># 创建附注标签 &lt;tag-name&gt;，并附带描述信息。</span><br>git tag -a &lt;tag-name&gt; -m <span class="hljs-string">&quot;Tag message&quot;</span><br><br><span class="hljs-comment"># 删除本地标签 &lt;tag-name&gt;。</span><br>git tag -d &lt;tag-name&gt;<br><br><span class="hljs-comment"># 推送本地标签 &lt;tag-name&gt; 到远程仓库。</span><br>git push origin &lt;tag-name&gt;<br><br><span class="hljs-comment"># 推送所有本地标签到远程仓库。</span><br>git push origin --tags<br><br><span class="hljs-comment"># 列出符合 v1.* 规则的标签。</span><br>git tag -l <span class="hljs-string">&quot;v1.*&quot;</span><br><br><span class="hljs-comment"># 查看附注标签详情。</span><br>git show &lt;tag-name&gt;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-27"><a href="#参数说明-27" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>-a</code>：创建附注标签，需添加描述信息。</li>
+<li><code>-m &quot;&lt;message&gt;&quot;</code>：指定标签的描述信息（用于附注标签）。</li>
+<li><code>-d</code>：删除本地标签。</li>
+<li><code>-l &lt;pattern&gt;</code>：按模式搜索标签（如 <code>v1.*</code>）。</li>
+<li><code>-f</code>：强制覆盖已有标签（需谨慎）。</li>
+</ul>
+<h4 id="示例-27"><a href="#示例-27" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 创建轻量标签 v1.0。</span><br>git tag v1.0<br><br><span class="hljs-comment"># 创建附注标签 v1.0，并附加描述信息。</span><br>git tag -a v1.0 -m <span class="hljs-string">&quot;First stable release&quot;</span><br><br><span class="hljs-comment"># 删除 v1.0 标签。</span><br>git tag -d v1.0<br><br><span class="hljs-comment"># 推送 v1.0 到远程仓库。</span><br>git push origin v1.0<br><br><span class="hljs-comment"># 推送所有本地标签到远程仓库。</span><br>git push origin --tags<br><br><span class="hljs-comment"># 查看 v1.0 的详细信息。</span><br>git show v1.0<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-describe"><a href="#git-describe" class="headerlink" title="git describe"></a>git describe</h3><h4 id="作用-27"><a href="#作用-27" class="headerlink" title="作用"></a>作用</h4><p><code>git describe</code> 用于显示最近的标签信息，通常用于版本管理，格式如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">tag-name</span>&gt;</span>-<span class="hljs-tag">&lt;<span class="hljs-name">number-of-commits</span>&gt;</span>-g<span class="hljs-tag">&lt;<span class="hljs-name">commit-hash</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+
+<p>例如：</p>
+<figure class="highlight apache"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">v1</span>.<span class="hljs-number">0</span>-<span class="hljs-number">5</span>-gf<span class="hljs-number">3</span>b<span class="hljs-number">1</span>c<span class="hljs-number">2</span>d<br></code></pre></div></td></tr></table></figure>
+
+<p>表示 <code>v1.0</code> 之后有 5 次提交，最新提交的哈希是 <code>f3b1c2d</code>。</p>
+<h4 id="基本用法-28"><a href="#基本用法-28" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 显示最近的标签信息。</span><br>git describe<br><br><span class="hljs-comment"># 显示最新的任意标签（默认只考虑 annotated tags）。</span><br>git describe --tags<br><br><span class="hljs-comment"># 如果没有标签，返回最近的提交哈希。</span><br>git describe --always<br><br><span class="hljs-comment"># 显示完整格式，包括标签、提交数和哈希。</span><br>git describe --long<br><br><span class="hljs-comment"># 如果工作区有修改，返回 dirty 状态。</span><br>git describe --dirty<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-28"><a href="#参数说明-28" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>--tags</code>：允许使用轻量标签。</li>
+<li><code>--always</code>：如果没有标签，则返回提交哈希。</li>
+<li><code>--long</code>：显示完整格式。</li>
+<li><code>--dirty</code>：如果工作区有修改，则标记为 <code>dirty</code>。</li>
+</ul>
+<h4 id="示例-28"><a href="#示例-28" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh">git describe<br><br><span class="hljs-comment"># 输出示例：表示距离 v1.0 有 5 次提交，最新提交哈希 f3b1c2d。</span><br>v1.0-5-gf3b1c2d<br><br><br><br>git describe --tags<br><br><span class="hljs-comment"># 输出示例：表示 v1.0.1 之后 3 次提交，最近提交哈希 5d6e8f9。</span><br>v1.0.1-3-g5d6e8f9<br><br><br><br><span class="hljs-comment"># 即使没有标签，也返回提交哈希。</span><br>git describe --always<br><br><span class="hljs-comment"># 输出示例：</span><br>g9a8b7c6<br>sh<br><br><br><br><span class="hljs-comment"># 查看未提交的修改。</span><br>git describe --dirty<br><br><span class="hljs-comment"># 输出示例：</span><br>v1.0-5-gf3b1c2d-dirty<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="子模块"><a href="#子模块" class="headerlink" title="子模块"></a><strong>子模块</strong></h2><p><code>git submodule</code> 提供了一系列命令来管理子模块，这在管理第三方库、依赖项目或大规模分布式开发时非常有用。</p>
+<h4 id="git-submodule-add"><a href="#git-submodule-add" class="headerlink" title="git submodule add"></a>git submodule add</h4><h4 id="作用-28"><a href="#作用-28" class="headerlink" title="作用"></a>作用</h4><p>将另一个 <code>Git</code> 仓库作为子模块添加到当前仓库。</p>
+<h4 id="基本用法-29"><a href="#基本用法-29" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 将另一个 Git 仓库作为子模块添加到当前仓库。</span><br>git submodule add &lt;repository_url&gt; &lt;path&gt;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-29"><a href="#参数说明-29" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>&lt;repository_url&gt;</code>：远程子模块仓库的地址。</li>
+<li><code>&lt;path&gt;</code>：子模块存放的目录（可选，默认仓库名）。</li>
+</ul>
+<h4 id="示例-29"><a href="#示例-29" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 在 libs/lib 目录下添加 lib.git 作为子模块。</span><br>git submodule add https://github.com/example/lib.git libs/lib<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-submodule-init"><a href="#git-submodule-init" class="headerlink" title="git submodule init"></a>git submodule init</h3><h4 id="作用-29"><a href="#作用-29" class="headerlink" title="作用"></a>作用</h4><p><code>git submodule init</code> 不会拉取子模块的代码，只是让 <code>Git</code> 知道有子模块的存在（注册子模块）。</p>
+<h4 id="基本用法-30"><a href="#基本用法-30" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 初始化所有子模块。</span><br>git submodule init<br><br><span class="hljs-comment"># 仅初始化 &lt;path&gt; 目录下的子模块。</span><br>git submodule init <br></code></pre></div></td></tr></table></figure>
+
+<h4 id="示例-30"><a href="#示例-30" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 初始化 .gitmodules 文件中定义的子模块。</span><br>git submodule init<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-submodule-update"><a href="#git-submodule-update" class="headerlink" title="git submodule update"></a>git submodule update</h3><h4 id="作用-30"><a href="#作用-30" class="headerlink" title="作用"></a>作用</h4><p><code>git submodule update</code> 用于拉取子模块的代码，并将其同步到父仓库指定的提交。</p>
+<h4 id="基本用法-31"><a href="#基本用法-31" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 拉取子模块代码，并将其切换到父仓库记录的提交。</span><br>git submodule update<br><br><span class="hljs-comment"># 递归更新所有嵌套子模块（即子模块中的子模块）。</span><br>git submodule update --recursive<br><br><span class="hljs-comment"># 更新子模块到远程最新版本，而非父仓库记录的提交。</span><br>git submodule update --remote<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-30"><a href="#参数说明-30" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>--recursive</code>：递归更新所有子模块（包括嵌套子模块）。</li>
+<li><code>--remote</code>：更新子模块到远程最新提交，而不是父仓库记录的提交。</li>
+</ul>
+<h4 id="示例-31"><a href="#示例-31" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 递归更新所有子模块，并拉取最新的远程提交。</span><br>git submodule update --recursive --remote<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-submodule-status"><a href="#git-submodule-status" class="headerlink" title="git submodule status"></a>git submodule status</h3><h4 id="作用-31"><a href="#作用-31" class="headerlink" title="作用"></a>作用</h4><p><code>git submodule status</code> 显示当前子模块的状态，包括：</p>
+<ul>
+<li><strong>哈希值</strong>：子模块当前指向的提交。</li>
+<li><strong>是否已修改</strong>：如果子模块的 <code>HEAD</code> 与父仓库的记录不同，则会有 <code>+</code> 标记。</li>
+<li><strong>路径</strong>：子模块存放的目录。</li>
+</ul>
+<h4 id="基本用法-32"><a href="#基本用法-32" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 列出所有子模块的状态。</span><br>git submodule status<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="示例-32"><a href="#示例-32" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh">git submodule status<br><br><span class="hljs-comment"># 示例输出：</span><br>+f1e2c3b4c5 libs/lib (v1.2-5-gf1e2c3b)<br>- `+` 表示子模块已修改，与父仓库记录的提交不同。<br>- `f1e2c3b4c5` 是子模块当前的提交哈希值。<br>- `libs/lib` 是子模块所在目录。<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-submodule-foreach"><a href="#git-submodule-foreach" class="headerlink" title="git submodule foreach"></a>git submodule foreach</h3><h4 id="作用-32"><a href="#作用-32" class="headerlink" title="作用"></a>作用</h4><p><code>git submodule foreach</code> 允许对所有子模块执行批量操作。</p>
+<h4 id="基本用法-33"><a href="#基本用法-33" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 在每个子模块的目录中执行 &lt;command&gt;。</span><br>git submodule foreach &lt;<span class="hljs-built_in">command</span>&gt;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="示例-33"><a href="#示例-33" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 在所有子模块中执行 git pull，拉取最新代码。</span><br>git submodule foreach <span class="hljs-string">&#x27;git pull origin main&#x27;</span><br><br><span class="hljs-comment"># 在所有子模块中切换到 main 分支并拉取最新代码。</span><br>git submodule foreach <span class="hljs-string">&#x27;git checkout main &amp;&amp; `Git` pull&#x27;</span><br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-submodule-sync"><a href="#git-submodule-sync" class="headerlink" title="git submodule sync"></a>git submodule sync</h3><h4 id="作用-33"><a href="#作用-33" class="headerlink" title="作用"></a>作用</h4><p>如果父仓库修改了 <code>.gitmodules</code> 文件中的子模块 URL，需要执行 <code>git submodule sync</code> 来同步 URL。</p>
+<h4 id="基本用法-34"><a href="#基本用法-34" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 同步所有子模块的 URL。</span><br>git submodule sync<br><br><span class="hljs-comment"># 仅同步指定子模块 &lt;path&gt;。</span><br>git submodule sync &lt;path&gt;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="示例-34"><a href="#示例-34" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 同步 .gitmodules 文件中的所有子模块 URL。</span><br>git submodule sync<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-submodule-deinit"><a href="#git-submodule-deinit" class="headerlink" title="git submodule deinit"></a>git submodule deinit</h3><h4 id="作用-34"><a href="#作用-34" class="headerlink" title="作用"></a>作用</h4><p><code>git submodule deinit</code> 取消初始化子模块，使其变成未克隆的状态。</p>
+<h4 id="基本用法-35"><a href="#基本用法-35" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 取消 &lt;path&gt; 目录下的子模块初始化。</span><br>git submodule deinit &lt;path&gt;<br><br><span class="hljs-comment"># 取消所有子模块的初始化。</span><br>git submodule deinit --all<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="示例-35"><a href="#示例-35" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 取消 libs/lib 目录下的子模块初始化。</span><br>git submodule deinit libs/lib<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-submodule-remove"><a href="#git-submodule-remove" class="headerlink" title="git submodule remove"></a>git submodule remove</h3><h4 id="作用-35"><a href="#作用-35" class="headerlink" title="作用"></a>作用</h4><p>Git 没有 <code>git submodule remove</code>，但可以手动删除子模块。</p>
+<h4 id="基本用法-36"><a href="#基本用法-36" class="headerlink" title="基本用法"></a>基本用法</h4><p>基本步骤如下：</p>
+<figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 1. 取消初始化</span><br>git submodule deinit -f &lt;path&gt;<br><br><span class="hljs-comment"># 2. 删除子模块目录</span><br>rm -rf &lt;path&gt; .git/modules/&lt;path&gt;<br><br><span class="hljs-comment"># 3. 从 Git 中移除子模块</span><br>git rm -f &lt;path&gt;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="git-clone-–recursive"><a href="#git-clone-–recursive" class="headerlink" title="git clone –recursive"></a>git clone –recursive</h3><h4 id="作用-36"><a href="#作用-36" class="headerlink" title="作用"></a>作用</h4><p>如果一个 <code>Git</code> 仓库包含子模块，直接 <code>git clone</code> 不会自动克隆子模块。需要使用 <code>--recursive</code> 参数。</p>
+<h4 id="基本用法-37"><a href="#基本用法-37" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 克隆仓库并初始化所有子模块。</span><br>git <span class="hljs-built_in">clone</span> --recursive &lt;repository_url&gt;<br><br><span class="hljs-comment"># 先克隆仓库，再初始化子模块（等效于 --recursive）。</span><br>git <span class="hljs-built_in">clone</span> &lt;repository_url&gt;<br>git submodule update --init --recursive<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="示例-36"><a href="#示例-36" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 克隆 repo.git 并自动拉取子模块。</span><br>git <span class="hljs-built_in">clone</span> --recursive https://github.com/example/repo.git<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="清理"><a href="#清理" class="headerlink" title="清理"></a><strong>清理</strong></h2><h3 id="git-clean"><a href="#git-clean" class="headerlink" title="git clean"></a>git clean</h3><h4 id="作用-37"><a href="#作用-37" class="headerlink" title="作用"></a>作用</h4><p>删除未跟踪文件，但不会影响已提交或暂存的文件，它只删除：</p>
+<ul>
+<li>未被 <code>Git</code> 跟踪的文件（未 <code>git add</code> 的文件）。</li>
+<li>忽略的文件（如 <code>.gitignore</code> 里的文件，可选择删除）。</li>
+<li>未跟踪的目录（可选择删除）。</li>
+</ul>
+<h4 id="基本用法-38"><a href="#基本用法-38" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 演示模式：显示将要删除的文件，但不会实际删除（安全检查）。</span><br>git clean -n<br><br><span class="hljs-comment"># 强制删除未跟踪的文件（不删除目录）。</span><br>git clean -f<br><br><span class="hljs-comment"># 强制删除未跟踪的文件和目录。</span><br>git clean -fd<br><br><span class="hljs-comment"># 删除所有未跟踪的文件，包括 .gitignore 里忽略的文件。</span><br>git clean -fx<br><br><span class="hljs-comment"># 删除所有未跟踪的文件和目录，包括 .gitignore 里忽略的文件。</span><br>git clean -fxd<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="参数说明-31"><a href="#参数说明-31" class="headerlink" title="参数说明"></a>参数说明</h4><ul>
+<li><code>-n</code>：仅模拟执行，不删除任何文件，只显示将被删除的文件列表。</li>
+<li><code>-f</code>：强制删除未跟踪的文件（<code>Git</code> 为了安全，不允许 <code>clean</code> 默认执行，需要 <code>-f</code>）。</li>
+<li><code>-d</code>：删除未跟踪的目录（默认只删除文件）。</li>
+<li><code>-x</code>：删除所有未跟踪的文件，包括 <code>.gitignore</code> 里忽略的文件。</li>
+<li><code>-X</code>：仅删除 <code>.gitignore</code> 里忽略的文件（不删除未跟踪但未被忽略的文件）。</li>
+</ul>
+<h4 id="示例-37"><a href="#示例-37" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 演示模式（安全检查）。</span><br>git clean -n<br><br><span class="hljs-comment"># 输出示例：</span><br>Would remove temp.txt<br>Would remove build/<br><span class="hljs-comment"># Would remove 只是模拟执行，未实际删除。</span><br><br><br><br><span class="hljs-comment"># 删除未跟踪的文件。</span><br>git clean -f<br><br><span class="hljs-comment"># 输出示例：</span><br>Removing temp.txt<br><span class="hljs-comment"># 删除 temp.txt（未跟踪的文件），不会删除目录。</span><br><br><br><br><span class="hljs-comment"># 删除未跟踪的文件和目录。</span><br>git clean -fd<br><br><span class="hljs-comment"># 输出示例：</span><br>Removing temp.txt<br>Removing build/<br><span class="hljs-comment"># 删除 `temp.txt（文件），删除 build/（目录）。</span><br><br><br><br><span class="hljs-comment"># 删除所有未跟踪的文件（包括 `.gitignore` 里的文件）。</span><br>git clean -fx<br><br><span class="hljs-comment"># 输出示例：</span><br>Removing temp.txt<br>Removing .env<br>Removing node_modules/<br><span class="hljs-comment"># 删除 .env（被 .gitignore 忽略的文件），删除 .gitignore 里忽略的所有文件。</span><br><br><br><br><span class="hljs-comment"># 仅删除 .gitignore 里忽略的文件。</span><br>git clean -fX<br><br><span class="hljs-comment"># 输出示例：</span><br>Removing .env<br>Removing node_modules/<br><span class="hljs-comment"># 不会删除 temp.txt（未跟踪但未被 .gitignore 忽略），仅删除 .gitignore 中列出的文件。</span><br></code></pre></div></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><code>Git</code> 提供了丰富且灵活的命令，从简单的 <code>init</code>、<code>add</code>、<code>commit</code>，到高级的 <code>rebase</code>、<code>cherry-pick</code>、<code>submodule</code> 等，覆盖了开发者在项目协作过程中可能遇到的几乎所有场景。掌握这些命令及其常见参数，能大幅提升我们对版本历史的可控性与开发效率。<br>然而，最重要的并不是死记硬背所有命令，而是在实际项目中灵活运用。遇到问题时，及时查看官方文档或 “<code>git &lt;command&gt; --help</code>” 也能快速解惑。希望本篇整理能帮助你在日常开发中更加游刃有余地管理代码。</p>
 
             </div>
             <hr>
@@ -307,7 +745,7 @@
                   <div class="post-meta mr-3">
                     <i class="iconfont icon-category"></i>
                     
-                      <a class="hover-with-bg" href="/categories/Docker/">Docker</a>
+                      <a class="hover-with-bg" href="/categories/Git/">Git</a>
                     
                   </div>
                 
@@ -315,9 +753,11 @@
                   <div class="post-meta">
                     <i class="iconfont icon-tags"></i>
                     
-                      <a class="hover-with-bg" href="/tags/Docker/">Docker</a>
+                      <a class="hover-with-bg" href="/tags/Git/">Git</a>
                     
-                      <a class="hover-with-bg" href="/tags/%E5%AE%B9%E5%99%A8/">容器</a>
+                      <a class="hover-with-bg" href="/tags/%E7%89%88%E6%9C%AC%E7%AE%A1%E7%90%86/">版本管理</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%91%BD%E4%BB%A4%E5%A4%A7%E5%85%A8/">命令大全</a>
                     
                   </div>
                 
