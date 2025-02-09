@@ -16,19 +16,19 @@
   <meta name="author" content="Yangtao">
   <meta name="keywords" content="">
   
-    <meta name="description" content="引言随着数据分析需求的增加，数据库查询的复杂性也随之提高。MySQL从8.0版本引入的窗口函数，为数据分析提供了更多的灵活性和强大的数据处理能力。窗口函数使得在单个查询中执行多种计算成为可能，大大增强了SQL的表达力。">
+    <meta name="description" content="引言随着业务的不断发展，数据分析需求愈发复杂，传统聚合查询往往不能同时保留明细数据与聚合结果。MySQL 8.0 所提供的窗口函数（Window Functions），为此类分析型查询提供了全新的解决方案。通过定义 “窗口” 对数据分组、排序并限制帧范围，能在一条查询中同时实现聚合、排名、偏移访问等操作，而不会像传统聚合函数那样缩减结果集。本文将系统介绍窗口函数的原理、语法、常见用法与注意事项，并">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MySQL窗口函数">
-<meta property="og:url" content="http://example.com/2024/05/26/mysql-window-function/index.html">
+<meta property="og:url" content="http://example.com/2022/05/26/mysql-window-function/index.html">
 <meta property="og:site_name" content="Yangtao&#39;s space">
-<meta property="og:description" content="引言随着数据分析需求的增加，数据库查询的复杂性也随之提高。MySQL从8.0版本引入的窗口函数，为数据分析提供了更多的灵活性和强大的数据处理能力。窗口函数使得在单个查询中执行多种计算成为可能，大大增强了SQL的表达力。">
+<meta property="og:description" content="引言随着业务的不断发展，数据分析需求愈发复杂，传统聚合查询往往不能同时保留明细数据与聚合结果。MySQL 8.0 所提供的窗口函数（Window Functions），为此类分析型查询提供了全新的解决方案。通过定义 “窗口” 对数据分组、排序并限制帧范围，能在一条查询中同时实现聚合、排名、偏移访问等操作，而不会像传统聚合函数那样缩减结果集。本文将系统介绍窗口函数的原理、语法、常见用法与注意事项，并">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/mysql-windows-function.webp">
-<meta property="article:published_time" content="2024-05-26T07:00:25.000Z">
-<meta property="article:modified_time" content="2024-05-26T07:00:25.000Z">
+<meta property="article:published_time" content="2022-05-26T07:00:25.000Z">
+<meta property="article:modified_time" content="2022-05-26T07:00:25.000Z">
 <meta property="article:author" content="Yangtao">
 <meta property="article:tag" content="MySQL">
-<meta property="article:tag" content="MySQL8">
+<meta property="article:tag" content="MySQL窗口函数">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/mysql-windows-function.webp">
   
@@ -206,8 +206,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2024-05-26 15:00" pubdate>
-        2024年5月26日 下午
+      <time datetime="2022-05-26 15:00" pubdate>
+        2022年5月26日 下午
       </time>
     </span>
   
@@ -217,7 +217,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      9.1k 字
+      10k 字
     </span>
   
 
@@ -226,7 +226,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      16 分钟
+      17 分钟
     </span>
   
 
@@ -267,144 +267,147 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：8 个月前
+                  本文最后更新于：3 年前
                 
               </p>
             
             <div class="markdown-body">
-              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>随着数据分析需求的增加，数据库查询的复杂性也随之提高。MySQL从8.0版本引入的窗口函数，为数据分析提供了更多的灵活性和强大的数据处理能力。窗口函数使得在单个查询中执行多种计算成为可能，大大增强了SQL的表达力。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 </p>
-<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p>MySQL中的窗口函数是一类非常强大的SQL功能，用于在数据记录集的<strong>“窗口”</strong>上进行计算。窗口函数可以在<strong>不改变数据行的返回数量</strong>的情况下，对一组行进行计算。这使得窗口函数特别适用于<strong>需要考虑相对位置或基于整个数据分区进行计算</strong>的复杂查询。</p>
-<h3 id="窗口"><a href="#窗口" class="headerlink" title="窗口"></a>窗口</h3><p>指定在<strong>哪些行</strong>上执行计算，这些行与当前行有某种逻辑关系，如在当前行的前后或与当前行处于相同分组。</p>
-<h3 id="分区"><a href="#分区" class="headerlink" title="分区"></a>分区</h3><p><code>PARTITION BY</code>，窗口函数可以按照一列或多列进行分区，相当于对数据进行<strong>分组</strong>，窗口函数在每个<strong>分组内部独立计算</strong>。</p>
-<h3 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h3><p><code>ORDER BY</code>，在窗口内部数据可以按照一列或多列进行<strong>排序</strong>，这个顺序会影响某些窗口函数的计算结果。</p>
-<h3 id="帧规范"><a href="#帧规范" class="headerlink" title="帧规范"></a>帧规范</h3><p><code>ROWS/RANGE BETWEEN</code>，进一步定义在当前行的上下文中，窗口<strong>包含哪些行</strong>。</p>
-<h2 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h2><figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-operator">&lt;</span>窗口函数名<span class="hljs-operator">&gt;</span>(<span class="hljs-operator">&lt;</span>参数<span class="hljs-operator">&gt;</span>)<br><span class="hljs-keyword">OVER</span> (<br>    [<span class="hljs-keyword">PARTITION</span> <span class="hljs-keyword">BY</span> <span class="hljs-operator">&lt;</span>分组列列表<span class="hljs-operator">&gt;</span>]<br>    [<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> <span class="hljs-operator">&lt;</span>排序列列表<span class="hljs-operator">&gt;</span> [<span class="hljs-keyword">ASC</span><span class="hljs-operator">|</span><span class="hljs-keyword">DESC</span>]]<br>    [<span class="hljs-keyword">ROWS</span> <span class="hljs-keyword">BETWEEN</span> <span class="hljs-operator">&lt;</span><span class="hljs-keyword">start</span><span class="hljs-operator">&gt;</span> <span class="hljs-keyword">AND</span> <span class="hljs-operator">&lt;</span><span class="hljs-keyword">end</span><span class="hljs-operator">&gt;</span> <span class="hljs-operator">|</span> <span class="hljs-keyword">RANGE</span> <span class="hljs-keyword">BETWEEN</span> <span class="hljs-operator">&lt;</span><span class="hljs-keyword">start</span><span class="hljs-operator">&gt;</span> <span class="hljs-keyword">AND</span> <span class="hljs-operator">&lt;</span><span class="hljs-keyword">end</span><span class="hljs-operator">&gt;</span>]<br>)<br></code></pre></div></td></tr></table></figure>
-<p>其中，<code>&lt;start&gt;</code> 和 <code>&lt;end&gt;</code> 的选项包括：</p>
-<ul>
-<li><code>UNBOUNDED PRECEDING</code>：从分区的第一行到当前行。</li>
-<li><code>N PRECEDING</code>：从当前行前的第N行到当前行（N为具体的行数）。</li>
-<li><code>CURRENT ROW</code>：当前行。</li>
-<li><code>N FOLLOWING</code>：从当前行后的第N行到当前行。</li>
-<li><code>UNBOUNDED FOLLOWING</code>：从当前行到分区的最后一行。</li>
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>随着业务的不断发展，数据分析需求愈发复杂，传统聚合查询往往不能同时保留明细数据与聚合结果。MySQL 8.0 所提供的窗口函数（<code>Window Functions</code>），为此类分析型查询提供了全新的解决方案。通过定义 “窗口” 对数据分组、排序并限制帧范围，能在一条查询中同时实现聚合、排名、偏移访问等操作，而不会像传统聚合函数那样缩减结果集。本文将系统介绍窗口函数的原理、语法、常见用法与注意事项，并结合实际示例进行说明。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      </p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>MySQL 从 8.0 版本开始支持窗口函数，它允许对查询结果集中的每一行执行基于一组相关行（窗口）的计算。例如，可以计算累计和、排名、前后行数据的比较等。与普通聚合函数不同，窗口函数不会减少返回行数，而是为每一行附加一个计算结果。</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><ul>
+<li>需要在保留原始行数据的同时计算统计信息（如累计求和、移动平均）。</li>
+<li>进行数据排名、分位数划分等操作。</li>
+<li>访问当前行之前或之后的某行数据（例如前后行的差值计算）。</li>
 </ul>
-<h2 id="常见的窗口函数"><a href="#常见的窗口函数" class="headerlink" title="常见的窗口函数"></a>常见的窗口函数</h2><p>注：以下说明中的特定窗口均是<code>OVER()</code>子句中的<code>PARTITION BY</code>分组、<code>ORDER BY</code>排序以及<code>ROWS/RANGE BETWEEN</code>限定的范围。</p>
-<h3 id="聚合窗口函数"><a href="#聚合窗口函数" class="headerlink" title="聚合窗口函数"></a>聚合窗口函数</h3><ul>
-<li><p><code>SUM(column_name)</code>：</p>
+<h2 id="核心概念"><a href="#核心概念" class="headerlink" title="核心概念"></a>核心概念</h2><h3 id="窗口（Window）"><a href="#窗口（Window）" class="headerlink" title="窗口（Window）"></a>窗口（Window）</h3><h4 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h4><p>一个 “窗口” 是由 <code>OVER()</code> 子句定义的一组行。窗口函数将在这个窗口范围内对数据进行计算。每一行都会根据其所在窗口返回一个计算结果。</p>
+<h4 id="关键点"><a href="#关键点" class="headerlink" title="关键点"></a>关键点</h4><ul>
+<li>窗口并不改变结果集的行数。</li>
+<li>允许在同一查询中同时返回原始数据和计算结果。</li>
+</ul>
+<h3 id="分区（Partition）"><a href="#分区（Partition）" class="headerlink" title="分区（Partition）"></a>分区（Partition）</h3><h4 id="定义-1"><a href="#定义-1" class="headerlink" title="定义"></a>定义</h4><p>使用 <code>PARTITION BY</code> 子句将数据分割成多个分区，相当于对数据进行分组，每个分区内的行将独立参与窗口函数的计算。</p>
+<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SUM(salary) OVER(PARTITION BY department)<br></code></pre></div></td></tr></table></figure>
+
+<p>这表示对每个部门（<code>department</code>）分别计算薪资总和。</p>
+<h3 id="排序（Order）"><a href="#排序（Order）" class="headerlink" title="排序（Order）"></a>排序（Order）</h3><h4 id="定义-2"><a href="#定义-2" class="headerlink" title="定义"></a>定义</h4><p>在窗口函数的 <code>OVER()</code> 子句中，可以使用 <code>ORDER BY</code> 对每个分区内的行进行排序，这会影响某些窗口函数的计算结果，对于排名、偏移及帧计算非常关键。</p>
+<h4 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">ROW_NUMBER() OVER(PARTITION BY department ORDER BY salary DESC)<br></code></pre></div></td></tr></table></figure>
+
+<p>在每个部门中，按照薪资从高到低排序，并为每一行分配一个行号。</p>
+<h3 id="帧规范（Frame-Specification）"><a href="#帧规范（Frame-Specification）" class="headerlink" title="帧规范（Frame Specification）"></a>帧规范（Frame Specification）</h3><p><code>ROWS/RANGE BETWEEN</code>，进一步定义在当前行的上下文中，窗口包含哪些行。</p>
+<h4 id="定义-3"><a href="#定义-3" class="headerlink" title="定义"></a>定义</h4><p>窗口帧限定了在排序后的分区内，参与窗口函数计算的行的范围，即窗口包含了哪些行。MySQL 支持两种帧模式：</p>
 <ul>
-<li>计算指定窗口内所有行指定列的<strong>总和</strong>。</li>
+<li><p><strong>ROWS</strong>：基于物理行数进行界定。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">ROWS BETWEEN 1 PRECEDING AND CURRENT ROW<br></code></pre></div></td></tr></table></figure>
+
+<p>表示以当前行及其前一行为计算范围。</p>
+</li>
+<li><p><strong>RANGE</strong>：基于排序列的值范围。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW<br></code></pre></div></td></tr></table></figure>
+
+<p>表示从分区开始到当前行所有符合排序条件的行。</p>
+</li>
+</ul>
+<h4 id="边界说明"><a href="#边界说明" class="headerlink" title="边界说明"></a>边界说明</h4><p>可以使用以下关键字来定义帧的边界：</p>
+<ul>
+<li><strong>UNBOUNDED PRECEDING</strong>：从分区的第一行开始。</li>
+<li><strong>N PRECEDING</strong>：前 N 行。</li>
+<li><strong>CURRENT ROW</strong>：当前行。</li>
+<li><strong>N FOLLOWING</strong>：后 N 行。</li>
+<li><strong>UNBOUNDED FOLLOWING</strong>：到分区的最后一行。</li>
+</ul>
+<h2 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h2><figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">window_function (expression) <span class="hljs-keyword">OVER</span> (<br>    [<span class="hljs-keyword">PARTITION</span> <span class="hljs-keyword">BY</span> <span class="hljs-operator">&lt;</span>partition_column<span class="hljs-operator">&gt;</span>]<br>    [<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> <span class="hljs-operator">&lt;</span>order_column<span class="hljs-operator">&gt;</span> [<span class="hljs-keyword">ASC</span><span class="hljs-operator">|</span><span class="hljs-keyword">DESC</span>]]<br>    [<span class="hljs-keyword">ROWS</span> <span class="hljs-keyword">BETWEEN</span> <span class="hljs-operator">&lt;</span><span class="hljs-keyword">start</span><span class="hljs-operator">&gt;</span> <span class="hljs-keyword">AND</span> <span class="hljs-operator">&lt;</span><span class="hljs-keyword">end</span><span class="hljs-operator">&gt;</span> <span class="hljs-operator">|</span> <span class="hljs-keyword">RANGE</span> <span class="hljs-keyword">BETWEEN</span> <span class="hljs-operator">&lt;</span><span class="hljs-keyword">start</span><span class="hljs-operator">&gt;</span> <span class="hljs-keyword">AND</span> <span class="hljs-operator">&lt;</span><span class="hljs-keyword">end</span><span class="hljs-operator">&gt;</span>]<br>)<br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li><strong>window_function</strong>：可以是聚合函数（如 <code>SUM</code>、<code>AVG</code>、<code>COUNT</code>、<code>MIN</code>、<code>MAX</code>）或其他专用窗口函数（如 <code>ROW_NUMBER()</code>、<code>RANK()</code>、<code>LAG()</code> 等）。</li>
+<li><strong>expression</strong>：要计算的表达式或列。</li>
+<li><strong>OVER 子句</strong>：<ul>
+<li>**PARTITION BY <partition_column>**：定义分区。</li>
+<li>**ORDER BY <order_column> [ASC|DESC]**：定义分区内的排序规则。</li>
+<li>**[ROWS BETWEEN &lt;start&gt; AND &lt;end&gt; | RANGE BETWEEN &lt;start&gt; AND &lt;end&gt;]**：定义窗口帧的范围。</li>
+</ul>
+</li>
+</ul>
+<h2 id="常见的窗口函数"><a href="#常见的窗口函数" class="headerlink" title="常见的窗口函数"></a>常见的窗口函数</h2><h3 id="聚合函数"><a href="#聚合函数" class="headerlink" title="聚合函数"></a>聚合函数</h3><p>这些函数在窗口内计算聚合值，与普通聚合函数类似，但不会压缩行数。</p>
+<h4 id="SUM-column-name"><a href="#SUM-column-name" class="headerlink" title="SUM(column_name)"></a>SUM(column_name)</h4><ul>
+<li>计算指定窗口内所有行指定列的总和。</li>
 <li>在需要对数据集中的特定窗口（如某个时间段内、某个部门内）计算总和时使用。</li>
 </ul>
-</li>
-<li><p><code>AVG(column_name)</code></p>
-<ul>
-<li>计算指定窗口内所有行指定列的<strong>平均值</strong>。</li>
+<h4 id="AVG-column-name"><a href="#AVG-column-name" class="headerlink" title="AVG(column_name)"></a>AVG(column_name)</h4><ul>
+<li>计算指定窗口内所有行指定列的平均值。</li>
 <li>在需要对数据集中的特定窗口（如某个时间段内、某个部门内）计算平均值时使用。</li>
 </ul>
-</li>
-<li><p><code>MIN(column_name)</code></p>
-<ul>
-<li>计算指定窗口内所有行指定列的<strong>最小值</strong>。</li>
+<h4 id="MIN-column-name"><a href="#MIN-column-name" class="headerlink" title="MIN(column_name)"></a>MIN(column_name)</h4><ul>
+<li>计算指定窗口内所有行指定列的最小值。</li>
 <li>在需要找出数据集中特定窗口（如某个时间段内、某个部门内）的最小值时使用。</li>
 </ul>
-</li>
-<li><p><code>MAX(column_name)</code></p>
-<ul>
-<li>计算指定窗口内所有行指定列的<strong>最大值</strong>。</li>
+<h4 id="MAX-column-name"><a href="#MAX-column-name" class="headerlink" title="MAX(column_name)"></a>MAX(column_name)</h4><ul>
+<li>计算指定窗口内所有行指定列的最大值。</li>
 <li>在需要找出数据集中特定窗口（如某个时间段内、某个部门内）的最大值时使用。</li>
 </ul>
-</li>
-<li><p><code>COUNT(column_name)</code></p>
-<ul>
-<li>计算指定窗口内所有行指定列的<strong>行数</strong>。</li>
+<h4 id="COUNT-column-name"><a href="#COUNT-column-name" class="headerlink" title="COUNT(column_name)"></a>COUNT(column_name)</h4><ul>
+<li>计算指定窗口内所有行指定列的行数。</li>
 <li>在需要计算数据集中特定窗口（如某个时间段内、某个部门内）的行数时使用。</li>
 </ul>
-</li>
-<li><p><code>VAR_POP(column_name)</code></p>
-<ul>
-<li>计算指定窗口内所有行指定列的<strong>总体方差</strong>。</li>
+<h4 id="VAR-POP-column-name"><a href="#VAR-POP-column-name" class="headerlink" title="VAR_POP(column_name)"></a>VAR_POP(column_name)</h4><ul>
+<li>计算指定窗口内所有行指定列的总体方差。</li>
 <li>在需要分析数据集中特定窗口（如某个时间段内、某个部门内）数据的变异性时使用。</li>
 </ul>
-</li>
-<li><p><code>STDDEV_POP()</code></p>
-<ul>
-<li>计算指定窗口内所有行指定列的<strong>总体标准差</strong>。</li>
+<h4 id="STDDEV-POP"><a href="#STDDEV-POP" class="headerlink" title="STDDEV_POP()"></a>STDDEV_POP()</h4><ul>
+<li>计算指定窗口内所有行指定列的总体标准差。</li>
 <li>在需要分析数据集中特定窗口（如某个时间段内、某个部门内）数据的标准差，即变异性度量时使用。</li>
 </ul>
-</li>
-</ul>
-<h3 id="排名类窗口函数"><a href="#排名类窗口函数" class="headerlink" title="排名类窗口函数"></a>排名类窗口函数</h3><ul>
-<li><code>ROW_NUMBER()</code><ul>
-<li>为每个窗口分组内的行提供一个唯一的<strong>序列号</strong>，从1开始。如1、2、3、…</li>
+<h3 id="排名函数"><a href="#排名函数" class="headerlink" title="排名函数"></a>排名函数</h3><h4 id="ROW-NUMBER"><a href="#ROW-NUMBER" class="headerlink" title="ROW_NUMBER()"></a>ROW_NUMBER()</h4><ul>
+<li>为每个窗口分组内的行提供一个唯一的序列号，从 1 开始，如1、2、3、…</li>
 <li>在需要对数据集中特定窗口（如某个时间段内、某个部门内）的行进行唯一编号时使用，常用于排序并提取排名。</li>
 </ul>
-</li>
-<li><code>RANK()</code><ul>
-<li>为指定窗口内的每一行分配一个<strong>排名</strong>。如果存在<strong>相同的值</strong>，它们会获得<strong>相同的排名</strong>，而下一个排名将<strong>跳过之前的重复排名数</strong>。</li>
+<h4 id="RANK"><a href="#RANK" class="headerlink" title="RANK()"></a>RANK()</h4><ul>
+<li>为指定窗口内的每一行分配一个排名。如果存在相同的值，它们会获得相同的排名，而下一个排名将跳过之前的重复排名数。</li>
 <li>在需要对数据集中特定窗口（如某个时间段内、某个部门内）的行进行排名时使用，特别是当存在并列排名的情况时。</li>
 </ul>
-</li>
-<li><code>DENSE_RANK()</code><ul>
-<li>与<code>RANK()</code>类似，但排名<strong>不会跳过任何排名数</strong>。</li>
+<h4 id="DENSE-RANK"><a href="#DENSE-RANK" class="headerlink" title="DENSE_RANK()"></a>DENSE_RANK()</h4><ul>
+<li>与 <code>RANK()</code> 类似，但排名不会跳过任何排名数。</li>
 <li>在需要对数据集中特定窗口（如某个时间段内、某个部门内）的行进行连续排名时使用，特别是当排名不应因并列而跳号时。</li>
 </ul>
-</li>
-<li><code>PERCENT_RANK()</code><ul>
-<li>计算当前行的<strong>百分比排名</strong>。这个排名是基于当前行在分组中的位置，公式为：**(排名 - 1) / (总行数 - 1)**。如果只有一行，结果是0。</li>
+<h4 id="PERCENT-RANK"><a href="#PERCENT-RANK" class="headerlink" title="PERCENT_RANK()"></a>PERCENT_RANK()</h4><ul>
+<li>计算当前行的百分比排名。这个排名是基于当前行在分组中的位置，公式为：(排名 - 1) / (总行数 - 1)。如果只有一行，结果是 0。</li>
 <li>在需要确定某个值在整个数据集中的相对位置时使用，常用于数据分析，特别是当需要评估数据相对于其它数据的表现时。</li>
 </ul>
-</li>
-<li><code>CUME_DIST()</code><ul>
-<li>计算当前行的<strong>累积分布</strong>，这意味着计算有多少比例的值小于等于当前行的值。公式为：<strong>当前行之前的行数（包括当前行） / 总行数</strong>。</li>
+<h4 id="CUME-DIST"><a href="#CUME-DIST" class="headerlink" title="CUME_DIST()"></a>CUME_DIST()</h4><ul>
+<li>计算当前行的累积分布，这意味着计算有多少比例的值小于等于当前行的值。公式为：当前行之前的行数（包括当前行） / 总行数。</li>
 <li>在需要确定某个值在整个数据集中的累积分布位置时使用，常用于统计分析，尤其是当需要评估一个值相对于集合的位置时。</li>
 </ul>
-</li>
-<li><code>NTILE()</code><ul>
-<li>将窗口内的行分成 <code>n</code> 个<strong>大致相等的组</strong>，并为每一行分配一个组号，从1到 <code>n</code>。如果窗口中的行数不能被 <code>n</code> 整除，那么前面的几个组将包含一个额外的行。</li>
+<h4 id="NTILE"><a href="#NTILE" class="headerlink" title="NTILE()"></a>NTILE()</h4><ul>
+<li>将窗口内的行分成  n  个大致相等的组，并为每一行分配一个组号，从 1 到 n。如果窗口中的行数不能被 n 整除，那么前面的几个组将包含一个额外的行。</li>
 <li>在需要将数据集分组进行分析时使用，如分位数分析、性能评级或将数据分成多个性能层次。</li>
 </ul>
-</li>
-</ul>
-<h3 id="值获取类窗口函数"><a href="#值获取类窗口函数" class="headerlink" title="值获取类窗口函数"></a>值获取类窗口函数</h3><ul>
-<li><p><code>FIRST_VALUE(column_name)</code></p>
-<ul>
-<li>返回窗口内<strong>第一行</strong>的指定列值。</li>
+<h3 id="值获取函数"><a href="#值获取函数" class="headerlink" title="值获取函数"></a>值获取函数</h3><h4 id="FIRST-VALUE-column-name"><a href="#FIRST-VALUE-column-name" class="headerlink" title="FIRST_VALUE(column_name)"></a>FIRST_VALUE(column_name)</h4><ul>
+<li>返回窗口内第一行的指定列值。</li>
 <li>在需要获取数据集中特定窗口（如某个时间段内、某个部门内）第一个记录的值时使用，常用于时间序列分析，或当需要参考某个范围内的起始值进行比较时。</li>
 </ul>
-</li>
-<li><p><code>LAST_VALUE(column_name)</code></p>
-<ul>
-<li>返回窗口内<strong>最后一行</strong>的指定列值，使用时要注意定义正确的窗口帧（ROWS/RANGE BETWEEN），否则可能不会得到预期的结果。</li>
+<h4 id="LAST-VALUE-column-name"><a href="#LAST-VALUE-column-name" class="headerlink" title="LAST_VALUE(column_name)"></a>LAST_VALUE(column_name)</h4><ul>
+<li>返回窗口内最后一行的指定列值，使用时要注意定义正确的窗口帧（ROWS/RANGE BETWEEN），否则可能不会得到预期的结果。</li>
 <li>在需要获取数据集中特定窗口（如某个时间段内、某个部门内）最后一个记录的值时使用，常用于时间序列分析，或当需要参考某个范围内的结束值进行比较时。</li>
 </ul>
-</li>
-<li><p><code>NTH_VALUE(column_name, n)</code></p>
-<ul>
-<li>返回窗口内<strong>第 n 行</strong>的指定列值。</li>
+<h4 id="NTH-VALUE-column-name-n"><a href="#NTH-VALUE-column-name-n" class="headerlink" title="NTH_VALUE(column_name, n)"></a>NTH_VALUE(column_name, n)</h4><ul>
+<li>返回窗口内第 n 行的指定列值。</li>
 <li>在需要获取数据集中特定窗口（如某个时间段内、某个部门内）特定位置的记录值时使用，常用于需要定位序列中特定点的数据分析。</li>
 </ul>
-</li>
-</ul>
-<h3 id="位移类窗口函数"><a href="#位移类窗口函数" class="headerlink" title="位移类窗口函数"></a>位移类窗口函数</h3><ul>
-<li><p><code>LAG(column_name [, offset, default_value])</code></p>
-<ul>
-<li>返回当前行的指定列在窗口中<strong>前一行</strong>的值，可指定前 <code>offset</code> 行的值并指定一个默认值作为返回。</li>
+<h3 id="位移类（偏移）函数"><a href="#位移类（偏移）函数" class="headerlink" title="位移类（偏移）函数"></a>位移类（偏移）函数</h3><h4 id="LAG-column-name-offset-default-value"><a href="#LAG-column-name-offset-default-value" class="headerlink" title="LAG(column_name [, offset, default_value])"></a>LAG(column_name [, offset, default_value])</h4><ul>
+<li>返回当前行的指定列在窗口中前一行的值，可指定前 <code>offset</code> 行的值并指定一个默认值作为返回。</li>
 <li>在需要访问当前行之前的数据时使用，常用于时间序列数据分析、比较连续记录之间的变化，或计算增长率等。</li>
 </ul>
-</li>
-<li><p><code>LEAD(column_name [, offset, default_value])</code></p>
-<ul>
-<li>返回当前行的指定列在窗口中<strong>后一行</strong>的值，可指定前后 <code>offset</code> 行的值并指定一个默认值作为返回。</li>
+<h4 id="LEAD-column-name-offset-default-value"><a href="#LEAD-column-name-offset-default-value" class="headerlink" title="LEAD(column_name [, offset, default_value])"></a>LEAD(column_name [, offset, default_value])</h4><ul>
+<li>返回当前行的指定列在窗口中后一行的值，可指定前后 <code>offset</code> 行的值并指定一个默认值作为返回。</li>
 <li>在需要访问当前行之后的数据时使用，常用于预测未来的数据点、比较连续记录之间的变化，或者在数据序列中提前反应趋势和模式。</li>
 </ul>
-</li>
-</ul>
-<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p>前置数据</p>
+<h2 id="示例说明"><a href="#示例说明" class="headerlink" title="示例说明"></a>示例说明</h2><h3 id="前置数据"><a href="#前置数据" class="headerlink" title="前置数据"></a>前置数据</h3><p>创建城市 GDP 信息表，模拟插入若干数据。</p>
 <figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-comment">-- 城市GDP信息表</span><br><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> `city_gdp`<br>(<br>    `id`       <span class="hljs-type">int</span>            <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> AUTO_INCREMENT COMMENT <span class="hljs-string">&#x27;主键ID&#x27;</span>,<br>    `<span class="hljs-keyword">year</span>`     <span class="hljs-keyword">year</span>           <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> COMMENT <span class="hljs-string">&#x27;年份&#x27;</span>,<br>    `province` <span class="hljs-type">varchar</span>(<span class="hljs-number">255</span>)   <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> COMMENT <span class="hljs-string">&#x27;省份&#x27;</span>,<br>    `city`     <span class="hljs-type">varchar</span>(<span class="hljs-number">255</span>)   <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> COMMENT <span class="hljs-string">&#x27;城市&#x27;</span>,<br>    `gdp`      <span class="hljs-type">decimal</span>(<span class="hljs-number">12</span>, <span class="hljs-number">2</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> COMMENT <span class="hljs-string">&#x27;人民币（亿）&#x27;</span>,<br>    <span class="hljs-keyword">PRIMARY</span> KEY (`id`)<br>) ENGINE <span class="hljs-operator">=</span> InnoDB<br>  <span class="hljs-keyword">DEFAULT</span> CHARSET <span class="hljs-operator">=</span> utf8mb4<br>  <span class="hljs-keyword">COLLATE</span> <span class="hljs-operator">=</span> utf8mb4_0900_ai_ci COMMENT <span class="hljs-operator">=</span><span class="hljs-string">&#x27;城市GDP&#x27;</span>;<br><br><span class="hljs-comment">-- 数据</span><br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> city_gdp(<span class="hljs-keyword">year</span>, province, city, gdp)<br><span class="hljs-keyword">VALUES</span> (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;广州市&#x27;</span>, <span class="hljs-number">28839</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;深圳市&#x27;</span>, <span class="hljs-number">32387.68</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;佛山市&#x27;</span>, <span class="hljs-number">12698.39</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;东莞市&#x27;</span>, <span class="hljs-number">11200.32</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;惠州市&#x27;</span>, <span class="hljs-number">5401.24</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;珠海市&#x27;</span>, <span class="hljs-number">4045.45</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;福建省&#x27;</span>, <span class="hljs-string">&#x27;福州市&#x27;</span>, <span class="hljs-number">12308.23</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;福建省&#x27;</span>, <span class="hljs-string">&#x27;泉州市&#x27;</span>, <span class="hljs-number">12102.97</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;福建省&#x27;</span>, <span class="hljs-string">&#x27;厦门市&#x27;</span>, <span class="hljs-number">7802.7</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;浙江省&#x27;</span>, <span class="hljs-string">&#x27;杭州市&#x27;</span>, <span class="hljs-number">18753</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;浙江省&#x27;</span>, <span class="hljs-string">&#x27;宁波市&#x27;</span>, <span class="hljs-number">15704.3</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;浙江省&#x27;</span>, <span class="hljs-string">&#x27;温州市&#x27;</span>, <span class="hljs-number">8029.8</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;浙江省&#x27;</span>, <span class="hljs-string">&#x27;绍兴市&#x27;</span>, <span class="hljs-number">7351</span>),<br>       (<span class="hljs-number">2022</span>, <span class="hljs-string">&#x27;浙江省&#x27;</span>, <span class="hljs-string">&#x27;嘉兴市&#x27;</span>, <span class="hljs-number">6739.45</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;广州市&#x27;</span>, <span class="hljs-number">30355.73</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;深圳市&#x27;</span>, <span class="hljs-number">34606.4</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;佛山市&#x27;</span>, <span class="hljs-number">13276.14</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;东莞市&#x27;</span>, <span class="hljs-number">11438.13</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;惠州市&#x27;</span>, <span class="hljs-number">5639.68</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;广东省&#x27;</span>, <span class="hljs-string">&#x27;珠海市&#x27;</span>, <span class="hljs-number">4233.2</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;福建省&#x27;</span>, <span class="hljs-string">&#x27;福州市&#x27;</span>, <span class="hljs-number">12928.47</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;福建省&#x27;</span>, <span class="hljs-string">&#x27;泉州市&#x27;</span>, <span class="hljs-number">12172.33</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;福建省&#x27;</span>, <span class="hljs-string">&#x27;厦门市&#x27;</span>, <span class="hljs-number">8066.49</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;浙江省&#x27;</span>, <span class="hljs-string">&#x27;杭州市&#x27;</span>, <span class="hljs-number">20058.98</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;浙江省&#x27;</span>, <span class="hljs-string">&#x27;宁波市&#x27;</span>, <span class="hljs-number">16452.83</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;浙江省&#x27;</span>, <span class="hljs-string">&#x27;温州市&#x27;</span>, <span class="hljs-number">8730.63</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;浙江省&#x27;</span>, <span class="hljs-string">&#x27;绍兴市&#x27;</span>, <span class="hljs-number">7791.14</span>),<br>       (<span class="hljs-number">2023</span>, <span class="hljs-string">&#x27;浙江省&#x27;</span>, <span class="hljs-string">&#x27;嘉兴市&#x27;</span>, <span class="hljs-number">7062.45</span>);<br></code></pre></div></td></tr></table></figure>
-<ol>
-<li><p>查询2022年广东省各城市GDP与第1名GDP的差值</p>
+
+<h3 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h3><ol>
+<li><p>查询 2022 年广东省各城市 GDP 与第一名城市 GDP 的差值。</p>
+<p><strong>SQL 示例</strong>：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT cg.year,<br>       cg.province,<br>       cg.city,<br>       cg.gdp,<br>       MAX(cg.gdp) OVER (PARTITION BY cg.province)          AS max_gdp,<br>       MAX(cg.gdp) OVER (PARTITION BY cg.province) - cg.gdp AS diff<br>FROM city_gdp cg<br>WHERE cg.province = &#x27;广东省&#x27;<br>  AND cg.year = 2022;<br></code></pre></div></td></tr></table></figure>
 
-<p>查询结果：</p>
+<p><strong>查询结果</strong>：</p>
 <table>
 <thead>
 <tr>
@@ -466,10 +469,11 @@
 </tr>
 </tbody></table>
 </li>
-<li><p>查询2022年各城市GDP在省份内的排名</p>
+<li><p>查询 2022 年各城市 GDP 在省份内的排名。</p>
+<p><strong>SQL 示例</strong>：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT cg.year,<br>       cg.province,<br>       cg.city,<br>       cg.gdp,<br>       RANK() OVER (PARTITION BY cg.province ORDER BY cg.gdp DESC) AS rk<br>FROM city_gdp cg<br>WHERE cg.year = 2022;<br></code></pre></div></td></tr></table></figure>
 
-<p>查询结果：</p>
+<p><strong>查询结果</strong>：</p>
 <table>
 <thead>
 <tr>
@@ -580,10 +584,11 @@
 </tr>
 </tbody></table>
 </li>
-<li><p>查询2022年广东省各城市GDP与第一名GDP的差值</p>
+<li><p>查询 2022 年各城市 GDP 与第二名 GDP 的差值。</p>
+<p><strong>SQL 示例</strong>：</p>
 <figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> cg.year,<br>       cg.province,<br>       cg.gdp,<br>       cg.city,<br>       <span class="hljs-built_in">NTH_VALUE</span>(cg.gdp, <span class="hljs-number">2</span>)<br>                 <span class="hljs-keyword">OVER</span> (<br>                     <span class="hljs-keyword">PARTITION</span> <span class="hljs-keyword">BY</span> cg.province<br>                     <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> cg.gdp <span class="hljs-keyword">DESC</span><br>                     )          <span class="hljs-keyword">AS</span> sec_gdp,<br>       cg.gdp <span class="hljs-operator">-</span> <span class="hljs-built_in">NTH_VALUE</span>(cg.gdp, <span class="hljs-number">2</span>)<br>                          <span class="hljs-keyword">OVER</span> (<br>                              <span class="hljs-keyword">PARTITION</span> <span class="hljs-keyword">BY</span> cg.province<br>                              <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> cg.gdp <span class="hljs-keyword">DESC</span><br>                              ) <span class="hljs-keyword">AS</span> diff<br><span class="hljs-keyword">FROM</span> city_gdp cg<br><span class="hljs-keyword">WHERE</span> cg.year <span class="hljs-operator">=</span> <span class="hljs-number">2022</span>;<br></code></pre></div></td></tr></table></figure>
 
-<p>查询结果：</p>
+<p><strong>查询结果</strong>：</p>
 <table>
 <thead>
 <tr>
@@ -708,10 +713,10 @@
 <td align="left">-4300.27</td>
 </tr>
 </tbody></table>
-<p>可以看到查询结果中第一名所在行的sec_gdp为null，这是因为 <code>NTH_VALUE()</code> 函数的默认行为只考虑从当前行往前到窗口开始的行，此时就需要调整<code>OVER()</code>子句中的窗口帧了，这里我们需要将其调整为从分区的第一行到最后一行，调整后SQL为</p>
+<p>可以看到查询结果中第一名所在行的 <code>sec_gdp</code> 为 <code>null</code>，这是因为 <code>NTH_VALUE()</code> 函数的默认行为只考虑从当前行往前到窗口开始的行，此时就需要调整 <code>OVER()</code> 子句中的窗口帧了，这里我们需要将其调整为从分区的第一行到最后一行，调整后 SQL 为</p>
 <figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> cg.year,<br>       cg.province,<br>       cg.gdp,<br>       cg.city,<br>       <span class="hljs-built_in">NTH_VALUE</span>(cg.gdp, <span class="hljs-number">2</span>)<br>                 <span class="hljs-keyword">OVER</span> (<br>                     <span class="hljs-keyword">PARTITION</span> <span class="hljs-keyword">BY</span> cg.province<br>                     <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> cg.gdp <span class="hljs-keyword">DESC</span><br>                     <span class="hljs-keyword">RANGE</span> <span class="hljs-keyword">BETWEEN</span> UNBOUNDED PRECEDING <span class="hljs-keyword">AND</span> UNBOUNDED FOLLOWING<br>                     )          <span class="hljs-keyword">AS</span> sec_gdp,<br>       cg.gdp <span class="hljs-operator">-</span> <span class="hljs-built_in">NTH_VALUE</span>(cg.gdp, <span class="hljs-number">2</span>)<br>                          <span class="hljs-keyword">OVER</span> (<br>                              <span class="hljs-keyword">PARTITION</span> <span class="hljs-keyword">BY</span> cg.province<br>                              <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> cg.gdp <span class="hljs-keyword">DESC</span><br>                              <span class="hljs-keyword">RANGE</span> <span class="hljs-keyword">BETWEEN</span> UNBOUNDED PRECEDING <span class="hljs-keyword">AND</span> UNBOUNDED FOLLOWING<br>                              ) <span class="hljs-keyword">AS</span> diff<br><span class="hljs-keyword">FROM</span> city_gdp cg<br><span class="hljs-keyword">WHERE</span> cg.year <span class="hljs-operator">=</span> <span class="hljs-number">2022</span>;<br></code></pre></div></td></tr></table></figure>
 
-<p>查询结果：</p>
+<p><strong>查询结果</strong>：</p>
 <table>
 <thead>
 <tr>
@@ -837,10 +842,11 @@
 </tr>
 </tbody></table>
 </li>
-<li><p>获取每个年度每个城市的GDP与前一名的GDP差距</p>
+<li><p>获取每个年度每个城市的GDP与前一名的GDP差距。</p>
+<p><strong>SQL 示例</strong>：</p>
 <figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> cg.year,<br>       cg.city,<br>       cg.province,<br>       cg.gdp,<br>       <span class="hljs-built_in">LAG</span>(cg.gdp) <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">PARTITION</span> <span class="hljs-keyword">BY</span> cg.year, cg.province <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> cg.gdp <span class="hljs-keyword">DESC</span>)          <span class="hljs-keyword">AS</span> pre_gdp,<br>       cg.gdp <span class="hljs-operator">-</span> <span class="hljs-built_in">LAG</span>(cg.gdp) <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">PARTITION</span> <span class="hljs-keyword">BY</span> cg.year, cg.province <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> cg.gdp <span class="hljs-keyword">DESC</span>) <span class="hljs-keyword">AS</span> diff<br><span class="hljs-keyword">FROM</span> city_gdp cg;<br></code></pre></div></td></tr></table></figure>
 
-<p>查询结果：</p>
+<p><strong>查询结果</strong>：</p>
 <table>
 <thead>
 <tr>
@@ -1080,7 +1086,7 @@
 </li>
 </ol>
 <h2 id="性能问题"><a href="#性能问题" class="headerlink" title="性能问题"></a>性能问题</h2><h3 id="性能开销"><a href="#性能开销" class="headerlink" title="性能开销"></a>性能开销</h3><ul>
-<li><strong>数据排序</strong>：窗口函数经常需要对数据进行排序，这可以是一个<strong>资源密集型</strong>的操作，尤其是当数据集非常大时。排序操作通常涉及内存和可能的磁盘I/O，这会影响查询的执行时间。</li>
+<li><strong>数据排序</strong>：窗口函数经常需要对数据进行排序，这可以是一个资源密集型的操作，尤其是当数据集非常大时。排序操作通常涉及内存和可能的磁盘 I/O，这会影响查询的执行时间。</li>
 <li><strong>分区处理</strong>：如果使用 <code>PARTITION BY</code> 子句，数据库需要为每个分区执行函数，这可能导致处理时间增加，尤其是当有大量小分区时。</li>
 <li><strong>计算开销</strong>：某些窗口函数本身（如计算排名或计算移动平均）就需要额外的计算开销。特别是当每个窗口大小较大或窗口函数涉及复杂操作（例如标准差或线性回归）时，这些计算可能变得相当昂贵。</li>
 </ul>
@@ -1090,11 +1096,11 @@
 <li><strong>精简窗口规格</strong>：尽量使用精简的 <code>ROWS</code> 或 <code>RANGE</code> 规格。例如，如果只需要访问前一行或后一行数据，使用 <code>LAG()</code> 或 <code>LEAD()</code> 而不是更广泛的窗口可能更有效。</li>
 <li><strong>避免冗余计算</strong>：如果可能，尝试重用已经计算过的结果，或者在应用层而不是数据库层面进行某些计算，尤其是在结果集较小的情况下。</li>
 </ul>
-<h3 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h3><ul>
+<h3 id="使用场景-1"><a href="#使用场景-1" class="headerlink" title="使用场景"></a>使用场景</h3><ul>
 <li>窗口函数虽然在处理复杂的分析查询时非常强大，但它们可能不适合实时查询或需要高度优化的系统，除非能够很好地控制查询条件和数据量。</li>
 <li>在处理大规模数据、需要高性能和高可用性的场景下，处理数据分析应优先考虑交给应用层实现，应用层往往有并行处理、缓存优化、资源分配、负载均衡等更多优势，虽然可能会涉及更多的开发工作，但通常能为系统提供更好的总体性能和更高的灵活性。</li>
 </ul>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文详细介绍了MySQL中窗口函数的使用方法和应用场景，窗口函数不仅增强了SQL的功能，也为复杂的数据处理提供了高效的解决方案。当然，在使用时也应当充分考虑数据库性能问题。掌握窗口函数，将使数据库开发者能够更好地处理数据分析任务，提高查询效率和准确性。随着实践的深入，窗口函数无疑将成为每个数据库专业人士必备的技能之一。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在 MySQL 8.0 中，窗口函数解决了 “既要聚合数据，又要保留明细” 的棘手问题。它通过 <code>OVER()</code> 子句使同一分组或排序下的多种计算（如排名、求和、移动平均、前后行比较等）在单条 SQL 中得以实现，大大减少了复杂分析场景下的开发成本。开发者需要充分理解窗口函数的机制并结合自身业务场景加以运用，以在数据库层面实现更灵活、高效的分析与统计处理，为数据驱动的决策和应用开发提供重要支撑。</p>
 
             </div>
             <hr>
@@ -1114,7 +1120,7 @@
                     
                       <a class="hover-with-bg" href="/tags/MySQL/">MySQL</a>
                     
-                      <a class="hover-with-bg" href="/tags/MySQL8/">MySQL8</a>
+                      <a class="hover-with-bg" href="/tags/MySQL%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0/">MySQL窗口函数</a>
                     
                   </div>
                 
@@ -1131,9 +1137,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/07/15/spring-cache/">
+                      <a href="/2022/06/26/mysql-index/">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Spring Cache</span>
+                        <span class="hidden-mobile">MySQL索引详解</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -1141,8 +1147,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/05/25/javase-threadlocal/">
-                        <span class="hidden-mobile">ThreadLocal详解</span>
+                      <a href="/2022/04/22/docker-commands/">
+                        <span class="hidden-mobile">Docker基础命令</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

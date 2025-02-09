@@ -203,8 +203,236 @@
     
     
       <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2021/08/06/javase-cp-jmm/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/java-concurrency-programming-logo.png" alt="Java并发编程——Java内存模型">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2021/08/06/javase-cp-jmm/" target="_blank">
+          Java并发编程——Java内存模型
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2021/08/06/javase-cp-jmm/" target="_blank">
+          
+          引言在多线程并发环境中，如何确保线程对共享数据的访问和修改是正确而一致的，是一个核心且复杂的问题。Java 内存模型（JMM） 就是为了解决这一问题而引入的抽象约定。本文将带你从 JMM 的基本概念出发，逐步理解并掌握 volatile 关键字的语义，以及 happens-before 规则对并发程序正确性的重大意义。 JMM 概述JMM，全称为 Java 内存模型（Java Memory Mod
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-08-06 01:51" pubdate>
+              2021-08-06
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/">Java并发编程</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/JavaSE/">JavaSE</a>
+            
+              <a href="/tags/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/">Java并发编程</a>
+            
+              <a href="/tags/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/">Java内存模型</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2021/08/05/javase-cp-monitor/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/java-concurrency-programming-logo.png" alt="Java并发编程——管程Monitor">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2021/08/05/javase-cp-monitor/" target="_blank">
+          Java并发编程——管程Monitor
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2021/08/05/javase-cp-monitor/" target="_blank">
+          
+          引言并发编程的本质是如何安全、高效地管理多个线程对共享资源的访问，而管程切好能够帮助我们在多线程环境中实现对共享资源的互斥访问与条件同步。Java 语言内建了管程机制，通过关键字 synchronized 以及 wait() &#x2F; notify() 等方法，让开发者能够自然地在代码层面封装共享数据的访问方式、保护临界区，降低并发编程的复杂度。本篇文章将基于管程这一概念，深入探讨其在 JVM 层级的实
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-08-05 01:17" pubdate>
+              2021-08-05
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/">Java并发编程</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/JavaSE/">JavaSE</a>
+            
+              <a href="/tags/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/">Java并发编程</a>
+            
+              <a href="/tags/%E7%AE%A1%E7%A8%8B/">管程</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2021/08/03/javase-cp-synchronized/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/java-concurrency-programming-logo.png" alt="Java并发编程——synchronized">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2021/08/03/javase-cp-synchronized/" target="_blank">
+          Java并发编程——synchronized
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2021/08/03/javase-cp-synchronized/" target="_blank">
+          
+          引言并发编程的核心目标是让多个线程在同一程序中协作并行，提升整体执行效率，同时保证共享数据的正确性和一致性。在 Java 语言中，synchronized 关键字是实现线程同步最基础、最直观的方式之一。它可以保证同一时刻只有一个线程能执行被同步的代码（或方法），并在线程间建立起可见性保证，从而避免数据竞争和竞态条件。本篇文章将针对 synchronized 的使用场景、使用方式、底层原理及其对程序
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-08-03 11:07" pubdate>
+              2021-08-03
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/">Java并发编程</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/JavaSE/">JavaSE</a>
+            
+              <a href="/tags/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/">Java并发编程</a>
+            
+              <a href="/tags/synchronized/">synchronized</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2021/08/01/javase-cp-thread/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/java-concurrency-programming-logo.png" alt="Java并发编程——线程">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2021/08/01/javase-cp-thread/" target="_blank">
+          Java并发编程——线程
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2021/08/01/javase-cp-thread/" target="_blank">
+          
+          引言在现代软件开发中，如何充分利用多核 CPU 并行执行能力并确保高并发下的程序正确性，是开发者必须掌握的核心技能。Java 语言自诞生之初便在语言层面提供了线程支持，并不断完善其并发工具库。本文将带领读者从进程与线程的基本概念出发，逐步探讨并发与并行的区别以及 Java 中多线程的创建方式；随后介绍 JVM 线程结构、常用的并发 API 和线程状态转换；最后结合竞态条件、临界区等概念，为读者理解
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-08-01 23:13" pubdate>
+              2021-08-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/">Java并发编程</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/JavaSE/">JavaSE</a>
+            
+              <a href="/tags/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/">Java并发编程</a>
+            
+              <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/">多线程</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2021/07/07/mysql-commands/" target="_blank">
-          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/mysql.webp" alt="MySQL常用命令">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/mysql.webp" alt="MySQL命令详解">
         </a>
       </div>
     
@@ -212,14 +440,14 @@
       <h1 class="index-header">
         
         <a href="/2021/07/07/mysql-commands/" target="_blank">
-          MySQL常用命令
+          MySQL命令详解
         </a>
       </h1>
 
       <p class="index-excerpt">
         <a href="/2021/07/07/mysql-commands/" target="_blank">
           
-          引言在数据驱动的应用开发中，数据库管理是核心技能之一。MySQL，作为世界上最受欢迎的关系数据库之一，提供了强大的数据管理能力。掌握MySQL命令不仅可以帮助开发者有效地进行数据库设计和维护，还可以优化数据查询和处理的性能。本文详细介绍了MySQL的各类命令，从数据定义到数据操作，再到事务控制和安全管理，旨在为开发者提供一份全面的MySQL命令手册。 DDL数据库12345678910111213
+          引言在日常使用 MySQL 数据库时，我们会频繁接触到不同类别的 SQL 命令，如增删改查（DML）、定义和管理数据库对象（DDL）、控制权限（DCL）以及管理事务（TCL）等。除了这些通用的 SQL 语法，MySQL 还提供了一系列针对自身特性的命令和工具，用于执行数据库的优化、备份、恢复、用户管理、数据导入导出以及性能监控等操作。本文将按照常见分类，对 MySQL 中的各类命令进行详细的介绍与
         </a>
       </p>
 

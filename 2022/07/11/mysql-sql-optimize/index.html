@@ -1,0 +1,1126 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="引言随着业务复杂度和数据量的不断上升，数据库性能往往成为系统瓶颈之一。如何让常见查询在海量数据下依然保持高效？MySQL 提供了多种机制与工具帮助我们识别和调优低效的 SQL，包括慢查询日志、SHOW PROFILE、Performance Schema 以及 EXPLAIN 等。结合良好的索引设计和 SQL 写法，才能可以显著改善查询响应时间，合理利用硬件资源。本文将围绕 MySQL 中常见的性">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL优化">
+<meta property="og:url" content="http://example.com/2022/07/11/mysql-sql-optimize/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="引言随着业务复杂度和数据量的不断上升，数据库性能往往成为系统瓶颈之一。如何让常见查询在海量数据下依然保持高效？MySQL 提供了多种机制与工具帮助我们识别和调优低效的 SQL，包括慢查询日志、SHOW PROFILE、Performance Schema 以及 EXPLAIN 等。结合良好的索引设计和 SQL 写法，才能可以显著改善查询响应时间，合理利用硬件资源。本文将围绕 MySQL 中常见的性">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/mysql-windows-function.webp">
+<meta property="article:published_time" content="2022-07-11T10:52:01.000Z">
+<meta property="article:modified_time" content="2022-07-11T10:52:01.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="MySQL">
+<meta property="article:tag" content="MySQL优化">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/mysql-windows-function.webp">
+  
+  
+  <title>MySQL优化 - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/mysql-windows-function.webp') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="MySQL优化">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-07-11 18:52" pubdate>
+        2022年7月11日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      17k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      30 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">MySQL优化</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：3 年前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>随着业务复杂度和数据量的不断上升，数据库性能往往成为系统瓶颈之一。如何让常见查询在海量数据下依然保持高效？MySQL 提供了多种机制与工具帮助我们识别和调优低效的 SQL，包括慢查询日志、<code>SHOW PROFILE</code>、<code>Performance Schema</code> 以及 <code>EXPLAIN</code> 等。结合良好的索引设计和 SQL 写法，才能可以显著改善查询响应时间，合理利用硬件资源。本文将围绕 MySQL 中常见的性能分析方法与查询优化技巧展开，从日志配置到语法策略，从索引失效到查询执行计划，为数据库优化提供一份系统性的指导。</p>
+<h2 id="慢查询日志"><a href="#慢查询日志" class="headerlink" title="慢查询日志"></a>慢查询日志</h2><h3 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h3><ul>
+<li><strong>记录慢查询</strong>：MySQL可以通过慢查询日志记录执行时间超过设定阈值的 SQL 语句，帮助定位性能瓶颈。</li>
+<li><strong>诊断工具</strong>：慢查询日志提供的详细信息（如执行时间、扫描行数等）可以发现未使用索引或设计不合理的查询，为后续调优提供依据。</li>
+</ul>
+<h3 id="常用配置参数"><a href="#常用配置参数" class="headerlink" title="常用配置参数"></a>常用配置参数</h3><ul>
+<li><strong>slow_query_log</strong>：用于开启或关闭慢查询日志。设置为 <code>ON</code> 表示启用。</li>
+<li><strong>slow_query_log_file</strong>：指定慢查询日志的存储文件路径。可以根据实际情况选择合适的位置，确保 MySQL 有写入权限。</li>
+<li><strong>long_query_time</strong>：定义记录为慢查询的阈值（单位为秒）。例如设置为 <code>1</code> 表示记录执行时间超过 <code>1</code> 秒的查询。可以根据系统情况和业务要求调整这个值。</li>
+<li><strong>log_queries_not_using_indexes</strong>：当设置为 <code>ON</code> 时，未使用索引的查询也会被记录，帮助发现没有走索引的查询语句，通常对于优化非常有帮助。</li>
+<li><strong>log_output</strong>：指定日志的输出方式，可以设置为 <code>FILE</code>（默认）、<code>TABLE</code> 或者 <code>NONE</code>。如果设置为 <code>TABLE</code>，慢查询日志会写入系统表 <code>mysql.slow_log</code>，便于通过 SQL 语句查询和分析。</li>
+</ul>
+<h3 id="配置示例"><a href="#配置示例" class="headerlink" title="配置示例"></a>配置示例</h3><h4 id="配置文件（my-cnf-或-my-ini）"><a href="#配置文件（my-cnf-或-my-ini）" class="headerlink" title="配置文件（my.cnf 或 my.ini）"></a>配置文件（my.cnf 或 my.ini）</h4><p>在 MySQL 的配置文件中添加或修改相关参数，示例如下：</p>
+<figure class="highlight ini"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs ini"><span class="hljs-section">[mysqld]</span><br><span class="hljs-comment"># 开启慢查询日志</span><br><span class="hljs-attr">slow_query_log</span> = <span class="hljs-literal">ON</span><br><span class="hljs-comment"># 指定慢查询日志文件路径（根据实际环境调整路径）</span><br><span class="hljs-attr">slow_query_log_file</span> = /var/log/mysql/slow_query.log<br><span class="hljs-comment"># 设置慢查询的时间阈值（单位秒）</span><br><span class="hljs-attr">long_query_time</span> = <span class="hljs-number">1</span><br><span class="hljs-comment"># 记录未使用索引的查询</span><br><span class="hljs-attr">log_queries_not_using_indexes</span> = <span class="hljs-literal">ON</span><br><span class="hljs-comment"># 设置日志输出方式，可选FILE或TABLE</span><br><span class="hljs-attr">log_output</span> = FILE<br></code></pre></div></td></tr></table></figure>
+
+<p>修改配置文件后需要重启MySQL服务以使配置生效。</p>
+<h4 id="动态设置"><a href="#动态设置" class="headerlink" title="动态设置"></a>动态设置</h4><p>除了配置文件外，也可以在 MySQL 客户端中通过<code>SET GLOBAL</code>命令动态设置参数：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">-- 开启慢查询日志<br>SET GLOBAL slow_query_log = &#x27;ON&#x27;;<br><br>-- 设置日志文件路径（注意：部分参数可能需要在配置文件中设置，具体取决于MySQL版本）<br>SET GLOBAL slow_query_log_file = &#x27;/var/log/mysql/slow_query.log&#x27;;<br><br>-- 设置慢查询时间阈值为1秒<br>SET GLOBAL long_query_time = 1;<br><br>-- 开启记录未使用索引的查询<br>SET GLOBAL log_queries_not_using_indexes = &#x27;ON&#x27;;<br><br>-- 指定日志输出方式为FILE<br>SET GLOBAL log_output = &#x27;FILE&#x27;;<br></code></pre></div></td></tr></table></figure>
+
+<p>这种方式适用于临时调整，但重启后可能失效，因此建议将关键参数写入配置文件中。</p>
+<h3 id="记录示例"><a href="#记录示例" class="headerlink" title="记录示例"></a>记录示例</h3><p>在开启慢查询日志后，当某条 SQL 语句执行时间超过设置的阈值（例如1秒）时，就会被记录到慢查询日志中。</p>
+<p><strong>示例</strong>：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs pgsql"># <span class="hljs-type">Time</span>: <span class="hljs-number">2022</span><span class="hljs-number">-07</span><span class="hljs-number">-02</span>T23:<span class="hljs-number">42</span>:<span class="hljs-number">43.123456</span>Z<br># <span class="hljs-keyword">User</span>@Host: dbuser[dbuser] @ localhost [<span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>]  Id: <span class="hljs-number">8</span><br># Query_time: <span class="hljs-number">1.234567</span>  Lock_time: <span class="hljs-number">0.000123</span>  Rows_sent: <span class="hljs-number">50</span>  Rows_examined: <span class="hljs-number">10000</span><br><span class="hljs-keyword">SET</span> <span class="hljs-type">timestamp</span>=<span class="hljs-number">1656776563</span>;<br><span class="hljs-keyword">SELECT</span> <span class="hljs-type">name</span>, email <span class="hljs-keyword">FROM</span> users <span class="hljs-keyword">WHERE</span> status = <span class="hljs-string">&#x27;active&#x27;</span> <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> created_at <span class="hljs-keyword">DESC</span> <span class="hljs-keyword">LIMIT</span> <span class="hljs-number">100</span>;<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>解析：</strong></p>
+<ul>
+<li><p><strong>时间戳信息</strong>：</p>
+<p><code># Time: 2022-07-02T23:42:43.123456Z</code> 表示该查询的开始执行时间（UTC 时间）。</p>
+</li>
+<li><p><strong>连接信息</strong>：</p>
+<p><code># User@Host: dbuser[dbuser] @ localhost [127.0.0.1] Id: 8</code> 记录了执行该查询的数据库用户、主机以及连接 ID。</p>
+</li>
+<li><p><strong>执行详情</strong>：</p>
+<ul>
+<li><code># Query_time: 1.234567</code> 表示该查询耗时 1.234567 秒。</li>
+<li><code>Lock_time: 0.000123</code> 显示锁定时间。</li>
+<li><code>Rows_sent: 50</code> 表示返回的行数。</li>
+<li><code>Rows_examined: 10000</code> 表示扫描的行数，通常行数越多说明可能存在优化空间。</li>
+</ul>
+</li>
+<li><p><strong>SET timestamp</strong>：</p>
+<p>表示实际执行 SQL 语句时的 Unix 时间戳，可以用来确认日志中的时间。</p>
+</li>
+<li><p><strong>实际查询语句</strong>：</p>
+<p>最后一行显示了完整的 SQL 语句，方便后续重现和调试。</p>
+</li>
+</ul>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><ul>
+<li><p><strong>权限与磁盘空间</strong>：确保 MySQL 用户对日志文件所在目录具有写权限，并定期监控日志文件的大小，避免因日志过大而影响磁盘空间。</p>
+</li>
+<li><p><strong>日志轮转（Log Rotation）</strong>：可配置日志轮转策略，定期归档和清理慢查询日志文件，避免日志文件无限制增长。</p>
+</li>
+<li><p><strong>日志分析工具</strong>：配合 <code>Percona Toolkit</code> 中的 <code>pt-query-digest</code> 等工具，可以对慢查询日志进行统计和分析，找到最耗时的查询和潜在的性能瓶颈。</p>
+</li>
+</ul>
+<h2 id="SHOW-PROFILE"><a href="#SHOW-PROFILE" class="headerlink" title="SHOW PROFILE"></a>SHOW PROFILE</h2><h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><p><code>SHOW PROFILE</code> 是 MySQL 提供的一种查询分析工具，用于展示单条 SQL 语句执行过程中的各个阶段及其耗时。通过查看这些阶段信息，可以发现查询在执行过程中哪些部分比较耗时，从而辅助性能调优。</p>
+<h3 id="开启-Profiling"><a href="#开启-Profiling" class="headerlink" title="开启 Profiling"></a>开启 Profiling</h3><p>在使用 <code>SHOW PROFILE</code> 前，需要在当前会话中启用 <code>profiling</code> 功能。可以通过以下命令启用：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SET profiling = 1;<br></code></pre></div></td></tr></table></figure>
+
+<p>此命令会在当前会话中启用查询分析功能，后续执行的 SQL 语句都会被记录详细的执行阶段信息。</p>
+<h3 id="查看-Profiling-信息"><a href="#查看-Profiling-信息" class="headerlink" title="查看 Profiling 信息"></a>查看 Profiling 信息</h3><h4 id="执行-SQL-查询"><a href="#执行-SQL-查询" class="headerlink" title="执行 SQL 查询"></a>执行 SQL 查询</h4><p>启用 <code>profiling</code> 后，执行需要分析的查询。</p>
+<p><strong>示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT id, name FROM tt_student WHERE class_id = 1;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="查看已记录的查询"><a href="#查看已记录的查询" class="headerlink" title="查看已记录的查询"></a>查看已记录的查询</h4><p>使用 <code>SHOW PROFILES</code> 命令可以查看当前会话中所有执行过的查询及其对应的查询 ID 和执行时间。</p>
+<p><strong>示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SHOW PROFILES;<br></code></pre></div></td></tr></table></figure>
+
+<p>得到的结果为：</p>
+<figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh">+----------+------------+----------------------------------------------------+<br>| Query_ID | Duration   | Query                                              |<br>+----------+------------+----------------------------------------------------+<br>|        1 | 0.00036925 | SELECT id, name FROM tt_student WHERE class_id = 1 |<br>+----------+------------+----------------------------------------------------+<br></code></pre></div></td></tr></table></figure>
+
+<p>这里的 <code>Query_ID</code> 是查询标识，后续可以通过该 ID 查看详细的执行阶段信息。</p>
+<h3 id="查看单条查询的详细执行阶段"><a href="#查看单条查询的详细执行阶段" class="headerlink" title="查看单条查询的详细执行阶段"></a>查看单条查询的详细执行阶段</h3><p>使用 <code>SHOW PROFILE FOR QUERY [query_id]</code> 命令可以查看指定查询的详细信息。</p>
+<p><strong>示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SHOW PROFILE FOR QUERY 1;<br></code></pre></div></td></tr></table></figure>
+
+<p>得到的结果为：</p>
+<figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh">+--------------------------------+----------+<br>| Status                         | Duration |<br>+--------------------------------+----------+<br>| starting                       | 0.000065 |<br>| Executing hook on transaction  | 0.000002 |<br>| starting                       | 0.000005 |<br>| checking permissions           | 0.000003 |<br>| Opening tables                 | 0.000117 |<br>| init                           | 0.000003 |<br>| System lock                    | 0.000005 |<br>| optimizing                     | 0.000006 |<br>| statistics                     | 0.000038 |<br>| preparing                      | 0.000009 |<br>| executing                      | 0.000025 |<br>| end                            | 0.000001 |<br>| query end                      | 0.000002 |<br>| waiting <span class="hljs-keyword">for</span> handler commit     | 0.000006 |<br>| closing tables                 | 0.000005 |<br>| freeing items                  | 0.000043 |<br>| logging slow query             | 0.000030 |<br>| cleaning up                    | 0.000006 |<br>+--------------------------------+----------+<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>解析说明</strong>：</p>
+<ul>
+<li><strong>Status</strong>：描述查询执行过程中的各个阶段（例如 <code>starting</code>、<code>opening tables</code>、<code>executing</code>、<code>sending data</code> 等）。</li>
+<li><strong>Duration</strong>：显示每个阶段的耗时，单位为秒，通过这些数据可以定位哪个环节消耗的时间较多。</li>
+</ul>
+<h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h3><ul>
+<li><strong>性能调优</strong>：通过详细的阶段耗时数据，可以找出执行时间较长的环节。例如，如果 <code>sending data</code> 阶段耗时显著，可能需要检查是否存在数据传输或排序等瓶颈。</li>
+<li><strong>调试复杂查询</strong>：对于结构复杂或执行过程不明确的查询，<code>SHOW PROFILE</code> 能够提供直观的分解信息，帮助理解 SQL 执行过程。</li>
+<li><strong>对比优化效果</strong>：在进行 SQL 优化前后，通过多次执行并对比 <code>SHOW PROFILE</code> 的输出，可以直观感受到性能改进情况。</li>
+</ul>
+<h3 id="注意事项-1"><a href="#注意事项-1" class="headerlink" title="注意事项"></a>注意事项</h3><ul>
+<li><strong>性能开销</strong>：启用 <code>profiling</code> 功能会对查询性能产生一定开销，建议在开发或测试环境中使用，生产环境中尽量只在必要时启用。</li>
+<li><strong>会话级别</strong>：<code>profiling</code> 信息仅在当前会话内有效，断开连接后相关数据将丢失。若需要长期保存查询性能信息，可结合慢查询日志或 <code>Performance Schema</code>。</li>
+</ul>
+<h2 id="Performance-Schema"><a href="#Performance-Schema" class="headerlink" title="Performance Schema"></a>Performance Schema</h2><h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p><code>Performance Schema</code> 是 MySQL 提供的内置性能监控与诊断框架。它基于一系列的 <code>producer-consumer</code> 模式来捕获数据库内部的各种事件（语句事件、阶段事件、等待事件等），并将这些事件信息存储在 <code>Performance Schema</code> 下的若干表中（如 <code>events_statements_summary_by_digest</code>、<code>events_stages_history</code>、<code>events_waits_summary_global_by_event_name</code> 等），以便我们进行查询分析和系统调优。</p>
+<p>相较于早期的 <code>SHOW PROFILE</code> 功能，<code>Performance Schema</code> 提供的数据更加全面、更细粒度，可用于多种场景下的性能分析，包括定位慢 SQL、监控高并发场景下的资源消耗、查看锁等待、分析表扫描量等。。</p>
+<h3 id="启用"><a href="#启用" class="headerlink" title="启用"></a>启用</h3><ol>
+<li><p><strong>检查是否已启用</strong></p>
+<p>在 MySQL 5.6+ 版本中，<code>Performance Schema</code> 默认是启用的。可以通过以下方式查看：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SHOW VARIABLES LIKE &#x27;performance_schema&#x27;;<br></code></pre></div></td></tr></table></figure>
+
+<p>如果结果为 <code>ON</code>，则表示已启用；若为 <code>OFF</code>，可在配置文件或启动参数中设置 <code>performance_schema=ON</code> 并重启 MySQL 生效。</p>
+</li>
+<li><p><strong>启用生产者（Instruments）</strong></p>
+<p><code>Performance Schema</code> 下的 <code>setup_instruments</code> 表决定了哪些事件会被记录。可以查看如下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT NAME, ENABLED, TIMED<br>FROM performance_schema.setup_instruments<br>WHERE NAME LIKE &#x27;stage/%&#x27; <br>   OR NAME LIKE &#x27;statement/%&#x27;<br>   OR NAME LIKE &#x27;wait/%&#x27;;<br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li><code>ENABLED = &#39;YES&#39;</code> 表示对该事件类型已开启采集；</li>
+<li><code>TIMED = &#39;YES&#39;</code> 表示会记录耗时信息。</li>
+</ul>
+<p>如需启用更多，可以执行：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">UPDATE performance_schema.setup_instruments<br>SET ENABLED = &#x27;YES&#x27;, TIMED = &#x27;YES&#x27;<br>WHERE NAME LIKE &#x27;stage/%&#x27;;<br></code></pre></div></td></tr></table></figure></li>
+<li><p><strong>启用消费者（Consumers）</strong></p>
+<p>采集到的数据是否写入相应的表，还取决于 <code>setup_consumers</code> 表的设置。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT NAME, ENABLED<br>FROM performance_schema.setup_consumers;<br></code></pre></div></td></tr></table></figure>
+
+<p>常用的消费者包括：</p>
+<ul>
+<li><p><code>events_statements_history</code></p>
+</li>
+<li><p><code>events_statements_history_long</code></p>
+</li>
+<li><p><code>events_stages_history</code></p>
+</li>
+<li><p><code>events_stages_history_long</code></p>
+</li>
+<li><p><code>events_statements_summary_by_digest</code> (用来做 SQL 摘要统计) 若想启用 <code>events_stages_history</code> 存储阶段数据：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">UPDATE performance_schema.setup_consumers<br>SET ENABLED = &#x27;YES&#x27;<br>WHERE NAME = &#x27;events_stages_history&#x27;;<br></code></pre></div></td></tr></table></figure>
+
+<p>同理，也可以启用或关闭其他消费者。</p>
+</li>
+</ul>
+<p><strong>注意</strong>：</p>
+<ul>
+<li>通过 <code>UPDATE</code> 的方式只对当前运行的 MySQL 实例生效，重启后可能会回到默认值。若需永久生效，需在 <code>my.cnf</code>（或 <code>mysqld.cnf</code>）里进行合适的配置或使用 MySQL 8.0+ 的持久化系统变量机制。</li>
+<li>在同一会话中进行配置、执行 SQL、查看数据，效果更明确。</li>
+</ul>
+</li>
+</ol>
+<h3 id="场景示例"><a href="#场景示例" class="headerlink" title="场景示例"></a>场景示例</h3><h4 id="执行次数及时长最多的-SQL"><a href="#执行次数及时长最多的-SQL" class="headerlink" title="执行次数及时长最多的 SQL"></a>执行次数及时长最多的 SQL</h4><p>最简单的是查看 <code>events_statements_summary_by_digest</code> 表。它会将类似的 SQL（相似结构但绑定值不同）聚合为一个 <code>digest</code>，统计执行次数、总耗时、平均耗时、最大耗时等信息。</p>
+<p><strong>示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT <br>    DIGEST_TEXT,<br>    COUNT_STAR AS exec_count,<br>    SUM_TIMER_WAIT/1000000000000 AS total_time_sec,<br>    AVG_TIMER_WAIT/1000000000000 AS avg_time_sec<br>FROM performance_schema.events_statements_summary_by_digest<br>ORDER BY exec_count DESC<br>LIMIT 10;<br></code></pre></div></td></tr></table></figure>
+
+<p>这条 SQL 能快速找到执行次数最多的前 10 条 SQL 摘要。</p>
+<ul>
+<li><strong>DIGEST_TEXT</strong>：一条 SQL 摘要化后的模板，如 <code>SELECT * FROM employees WHERE employee_id = ?</code>。</li>
+<li><strong>COUNT_STAR</strong>：统计 SQL 被执行的次数。</li>
+<li><strong>SUM_TIMER_WAIT 和 AVG_TIMER_WAIT</strong>：代表总执行时间和平均执行时间，单位通常是皮秒（可除以 <code>10^12</code> 转化为秒）。</li>
+</ul>
+<h4 id="扫描记录最多的-SQL"><a href="#扫描记录最多的-SQL" class="headerlink" title="扫描记录最多的 SQL"></a>扫描记录最多的 SQL</h4><p><code>Performance Schema</code> 的摘要表也会统计 “扫描的行数（<code>Rows_examined</code>）” 等信息，可以帮助定位 “谁” 在频繁地做全表扫描或高代价扫描。</p>
+<p><strong>示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT <br>    DIGEST_TEXT,<br>    SUM_ROWS_EXAMINED AS total_rows_examined,<br>    COUNT_STAR AS exec_count,<br>    ROUND(SUM_ROWS_EXAMINED / COUNT_STAR) AS avg_rows_examined<br>FROM performance_schema.events_statements_summary_by_digest<br>ORDER BY total_rows_examined DESC<br>LIMIT 10;<br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li><strong>SUM_ROWS_EXAMINED</strong>：此 <code>digest</code> 下所有 SQL 语句执行时累计检查的行数。</li>
+<li><strong>avg_rows_examined</strong>：平均每次扫描的行数，如果某条 SQL 平均扫描行数特别高，则通常有潜在的索引或写法问题，需要优化。</li>
+</ul>
+<h4 id="查看单条-SQL-各阶段运行时间"><a href="#查看单条-SQL-各阶段运行时间" class="headerlink" title="查看单条 SQL 各阶段运行时间"></a>查看单条 SQL 各阶段运行时间</h4><p>当需要更细粒度地了解 SQL 执行中的具体耗时环节（例如：<code>opening tables</code>、<code>executing</code>、<code>sending data</code> 等），可以使用阶段（<code>stage</code>）事件。步骤如下：</p>
+<ol>
+<li><p>启用生产者 <code>stage instrument</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">UPDATE performance_schema.setup_instruments<br>SET ENABLED = &#x27;YES&#x27;, TIMED = &#x27;YES&#x27;<br>WHERE NAME LIKE &#x27;stage/%&#x27;;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>启用对应消费者 <code>setup_consumers</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">UPDATE performance_schema.setup_consumers<br>SET ENABLED = &#x27;YES&#x27;<br>WHERE NAME = &#x27;events_stages_history&#x27;;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>在当前会话中执行一个查询（尽量稍微复杂些，让它有足够阶段可记录）。</p>
+</li>
+<li><p>然后查看 events_stages_history 表：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT EVENT_ID,<br>       EVENT_NAME,<br>       TIMER_WAIT/1000000000000 AS duration_sec<br>FROM performance_schema.events_stages_history<br>ORDER BY EVENT_ID DESC<br>LIMIT 10;<br></code></pre></div></td></tr></table></figure>
+
+<p>或者查看 <code>events_stages_history_long</code> 表 以获取更久远的数据。开发者将看到每一阶段名称（例如 <code>stage/sql/starting</code>、<code>stage/sql/executing</code>、<code>stage/sql/sending data</code> 等）以及对应的耗时，从而判断在哪个阶段花费了最多时间，针对性进行优化。</p>
+</li>
+</ol>
+<h3 id="其他数据指标"><a href="#其他数据指标" class="headerlink" title="其他数据指标"></a>其他数据指标</h3><p><code>Performance Schema</code> 涵盖了广泛的性能信息，以下是常见的一些指标及其对应的表或视图，你可在需要时参考官方文档或进一步查询：</p>
+<ul>
+<li><strong>临时表使用情况</strong>：可关注 <code>events_statements_summary_by_digest</code> 中的 <code>SUM_CREATED_TMP_DISK_TABLES</code>、<code>SUM_CREATED_TMP_TABLES</code> 等字段，或在 <code>events_statements_history[_long]</code> 表中查看单次执行的具体信息。</li>
+<li><strong>索引使用情况</strong>：可以通过 “扫描行数” 与 “返回行数” 的对比来做粗略判断，也可结合慢查询日志和 <code>EXPLAIN</code> 工具来评估索引是否生效。</li>
+<li><strong>锁使用情况</strong>：在 <code>performance_schema.events_waits_history</code>、<code>events_waits_summary_global_by_event_name</code> 等表中查看锁等待事件（<code>wait/lock</code>）。</li>
+<li><strong>IO 次数、IO 等待情况</strong>：查询 <code>events_waits_summary_global_by_event_name</code> 中 <code>wait/io/file</code> 或 <code>wait/io/socket</code> 类型的事件。也可通过 <code>events_waits_history</code> / <code>events_waits_history_long</code> 研究具体会话下的 IO 等待。</li>
+</ul>
+<h3 id="注意事项-2"><a href="#注意事项-2" class="headerlink" title="注意事项"></a>注意事项</h3><ul>
+<li><strong>性能开销</strong>：开启过多的 <code>Instruments</code> 和 <code>Consumers</code>，尤其在高并发环境下，可能带来较大性能开销。应根据实际需求 “按需启用”，避免给生产环境造成显著负担。</li>
+<li><strong>会话与持久化</strong>：通过 <code>UPDATE performance_schema.setup_instruments</code> 或 <code>setup_consumers</code> 的方式通常只对当前实例生效，重启后会恢复为默认。若要永久生效，需在配置文件中写明或使用 MySQL 8.0+ 的 <code>SET PERSIST</code> 语句。</li>
+<li><strong>版本差异</strong>：不同 MySQL 版本对 <code>Performance Schema</code> 的默认配置和可用字段略有差异。遇到无法查询字段或表的情况，应查阅对应版本的官方文档进行确认。</li>
+<li><strong>安全与权限</strong>：<code>Performance Schema</code> 某些表仅有 <code>SELECT</code> 权限对 DBA 或特定用户开放，需确保当前用户具备访问 <code>performance_schema</code> 数据的权限。</li>
+</ul>
+<h2 id="Explain"><a href="#Explain" class="headerlink" title="Explain"></a>Explain</h2><h3 id="作用-1"><a href="#作用-1" class="headerlink" title="作用"></a>作用</h3><ul>
+<li><strong>展示执行计划</strong>：<code>EXPLAIN</code> 命令用于显示给定 SQL 语句（包括 <code>SELECT</code>、<code>DELETE</code>、<code>INSERT</code>、<code>REPLACE</code>、<code>UPDATE</code> 等）生成的执行计划。它揭示了查询语句中涉及的各个表的访问顺序、使用的索引以及访问数据的方式。</li>
+<li><strong>辅助查询优化</strong>：通过分析 <code>EXPLAIN</code> 的输出，可以判断查询是否存在全表扫描、索引选择不合理或者不必要的排序、临时表等问题，从而针对性地调整 SQL 语句、创建或修改索引以及改进表结构，以提高查询性能。</li>
+</ul>
+<h3 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h3><p>在 SQL 语句前加上 <code>EXPLAIN</code>，即可查看执行计划。</p>
+<p><strong>示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">EXPLAIN [FORMAT=JSON] SELECT * FROM employees WHERE id = 100;<br></code></pre></div></td></tr></table></figure>
+
+<p>其中 <code>FORMAT=JSON</code> 为 MySQL 5.6 引入的可选项，可以适用 <code>JSON</code> 格式输出执行计划。</p>
+<h3 id="详细说明"><a href="#详细说明" class="headerlink" title="详细说明"></a>详细说明</h3><p><code>EXPLAIN</code> 命令返回的结果集通常包含多个列，不同版本可能略有不同，但主要列及其含义如下：</p>
+<ul>
+<li><p><strong>id</strong>：表示查询中每个 <code>SELECT</code> 子句的标识符。<code>id</code> 值越大，表示该子查询或联合查询的优先级越高，通常也能反映执行顺序。</p>
+</li>
+<li><p><strong>select_type</strong>：描述查询中各个 <code>SELECT</code> 的类型，如：</p>
+<ul>
+<li><strong>SIMPLE</strong>：简单查询，不包含子查询或 <code>UNION</code>。</li>
+<li><strong>PRIMARY</strong>：主查询，即复杂查询中的最外层 <code>SELECT</code>。</li>
+<li><strong>SUBQUERY</strong>：在 <code>SELECT</code> 或 <code>WHERE</code> 语句中嵌套的子查询。</li>
+<li><strong>DERIVED</strong>：派生表（<code>Derived Table</code>），即 <code>FROM</code> 子查询，MySQL 会将其视为临时表。</li>
+<li><strong>UNION</strong>：<code>UNION</code> 查询中的第二个及后续 <code>SELECT</code> 语句。</li>
+<li><strong>UNION RESULT</strong>：<code>UNION</code> 查询的结果集，存放在一个临时表中。</li>
+<li><strong>DEPENDENT SUBQUERY</strong>：依赖外部查询的子查询，必须逐行执行（类似于 <code>correlated subquery</code> 相关子查询）。</li>
+<li><strong>DEPENDENT UNION</strong>：<code>UNION</code> 查询中的第二个及后续 <code>SELECT</code> 语句，且依赖于外部查询。</li>
+<li><strong>UNCACHEABLE SUBQUERY</strong>：不能被缓存的子查询，每次执行都要重新评估。</li>
+<li><strong>UNCACHEABLE UNION</strong>：<code>UNION</code> 语句中的一个分支，该分支不能被缓存。</li>
+</ul>
+</li>
+<li><p><strong>table</strong>：显示当前行所引用的表的名称，表示查询中正在访问哪个表。</p>
+</li>
+<li><p><strong>partitions</strong>：如果表使用了分区，则此列会显示参与查询的分区信息。</p>
+</li>
+<li><p><strong>type</strong>：代表访问类型，也是衡量查询性能的关键指标。从最好到最差的类型依次为：</p>
+<ul>
+<li><strong>system</strong>、<strong>const</strong>：极其高效，只需要访问一行或几行数据。</li>
+<li><strong>eq_ref</strong>、<strong>ref</strong>：较好，可以利用索引精确定位。</li>
+<li><strong>range</strong>：通过范围条件访问索引中的连续数据。</li>
+<li><strong>index</strong>：全索引扫描，比全表扫描略好。</li>
+<li><strong>ALL</strong>：全表扫描，效率较低，应尽量避免。</li>
+</ul>
+</li>
+<li><p><strong>possible_keys</strong>：列出查询中可能用到的所有索引，供优化器参考。</p>
+</li>
+<li><p><strong>key</strong>：实际上被 MySQL 选择使用的索引。如果为 <code>NULL</code>，说明没有使用索引。</p>
+</li>
+<li><p><strong>key_len</strong>：表示 MySQL 实际使用的索引长度。这个值可以帮助判断索引是否被充分利用。</p>
+</li>
+<li><p><strong>ref</strong>：显示哪个列或常量与 key 索引一起被使用，用来指示索引的匹配情况。</p>
+</li>
+<li><p><strong>rows</strong>：估计需要扫描的行数，行数越多，通常说明查询的代价越高。</p>
+</li>
+<li><p><strong>filtered</strong>：表示经过表过滤条件后，实际返回的行所占的百分比。</p>
+</li>
+<li><p><strong>Extra</strong>：提供额外的执行信息，比如：</p>
+<ul>
+<li><strong>Using where</strong>：查询中使用了 <code>WHERE</code> 过滤条件。</li>
+<li><strong>Using index</strong>：查询仅通过索引、无需访问表数据就能获取数据，称为 “覆盖索引”。</li>
+<li><strong>Using index condition</strong>：只利用索引条件进行部分筛选，但仍需访问表数据。</li>
+<li><strong>Using temporary</strong>：查询中使用了临时表（通常出现在 <code>GROUP BY</code> 和 <code>ORDER BY</code> 查询中）。</li>
+<li><strong>Using filesort</strong>：需要额外的排序操作，而不是利用索引进行排序（通常出现在 <code>ORDER BY</code> 语句中）。</li>
+<li>**Using join buffer (Block Nested Loop)**：连接时使用了 <code>join buffer</code>，通常发生在 <code>JOIN</code> 查询未使用索引的情况下。</li>
+<li><strong>Using MRR</strong>：MySQL 使用了 <code>Multi-Range Read</code>，优化范围查询时的一种方式。</li>
+<li><strong>Using index for group-by</strong>：<code>GROUP BY</code> 操作直接使用索引，无需额外排序或临时表。</li>
+<li><strong>Using where with pushed condition</strong>：<code>WHERE</code> 条件被 “推送” 到索引扫描阶段，提高查询效率（主要适用于 <code>InnoDB</code>）。</li>
+<li><strong>Start temporary; End temporary</strong>：表示查询涉及临时表，数据可能在临时表中被重新排序或处理。</li>
+<li><strong>No matching rows in const table</strong>：查询的 <code>const</code> 类型表没有匹配的行，通常意味着索引查找失败。</li>
+</ul>
+</li>
+</ul>
+<h3 id="注意事项-3"><a href="#注意事项-3" class="headerlink" title="注意事项"></a>注意事项</h3><ul>
+<li><strong>关注访问类型（type）</strong>：访问类型是衡量查询效率的重要指标，尽量避免出现全表扫描这种类型。如果发现查询使用了全表扫描，应考虑是否能通过增加索引或修改查询条件来改进。</li>
+<li><strong>索引使用情况</strong>：比较 <code>possible_keys</code> 与 <code>key</code> 列，看看是否 MySQL 在可选的索引中选用了最优的索引。如果 <code>key</code> 为 <code>NULL</code> 而 <code>possible_keys</code> 不为空，可能说明查询条件未能充分利用索引。</li>
+<li><strong>额外信息（Extra）</strong>：注意 <code>Extra</code> 列中出现的提示信息，如 <code>Using temporary</code> 或 <code>Using filesort</code>。这通常表示查询中存在需要额外优化的部分，如排序或分组操作，这时可以考虑改写查询或调整索引。</li>
+<li><strong>扫描行数（rows）</strong>：如果扫描的行数较多，查询可能会变慢。可以尝试进一步缩小查询范围或优化查询条件，以减少扫描的行数。</li>
+</ul>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><p>查看以下 SQL 的执行计划</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">EXPLAIN SELECT id, name FROM tt_student WHERE class_id = 1;<br></code></pre></div></td></tr></table></figure>
+
+<p>执行计划如下：</p>
+<figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh">+----+-------------+------------+------------+------+---------------+--------------+---------+-------+------+----------+-------+<br>| id | select_type | table      | partitions | <span class="hljs-built_in">type</span> | possible_keys | key          | key_len | ref   | rows | filtered | Extra |<br>+----+-------------+------------+------------+------+---------------+--------------+---------+-------+------+----------+-------+<br>|  1 | SIMPLE      | tt_student | NULL       | ref  | idx_class_id  | idx_class_id | 4       | const |    1 |   100.00 | NULL  |<br>+----+-------------+------------+------------+------+---------------+--------------+---------+-------+------+----------+-------+<br></code></pre></div></td></tr></table></figure>
+
+<p>通过 <code>EXPLAIN</code> 输出，可以检查：</p>
+<ul>
+<li>查询是否利用了 <code>class_id</code> 的索引；</li>
+<li>访问类型是否为 <code>range</code> 或 <code>ref</code>，从而判断索引是否有效；</li>
+<li><code>rows</code> 列显示的扫描行数，判断查询过滤效果；</li>
+<li><code>Extra</code> 列是否有额外信息，比如是否需要临时表或排序。</li>
+</ul>
+<p>根据这些信息，你可以决定是否需要重新建立索引，或者调整查询语句来提高性能。</p>
+<h3 id="优化方向"><a href="#优化方向" class="headerlink" title="优化方向"></a>优化方向</h3><p>关注 <code>EXPLAIN</code> 结果可以让 SQL 优化有一些方向，如：</p>
+<h4 id="访问方式"><a href="#访问方式" class="headerlink" title="访问方式"></a>访问方式</h4><p>关注 <code>type</code> 列，如果出现 <code>ALL</code>（全表扫描）或 <code>index</code>（全索引扫描），通常意味着索引未被合理利用，应优化查询。</p>
+<table>
+<thead>
+<tr>
+<th>type 值</th>
+<th>可能问题</th>
+<th>解决方案</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ALL</code> (全表扫描)</td>
+<td>查询未使用索引，性能最差</td>
+<td>创建合适的索引、调整 <code>WHERE</code> 条件</td>
+</tr>
+<tr>
+<td><code>index</code> (全索引扫描)</td>
+<td>索引被扫描，但未高效过滤数据</td>
+<td>考虑是否可以改用 <code>WHERE</code> 限制数据范围</td>
+</tr>
+<tr>
+<td><code>range</code> (范围查询)</td>
+<td>使用索引进行范围查找，但扫描行数仍然较多</td>
+<td>确保查询字段上有合适的索引，考虑索引选择性</td>
+</tr>
+<tr>
+<td><code>ref</code></td>
+<td>索引被使用，但匹配的数据较多</td>
+<td>尽量提高索引的唯一性（比如 唯一索引）</td>
+</tr>
+<tr>
+<td><code>eq_ref</code></td>
+<td>索引精准查找，性能很好</td>
+<td>无需优化</td>
+</tr>
+<tr>
+<td><code>const/system</code></td>
+<td>仅查询单行数据，性能最佳</td>
+<td>无需优化</td>
+</tr>
+</tbody></table>
+<h4 id="索引使用"><a href="#索引使用" class="headerlink" title="索引使用"></a>索引使用</h4><p>关注 <code>possible_keys</code> 和 <code>key</code>。</p>
+<table>
+<thead>
+<tr>
+<th>possible_keys 和 key</th>
+<th>可能问题</th>
+<th>解决方案</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>possible_keys</code> 为空</td>
+<td>没有可用索引</td>
+<td>创建合适的索引</td>
+</tr>
+<tr>
+<td><code>key</code> 为 <code>NULL</code></td>
+<td>没有索引被使用</td>
+<td>调整 <code>WHERE</code> 条件或创建索引</td>
+</tr>
+<tr>
+<td><code>possible_keys</code> 多于 <code>key</code></td>
+<td>有更优索引但未被使用</td>
+<td>使用 <code>FORCE INDEX</code> 或优化查询逻辑</td>
+</tr>
+<tr>
+<td><code>key_len</code> 过小</td>
+<td>使用了复合索引，但未充分利用</td>
+<td>确保索引的最左前缀原则</td>
+</tr>
+</tbody></table>
+<h4 id="扫描行数"><a href="#扫描行数" class="headerlink" title="扫描行数"></a>扫描行数</h4><p>关注 <code>rows</code>，这个参数代表 MySQL 预计要扫描的行数，值越大，查询成本越高。</p>
+<p>关注点：</p>
+<ul>
+<li>确保索引被使用，减少 <code>rows</code> 数量。</li>
+<li><code>rows</code> 过大可能意味着索引选择不合理，需要调整索引或查询逻辑。</li>
+<li>对大表查询时，考虑 <code>LIMIT</code> 限制查询范围。</li>
+</ul>
+<h4 id="额外执行信息"><a href="#额外执行信息" class="headerlink" title="额外执行信息"></a>额外执行信息</h4><p>关注 <code>Extra</code> 列展示的额外执行信息。</p>
+<table>
+<thead>
+<tr>
+<th>Extra 取值</th>
+<th>可能问题</th>
+<th>解决方案</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Using filesort</code></td>
+<td>额外的排序操作，未使用索引排序</td>
+<td>添加合适的索引 (<code>ORDER BY</code> 字段建立索引)</td>
+</tr>
+<tr>
+<td><code>Using temporary</code></td>
+<td>查询使用了临时表，性能较差</td>
+<td>优化 <code>GROUP BY</code>、<code>ORDER BY</code>，尽量使用索引</td>
+</tr>
+<tr>
+<td><code>Using where</code></td>
+<td>使用了 <code>WHERE</code> 过滤条件，但索引可能未充分利用</td>
+<td>确保 <code>WHERE</code> 条件字段有索引</td>
+</tr>
+<tr>
+<td><code>Using index</code></td>
+<td>覆盖索引查询，无需回表</td>
+<td>推荐，尽量让查询满足索引覆盖</td>
+</tr>
+<tr>
+<td><code>Using join buffer</code></td>
+<td><code>JOIN</code> 查询未使用索引，导致 <code>join buffer</code> 过多使用</td>
+<td>给 <code>JOIN</code> 的连接字段创建索引</td>
+</tr>
+</tbody></table>
+<h2 id="索引失效及应对"><a href="#索引失效及应对" class="headerlink" title="索引失效及应对"></a>索引失效及应对</h2><p>对于数据量较大的表，利用好索引往往能让查询效率变得非常高，但 SQL 如果不规范往往会导致索引失效，如以下场景：</p>
+<h3 id="对索引列使用函数或表达式"><a href="#对索引列使用函数或表达式" class="headerlink" title="对索引列使用函数或表达式"></a>对索引列使用函数或表达式</h3><h4 id="场景说明"><a href="#场景说明" class="headerlink" title="场景说明"></a>场景说明</h4><p>当在 WHERE 子句中对索引列应用函数（如 <code>YEAR()</code>、<code>DATE()</code>、<code>UPPER()</code> 等）或做算术运算时，MySQL 无法直接利用该列的原始索引。</p>
+<h4 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT * FROM orders WHERE YEAR(order_date) = 2021;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="应对措施"><a href="#应对措施" class="headerlink" title="应对措施"></a>应对措施</h4><ul>
+<li><p>尽量将常量转换为范围值，避免在索引列上进行函数调用。</p>
+</li>
+<li><p>修改查询，如将上例改写为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT * FROM orders <br>WHERE order_date BETWEEN &#x27;2021-01-01&#x27; AND &#x27;2021-12-31&#x27;;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>或者在设计时考虑增加一个存储计算结果的辅助列，并对其建立索引。</p>
+</li>
+</ul>
+<p><strong>注意</strong>：MySQL 8.0 的优化器在某些函数场景也可能部分利用索引的 <code>MRR</code>（<code>Multi-Range Read</code>）或 <code>ICP</code>（<code>Index Condition Pushdown</code>），但大多数情况下仍建议避免对索引列进行函数处理。</p>
+<h3 id="数据类型不匹配或隐式转换"><a href="#数据类型不匹配或隐式转换" class="headerlink" title="数据类型不匹配或隐式转换"></a>数据类型不匹配或隐式转换</h3><h4 id="场景说明-1"><a href="#场景说明-1" class="headerlink" title="场景说明"></a>场景说明</h4><p>如果查询中的常量数据类型与索引列的数据类型不一致，或者表关联字段数据类型不一致，MySQL 可能会进行隐式转换，这往往会使索引失效。</p>
+<h4 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql"># users表中id字段为数值类型，非字符串类型<br>SELECT * FROM users WHERE id = &#x27;100&#x27;;  -- 字符串 &#x27;100&#x27; 可能引发隐式转换<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="应对措施-1"><a href="#应对措施-1" class="headerlink" title="应对措施"></a>应对措施</h4><ul>
+<li>在编写 SQL 语句时，确保传入的参数与列的数据类型一致，避免不必要的类型转换。</li>
+<li>检查应用层传入的参数，保持数据类型的匹配。</li>
+</ul>
+<h3 id="使用-LIKE-时使用前导通配符"><a href="#使用-LIKE-时使用前导通配符" class="headerlink" title="使用 LIKE 时使用前导通配符"></a>使用 LIKE 时使用前导通配符</h3><h4 id="场景说明-2"><a href="#场景说明-2" class="headerlink" title="场景说明"></a>场景说明</h4><p>当使用 <code>LIKE</code> 模糊查询且模式中以 <code>%</code> 或 <code>_</code> 开头时，MySQL 无法利用索引进行匹配。</p>
+<h4 id="示例-3"><a href="#示例-3" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT * FROM products WHERE name LIKE &#x27;%phone&#x27;;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="应对措施-2"><a href="#应对措施-2" class="headerlink" title="应对措施"></a>应对措施</h4><ul>
+<li>如果业务允许，尽量避免前导通配符；改为后缀通配符，如 <code>LIKE &#39;phone%&#39;</code>。</li>
+<li>当必须使用前导通配符时，可以考虑使用全文索引（<code>FULLTEXT</code>）或其他搜索引擎来替代常规索引。</li>
+</ul>
+<h3 id="OR-条件中部分字段缺少索引"><a href="#OR-条件中部分字段缺少索引" class="headerlink" title="OR 条件中部分字段缺少索引"></a>OR 条件中部分字段缺少索引</h3><h4 id="场景说明-3"><a href="#场景说明-3" class="headerlink" title="场景说明"></a>场景说明</h4><p>在使用 <code>OR</code> 条件连接多个字段时，如果其中某个字段没有索引，整个查询可能会无法利用索引。</p>
+<h4 id="示例-4"><a href="#示例-4" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT * FROM customers <br>WHERE first_name = &#x27;John&#x27; OR last_name = &#x27;Doe&#x27;;<br></code></pre></div></td></tr></table></figure>
+
+<p>假设只有 <code>first_name</code> 建有索引，而 <code>last_name</code> 没有索引，查询整体可能不会走索引。</p>
+<h4 id="应对措施-3"><a href="#应对措施-3" class="headerlink" title="应对措施"></a>应对措施</h4><ul>
+<li>为所有涉及的字段建立适当的索引。</li>
+<li>或者将 <code>OR</code> 查询拆分成两个独立查询，再用 <code>UNION</code> 组合结果，这样可以确保每个子查询都能走索引。</li>
+</ul>
+<h3 id="多列复合索引的最左前缀原则失效"><a href="#多列复合索引的最左前缀原则失效" class="headerlink" title="多列复合索引的最左前缀原则失效"></a>多列复合索引的最左前缀原则失效</h3><h4 id="场景说明-4"><a href="#场景说明-4" class="headerlink" title="场景说明"></a>场景说明</h4><p>对于复合索引，只有在 <code>WHERE</code> 子句中包含索引最左侧连续列时，索引才会生效。如果跳过了最左侧的列，后面的索引将无法被利用。</p>
+<h4 id="示例-5"><a href="#示例-5" class="headerlink" title="示例"></a>示例</h4><p>假设有复合索引 <code>(a, b, c)</code>，但查询条件仅涉及 <code>b</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT * FROM table WHERE b = &#x27;value&#x27;;<br></code></pre></div></td></tr></table></figure>
+
+<p>此时就会导致整个查询没有用上符合索引。</p>
+<h4 id="应对措施-4"><a href="#应对措施-4" class="headerlink" title="应对措施"></a>应对措施</h4><ul>
+<li>设计复合索引时，应根据查询条件的实际使用顺序，合理规划最左前缀。</li>
+<li>根据常用查询调整索引顺序，或者针对单列查询建立独立索引。</li>
+</ul>
+<h3 id="不等于条件和范围查询的特殊情况"><a href="#不等于条件和范围查询的特殊情况" class="headerlink" title="不等于条件和范围查询的特殊情况"></a>不等于条件和范围查询的特殊情况</h3><h4 id="场景说明-5"><a href="#场景说明-5" class="headerlink" title="场景说明"></a>场景说明</h4><p>对于不等于 (<code>!=</code> 或 <code>&lt;&gt;</code>) 条件或范围查询，索引可能无法达到理想的过滤效果，尤其是在数据分布不均的情况下。</p>
+<h4 id="示例-6"><a href="#示例-6" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT * FROM employees WHERE salary &lt;&gt; 5000;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="应对措施-5"><a href="#应对措施-5" class="headerlink" title="应对措施"></a>应对措施</h4><ul>
+<li>尽量避免在索引列上使用不等于条件，或者改为其他能利用索引的查询条件。</li>
+<li>对于范围查询，要确保索引列选择性较高，以便缩小扫描范围。</li>
+</ul>
+<h2 id="SQL-语法参数优化"><a href="#SQL-语法参数优化" class="headerlink" title="SQL 语法参数优化"></a>SQL 语法参数优化</h2><p>除了利用好索引外，SQL 语法中的参数同样需要引起重视：</p>
+<h3 id="SELECT语句"><a href="#SELECT语句" class="headerlink" title="SELECT语句"></a>SELECT语句</h3><ul>
+<li><strong>字段选择</strong>：避免 <code>SELECT *</code>，明确列名，减少数据传输量。</li>
+<li><strong>DISTINCT 与 GROUP BY</strong>：对结果集进行去重或分组时，注意计算成本，必要时可以通过业务逻辑在应用层实现。</li>
+</ul>
+<h3 id="JOIN-操作"><a href="#JOIN-操作" class="headerlink" title="JOIN 操作"></a>JOIN 操作</h3><ul>
+<li><strong>选择合适的JOIN类型</strong>：内连接（<code>INNER JOIN</code>）通常性能较好，尽量避免使用笛卡尔积。</li>
+<li><strong>索引支持</strong>：<code>JOIN</code> 操作涉及的字段应有索引支持，确保连接条件能够高效匹配。</li>
+<li><strong>顺序优化</strong>：调整 <code>JOIN</code> 顺序，使得大表与小表连接时优先过滤数据。</li>
+</ul>
+<h3 id="条件优化"><a href="#条件优化" class="headerlink" title="条件优化"></a>条件优化</h3><ul>
+<li><p>避免在 <code>WHERE</code> 子句中对索引字段使用函数或进行运算，尽量直接使用常量进行比较。</p>
+</li>
+<li><p>使用范围查询时，合理利用索引前缀。</p>
+</li>
+</ul>
+<h3 id="GROUP-BY-与-ORDER-BY"><a href="#GROUP-BY-与-ORDER-BY" class="headerlink" title="GROUP BY 与 ORDER BY"></a>GROUP BY 与 ORDER BY</h3><ul>
+<li><p>对于排序和分组字段应建立合适的索引。</p>
+</li>
+<li><p>避免在大数据集上进行不必要的排序操作，可考虑在应用层处理部分逻辑。</p>
+</li>
+</ul>
+<h3 id="LIMIT-与分页查询"><a href="#LIMIT-与分页查询" class="headerlink" title="LIMIT 与分页查询"></a>LIMIT 与分页查询</h3><ul>
+<li><strong>索引分页</strong>：对于大数据量分页，使用 “上次记录的最后值” 作为条件进行下一页查询，避免大量数据扫描。</li>
+<li><strong>合理分页大小</strong>：根据业务场景设置合理的分页大小，平衡用户体验与系统性能。</li>
+</ul>
+<h3 id="子查询与预编译"><a href="#子查询与预编译" class="headerlink" title="子查询与预编译"></a>子查询与预编译</h3><ul>
+<li><strong>子查询优化</strong>：尽量将子查询转换为 <code>JOIN</code> 或临时表，降低嵌套层级。</li>
+<li><strong>预编译与参数绑定</strong>：使用预编译语句（<code>Prepared Statement</code>）不仅可以提高执行效率，还能防止 SQL 注入。</li>
+</ul>
+<h2 id="小表驱动大表"><a href="#小表驱动大表" class="headerlink" title="小表驱动大表"></a>小表驱动大表</h2><h3 id="含义"><a href="#含义" class="headerlink" title="含义"></a>含义</h3><p>这句话通常出现在数据库的多表 <code>JOIN</code> 查询 优化中，尤其是对于嵌套循环连接（<code>Nested Loop Join</code>） 的场景。其含义为在多表连接中，应该让较小的数据集（“小表”）作为驱动表（外表/驱动器），而较大的数据集（“大表”）作为被驱动表（内表）。这种优化策略有助于提高查询效率。</p>
+<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><ul>
+<li><strong>驱动表更小，内存缓存更高效</strong>：<ul>
+<li>小表更容易被完全加载到内存中作为驱动表，从而减少磁盘 I/O。</li>
+<li>驱动表每次只需要从内存中取数据，而大表可以按块分批扫描，提高查询效率。</li>
+</ul>
+</li>
+<li><strong>被驱动表通常有索引辅助</strong>：如果被驱动表的连接列上存在索引，查询效率更高，因为每次匹配时能直接利用索引快速定位目标数据。</li>
+<li><strong>网络开销考虑</strong>：分布式数据库中，小表驱动大表可以减少跨节点传输的数据量。例如，先将小表的结果集传输到另一个节点与大表匹配，网络开销更小。</li>
+</ul>
+<h3 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h3><h4 id="JOIN"><a href="#JOIN" class="headerlink" title="JOIN"></a>JOIN</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT *<br>FROM a<br>JOIN b<br>ON a.key = b.key;<br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li>驱动表：<code>a</code>，<code>JOIN</code> 的处理会先扫描此表。</li>
+<li>被驱动表：<code>b</code>，通过 <code>a.key</code> 扫描此表。</li>
+</ul>
+<p><strong>优化注意</strong>：数据量较小的表放在位置 <code>a</code> 作为驱动表，减少外层扫描次数，提高效率。</p>
+<h4 id="EXISTS"><a href="#EXISTS" class="headerlink" title="EXISTS"></a>EXISTS</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT *<br>FROM a<br>WHERE EXISTS (<br>    SELECT 1<br>    FROM b<br>    WHERE b.key = a.key<br>);<br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li>驱动表：<code>a</code>，<code>EXISTS</code> 的执行是对此表的每一行数据一次检查是否满足子查询的条件，因此外层表始终都是驱动表。</li>
+<li>被驱动表：<code>b</code>，外层的行作为条件执行此表的查询。</li>
+</ul>
+<p><strong>优化注意</strong>：数据量较小的表放在位置 <code>a</code> 作为驱动表，位置 <code>b</code> 上的表不需要全部扫描，只要有一行匹配即返回 <code>TRUE</code>。</p>
+<h4 id="IN"><a href="#IN" class="headerlink" title="IN"></a>IN</h4><p><strong>情况1</strong>：子查询在 <code>IN</code> 中。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT *<br>FROM a<br>WHERE l.key IN (<br>    SELECT b.key<br>    FROM b<br>);<br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li>驱动表：<code>a</code>，<code>IN</code> 查询时 MySQL 优化器会对此表逐行扫描，每行数据都与子查询的结果进行匹配，因此外层表是驱动表。</li>
+<li>被驱动表：<code>b</code>，MySQL 会先执行子查询，生成一个中间结果集，然后与外层表的行进行比对。</li>
+</ul>
+<p><strong>优化注意</strong>：如果子查询返回的结果集比较大，可能导致性能问题，这种情况下应考虑将子查询改为 <code>JOIN</code> 或使用索引优化。</p>
+<p><strong>情况2</strong>：多值 <code>IN</code> 的写法。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT *<br>FROM a<br>WHERE a.key IN (1, 2, 3);<br></code></pre></div></td></tr></table></figure>
+
+<p>这种写法中，<code>a</code> 是驱动表，<code>IN</code> 的常量集合被 MySQL 优化为索引查找。</p>
+<h3 id="注意事项-4"><a href="#注意事项-4" class="headerlink" title="注意事项"></a><strong>注意事项</strong></h3><ol>
+<li><strong>不绝对适用</strong>：“小表驱动大表” 是通用原则，但具体是否适用需结合表的大小、索引情况和查询语句的实际执行计划来判断。</li>
+<li><strong>联合索引优先</strong>：被驱动表如果有合适的联合索引，则查询效率可能更高，此时，即使大表作为驱动表也可能具有一定优势。</li>
+<li><strong>分布式系统</strong>：在分布式数据库中，需综合考虑网络传输成本和各节点的计算负载。</li>
+</ol>
+<h2 id="特殊情况"><a href="#特殊情况" class="headerlink" title="特殊情况"></a>特殊情况</h2><p>在某些情况下，MySQL 的查询优化器可能主动选择全表扫描而不是使用索引，这是一个经过计算和权衡后的决策，并且实际上查询效率可能更高。以下是可能导致这种情况的原因，以及引发的思考：</p>
+<h3 id="全表扫描更高效场景"><a href="#全表扫描更高效场景" class="headerlink" title="全表扫描更高效场景"></a>全表扫描更高效场景</h3><h4 id="表中的数据量较少"><a href="#表中的数据量较少" class="headerlink" title="表中的数据量较少"></a>表中的数据量较少</h4><p>当表的数据量很少时（如只有几十行或更少），全表扫描一次性读取所有数据的开销可能比使用索引导航到数据位置的开销更低。</p>
+<p><strong>索引的代价</strong>： 索引查找需要进行多次 <code>B+</code> 树节点访问（通常是磁盘 I/O），即使在内存中也存在一定的代价。对于小表来说，这种代价可能高于全表扫描。</p>
+<h4 id="回表代价更高"><a href="#回表代价更高" class="headerlink" title="回表代价更高"></a>回表代价更高</h4><ol>
+<li><p><strong>索引选择性较低</strong>：索引选择性是指索引列中不重复值的比例（公式：选择性 = 不同值的数量 / 总行数）。当索引选择性较低时，大量行具有相同的值，使用索引可能会返回大量数据行，这会导致查询性能不如全表扫描。</p>
+<p><strong>示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT * FROM table_name WHERE status = 1;<br></code></pre></div></td></tr></table></figure>
+
+<p>如果 <code>status</code> 字段的值几乎都是 <code>1</code>（如 99% 的行满足条件），使用索引会导致大量回表操作，而全表扫描一次性读取所有数据可能更高效。</p>
+</li>
+<li><p><strong>索引无法覆盖查询</strong>：如果查询的字段不在索引中，MySQL 需要通过索引定位到主键值，然后再回表查询数据，这会产生额外的 I/O 开销，而全表扫描在这种情况下可能更高效。</p>
+<p><strong>示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT id, name FROM table_name WHERE age &gt; 20;<br></code></pre></div></td></tr></table></figure>
+
+<p>如果只有 <code>age</code> 建立了索引，但 <code>id</code> 和 <code>name</code> 没有包含在索引中，查询需要频繁回表，效率可能低于直接全表扫描。</p>
+</li>
+</ol>
+<h4 id="查询涉及大量数据行"><a href="#查询涉及大量数据行" class="headerlink" title="查询涉及大量数据行"></a>查询涉及大量数据行</h4><p>如果查询需要返回的行数占总行数的大部分，使用索引将不再具备显著优势，优化器可能会选择全表扫描。</p>
+<p><strong>示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT * FROM table_name WHERE age &gt; 5;<br></code></pre></div></td></tr></table></figure>
+
+<p>如果表中 90% 的记录都符合条件，MySQL 会倾向于全表扫描而不是通过索引逐一定位数据行。</p>
+<h4 id="索引统计信息不准确"><a href="#索引统计信息不准确" class="headerlink" title="索引统计信息不准确"></a>索引统计信息不准确</h4><p>MySQL 优化器根据表的统计信息（如行数、索引选择性等）评估索引的性能。如果统计信息过期或不准确，可能导致优化器选择全表扫描，此时可以手动更新统计信息。</p>
+<p><strong>示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">ANALYZE TABLE table_name;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="引发思考"><a href="#引发思考" class="headerlink" title="引发思考"></a>引发思考</h3><ul>
+<li><p><strong>索引并非越多越好</strong>：每个索引都有维护成本（写入、更新、删除时需更新索引结构），因此需要合理设计，不合理的索引可能导致查询计划复杂化甚至性能下降。</p>
+</li>
+<li><p><strong>索引设计需结合数据特性</strong>：索引适用于高选择性字段，避免对低选择性字段（如性别、状态等）单独建立索引。对于频繁查询的字段，尽可能设计覆盖索引，避免回表操作。</p>
+</li>
+<li><p><strong>定期更新优化器</strong>：优化器是基于统计信息来选择执行计划的，需要理解数据分布、索引选择性、返回行数与扫描范围的关系，同时定期更新表的统计信息以帮助优化器做出更准确的选择。</p>
+</li>
+<li><p><strong>要关注实际查询执行计划</strong>：使用 <code>EXPLAIN</code>  检查查询的执行计划，分析是否选择了合理的索引路径，如果发现优化器选择全表扫描，而强制索引更快，可能需要调整索引设计或优化 SQL。</p>
+</li>
+<li><p><strong>性能测试与实践的重要性</strong>：理论分析并不总能覆盖所有情况，应通过实际查询测试确认最佳索引策略，在高并发和大数据量场景下，实时测试尤为重要。</p>
+</li>
+</ul>
+<h2 id="其他注意事项"><a href="#其他注意事项" class="headerlink" title="其他注意事项"></a>其他注意事项</h2><h3 id="编写规范化SQL"><a href="#编写规范化SQL" class="headerlink" title="编写规范化SQL"></a>编写规范化SQL</h3><ul>
+<li><strong>清晰明了：</strong> 保持 SQL 结构清晰，避免嵌套过深和复杂联接。</li>
+<li><strong>注释与文档：</strong> 对复杂查询加以注释，便于日后维护和调优。</li>
+</ul>
+<h3 id="索引管理"><a href="#索引管理" class="headerlink" title="索引管理"></a>索引管理</h3><ul>
+<li><strong>定期评审：</strong> 根据查询情况和数据量变化定期审查索引使用情况，删除冗余和低效索引。</li>
+<li><strong>监控工具：</strong> 使用慢查询日志和监控工具定期评估索引命中率和性能。</li>
+</ul>
+<h3 id="数据库连接与事务管理"><a href="#数据库连接与事务管理" class="headerlink" title="数据库连接与事务管理"></a>数据库连接与事务管理</h3><ul>
+<li><strong>连接池：</strong> 使用数据库连接池技术，避免频繁创建连接带来的开销。</li>
+<li><strong>事务控制：</strong> 合理划分事务范围，避免长事务锁定资源，同时确保数据一致性。</li>
+</ul>
+<h3 id="代码与数据库解耦"><a href="#代码与数据库解耦" class="headerlink" title="代码与数据库解耦"></a>代码与数据库解耦</h3><ul>
+<li><strong>业务逻辑分离：</strong> 将复杂数据处理逻辑尽可能放在业务层，实现数据查询与业务逻辑的分离。</li>
+<li><strong>缓存策略：</strong> 对热点数据使用缓存策略，降低数据库直接压力。</li>
+</ul>
+<h3 id="定期监控与调优"><a href="#定期监控与调优" class="headerlink" title="定期监控与调优"></a>定期监控与调优</h3><ul>
+<li><strong>性能监控：</strong> 建立完善的性能监控体系，及时发现异常查询。</li>
+<li><strong>版本升级：</strong> 关注MySQL版本更新，利用新版本中引入的性能改进和新特性。</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在高并发、大数据量的应用场景中，SQL 优化对系统的整体性能至关重要。通过慢查询日志和 <code>SHOW PROFILE</code>，迅速定位个别耗时严重的查询，配合 <code>Performance Schema</code> 进一步挖掘性能瓶颈，掌握执行阶段的每个细节。而 <code>EXPLAIN</code> 则提供了直观的执行计划视图，帮助评估索引使用、扫描行数以及是否产生临时表或文件排序。在实际落地时，仍针对不同类型的 SQL，需要针对性地编写或改写查询。综合运用本文介绍的技巧与工具，在开发和运维阶段持续关注慢查询和性能指标，既能大幅缩短关键 SQL 的响应时间，也能为业务提供更稳定的系统支撑。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/MySQL/">MySQL</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/MySQL/">MySQL</a>
+                    
+                      <a class="hover-with-bg" href="/tags/MySQL%E4%BC%98%E5%8C%96/">MySQL优化</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/07/18/mysql-transaction/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">MySQL事务</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/06/26/mysql-index/">
+                        <span class="hidden-mobile">MySQL索引详解</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

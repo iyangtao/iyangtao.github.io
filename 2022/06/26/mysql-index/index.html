@@ -1,0 +1,934 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="引言随着数据量的持续增长，如何在海量记录中迅速找到目标数据，成为数据库性能优化的关键。索引正是为了解决这一问题而生，它借助专门的数据结构（如 B+ 树），帮助数据库在最短时间内定位所需行。MySQL 提供了多种类型的索引以应对不同场景需求：从最常见的主键索引、唯一索引，到专门面向文本搜索的全文索引，以及地理空间场景所需的空间索引。本文将围绕 MySQL 中的索引概念、实现原理和应用技巧展开探讨，帮">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL索引详解">
+<meta property="og:url" content="http://example.com/2022/06/26/mysql-index/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="引言随着数据量的持续增长，如何在海量记录中迅速找到目标数据，成为数据库性能优化的关键。索引正是为了解决这一问题而生，它借助专门的数据结构（如 B+ 树），帮助数据库在最短时间内定位所需行。MySQL 提供了多种类型的索引以应对不同场景需求：从最常见的主键索引、唯一索引，到专门面向文本搜索的全文索引，以及地理空间场景所需的空间索引。本文将围绕 MySQL 中的索引概念、实现原理和应用技巧展开探讨，帮">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/mysql-windows-function.webp">
+<meta property="article:published_time" content="2022-06-26T14:39:43.000Z">
+<meta property="article:modified_time" content="2022-06-26T14:39:43.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="MySQL">
+<meta property="article:tag" content="MySQL索引">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/mysql-windows-function.webp">
+  
+  
+  <title>MySQL索引详解 - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/mysql-windows-function.webp') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="MySQL索引详解">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-06-26 22:39" pubdate>
+        2022年6月26日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      8.3k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      14 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">MySQL索引详解</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：3 年前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>随着数据量的持续增长，如何在海量记录中迅速找到目标数据，成为数据库性能优化的关键。索引正是为了解决这一问题而生，它借助专门的数据结构（如 <code>B+</code> 树），帮助数据库在最短时间内定位所需行。MySQL 提供了多种类型的索引以应对不同场景需求：从最常见的主键索引、唯一索引，到专门面向文本搜索的全文索引，以及地理空间场景所需的空间索引。本文将围绕 MySQL 中的索引概念、实现原理和应用技巧展开探讨，帮助读者在开发和运维中高效利用索引来提升查询性能、维护数据一致性。</p>
+<h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>索引是一种数据结构，它为数据库表中的一列或多列数据建立映射关系，使得数据库能够快速定位到数据行，而无需遍历整个表。可以把索引看作是书籍的目录，通过目录能迅速找到对应的章节内容。</p>
+<h2 id="创建命令"><a href="#创建命令" class="headerlink" title="创建命令"></a>创建命令</h2><h3 id="主键索引"><a href="#主键索引" class="headerlink" title="主键索引"></a>主键索引</h3><ul>
+<li>主键索引在创建表时通常直接定义。</li>
+<li>主键索引的特点是：唯一性 + 不允许为空。</li>
+</ul>
+<p><strong>创建示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">ALTER TABLE table_name ADD PRIMARY KEY (id);<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="唯一索引"><a href="#唯一索引" class="headerlink" title="唯一索引"></a>唯一索引</h3><ul>
+<li>唯一索引用于确保列值的唯一性，但允许 <code>NULL</code> 值。</li>
+<li>一个表可以有多个唯一索引。</li>
+</ul>
+<p><strong>创建示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">ALTER TABLE table_name ADD UNIQUE (email);<br><br>CREATE UNIQUE INDEX idx_email ON table_name (email);<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="普通索引"><a href="#普通索引" class="headerlink" title="普通索引"></a>普通索引</h3><ul>
+<li>普通索引没有唯一性约束，主要用于提高查询效率。</li>
+</ul>
+<p><strong>创建示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">ALTER TABLE table_name ADD INDEX idx_name (name);<br><br>CREATE INDEX idx_name ON table_name (name);<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="复合索引"><a href="#复合索引" class="headerlink" title="复合索引"></a>复合索引</h3><ul>
+<li>复合索引在单个索引中包含多个列，用于多列组合查询。</li>
+<li>遵循最左前缀原则，即必须从索引的最左列开始使用。</li>
+</ul>
+<p><strong>创建示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">ALTER TABLE table_name ADD INDEX idx_name_age (name, age);<br><br>CREATE INDEX idx_name_age ON table_name (name, age);<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="全文索引"><a href="#全文索引" class="headerlink" title="全文索引"></a>全文索引</h3><ul>
+<li>用于对文本字段进行全文搜索。</li>
+<li>支持 <code>MyISAM</code> 和 <code>InnoDB</code> 存储引擎。</li>
+</ul>
+<p><strong>创建示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">ALTER TABLE table_name ADD FULLTEXT (content);<br><br>CREATE FULLTEXT INDEX idx_content ON table_name (content);<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="前缀索引"><a href="#前缀索引" class="headerlink" title="前缀索引"></a>前缀索引</h3><ul>
+<li>用于减少大文本字段的索引大小。</li>
+<li>只索引字段的前 N 个字符。</li>
+</ul>
+<p><strong>创建示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">CREATE INDEX idx_email_prefix ON table_name (email(10));<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h2><h3 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h3><p>MySQL 中最常用的索引实现结构是 <code>B+</code> 树，其特点是所有数据都存储在叶子节点上，并且叶子节点之间通过链表相连，方便进行范围查询。除此之外，还有哈希索引（主要用于 <code>Memory</code> 存储引擎）以及空间索引（用于 <code>GIS</code> 数据）等。</p>
+<h3 id="存储方式"><a href="#存储方式" class="headerlink" title="存储方式"></a>存储方式</h3><p>对于 <code>InnoDB</code> 引擎，主键索引采用聚簇索引，即数据行本身存储在索引叶子节点；而其他辅助索引（非聚簇索引）存储的是主键值的引用，这种设计便于通过主键 “回表” 获取完整数据。</p>
+<h2 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h2><ul>
+<li><p><strong>提升查询效率</strong>：</p>
+<ul>
+<li><p><strong>快速定位数据</strong>：索引可以大幅减少数据库需要扫描的行数，避免全表扫描，从而降低 I/O 操作，提高查询速度。</p>
+</li>
+<li><p><strong>支持范围查询和排序</strong>：<code>B+</code> 树的结构非常适合范围查询和有序数据的查找，可用于加速 <code>BETWEEN</code>、<code>&gt;</code>、<code>&lt;</code> 等条件查询以及 <code>ORDER BY</code> 排序。</p>
+</li>
+<li><p><strong>覆盖查询</strong>：当查询字段全部包含在索引中时（即覆盖索引），可以避免回表操作，进一步提高查询性能。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>数据完整性与约束：</strong></p>
+</li>
+</ul>
+<ul>
+<li><p><strong>唯一性验证</strong>：唯一索引可以保证数据的唯一性，防止重复数据插入。</p>
+</li>
+<li><p><strong>加速关联查询</strong>：在多表关联时，索引能够大幅降低数据匹配的计算量。</p>
+</li>
+</ul>
+<h2 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h2><h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><ul>
+<li><strong>大幅提升查询效率</strong>：对于数据量较大的表，使用合适的索引可以显著减少查询时间。</li>
+<li><strong>降低 I/O 负担</strong>：索引使得数据库能够直接定位到数据位置，减少磁盘读写次数。</li>
+<li><strong>优化排序和分组</strong>：合适的索引可以使排序、分组操作在索引层面完成，节省计算资源。</li>
+<li><strong>支持数据完整性约束</strong>：唯一索引等有助于保证数据质量。</li>
+</ul>
+<h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><ul>
+<li><strong>增加写操作成本</strong>：插入、更新、删除操作时，除了对数据表进行修改，还需要维护相应的索引结构，这会带来额外的 CPU 和磁盘开销。</li>
+<li><strong>占用额外存储空间</strong>：索引需要额外的磁盘空间保存数据结构和辅助信息。</li>
+<li><strong>设计不当可能影响性能</strong>：索引过多或不合理的索引顺序会导致查询优化器选择不合适的执行计划，反而降低性能。</li>
+<li><strong>维护复杂性</strong>：随着数据变化，索引可能会产生碎片，需要定期整理或重建索引。</li>
+</ul>
+<h2 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h2><h3 id="适合使用索引的场景"><a href="#适合使用索引的场景" class="headerlink" title="适合使用索引的场景"></a>适合使用索引的场景</h3><ul>
+<li><strong>大数据量的表</strong>：当数据量较大时，全表扫描的代价很高，使用索引能大幅提高查询效率。</li>
+<li><strong>外键关联字段</strong>：对于频繁与外键关联的表字段，建立索引能大幅降低数据匹配的计算量。</li>
+<li><strong>频繁的查询操作</strong>：对于经常出现在 <code>WHERE</code> 子句、<code>JOIN</code> 条件、<code>ORDER BY</code> 或 <code>GROUP BY</code> 中的字段，应考虑建立索引。</li>
+<li><strong>需要保证数据唯一性</strong>：主键和唯一索引不仅加速查询，同时确保数据的唯一性，防止重复插入。</li>
+<li><strong>范围查询与排序</strong>：例如查询某个时间段的数据或对结果进行排序时，合适的 B+ 树索引能够显著提高效率。</li>
+<li><strong>覆盖索引场景</strong>：如果查询中涉及的列全部包含在某个索引中，则可以避免回表，达到更快的查询响应。</li>
+</ul>
+<h3 id="谨慎或避免使用索引的场景"><a href="#谨慎或避免使用索引的场景" class="headerlink" title="谨慎或避免使用索引的场景"></a>谨慎或避免使用索引的场景</h3><ul>
+<li><strong>频繁的写操作</strong>：插入、更新、删除操作需要同时维护索引，过多或不合理的索引会降低写入性能。</li>
+<li><strong>小数据量的表</strong>：如果表的数据量很少，全表扫描的开销可能远低于维护索引的额外成本，此时使用索引收益不明显。</li>
+<li><strong>不适宜的查询条件</strong>：<ul>
+<li>使用 <code>LIKE &#39;%keyword%&#39;</code> 的模糊匹配，前置通配符会导致索引失效。</li>
+<li>在查询中对索引字段进行函数操作或类型转换，也可能导致无法利用索引。</li>
+</ul>
+</li>
+<li><strong>动态变化的数据</strong>：数据频繁变动的场景下，索引的统计信息可能不够准确，导致查询优化器选择不佳的执行计划，此时需要额外关注索引维护。</li>
+<li><strong>数据重复且分布均匀的字段</strong>：索引选择性是指索引列中不重复值的比例（公式：<code>选择性 = 不同值的数量 / 总行数</code>）。当索引选择性较低时，大量行具有相同的值，使用索引可能会返回大量数据行，这会导致查询性能不如全表扫描。</li>
+</ul>
+<h2 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h2><h3 id="主键索引（Primary-Key-Index）"><a href="#主键索引（Primary-Key-Index）" class="headerlink" title="主键索引（Primary Key Index）"></a>主键索引（Primary Key Index）</h3><ul>
+<li><strong>定义</strong>：表中唯一标识每一行数据的索引，不能为空且必须唯一。</li>
+<li><strong>特点</strong>：<code>InnoDB</code> 中采用聚簇索引，数据行直接存储在主键索引中，查询效率高。</li>
+</ul>
+<h3 id="唯一索引（Unique-Index）"><a href="#唯一索引（Unique-Index）" class="headerlink" title="唯一索引（Unique Index）"></a>唯一索引（Unique Index）</h3><ul>
+<li><strong>定义</strong>：除了能加速查询，还能保证字段值的唯一性。</li>
+<li><strong>特点</strong>：与主键索引类似，但允许存在空值（<code>NULL</code>）的情况（具体实现上可能有所不同）。</li>
+</ul>
+<h3 id="普通索引（Non-Unique-或-Index）"><a href="#普通索引（Non-Unique-或-Index）" class="headerlink" title="普通索引（Non-Unique 或 Index）"></a>普通索引（Non-Unique 或 Index）</h3><ul>
+<li><strong>定义</strong>：主要用于加速查询，不对数据的唯一性做限制。</li>
+<li><strong>特点</strong>：适用于大多数查询场景，创建和维护成本相对较低。</li>
+</ul>
+<h3 id="复合索引（Composite-Index）"><a href="#复合索引（Composite-Index）" class="headerlink" title="复合索引（Composite Index）"></a>复合索引（Composite Index）</h3><ul>
+<li><strong>定义</strong>：在同一索引中包含多个列。</li>
+<li><strong>特点</strong>：遵循 “最左前缀原则”，即查询条件中必须包含索引最左边的列才能有效利用复合索引。</li>
+</ul>
+<h3 id="全文索引（Fulltext-Index）"><a href="#全文索引（Fulltext-Index）" class="headerlink" title="全文索引（Fulltext Index）"></a>全文索引（Fulltext Index）</h3><ul>
+<li><strong>定义</strong>：针对文本数据的全文搜索建立的索引。</li>
+<li><strong>特点</strong>：适用于需要对大段文本进行匹配搜索的场景（例如搜索文章内容），但其灵活性和性能在某些场景下不及专门的搜索引擎，如 <code>Elasticsearch</code>。</li>
+</ul>
+<h3 id="空间索引（Spatial-Index）"><a href="#空间索引（Spatial-Index）" class="headerlink" title="空间索引（Spatial Index）"></a>空间索引（Spatial Index）</h3><ul>
+<li><strong>定义</strong>：专门针对地理信息系统（<code>GIS</code>）数据设计的索引。</li>
+<li><strong>特点</strong>：支持二维或多维数据的快速查询，使用场景较为特殊。</li>
+</ul>
+<h3 id="前缀索引-1"><a href="#前缀索引-1" class="headerlink" title="前缀索引"></a>前缀索引</h3><ul>
+<li><strong>定义</strong>：对文本字段的部分字符建立索引。</li>
+<li><strong>特点</strong>：可以减少索引体积，但可能会影响索引的选择性和精确度。</li>
+</ul>
+<h2 id="索引与-B-树"><a href="#索引与-B-树" class="headerlink" title="索引与 B+ 树"></a>索引与 B+ 树</h2><h3 id="B-树的结构与核心特点"><a href="#B-树的结构与核心特点" class="headerlink" title="B+ 树的结构与核心特点"></a>B+ 树的结构与核心特点</h3><h4 id="基本结构"><a href="#基本结构" class="headerlink" title="基本结构"></a>基本结构</h4><p><code>B+</code> 树是一种多路平衡搜索树，由内部节点（非叶子节点）和叶子节点构成。</p>
+<ul>
+<li><strong>内部节点</strong>：仅存储键值和指向子节点的指针，不存储实际数据。这些节点起到导航作用，帮助快速定位到正确的叶子节点。</li>
+<li><strong>叶子节点</strong>：存储所有的数据记录或数据记录的指针，是实际存储数据的位置。</li>
+</ul>
+<h4 id="有序性与链表结构"><a href="#有序性与链表结构" class="headerlink" title="有序性与链表结构"></a>有序性与链表结构</h4><ul>
+<li><strong>顺序存储</strong>：所有叶子节点通过双向链表连接，保证了数据的顺序性，这使得范围查询、顺序遍历和排序操作非常高效。</li>
+<li><strong>平衡性</strong>：<code>B+</code> 树是一棵平衡树，所有叶子节点都处在同一深度，因此查询时从根到叶子的路径长度固定，降低了磁盘 I/O 次数。</li>
+</ul>
+<h4 id="节点容量与磁盘适应性"><a href="#节点容量与磁盘适应性" class="headerlink" title="节点容量与磁盘适应性"></a>节点容量与磁盘适应性</h4><ul>
+<li><strong>多路分支</strong>：每个节点可以存储多个键值（通常上百个），从而使树的高度很低，即使面对海量数据，也只需访问少量节点即可定位目标数据。</li>
+<li><strong>数据页存储</strong>：<code>B+</code> 树的节点通常与磁盘页（如 <code>InnoDB</code> 中默认的 <code>16KB</code> 页面）相匹配，充分利用磁盘 I/O 的块读取特性，提高存取效率。</li>
+</ul>
+<h3 id="索引对-B-树的利用"><a href="#索引对-B-树的利用" class="headerlink" title="索引对 B+ 树的利用"></a>索引对 B+ 树的利用</h3><h4 id="聚簇索引（Clustered-Index）"><a href="#聚簇索引（Clustered-Index）" class="headerlink" title="聚簇索引（Clustered Index）"></a>聚簇索引（Clustered Index）</h4><p><strong>数据与索引共存</strong>：<code>InnoDB</code> 的主键索引采用聚簇索引实现，即数据记录本身存储在 <code>B+</code> 树的叶子节点中。这意味着：</p>
+<ul>
+<li>根据主键查询时，直接在叶子节点上即可找到完整数据，无需额外的 “回表” 操作。</li>
+<li>聚簇索引保证了数据的物理顺序与逻辑顺序一致，这对于范围查询和排序都非常有利。</li>
+</ul>
+<h4 id="辅助索引（Secondary-Index）"><a href="#辅助索引（Secondary-Index）" class="headerlink" title="辅助索引（Secondary Index）"></a>辅助索引（Secondary Index）</h4><ul>
+<li><strong>存储方式</strong>：<code>InnoDB</code> 中除主键外的其他索引（辅助索引）也采用 <code>B+</code> 树结构，但它们的叶子节点并不存储实际数据，而是存储相应的索引键和主键值。</li>
+<li><strong>工作流程</strong>：在执行查询时，如果查询条件使用了辅助索引，则首先通过 <code>B+</code> 树快速定位到匹配的主键值，再通过聚簇索引找到完整记录，这一过程称为 “回表” 操作。</li>
+<li><strong>设计原则</strong>：为减少回表次数，常见的优化方式是建立覆盖索引（即查询所需字段均包含在辅助索引中），从而直接在辅助索引中返回结果。</li>
+</ul>
+<h4 id="数据更新与维护"><a href="#数据更新与维护" class="headerlink" title="数据更新与维护"></a>数据更新与维护</h4><ul>
+<li><strong>插入与分裂</strong>：当向 <code>B+</code> 树中插入数据时，如果目标叶子节点已满，会触发节点分裂，进而调整父节点结构以保持平衡。这一过程虽然会带来额外的维护开销，但由于树的高度较低，整体更新代价一般可控。</li>
+<li><strong>缓冲机制</strong>：<code>InnoDB</code> 采用 <code>Buffer Pool</code> 缓存数据页，频繁访问的 <code>B+</code> 树节点（特别是根节点和较高层的内部节点）往往会被缓存在内存中，从而降低磁盘 I/O，进一步提升查询性能。</li>
+</ul>
+<h4 id="范围查询与顺序扫描"><a href="#范围查询与顺序扫描" class="headerlink" title="范围查询与顺序扫描"></a>范围查询与顺序扫描</h4><ul>
+<li><strong>高效区间查找</strong>：由于 <code>B+</code> 树叶子节点之间按键值顺序相连，当执行范围查询（例如 <code>BETWEEN</code>、<code>&gt;</code>、<code>&lt;</code> 等）时，只需定位到第一个匹配节点，随后沿链表顺序扫描即可，极大地提高了查询效率。</li>
+<li><strong>排序优化</strong>：如果查询要求返回有序数据，<code>B+</code> 树天然的顺序存储特点能够避免额外的排序操作，直接利用索引顺序返回结果。</li>
+</ul>
+<h3 id="图示及说明"><a href="#图示及说明" class="headerlink" title="图示及说明"></a>图示及说明</h3><p><img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/B+tree&innodb.png" alt="B+树结构"></p>
+<h4 id="B-树索引的多级结构"><a href="#B-树索引的多级结构" class="headerlink" title="B+ 树索引的多级结构"></a>B+ 树索引的多级结构</h4><ul>
+<li><p><strong>根节点（Level 2）</strong></p>
+<ul>
+<li><p>通常在 <code>B+</code> 树的最上层（图中为 <code>Page 1</code>）。</p>
+</li>
+<li><p>根节点中只存储索引键（如 <code>1</code>、<code>28</code>、<code>66</code>）和指向下一层节点的指针（如指向 <code>Page 2</code>、<code>Page 3</code>、<code>Page 4</code>）。</p>
+</li>
+<li><p>在 <code>InnoDB</code> 中，这一层的节点往往会被加载在内存里（<code>Buffer Pool</code>）进行缓存，加快定位子节点的速度。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>内部节点（Level 1）</strong></p>
+<ul>
+<li><p>这些页面（图中 <code>Page 2</code>、<code>Page 3</code>、<code>Page 4</code>）承接根节点的下探，也只存储索引键和指向更底层页面的指针。</p>
+</li>
+<li><p>例如 <code>Page 2</code> 中的键值是 <code>1</code>、<code>10</code>、<code>20</code>，它会分别指向 <code>Page 5</code>、<code>Page 6</code>、<code>Page 7</code> 这三个更底层页面。</p>
+</li>
+<li><p>该层的目的仍然是 “导航”，帮助快速锁定目标页所在的叶子节点，而不存储实际行数据。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>叶子节点（Level 0）</strong></p>
+</li>
+</ul>
+<ul>
+<li><p>这里才是真正存储数据的地方（<code>InnoDB</code> 的聚簇索引模式），在图中就是 <code>Page 5</code>、<code>Page 6</code>、<code>Page 7</code>、… <code>Page 13</code>。</p>
+</li>
+<li><p>例如图中 <code>Page 12</code> 叶子节点里存储了 <code>id=78, name=A1, age=20</code> 这样的行数据。</p>
+</li>
+<li><p>所有记录都存放在这一层，这也是 <code>B+</code> 树和 <code>B</code> 树在概念上的一个主要区别：<code>B+</code> 树把所有数据都集中在最底层的叶子节点。</p>
+</li>
+</ul>
+<h4 id="叶子节点间的双向链表"><a href="#叶子节点间的双向链表" class="headerlink" title="叶子节点间的双向链表"></a>叶子节点间的双向链表</h4><p>从图中可以看出，每个叶子节点与相邻节点之间通过双向链表指针（紫色双向箭头）相互连接。这种设计的好处在于：</p>
+<ol>
+<li><strong>范围查询</strong>：可以只用一次索引查找定位到区间起点，然后依次顺序或逆序遍历叶子节点，即可获得完整区间数据；无需反复返回到上层节点。</li>
+<li><strong>顺序存取</strong>：在做排序、扫描等操作时，利用已排序的叶子节点链表可以极大地减少排序或临时表的开销。</li>
+</ol>
+<h4 id="索引键与数据存储的对应关系"><a href="#索引键与数据存储的对应关系" class="headerlink" title="索引键与数据存储的对应关系"></a>索引键与数据存储的对应关系</h4><ol>
+<li><strong>聚簇索引（主键索引）</strong><ul>
+<li><code>InnoDB</code> 将表的主键作为聚簇索引的索引键，图中展示的示例是按 <code>id</code> 字段构建的 <code>B+</code> 树。</li>
+<li>在叶子节点中，索引键和行数据直接保存在同一数据页中（如 <code>Page 12</code> 存了 <code>id=78, name=A1, age=20</code>）。</li>
+<li>当进行基于主键的等值或范围查询时，可以直接根据 <code>B+</code> 树导航到对应叶子节点，快速拿到完整行。</li>
+</ul>
+</li>
+<li><strong>辅助索引（Secondary Index）</strong><ul>
+<li>虽然图里主要展示的是主键索引的结构，但在 <code>InnoDB</code> 中，对非主键字段建立的索引也还是 <code>B+</code> 树。</li>
+<li>辅助索引的叶子节点并不存储整行数据，而是存储 “索引键 + 主键值”。然后通过这个主键值再去回表查询真正的数据行。</li>
+<li>这就是为什么主键在 <code>InnoDB</code> 中极为重要，因为所有辅助索引都依赖它来定位完整数据。</li>
+</ul>
+</li>
+</ol>
+<h4 id="数据页-Page-与-InnoDB-存储"><a href="#数据页-Page-与-InnoDB-存储" class="headerlink" title="数据页 (Page) 与 InnoDB 存储"></a>数据页 (Page) 与 InnoDB 存储</h4><ol>
+<li><strong>InnoDB 的数据页</strong><ul>
+<li><code>InnoDB</code> 默认的页面大小是 <code>16KB</code>（也可配置为 <code>8KB</code> 或 <code>4KB</code> 等），所以图中的每一个 <code>Page X</code> 可以看成 <code>16KB</code> 大小的 “数据块”。</li>
+<li><code>B+</code> 树的节点结构恰巧和 “页” 一一对应，保证在一次磁盘 I/O 读取一个数据页时，可以得到同一个节点的所有索引信息。</li>
+</ul>
+</li>
+<li><strong>内部节点与叶子节点的页面区别</strong><ul>
+<li>内部节点页中主要是 “（键值，指针）” 的对，用来指导查找方向。</li>
+<li>叶子节点页中同样有 “（键值，指针）” ，不过它的指针指向的是实际行记录（聚簇索引的情况下，直接把整行存在同一个数据页；辅助索引则指向主键）。</li>
+<li>由于 <code>B+</code> 树的高扇出特性，当数据量很大时，树高依然很低，一般只需 <code>3 ~ 4</code> 层就能容纳大量行。</li>
+</ul>
+</li>
+</ol>
+<h4 id="关键细节"><a href="#关键细节" class="headerlink" title="关键细节"></a>关键细节</h4><ul>
+<li><p><strong>Level 2（根节点） 中每个键值对应的下级页面</strong>：</p>
+<ul>
+<li>键值区间 <code>[1 ~ 28) =&gt; Page 2</code></li>
+<li>键值区间 <code>[28 ~ 66) =&gt; Page 3</code></li>
+<li>键值区间 <code>[66 ~ +∞) =&gt; Page 4</code></li>
+</ul>
+<p>在实际实现中，可能还会有区间的右边界等定义，但思路类似。</p>
+</li>
+<li><p><strong>Level 1（内部节点） 示例</strong>：</p>
+<ul>
+<li><code>Page 2</code> 拥有键值 <code>1</code>、<code>10</code>、<code>20</code>，对应下级页面分别是 <code>Page 5</code>、<code>Page 6</code>、<code>Page 7</code>。</li>
+<li>当要查找 <code>id = 15</code> 的记录时，会先比对根节点键值，发现应从 <code>Page 2</code> 继续查找，再在 <code>Page 2</code> 中比对 <code>10</code> 和 <code>20</code>，得知应去 <code>Page 6</code> 找最终记录。</li>
+</ul>
+</li>
+<li><p><strong>Level 0（叶子节点） 中的行数据</strong>：</p>
+<ul>
+<li>图中显示的 <code>Page 12</code>、<code>Page 13</code> 等存放了真实的 <code>(id, name, age)</code> 信息，彼此之间通过双向链表衔接。</li>
+<li>叶子节点中同一个页面里可能包含多行数据，具体行数取决于单行大小和 <code>16KB</code> 页的利用率。</li>
+</ul>
+</li>
+<li><p>单向链表指针（绿色箭头）与双向链表指针（紫色箭头）</p>
+<ul>
+<li>一些指针是自上而下的层级指向。</li>
+<li>一些指针是叶子节点之间的横向连接，既可正向又可反向遍历。</li>
+</ul>
+</li>
+</ul>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ol>
+<li>B+ <strong>树层级</strong>：从根节点、内部节点到叶子节点，每一层各司其职，能在大规模数据情况下依旧保持相对较低的树高。</li>
+<li><strong>聚簇索引融合数据</strong>：<code>InnoDB</code> 将数据行本身保存在叶子节点（主键索引），这使得基于主键的查询和范围扫描非常高效。</li>
+<li><strong>双向链表适合范围扫描</strong>：叶子节点间的双向链表有效提升了区间查询、排序、分组等操作的性能。</li>
+<li><strong>高度与 I/O</strong>：<code>B+</code> 树的高扇出特性使得访问一个节点就能拿到大量索引信息，树高变低，磁盘 I/O 次数也随之减少。</li>
+<li><strong>回表机制</strong>：对辅助索引的查询，最终还是需要通过主键到聚簇索引中取回完整行数据，这里也体现了主键索引在 <code>InnoDB</code> 中的中心地位。</li>
+</ol>
+<h3 id="对比-B-树"><a href="#对比-B-树" class="headerlink" title="对比 B 树"></a>对比 B 树</h3><table>
+<thead>
+<tr>
+<th>特性</th>
+<th><strong>B树</strong></th>
+<th><strong>B+树</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>节点内容</strong></td>
+<td>每个节点同时存储键值和数据记录。</td>
+<td>只有叶子节点存储数据记录，非叶子节点只存储索引键和指针。</td>
+</tr>
+<tr>
+<td><strong>叶子节点链表</strong></td>
+<td>叶子节点之间没有指针连接。</td>
+<td>叶子节点通过双向链表连接，方便顺序遍历和范围查询。</td>
+</tr>
+<tr>
+<td><strong>查找结束位置</strong></td>
+<td>查询可以在任何一个节点结束（可能是非叶子节点）。</td>
+<td>查询必须到达叶子节点才能结束，所有数据存储在叶子节点中。</td>
+</tr>
+<tr>
+<td><strong>树的层级</strong></td>
+<td>树的层级可能较高，因为节点存储数据占用更多空间。</td>
+<td>树的层级更低，因为节点仅存索引键，容量更大。</td>
+</tr>
+<tr>
+<td><strong>范围查询</strong></td>
+<td>范围查询较为复杂，需要遍历多个子树。</td>
+<td>范围查询高效，从叶子节点链表顺序遍历即可。</td>
+</tr>
+</tbody></table>
+<p><strong>为什么 B+ 树更适合作为 MySQL 的索引结构？</strong></p>
+<ol>
+<li><strong>磁盘读写效率更高</strong><ul>
+<li><code>B+</code> 树的非叶子节点只存索引键和指针，单个节点可以容纳更多索引值，树的高度更低。</li>
+<li>查询时需要从根节点到叶子节点，树高较低意味着磁盘 I/O 次数更少，性能更高。</li>
+</ul>
+</li>
+<li><strong>范围查询更高效</strong><ul>
+<li><code>B+</code> 树的叶子节点通过双向链表连接，范围查询只需定位到范围的起点，然后通过链表顺序扫描即可完成，效率非常高。</li>
+<li><code>B</code> 树没有链表结构，范围查询需要回到上层节点，复杂度更高。</li>
+</ul>
+</li>
+<li><strong>数据顺序性更强</strong><ul>
+<li>所有数据都存储在叶子节点，并按键值顺序排列，这种顺序存储方便支持 <code>ORDER BY</code>、<code>GROUP BY</code> 等操作，而无需额外排序。</li>
+</ul>
+</li>
+<li><strong>占用空间更少</strong><ul>
+<li><code>B+</code> 树非叶子节点不存实际数据，因此整体存储空间更小，可以容纳更多索引，减少磁盘访问次数。</li>
+</ul>
+</li>
+<li><strong>一致的查询路径</strong><ul>
+<li>在 <code>B+</code> 树中，所有查询都会到达叶子节点，而 <code>B</code> 树可能在不同层结束。</li>
+<li>一致的路径方便优化查询逻辑，并简化范围查询的实现。</li>
+</ul>
+</li>
+</ol>
+<p>综上，<code>B+</code> 树通过降低树高、优化范围查询、支持顺序存储等特性，大大提高了 MySQL 的查询效率，相比于 <code>B</code> 树是个更优的选择。</p>
+<h2 id="其他索引"><a href="#其他索引" class="headerlink" title="其他索引"></a>其他索引</h2><h3 id="MyISAM-索引"><a href="#MyISAM-索引" class="headerlink" title="MyISAM 索引"></a>MyISAM 索引</h3><p><code>MyISAM</code> 索引通常与 <code>InnoDB</code> 索引进行对比，如下：</p>
+<ul>
+<li><strong>存储结构与数据存放</strong>：<ul>
+<li><strong>MyISAM：</strong> 数据和索引分别存储在不同的文件中；索引结构一般采用 <code>B-Tree</code>（在本质上也可以认为是 <code>B+</code> 树结构，只是在官方手册或多数资料中常直接称为 <code>B-Tree</code> 索引）。</li>
+<li><strong>InnoDB：</strong> 数据和索引存储在同一表空间中，且采用聚集索引（主键索引）存储数据。</li>
+</ul>
+</li>
+<li><strong>事务支持与锁机制</strong>：<ul>
+<li><strong>MyISAM：</strong> 不支持事务，使用表级锁，适合读多写少的场景。</li>
+<li><strong>InnoDB：</strong> 支持事务、行级锁和外键约束，适用于高并发、事务性要求较高的应用。</li>
+</ul>
+</li>
+<li><strong>全文索引支持</strong>：<ul>
+<li><strong>MyISAM：</strong> 长期支持全文索引。</li>
+<li><strong>InnoDB：</strong> 从 MySQL 5.6 开始也支持全文索引，但在实现细节和性能上有所不同。</li>
+</ul>
+</li>
+</ul>
+<h3 id="哈希索引"><a href="#哈希索引" class="headerlink" title="哈希索引"></a>哈希索引</h3><h4 id="基本特性"><a href="#基本特性" class="headerlink" title="基本特性"></a>基本特性</h4><p>哈希索引是基于哈希表实现的索引结构，查找等值匹配时速度极快。</p>
+<h4 id="使用限制"><a href="#使用限制" class="headerlink" title="使用限制"></a>使用限制</h4><ul>
+<li>仅支持等值查询，不支持范围查询（如 <code>BETWEEN</code>、<code>&lt;</code>、<code>&gt;</code> 等）。</li>
+<li>无法用于排序操作，因为哈希表内部没有顺序性。</li>
+</ul>
+<h4 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h4><p>主要用于 <code>Memory</code> 存储引擎中，对于仅依赖精确匹配的场景非常适合。</p>
+<h3 id="空间索引"><a href="#空间索引" class="headerlink" title="空间索引"></a>空间索引</h3><h4 id="基本特性-1"><a href="#基本特性-1" class="headerlink" title="基本特性"></a>基本特性</h4><p>空间索引主要用于存储和查询地理空间数据（<code>GIS</code> 数据），支持数据类型如 <code>POINT</code>、<code>LINESTRING</code>、<code>POLYGON</code> 等。</p>
+<h4 id="索引结构"><a href="#索引结构" class="headerlink" title="索引结构"></a>索引结构</h4><p>常用 <code>R-Tree</code> 算法来实现，对空间数据进行高效的范围搜索和邻近搜索。</p>
+<h4 id="支持情况"><a href="#支持情况" class="headerlink" title="支持情况"></a>支持情况</h4><ul>
+<li><code>MyISAM</code> 一直支持空间索引。</li>
+<li><code>InnoDB</code> 从较新的版本（如 MySQL 8.0）开始也支持空间索引。</li>
+</ul>
+<h3 id="前缀索引-2"><a href="#前缀索引-2" class="headerlink" title="前缀索引"></a>前缀索引</h3><h4 id="基本特性-2"><a href="#基本特性-2" class="headerlink" title="基本特性"></a>基本特性</h4><p>前缀索引是指只对字符类（如 <code>VARCHAR</code>、<code>TEXT</code>）字段的前若干字符建立索引，而不是整个字段，有助于减少索引占用的存储空间和提高索引构建效率。</p>
+<h4 id="使用限制-1"><a href="#使用限制-1" class="headerlink" title="使用限制"></a>使用限制</h4><ul>
+<li>匹配能力不如全值索引精确，查询时可能需要回表验证。</li>
+<li>在设计时需要平衡前缀长度，既要尽可能覆盖区分性，又要控制索引大小。</li>
+</ul>
+<h3 id="全文索引-1"><a href="#全文索引-1" class="headerlink" title="全文索引"></a>全文索引</h3><h4 id="基本特性-3"><a href="#基本特性-3" class="headerlink" title="基本特性"></a>基本特性</h4><p>全文索引用于对文本内容进行自然语言全文搜索，支持复杂的关键字匹配、布尔搜索等。</p>
+<p>支持情况</p>
+<ul>
+<li><code>MyISAM</code> 一直支持全文索引，适合需要搜索大段文本数据的应用（如博客、论坛等）。</li>
+<li><code>InnoDB</code> 从 MySQL 5.6 起也开始支持全文索引，但其实现和性能特性与 <code>MyISAM</code> 有所不同。</li>
+</ul>
+<h4 id="使用注意"><a href="#使用注意" class="headerlink" title="使用注意"></a>使用注意</h4><p>全文索引更适合非结构化或半结构化的文本搜索，对于结构化数据推荐使用常规 <code>B-Tree</code> 索引。</p>
+<h2 id="索引统计信息"><a href="#索引统计信息" class="headerlink" title="索引统计信息"></a>索引统计信息</h2><h3 id="基本特性-4"><a href="#基本特性-4" class="headerlink" title="基本特性"></a>基本特性</h3><p>MySQL 内部会对每个索引维护统计信息，如基数、分布情况等，这些信息帮助查询优化器选择最优执行计划。</p>
+<h3 id="更新与维护"><a href="#更新与维护" class="headerlink" title="更新与维护"></a>更新与维护</h3><ul>
+<li>数据变动较大时，统计信息可能需要重新计算；可以通过 <code>ANALYZE TABLE table_name</code> 命令手动更新或通过 <code>SHOW INDEX FROM table_name</code> 查看或评估某个索引的基数。</li>
+<li>一般情况下无需手动干预，优化器会自动利用统计信息进行判断。</li>
+</ul>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><p>统计信息不准确可能导致查询优化器选择非最优方案，因此在大批量数据更新后适时更新统计信息是个好习惯。</p>
+<h2 id="索引合并"><a href="#索引合并" class="headerlink" title="索引合并"></a>索引合并</h2><h3 id="基本特性-5"><a href="#基本特性-5" class="headerlink" title="基本特性"></a>基本特性</h3><p>当查询条件中涉及多个不同的索引列时，MySQL 可能采用索引合并（<code>Index Merge</code>）策略，即同时利用多个索引进行过滤，再将结果合并后返回。</p>
+<h3 id="合并方式"><a href="#合并方式" class="headerlink" title="合并方式"></a>合并方式</h3><ul>
+<li><strong>索引交集：</strong> 同时满足多个索引条件的记录。</li>
+<li><strong>索引并集：</strong> 满足任一索引条件的记录，再通过额外过滤得到最终结果。</li>
+</ul>
+<h3 id="使用注意-1"><a href="#使用注意-1" class="headerlink" title="使用注意"></a>使用注意</h3><ul>
+<li>索引合并可以在某些情况下提高查询效率，但也可能引入额外的合并开销。</li>
+<li>优化时需要关注 <code>EXPLAIN</code> 输出，评估是否需要调整索引设计以避免依赖过多的索引合并操作。</li>
+</ul>
+<h2 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a>总结</h2><p>索引既是 MySQL 数据库中提升查询速度的利器，也是一把双刃剑：在查询场景中，合理设计索引能成倍地减少磁盘扫描量，大大加速等值、范围及排序等各类操作；在写入场景中，索引维护会增加额外开销，不当的索引布局反而拖慢插入和更新的性能。掌握索引原理与应用场景，将帮助数据库开发者和运维人员在面对各种复杂查询需求时，找到性能与存储之间的最佳平衡点，为系统提供更卓越的数据处理能力。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/MySQL/">MySQL</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/MySQL/">MySQL</a>
+                    
+                      <a class="hover-with-bg" href="/tags/MySQL%E7%B4%A2%E5%BC%95/">MySQL索引</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/07/11/mysql-sql-optimize/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">MySQL优化</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/05/26/mysql-window-function/">
+                        <span class="hidden-mobile">MySQL窗口函数</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

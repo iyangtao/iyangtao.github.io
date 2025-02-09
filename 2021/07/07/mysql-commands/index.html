@@ -16,12 +16,12 @@
   <meta name="author" content="Yangtao">
   <meta name="keywords" content="">
   
-    <meta name="description" content="引言在数据驱动的应用开发中，数据库管理是核心技能之一。MySQL，作为世界上最受欢迎的关系数据库之一，提供了强大的数据管理能力。掌握MySQL命令不仅可以帮助开发者有效地进行数据库设计和维护，还可以优化数据查询和处理的性能。本文详细介绍了MySQL的各类命令，从数据定义到数据操作，再到事务控制和安全管理，旨在为开发者提供一份全面的MySQL命令手册。 DDL数据库12345678910111213">
+    <meta name="description" content="引言在日常使用 MySQL 数据库时，我们会频繁接触到不同类别的 SQL 命令，如增删改查（DML）、定义和管理数据库对象（DDL）、控制权限（DCL）以及管理事务（TCL）等。除了这些通用的 SQL 语法，MySQL 还提供了一系列针对自身特性的命令和工具，用于执行数据库的优化、备份、恢复、用户管理、数据导入导出以及性能监控等操作。本文将按照常见分类，对 MySQL 中的各类命令进行详细的介绍与">
 <meta property="og:type" content="article">
-<meta property="og:title" content="MySQL常用命令">
+<meta property="og:title" content="MySQL命令详解">
 <meta property="og:url" content="http://example.com/2021/07/07/mysql-commands/index.html">
 <meta property="og:site_name" content="Yangtao&#39;s space">
-<meta property="og:description" content="引言在数据驱动的应用开发中，数据库管理是核心技能之一。MySQL，作为世界上最受欢迎的关系数据库之一，提供了强大的数据管理能力。掌握MySQL命令不仅可以帮助开发者有效地进行数据库设计和维护，还可以优化数据查询和处理的性能。本文详细介绍了MySQL的各类命令，从数据定义到数据操作，再到事务控制和安全管理，旨在为开发者提供一份全面的MySQL命令手册。 DDL数据库12345678910111213">
+<meta property="og:description" content="引言在日常使用 MySQL 数据库时，我们会频繁接触到不同类别的 SQL 命令，如增删改查（DML）、定义和管理数据库对象（DDL）、控制权限（DCL）以及管理事务（TCL）等。除了这些通用的 SQL 语法，MySQL 还提供了一系列针对自身特性的命令和工具，用于执行数据库的优化、备份、恢复、用户管理、数据导入导出以及性能监控等操作。本文将按照常见分类，对 MySQL 中的各类命令进行详细的介绍与">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/mysql.webp">
 <meta property="article:published_time" content="2021-07-07T07:51:23.000Z">
@@ -33,7 +33,7 @@
 <meta name="twitter:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/mysql.webp">
   
   
-  <title>MySQL常用命令 - Yangtao&#39;s space</title>
+  <title>MySQL命令详解 - Yangtao&#39;s space</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
@@ -191,7 +191,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="MySQL常用命令">
+            <span class="h2" id="subtitle" title="MySQL命令详解">
               
             </span>
 
@@ -217,7 +217,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      6.3k 字
+      30k 字
     </span>
   
 
@@ -226,7 +226,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      11 分钟
+      50 分钟
     </span>
   
 
@@ -263,7 +263,7 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">MySQL常用命令</h1>
+            <h1 style="display: none">MySQL命令详解</h1>
             
               <p class="note note-info">
                 
@@ -272,61 +272,1092 @@
               </p>
             
             <div class="markdown-body">
-              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>在数据驱动的应用开发中，数据库管理是核心技能之一。MySQL，作为世界上最受欢迎的关系数据库之一，提供了强大的数据管理能力。掌握MySQL命令不仅可以帮助开发者有效地进行数据库设计和维护，还可以优化数据查询和处理的性能。本文详细介绍了MySQL的各类命令，从数据定义到数据操作，再到事务控制和安全管理，旨在为开发者提供一份全面的MySQL命令手册。</p>
-<h2 id="DDL"><a href="#DDL" class="headerlink" title="DDL"></a>DDL</h2><h3 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h3><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">-- 创建数据库<br>create database 数据库名 [character set 编码] [collate 校对规则] [if not exists 数据库名];<br><br>-- 查看字符集和校对规则<br>show character set;<br><br>-- 查看所有数据库<br>show databases;<br><br>-- 查看数据库的创建信息<br>show create database 数据库名;<br><br>-- 使用数据库<br>use 数据库名;<br><br>-- 查看正在使用的数据库<br>select database();<br><br>-- 修改数据库<br>alter database 数据库名 default character set 编码方式 collate 校对规则;<br><br>-- 删除数据库<br>drop database 数据库名 [if exists 数据库名];<br></code></pre></div></td></tr></table></figure>
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>在日常使用 MySQL 数据库时，我们会频繁接触到不同类别的 SQL 命令，如增删改查（<code>DML</code>）、定义和管理数据库对象（<code>DDL</code>）、控制权限（<code>DCL</code>）以及管理事务（<code>TCL</code>）等。除了这些通用的 SQL 语法，MySQL 还提供了一系列针对自身特性的命令和工具，用于执行数据库的优化、备份、恢复、用户管理、数据导入导出以及性能监控等操作。本文将按照常见分类，对 MySQL 中的各类命令进行详细的介绍与示例说明。</p>
+<h2 id="DDL"><a href="#DDL" class="headerlink" title="DDL"></a>DDL</h2><p>数据定义语言。</p>
+<h3 id="CREATE-DATABASE-创建数据库"><a href="#CREATE-DATABASE-创建数据库" class="headerlink" title="CREATE DATABASE - 创建数据库"></a>CREATE DATABASE - 创建数据库</h3><h4 id="语法格式"><a href="#语法格式" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">CREATE DATABASE [IF NOT EXISTS] database_name<br>    [DEFAULT CHARACTER SET charset_name]<br>    [COLLATE collation_name];<br></code></pre></div></td></tr></table></figure>
 
-<ul>
-<li>编码：utf8mb4、utf8 、GBK等</li>
-<li>校对规则：utf8_general_ci（不区分大小写）、utf8_general_cs（区分大小写）、utf8_bin（二进制）等</li>
+<h4 id="常见参数"><a href="#常见参数" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>IF NOT EXISTS</strong>：如果数据库已存在，则不报错。</li>
+<li><strong>DEFAULT CHARACTER SET</strong>：指定数据库默认字符集。</li>
+<li><strong>COLLATE</strong>：指定字符集对应的校对规则。</li>
 </ul>
-<h3 id="数据表"><a href="#数据表" class="headerlink" title="数据表"></a>数据表</h3><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">-- 创建数据库<br>create table 表名(<br>	字段名 数据类型 完整性约束条件 [character set 字符集名称] [collate 比较规则],<br>	字段名 数据类型 完整性约束条件,<br>	字段名 数据类型 完整性约束条件<br>)engine=存储引擎 auto_incrment=1 default charset=编码方式;<br><br>-- 复制其他库下的表及数据<br>create table 表名<br>as <br>select * from sechema.表名;<br><br>-- 查看数据表<br>show create table 表名;<br>desc 表名;<br><br>-- 查看表的所有列信息<br>show columns from 表名;<br><br>-- 修改表名<br>alter table 表名 rename 新表名;<br><br>-- 修改字段名<br>alter table 表名 change 旧字段名 新字段名 新数据类型;<br><br>-- 修改字段数据类型<br>alter table 表名 modify 字段名 数据类型;<br><br>-- 添加字段<br>alter table 表名 add 字段名 数据类型 [约束条件] [first/after已存在字段名];<br><br>-- 删除字段<br>alter table 表名 drop 字段名;<br><br>-- 修改字段排列位置<br>alter table 表名 modify 字段名1 数据类型 first/after 字段名2;<br><br>-- 添加外键<br>alter table 表名 add constraint [外键名] foreign key(主表字段) references 外表表名(字段名);<br><br>-- 删除外键<br>alter table 表名 drop foreign key 外键名;<br><br>-- 查看表状态<br>show table status like &#x27;表名&#x27;;<br>show table status from 数据库名 like &#x27;表名&#x27;;<br><br>-- 清空表<br>truncate table 表名;<br><br>-- 查看表的约束<br>select * from information_schema.table_constraints where table_name = &#x27;表名称&#x27;;<br></code></pre></div></td></tr></table></figure>
+<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">CREATE DATABASE IF NOT EXISTS mydb<br>    DEFAULT CHARACTER SET utf8mb4<br>    COLLATE utf8mb4_general_ci;<br></code></pre></div></td></tr></table></figure>
 
-<ul>
-<li>数据类型<ul>
-<li>整数型：TINYINT、SMALLINT、MEDIUMINT、**<code>INT</code>**、BIGINT</li>
-<li>浮点型：FLOAT、DOUBLE</li>
-<li>定点数：**<code>DECIMAL</code>**</li>
-<li>逻辑型：BIT</li>
-<li>日期型：YEAR、TIME、DATE、DATETIME、**<code>TIMESTAMP</code>**</li>
-<li>文本型：CHAR、**<code>VARCHAR</code>**、TINYTEXT、TEXT、MEDIUMTEXT、LONGTEXT</li>
-<li>枚举型：ENUM</li>
-<li>集合型：SET</li>
-<li>二进制字符串：BINARY、VARBINARY、TINYBLOG、BLOG、MEDIUMBLOB、LONGBLOB</li>
-<li>其他…</li>
+<h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>数据库名不能与已有的数据库重复（使用 <code>IF NOT EXISTS</code> 可避免错误）。</li>
+<li>修改数据库默认字符集和校对规则只影响新建的数据表，已存在的表不会更改。</li>
+<li>执行该命令需要相应的权限（如 <code>CREATE</code> 权限）。</li>
+</ul>
+<h3 id="DROP-DATABASE-删除数据库"><a href="#DROP-DATABASE-删除数据库" class="headerlink" title="DROP DATABASE - 删除数据库"></a>DROP DATABASE - 删除数据库</h3><h4 id="语法格式-1"><a href="#语法格式-1" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">DROP DATABASE [IF EXISTS] database_name;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-1"><a href="#常见参数-1" class="headerlink" title="常见参数"></a><strong>常见参数</strong></h4><ul>
+<li><strong>IF EXISTS</strong>：如果数据库不存在，则不报错。</li>
+</ul>
+<h4 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a><strong>示例</strong></h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">DROP DATABASE IF EXISTS mydb;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-1"><a href="#注意事项-1" class="headerlink" title="注意事项"></a><strong>注意事项</strong></h4><ul>
+<li>删除数据库会同时删除该数据库中的所有数据和对象，操作不可逆。</li>
+<li>建议在删除前先备份数据，避免误删。</li>
+<li>执行该命令需要相应的权限（如 <code>DROP</code> 权限）。</li>
+</ul>
+<h3 id="ALTER-DATABASE-修改数据库属性"><a href="#ALTER-DATABASE-修改数据库属性" class="headerlink" title="ALTER DATABASE - 修改数据库属性"></a>ALTER DATABASE - 修改数据库属性</h3><h4 id="语法格式-2"><a href="#语法格式-2" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">ALTER DATABASE database_name<br>    [DEFAULT CHARACTER SET charset_name]<br>    [COLLATE collation_name];<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-2"><a href="#常见参数-2" class="headerlink" title="常见参数"></a><strong>常见参数</strong></h4><ul>
+<li><strong>DEFAULT CHARACTER SET</strong>：修改数据库的默认字符集。</li>
+<li><strong>COLLATE</strong>：修改数据库的校对规则。</li>
+</ul>
+<h4 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">ALTER DATABASE mydb<br>    DEFAULT CHARACTER SET utf8<br>    COLLATE utf8_general_ci;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-2"><a href="#注意事项-2" class="headerlink" title="注意事项"></a><strong>注意事项</strong></h4><ul>
+<li>该命令主要用于修改数据库的默认设置，对已存在的表不会产生直接影响。</li>
+<li>修改字符集和校对规则时需谨慎，避免数据出现编码问题。</li>
+<li>执行该命令需要相应的权限。</li>
+</ul>
+<h3 id="CREATE-TABLE-创建数据表"><a href="#CREATE-TABLE-创建数据表" class="headerlink" title="CREATE TABLE - 创建数据表"></a>CREATE TABLE - 创建数据表</h3><h4 id="语法格式-3"><a href="#语法格式-3" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">CREATE TABLE [IF NOT EXISTS] table_name (<br>    column1 datatype [column_constraint],<br>    column2 datatype [column_constraint],<br>    ...<br>    [table_constraint]<br>) [table_options];<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-3"><a href="#常见参数-3" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>IF NOT EXISTS</strong>：如果表已存在，则不报错。</li>
+<li><strong>datatype、constraint</strong>：数据类型和约束。</li>
+<li><strong>table_options</strong>：如 <code>ENGINE</code>、<code>DEFAULT CHARSET</code> 等选项。</li>
+</ul>
+<h4 id="示例-3"><a href="#示例-3" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">CREATE TABLE IF NOT EXISTS users (<br>    id INT AUTO_INCREMENT PRIMARY KEY,<br>    name VARCHAR(50) NOT NULL,<br>    age INT,<br>    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP<br>) ENGINE=InnoDB DEFAULT CHARSET=utf8;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-3"><a href="#注意事项-3" class="headerlink" title="注意事项"></a><strong>注意事项</strong></h4><ul>
+<li>表名和字段名建议遵循命名规范，避免使用 <code>MySQL</code> 保留关键字。</li>
+<li>选择合适的数据类型和存储引擎，能提高性能。</li>
+<li>确保设计的主键、索引满足查询需求。</li>
+</ul>
+<h3 id="DROP-TABLE-删除数据表"><a href="#DROP-TABLE-删除数据表" class="headerlink" title="DROP TABLE - 删除数据表"></a>DROP TABLE - 删除数据表</h3><h4 id="语法格式-4"><a href="#语法格式-4" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">DROP</span> <span class="hljs-keyword">TABLE</span> [IF <span class="hljs-keyword">EXISTS</span>] table_name [, table_name2, ...];<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-4"><a href="#常见参数-4" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>IF EXISTS</strong>：如果表不存在，则不报错。</li>
+</ul>
+<h4 id="示例-4"><a href="#示例-4" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">DROP TABLE IF EXISTS users;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-4"><a href="#注意事项-4" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>删除表会同时删除表中的所有数据和结构，操作不可逆。</li>
+<li>建议在删除前备份重要数据。</li>
+<li>执行该命令需要有 <code>DROP</code> 权限。</li>
+</ul>
+<h3 id="ALTER-TABLE-修改表结构"><a href="#ALTER-TABLE-修改表结构" class="headerlink" title="ALTER TABLE - 修改表结构"></a>ALTER TABLE - 修改表结构</h3><h4 id="语法格式-5"><a href="#语法格式-5" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">ALTER TABLE table_name<br>    alteration_action [, alteration_action2, ...];<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数及操作"><a href="#常见参数及操作" class="headerlink" title="常见参数及操作"></a>常见参数及操作</h4><ul>
+<li><p><strong>ADD COLUMN</strong>：添加新列</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">ALTER TABLE table_name ADD COLUMN column_name datatype [constraint];<br></code></pre></div></td></tr></table></figure></li>
+<li><p><strong>DROP COLUMN</strong>：删除已有列</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">ALTER TABLE table_name DROP COLUMN column_name;<br></code></pre></div></td></tr></table></figure></li>
+<li><p><strong>MODIFY COLUMN</strong>：修改列的数据类型或约束</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">ALTER TABLE table_name MODIFY COLUMN column_name new_datatype [new_constraint];<br></code></pre></div></td></tr></table></figure></li>
+<li><p><strong>CHANGE COLUMN</strong>：重命名列并修改数据类型</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">ALTER TABLE table_name CHANGE COLUMN old_name new_name new_datatype [constraint];<br></code></pre></div></td></tr></table></figure></li>
+<li><p><strong>ADD INDEX/PRIMARY KEY</strong>：添加索引或主键</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">ALTER TABLE table_name ADD INDEX IDX_X;<br></code></pre></div></td></tr></table></figure></li>
+<li><p><strong>DROP INDEX/PRIMARY KEY</strong>：删除索引或主键</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">ALTER TABLE table_name DROP INDEX IDX_X;<br></code></pre></div></td></tr></table></figure></li>
+<li><p><strong>RENAME INDEX</strong>：重命名索引（MySQL 8.0 及以上）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">ALTER TABLE table_name RENAME INDEX old_index_name TO new_index_name;<br></code></pre></div></td></tr></table></figure></li>
+</ul>
+<h4 id="示例-5"><a href="#示例-5" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql"># 添加新列<br>ALTER TABLE users ADD COLUMN email VARCHAR(100) NOT NULL;<br><br># 修改列数据类型<br>ALTER TABLE users MODIFY COLUMN age SMALLINT;<br><br># 重命名列并修改类型<br>ALTER TABLE users CHANGE COLUMN name username VARCHAR(60) NOT NULL;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-5"><a href="#注意事项-5" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><code>ALTER</code> 操作可能会锁定表，影响并发性能，建议在低峰期操作。</li>
+<li>修改列的类型时要确保新数据类型兼容已有数据，避免数据丢失。</li>
+<li>某些 <code>ALTER</code> 操作可能无法撤销，操作前建议备份数据。</li>
+<li>若需要修改索引的列或类型，建议先 <code>DROP</code> 索引，再重新 <code>CREATE</code> 新索引。</li>
+</ul>
+<h3 id="TRUNCATE-TABLE-清空表数据"><a href="#TRUNCATE-TABLE-清空表数据" class="headerlink" title="TRUNCATE TABLE - 清空表数据"></a>TRUNCATE TABLE - 清空表数据</h3><h4 id="语法格式-6"><a href="#语法格式-6" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">TRUNCATE TABLE table_name;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-5"><a href="#常见参数-5" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li>该命令没有其他参数，直接指定需要清空数据的表。</li>
+</ul>
+<h4 id="示例-6"><a href="#示例-6" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">TRUNCATE TABLE users;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-6"><a href="#注意事项-6" class="headerlink" title="注意事项"></a><strong>注意事项</strong></h4><ul>
+<li><code>TRUNCATE TABLE</code> 会快速删除所有记录，并重置 <code>AUTO_INCREMENT</code> 计数器。</li>
+<li>与 <code>DELETE</code> 不同，<code>TRUNCATE</code> 通常不能被回滚（依赖存储引擎），操作不可逆。</li>
+<li>执行该命令需要相应的权限，同时要谨慎使用以免误删数据。</li>
+</ul>
+<h3 id="CREATE-INDEX-创建索引"><a href="#CREATE-INDEX-创建索引" class="headerlink" title="CREATE INDEX - 创建索引"></a>CREATE INDEX - 创建索引</h3><h4 id="语法格式-7"><a href="#语法格式-7" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">CREATE [UNIQUE] INDEX index_name<br>ON table_name (column1 [ASC|DESC], column2 [ASC|DESC], ...);<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-6"><a href="#常见参数-6" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>UNIQUE</strong>：创建唯一索引，保证索引列中所有值唯一。</li>
+<li><strong>ASC/DESC</strong>：指定列的排序顺序（默认通常为 <code>ASC</code>）。</li>
+<li><strong>USING BTREE/FULLTEXT/HASH</strong>：指定索引类型，可根据存储引擎支持情况决定。</li>
+</ul>
+<h4 id="示例-7"><a href="#示例-7" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">CREATE INDEX idx_username ON users (username);<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-7"><a href="#注意事项-7" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>索引能提高查询性能，但过多或不合理的索引会影响写操作（如 <code>INSERT</code>、<code>UPDATE</code>、<code>DELETE</code>）的效率。</li>
+<li>在创建唯一索引时，要确保数据中没有重复值，否则会导致创建失败。</li>
+<li>部分存储引擎支持的索引类型有限，需参考具体引擎文档。</li>
+</ul>
+<h3 id="DROP-INDEX-删除索引"><a href="#DROP-INDEX-删除索引" class="headerlink" title="DROP INDEX - 删除索引"></a>DROP INDEX - 删除索引</h3><h4 id="语法格式-8"><a href="#语法格式-8" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">DROP INDEX index_name ON table_name;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-7"><a href="#常见参数-7" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li>需要指定 <code>index_name</code> 及其所在的 <code>table_name</code>。</li>
+</ul>
+<h4 id="示例-8"><a href="#示例-8" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">DROP INDEX idx_username ON users;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-8"><a href="#注意事项-8" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>删除索引会影响查询优化计划，操作前应评估索引对系统性能的影响。</li>
+<li>删除索引不会影响表中实际数据，但可能影响外键约束（如涉及唯一性要求时）。</li>
+</ul>
+<h3 id="CREATE-VIEW-创建视图"><a href="#CREATE-VIEW-创建视图" class="headerlink" title="CREATE VIEW - 创建视图"></a>CREATE VIEW - 创建视图</h3><h4 id="语法格式-9"><a href="#语法格式-9" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">CREATE [OR REPLACE] [ALGORITHM = &#123;UNDEFINED | MERGE | TEMPTABLE&#125;]<br>VIEW view_name [(column_list)]<br>AS select_statement<br>[WITH [CASCADED | LOCAL] CHECK OPTION];<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-8"><a href="#常见参数-8" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>OR REPLACE</strong>：如果视图已存在，则替换原视图定义。</li>
+<li><strong>ALGORITHM</strong>：指定视图处理算法，常用值包括 MERGE（将视图查询合并到主查询中）和 <code>TEMPTABLE</code>（使用临时表存储中间结果）。</li>
+<li><strong>column_list</strong>：定义视图中各列的名称（可选，如果不指定则使用查询中返回的列名）。</li>
+<li><strong>WITH [CASCADED | LOCAL] CHECK OPTION</strong>：用于限制通过视图插入或更新数据时，必须满足视图定义的条件。</li>
+</ul>
+<h4 id="示例-9"><a href="#示例-9" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">CREATE VIEW user_view AS<br>SELECT id, username, email<br>FROM users<br>WHERE status = &#x27;active&#x27;;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-9"><a href="#注意事项-9" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>视图本质上是存储的查询语句，不存储实际数据，修改视图后，查询结果会实时反映最新数据。</li>
+<li>使用 <code>CHECK OPTION</code> 可防止插入不符合视图条件的数据，但要注意级联（<code>CASCADED</code>）和本地（<code>LOCAL</code>）选项的差异。</li>
+<li>部分复杂视图（如包含聚合、子查询、联接等）可能会受到更新限制。</li>
+</ul>
+<h3 id="DROP-VIEW-删除视图"><a href="#DROP-VIEW-删除视图" class="headerlink" title="DROP VIEW - 删除视图"></a>DROP VIEW - 删除视图</h3><h4 id="语法格式-10"><a href="#语法格式-10" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">DROP VIEW [IF EXISTS] view_name [, view_name2, ...];<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-9"><a href="#常见参数-9" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>IF EXISTS</strong>：如果视图不存在，则不报错，可同时删除多个视图。</li>
+</ul>
+<h4 id="示例-10"><a href="#示例-10" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">DROP VIEW IF EXISTS user_view;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-10"><a href="#注意事项-10" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>删除视图只会移除视图定义，不会删除视图所引用的底层数据表。</li>
+<li>视图被其他对象（如存储过程）引用时，删除前需评估可能带来的影响。</li>
+</ul>
+<h3 id="ALTER-VIEW-修改视图"><a href="#ALTER-VIEW-修改视图" class="headerlink" title="ALTER VIEW - 修改视图"></a>ALTER VIEW - 修改视图</h3><h4 id="语法格式-11"><a href="#语法格式-11" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">ALTER VIEW view_name<br>AS select_statement<br>[WITH [CASCADED | LOCAL] CHECK OPTION];<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-10"><a href="#常见参数-10" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li>参数基本与 <code>CREATE VIEW</code> 类似，主要用于修改视图的查询定义。</li>
+<li>可使用 <code>WITH CHECK OPTION</code> 限制通过视图进行数据操作时的数据有效性。</li>
+</ul>
+<h4 id="示例-11"><a href="#示例-11" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">ALTER VIEW user_view AS<br>SELECT id, username, email, created_at<br>FROM users<br>WHERE status = &#x27;active&#x27;<br>WITH CHECK OPTION;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-11"><a href="#注意事项-11" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><code>ALTER VIEW</code> 会完全替换原有的视图定义，因此修改时应确保新定义与业务逻辑一致。</li>
+<li>对于某些复杂视图，修改后可能导致权限、依赖关系或更新限制等问题，需要额外验证。</li>
+<li>视图的更新性受限于其查询定义，若包含多表联接、聚合等，可能会导致视图不可更新。</li>
+</ul>
+<h3 id="CREATE-TRIGGER-创建触发器"><a href="#CREATE-TRIGGER-创建触发器" class="headerlink" title="CREATE TRIGGER - 创建触发器"></a>CREATE TRIGGER - 创建触发器</h3><h4 id="语法格式-12"><a href="#语法格式-12" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">CREATE TRIGGER trigger_name<br>    &#123;BEFORE | AFTER&#125; &#123;INSERT | UPDATE | DELETE&#125;<br>    ON table_name<br>    FOR EACH ROW<br>    trigger_body<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-11"><a href="#常见参数-11" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>触发时间</strong>：<code>BEFORE</code> 或 <code>AFTER</code>，决定触发器在操作前还是操作后执行。</li>
+<li><strong>触发事件</strong>：<code>INSERT</code>、<code>UPDATE</code> 或 <code>DELETE</code>，指定触发器响应的数据修改操作。</li>
+<li><strong>FOR EACH ROW</strong>：<code>MySQL</code> 只支持逐行触发器，必须为每一行操作执行触发器体。</li>
+<li><strong>trigger_body</strong>：可以是一个简单的 SQL 语句或一个包含多条 SQL 语句的 <code>BEGIN...END</code> 块。</li>
+</ul>
+<h4 id="示例-12"><a href="#示例-12" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">CREATE TRIGGER before_insert_users<br>BEFORE INSERT ON users<br>FOR EACH ROW<br>SET NEW.created_at = NOW();<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-12"><a href="#注意事项-12" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>每个表每个操作（<code>INSERT</code>、<code>UPDATE</code>、<code>DELETE</code>）只能有一个触发器。</li>
+<li>触发器中的操作要尽量保持简单，以免影响数据修改性能。</li>
+<li>触发器在执行过程中出现错误会导致原始操作失败，需谨慎调试和使用。</li>
+</ul>
+<h3 id="DROP-TRIGGER-删除触发器"><a href="#DROP-TRIGGER-删除触发器" class="headerlink" title="DROP TRIGGER - 删除触发器"></a>DROP TRIGGER - 删除触发器</h3><h4 id="语法格式-13"><a href="#语法格式-13" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">DROP TRIGGER [IF EXISTS] [schema_name.]trigger_name;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-12"><a href="#常见参数-12" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>IF EXISTS</strong>：如果触发器不存在则不报错。</li>
+<li>可通过指定 <code>schema_name</code> 来明确触发器所属的数据库。</li>
+</ul>
+<h4 id="示例-13"><a href="#示例-13" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">DROP TRIGGER IF EXISTS before_insert_users;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-13"><a href="#注意事项-13" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>删除触发器将移除与之绑定的自动执行逻辑，操作不可逆。</li>
+<li>执行该命令需要相应的权限。</li>
+</ul>
+<h3 id="CREATE-PROCEDURE-创建存储过程"><a href="#CREATE-PROCEDURE-创建存储过程" class="headerlink" title="CREATE PROCEDURE - 创建存储过程"></a>CREATE PROCEDURE - 创建存储过程</h3><h4 id="语法格式-14"><a href="#语法格式-14" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">DELIMITER //<br>CREATE PROCEDURE procedure_name ([IN|OUT|INOUT] param1 datatype, ...)<br>BEGIN<br>    -- SQL 语句块<br>    statement;<br>    ...<br>END //<br>DELIMITER ;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-13"><a href="#常见参数-13" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>参数类型</strong>：<code>IN</code>（输入参数）、<code>OUT</code>（输出参数）、<code>INOUT</code>（输入输出参数）。</li>
+<li><strong>语句块</strong>：通常使用 <code>BEGIN ... END</code> 包含多条 <code>SQL</code> 语句。</li>
+<li>需更改定界符（<code>DELIMITER</code>）以避免与存储过程内的语句结束符冲突。</li>
+</ul>
+<h4 id="示例-14"><a href="#示例-14" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">DELIMITER //<br>CREATE PROCEDURE sp_get_users()<br>BEGIN<br>    SELECT * FROM users;<br>END //<br>DELIMITER ;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-14"><a href="#注意事项-14" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>存储过程不会直接返回结果集，而是通过 <code>SELECT</code> 语句或输出参数传递数据。</li>
+<li>调用时需要使用 <code>CALL procedure_name();</code>。</li>
+<li>需要确保过程内的逻辑正确，避免影响事务和并发性能。</li>
+</ul>
+<h3 id="DROP-PROCEDURE-删除存储过程"><a href="#DROP-PROCEDURE-删除存储过程" class="headerlink" title="DROP PROCEDURE - 删除存储过程"></a>DROP PROCEDURE - 删除存储过程</h3><h4 id="语法格式-15"><a href="#语法格式-15" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">DROP PROCEDURE [IF EXISTS] procedure_name;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-14"><a href="#常见参数-14" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>IF EXISTS</strong>：如果存储过程不存在，则不报错。</li>
+</ul>
+<h4 id="示例-15"><a href="#示例-15" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">DROP PROCEDURE IF EXISTS sp_get_users;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-15"><a href="#注意事项-15" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>删除存储过程后，依赖该过程的业务逻辑将失效，操作前应确认。</li>
+<li>需要相应的权限才能删除存储过程。</li>
+</ul>
+<h3 id="CREATE-FUNCTION-创建用户自定义函数"><a href="#CREATE-FUNCTION-创建用户自定义函数" class="headerlink" title="CREATE FUNCTION - 创建用户自定义函数"></a>CREATE FUNCTION - 创建用户自定义函数</h3><h4 id="语法格式-16"><a href="#语法格式-16" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">DELIMITER //<br>CREATE FUNCTION function_name ([IN] param1 datatype, ...)<br>RETURNS return_data_type<br>    [characteristic ...]<br>BEGIN<br>    -- SQL 语句块<br>    RETURN expression;<br>END //<br>DELIMITER ;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-15"><a href="#常见参数-15" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>参数</strong>：函数通常只支持 <code>IN</code> 参数。</li>
+<li><strong>RETURNS</strong>：必须定义返回值的数据类型。</li>
+<li><strong>characteristic</strong>：可选特性如 <code>DETERMINISTIC</code>、<code>NO SQL</code>、<code>READS SQL DATA</code> 等，用以描述函数的行为和优化器提示。</li>
+</ul>
+<h4 id="示例-16"><a href="#示例-16" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">DELIMITER //<br>CREATE FUNCTION get_full_name(first_name VARCHAR(50), last_name VARCHAR(50))<br>RETURNS VARCHAR(101)<br>DETERMINISTIC<br>BEGIN<br>    RETURN CONCAT(first_name, &#x27; &#x27;, last_name);<br>END //<br>DELIMITER ;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-16"><a href="#注意事项-16" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>用户自定义函数（<code>UDF</code>）可以在 SQL 语句中调用，但需保证逻辑简单且执行效率高。</li>
+<li>函数必须返回一个值，且返回类型不可省略。</li>
+<li>权限要求较高，需确保用户有创建函数的权限。</li>
+</ul>
+<h3 id="DROP-FUNCTION-删除用户自定义函数"><a href="#DROP-FUNCTION-删除用户自定义函数" class="headerlink" title="DROP FUNCTION - 删除用户自定义函数"></a>DROP FUNCTION - 删除用户自定义函数</h3><h4 id="语法格式-17"><a href="#语法格式-17" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">DROP FUNCTION [IF EXISTS] function_name;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-16"><a href="#常见参数-16" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>IF EXISTS</strong>：如果函数不存在，则不报错。</li>
+</ul>
+<h4 id="示例-17"><a href="#示例-17" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">DROP FUNCTION IF EXISTS get_full_name;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-17"><a href="#注意事项-17" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>删除函数后，所有调用该函数的 SQL 语句可能会失效。</li>
+<li>需确认无业务依赖后再执行删除操作。</li>
+</ul>
+<h3 id="CREATE-EVENT-创建事件"><a href="#CREATE-EVENT-创建事件" class="headerlink" title="CREATE EVENT - 创建事件"></a>CREATE EVENT - 创建事件</h3><h4 id="语法格式-18"><a href="#语法格式-18" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">CREATE EVENT [IF NOT EXISTS] event_name<br>ON SCHEDULE &#123;AT timestamp | EVERY interval [STARTS timestamp] [ENDS timestamp]&#125;<br>[ON COMPLETION [NOT] PRESERVE]<br>[ENABLE | DISABLE]<br>DO<br>event_body;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-17"><a href="#常见参数-17" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>ON SCHEDULE</strong>：指定事件的调度方式，可以是单次执行（<code>AT</code>）或周期性执行（<code>EVERY</code>）。</li>
+<li><strong>STARTS/ENDS</strong>：定义周期性事件的起始和结束时间。</li>
+<li><strong>ON COMPLETION [NOT] PRESERVE</strong>：决定事件执行完毕后是否保留事件信息（默认一次性事件在执行后会被删除）。</li>
+<li><strong>ENABLE/DISABLE</strong>：控制事件是否启用。</li>
+</ul>
+<h4 id="示例-18"><a href="#示例-18" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">CREATE EVENT IF NOT EXISTS cleanup_event<br>ON SCHEDULE EVERY 1 DAY<br>DO<br>DELETE FROM logs WHERE log_date &lt; NOW() - INTERVAL 30 DAY;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-18"><a href="#注意事项-18" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>必须启用事件调度器（<code>SET GLOBAL event_scheduler = ON;</code>）才能使事件生效。</li>
+<li>周期性事件需要合理设置时间范围和间隔，避免对系统性能造成过大影响。</li>
+<li>事件执行后可能影响数据，建议在生产环境前充分测试。</li>
+</ul>
+<h3 id="DROP-EVENT-删除事件"><a href="#DROP-EVENT-删除事件" class="headerlink" title="DROP EVENT - 删除事件"></a>DROP EVENT - 删除事件</h3><h4 id="语法格式-19"><a href="#语法格式-19" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">DROP EVENT [IF EXISTS] event_name;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-18"><a href="#常见参数-18" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>IF EXISTS</strong>：如果事件不存在则不报错。</li>
+</ul>
+<h4 id="示例-19"><a href="#示例-19" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">DROP EVENT IF EXISTS cleanup_event;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-19"><a href="#注意事项-19" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>删除事件将停止定时任务，不再自动执行预定操作。</li>
+<li>操作前应确认事件不再需要或已迁移至其他机制中。</li>
+</ul>
+<h2 id="DML"><a href="#DML" class="headerlink" title="DML"></a>DML</h2><p>数据库操作语言，主要用于操作数据表。</p>
+<h3 id="INSERT-INTO-插入数据"><a href="#INSERT-INTO-插入数据" class="headerlink" title="INSERT INTO - 插入数据"></a>INSERT INTO - 插入数据</h3><h4 id="语法格式-20"><a href="#语法格式-20" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql"># 单条插入<br>INSERT [LOW_PRIORITY | DELAYED] [IGNORE]<br>INTO table_name<br>SET column1 = value1[, (column2 = value2), ...];<br><br># 批量插入<br>INSERT [LOW_PRIORITY | DELAYED] [IGNORE]<br>INTO table_name [(column1, column2, ...)]<br>VALUES (value1, value2, ...)[, (value1, value2, ...)], ...;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-19"><a href="#常见参数-19" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>LOW_PRIORITY</strong>：在没有其他读取操作时再执行插入。</li>
+<li><strong>DELAYED</strong>：将插入操作延迟执行（注意：该选项在新版本中已不推荐使用）。</li>
+<li><strong>IGNORE</strong>：在遇到错误（如主键冲突）时跳过出错的行，而非终止整个操作。</li>
+</ul>
+<h4 id="示例-20"><a href="#示例-20" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">INSERT INTO users<br>SET username = &#x27;alice&#x27;, email = &#x27;alice@example.com&#x27;, age = 25;<br><br>INSERT INTO users (username, email, age)<br>VALUES (&#x27;alice&#x27;, &#x27;alice@example.com&#x27;, 25),<br>       (&#x27;bob&#x27;, &#x27;bob@example.com&#x27;, 30);<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-20"><a href="#注意事项-20" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>如果不指定列名，则要求所有列都必须按表的列顺序提供值。</li>
+<li>使用 <code>IGNORE</code> 可避免因重复键值导致整个语句失败，但也可能隐藏数据异常。</li>
+<li>插入大量数据时，可采用批量插入以提高效率。</li>
+</ul>
+<h3 id="UPDATE-修改数据"><a href="#UPDATE-修改数据" class="headerlink" title="UPDATE - 修改数据"></a>UPDATE - 修改数据</h3><h4 id="语法格式-21"><a href="#语法格式-21" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">UPDATE [LOW_PRIORITY] table_name<br>SET column1 = value1, column2 = value2, ...<br>[WHERE condition]<br>[ORDER BY ...]<br>[LIMIT row_count];<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-20"><a href="#常见参数-20" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>LOW_PRIORITY</strong>：延迟更新，待没有读取操作时再执行。</li>
+<li><strong>WHERE</strong>：指定更新条件，避免对所有记录进行修改。</li>
+<li><strong>ORDER BY</strong> 与 <strong>LIMIT</strong>：配合使用时可限制更新的行数及更新顺序。</li>
+</ul>
+<h4 id="示例-21"><a href="#示例-21" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">UPDATE users<br>SET age = age + 1<br>WHERE username = &#x27;alice&#x27;;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-21"><a href="#注意事项-21" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>未加 <code>WHERE</code> 条件时，<code>UPDATE</code> 会作用于所有记录，可能造成数据错误。</li>
+<li>更新过程中建议使用事务管理，确保数据一致性。</li>
+<li>同一表上同时有多个更新操作时，要注意锁机制对并发性能的影响。</li>
+</ul>
+<h3 id="DELETE-FROM-删除数据"><a href="#DELETE-FROM-删除数据" class="headerlink" title="DELETE FROM - 删除数据"></a>DELETE FROM - 删除数据</h3><h4 id="语法格式-22"><a href="#语法格式-22" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">DELETE [LOW_PRIORITY] FROM table_name<br>[WHERE condition]<br>[ORDER BY ...]<br>[LIMIT row_count];<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-21"><a href="#常见参数-21" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>LOW_PRIORITY</strong>：延迟删除操作，待没有读取操作时再执行。</li>
+<li><strong>WHERE</strong>：指定删除条件，避免误删所有记录。</li>
+<li><strong>ORDER BY</strong> 与 <strong>LIMIT</strong>：用于限定删除的记录数及顺序。</li>
+</ul>
+<h4 id="示例-22"><a href="#示例-22" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">DELETE FROM users<br>WHERE age &lt; 18;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-22"><a href="#注意事项-22" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>同 <code>UPDATE</code> 一样，缺少 <code>WHERE</code> 条件会删除表中所有记录。</li>
+<li>对大表执行 <code>DELETE</code> 操作时，可能会锁表或导致性能问题，必要时可分批删除。</li>
+<li>删除操作建议做好数据备份以防误删。</li>
+</ul>
+<h3 id="REPLACE-INTO-插入数据"><a href="#REPLACE-INTO-插入数据" class="headerlink" title="REPLACE INTO - 插入数据"></a>REPLACE INTO - 插入数据</h3><h4 id="语法格式-23"><a href="#语法格式-23" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">REPLACE [LOW_PRIORITY] INTO table_name [(column1, column2, ...)]<br>VALUES (value1, value2, ...)[, (value1, value2, ...)], ...;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-22"><a href="#常见参数-22" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li>与 <code>INSERT</code> 类似，但 <code>REPLACE</code> 语句在遇到主键或唯一索引冲突时会先删除旧记录，再插入新记录。</li>
+</ul>
+<h4 id="示例-23"><a href="#示例-23" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">REPLACE INTO users (id, username, email)<br>VALUES (1, &#x27;alice&#x27;, &#x27;alice_new@example.com&#x27;);<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-23"><a href="#注意事项-23" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><code>REPLACE</code> 的执行过程先执行删除操作，再插入新记录，因此可能引起触发器执行、外键约束及自动递增值重置等问题。</li>
+<li>对于需要更新部分字段的场景，推荐使用 <code>INSERT ... ON DUPLICATE KEY UPDATE</code> 语法以减少副作用。</li>
+<li><code>REPLACE</code> 操作可能导致删除记录的副作用（例如级联删除）。</li>
+</ul>
+<h3 id="INSERT-INTO-…-SELECT-查询并插入"><a href="#INSERT-INTO-…-SELECT-查询并插入" class="headerlink" title="INSERT INTO … SELECT - 查询并插入"></a>INSERT INTO … SELECT - 查询并插入</h3><h4 id="语法格式-24"><a href="#语法格式-24" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">INSERT [LOW_PRIORITY | IGNORE] INTO target_table [(column1, column2, ...)]<br>SELECT expression1, expression2, ...<br>FROM source_table<br>[WHERE condition];<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-23"><a href="#常见参数-23" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>IGNORE</strong>：忽略因数据冲突引起的错误。</li>
+<li><strong>WHERE</strong>：筛选需要插入的数据行。</li>
+</ul>
+<h4 id="示例-24"><a href="#示例-24" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">INSERT INTO backup_users (username, email, age)<br>SELECT username, email, age<br>FROM users<br>WHERE created_at &lt; &#x27;2022-01-01&#x27;;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-24"><a href="#注意事项-24" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>源表和目标表的字段对应和数据类型要匹配。</li>
+<li><code>INSERT INTO ... SELECT</code> 常用于数据迁移和备份，操作前建议确认数据一致性。</li>
+<li>如果目标表存在约束（如唯一性约束），可能导致部分行插入失败。</li>
+</ul>
+<h3 id="LOAD-DATA-INFILE-批量导入数据"><a href="#LOAD-DATA-INFILE-批量导入数据" class="headerlink" title="LOAD DATA INFILE - 批量导入数据"></a>LOAD DATA INFILE - 批量导入数据</h3><h4 id="语法格式-25"><a href="#语法格式-25" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">LOAD DATA [LOW_PRIORITY | CONCURRENT] [LOCAL] INFILE &#x27;file_name&#x27;<br>[REPLACE | IGNORE]<br>INTO TABLE table_name<br>[CHARACTER SET charset_name]<br>[FIELDS<br>    [TERMINATED BY &#x27;string&#x27;]<br>    [OPTIONALLY] ENCLOSED BY &#x27;char&#x27;<br>    [ESCAPED BY &#x27;char&#x27;]<br>]<br>[LINES<br>    [STARTING BY &#x27;string&#x27;]<br>    [TERMINATED BY &#x27;string&#x27;]<br>]<br>[IGNORE number LINES]<br>[(column1, column2, ...)];<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-24"><a href="#常见参数-24" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>LOCAL</strong>：文件位于客户端而非服务器。</li>
+<li><strong>REPLACE/IGNORE</strong>：指定遇到重复记录时的处理方式。</li>
+<li><strong>CHARACTER SET</strong>：指定文件的字符集。</li>
+<li><strong>FIELDS 和 LINES</strong>：定义字段和行的分隔符、包围符及转义字符。</li>
+<li><strong>IGNORE n LINES</strong>：跳过文件开头的 n 行数据（如标题行）。</li>
+</ul>
+<h4 id="示例-25"><a href="#示例-25" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">LOAD DATA LOCAL INFILE &#x27;/path/to/data.csv&#x27;<br>INTO TABLE users<br>CHARACTER SET utf8mb4<br>FIELDS TERMINATED BY &#x27;,&#x27; ENCLOSED BY &#x27;&quot;&#x27;<br>LINES TERMINATED BY &#x27;\n&#x27;<br>IGNORE 1 LINES;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-25"><a href="#注意事项-25" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>使用 <code>LOAD DATA INFILE</code> 时需确认文件权限及路径正确，MySQL 服务器需要有读取该文件的权限。</li>
+<li>不同平台的换行符可能不同，需根据实际情况调整 <code>LINES TERMINATED BY</code> 的参数。</li>
+<li>若数据中含有特殊字符，注意转义设置，确保数据正确导入。</li>
+</ul>
+<h2 id="DQL"><a href="#DQL" class="headerlink" title="DQL"></a>DQL</h2><p>数据查询语言。</p>
+<h3 id="SELECT-查询数据"><a href="#SELECT-查询数据" class="headerlink" title="SELECT - 查询数据"></a>SELECT - 查询数据</h3><h4 id="语法格式-26"><a href="#语法格式-26" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT [ALL | DISTINCT] select_expr [, select_expr ...]<br>FROM table_reference<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-25"><a href="#常见参数-25" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>ALL</strong>：默认，返回所有记录（包括重复值）。</li>
+<li><strong>DISTINCT</strong>：用于去除重复行（见下一部分说明）。</li>
+<li><strong>select_expr</strong>：可以是一个或多个列、表达式，甚至是函数计算的结果。</li>
+<li>可选的 FROM，用于进一步限定结果。</li>
+</ul>
+<h4 id="示例-26"><a href="#示例-26" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT id, username, email<br>FROM users;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-26"><a href="#注意事项-26" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>如果省略 <code>FROM</code> 子句，MySQL 允许从表达式（如 <code>SELECT 1+1;</code>）中返回结果。</li>
+<li>根据实际业务需要选择合适的列和子句，避免返回不必要的数据。</li>
+<li>大型查询时注意优化（如使用索引、合理拆分子查询等）。</li>
+</ul>
+<h3 id="DISTINCT-去重查询"><a href="#DISTINCT-去重查询" class="headerlink" title="DISTINCT - 去重查询"></a>DISTINCT - 去重查询</h3><h4 id="语法格式-27"><a href="#语法格式-27" class="headerlink" title="语法格式"></a>语法格式</h4><p>在 <code>SELECT</code> 语句中使用，格式如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT DISTINCT select_expr [, select_expr ...]<br>FROM table_name;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-26"><a href="#常见参数-26" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>DISTINCT</strong>：放在 <code>SELECT</code> 后，用于剔除结果集中的重复记录。</li>
+</ul>
+<h4 id="示例-27"><a href="#示例-27" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT DISTINCT country<br>FROM users;<br></code></pre></div></td></tr></table></figure>
+
+<p>（返回 <code>users</code> 表中不同的 <code>country</code> 值。）</p>
+<h4 id="注意事项-27"><a href="#注意事项-27" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><code>DISTINCT</code> 会对整个结果行进行判断，相比普通 <code>SELECT</code> 会增加额外的排序或去重开销。</li>
+<li>对性能有一定影响，尤其在大数据量查询中，建议仅在必要时使用。</li>
+</ul>
+<h3 id="WHERE-过滤查询条件"><a href="#WHERE-过滤查询条件" class="headerlink" title="WHERE - 过滤查询条件"></a>WHERE - 过滤查询条件</h3><h4 id="语法格式-28"><a href="#语法格式-28" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT columns<br>FROM table_name<br>WHERE condition;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-27"><a href="#常见参数-27" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>condition</strong>：可以包含比较运算符（<code>=</code>、<code>&lt;&gt;</code>、<code>&gt;</code>、<code>&lt;</code>、<code>&gt;=</code>、<code>&lt;=</code>）、逻辑运算符（<code>AND</code>、<code>OR</code>、<code>NOT</code>）、<code>BETWEEN</code>、<code>LIKE</code>、<code>IN</code>、<code>IS NULL</code> 等，用于限定返回的行。</li>
+</ul>
+<h4 id="示例-28"><a href="#示例-28" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT id, username, email<br>FROM users<br>WHERE age &gt;= 18 AND status = &#x27;active&#x27;;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-28"><a href="#注意事项-28" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><code>WHERE</code> 子句过滤的是行数据，在分组（<code>GROUP BY</code>）前执行。</li>
+<li>对涉及大量数据的列，应考虑建立索引以提高过滤效率。</li>
+<li>注意条件中数据类型的匹配和空值的处理。</li>
+</ul>
+<h3 id="ORDER-BY-对查询结果排序"><a href="#ORDER-BY-对查询结果排序" class="headerlink" title="ORDER BY - 对查询结果排序"></a>ORDER BY - 对查询结果排序</h3><h4 id="语法格式-29"><a href="#语法格式-29" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT columns<br>FROM table_name<br>ORDER BY expression [ASC | DESC] [, expression [ASC | DESC] ...];<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-28"><a href="#常见参数-28" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>expression</strong>：可以是列名、表达式或列的别名。</li>
+<li><strong>ASC</strong>（默认）或 <strong>DESC</strong>：指定升序或降序排序。</li>
+</ul>
+<h4 id="示例-29"><a href="#示例-29" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT id, username, created_at<br>FROM users<br>ORDER BY created_at DESC, username ASC;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-29"><a href="#注意事项-29" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>排序会增加额外的处理开销，尤其当数据量大且没有合适的索引时。</li>
+<li>在使用 <code>ORDER BY</code> 时，建议对排序字段建立索引以提高性能。</li>
+<li>排序顺序可以混合使用升序和降序，但要确保逻辑清晰。</li>
+</ul>
+<h3 id="GROUP-BY-对查询结果分组"><a href="#GROUP-BY-对查询结果分组" class="headerlink" title="GROUP BY - 对查询结果分组"></a>GROUP BY - 对查询结果分组</h3><h4 id="语法格式-30"><a href="#语法格式-30" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT columns, aggregate_function(column)<br>FROM table_name<br>WHERE condition<br>GROUP BY expression [, expression ...];<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-29"><a href="#常见参数-29" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>expression</strong>：通常为分组依据的列，可以是单个列或多个列。</li>
+<li>常用聚合函数：如 <code>COUNT</code>、<code>SUM</code>、<code>AVG</code>、<code>MIN</code>、<code>MAX</code> 等，用于对每个分组进行统计计算。</li>
+</ul>
+<h4 id="示例-30"><a href="#示例-30" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT country, COUNT(*) AS user_count<br>FROM users<br>GROUP BY country;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-30"><a href="#注意事项-30" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><code>GROUP BY</code> 在 <code>WHERE</code> 过滤之后、<code>HAVING</code> 过滤之前执行。</li>
+<li><code>SELECT</code> 中的非聚合列必须出现在 <code>GROUP BY</code> 子句中（或者依赖于 MySQL 的扩展特性，但建议遵守标准写法）。</li>
+<li>对分组结果进行排序时，可结合 <code>ORDER BY</code> 使用。</li>
+</ul>
+<h3 id="HAVING-过滤分组后的数据"><a href="#HAVING-过滤分组后的数据" class="headerlink" title="HAVING - 过滤分组后的数据"></a>HAVING - 过滤分组后的数据</h3><h4 id="语法格式-31"><a href="#语法格式-31" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT columns, aggregate_function(column)<br>FROM table_name<br>GROUP BY expression<br>HAVING aggregate_function(column) condition;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-30"><a href="#常见参数-30" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>condition</strong>：用于对分组后的结果进行过滤，通常基于聚合函数的计算结果（如 <code>COUNT</code>、<code>SUM</code> 等）。</li>
+</ul>
+<h4 id="示例-31"><a href="#示例-31" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT country, COUNT(*) AS user_count<br>FROM users<br>GROUP BY country<br>HAVING COUNT(*) &gt; 10;<br></code></pre></div></td></tr></table></figure>
+
+<p>（返回用户数大于 <code>10</code> 的各 <code>country</code> 分组）</p>
+<h4 id="注意事项-31"><a href="#注意事项-31" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><code>HAVING</code> 子句用于过滤经过 <code>GROUP BY</code> 分组后的数据，与 <code>WHERE</code> 子句作用的层次不同。</li>
+<li>当不使用聚合函数时，<code>HAVING</code> 也可用于过滤，但建议使用 <code>WHERE</code>，一般情况下，<code>HAVING</code> 应仅用于聚合数据的过滤。</li>
+<li><code>HAVING</code> 会在分组计算后执行，故相对 <code>WHERE</code> 有额外的性能开销，尽量将非聚合的过滤条件放到 <code>WHERE</code> 子句中。</li>
+</ul>
+<h3 id="LIMIT-限制查询结果的条数"><a href="#LIMIT-限制查询结果的条数" class="headerlink" title="LIMIT - 限制查询结果的条数"></a>LIMIT - 限制查询结果的条数</h3><h4 id="语法格式-32"><a href="#语法格式-32" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT columns<br>FROM table_name<br>LIMIT [offset,] row_count;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-31"><a href="#常见参数-31" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>row_count</strong>：返回记录的最大行数。</li>
+<li><strong>offset</strong>：可选参数，表示从结果集的第几行开始返回数据（注意：<code>offset</code> 从 <code>0</code> 开始计数）。</li>
+</ul>
+<h4 id="示例-32"><a href="#示例-32" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT * FROM users<br>LIMIT 10;  -- 返回前 10 行记录<br><br>SELECT * FROM users<br>LIMIT 5, 10;  -- 从第 6 行开始返回 10 行记录<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-32"><a href="#注意事项-32" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>在大数据量查询中，使用较大的 <code>offset</code> 会影响性能，因为 MySQL 需要扫描并丢弃 <code>offset</code> 之前的记录。</li>
+<li>对结果顺序有要求时应配合 <code>ORDER BY</code> 子句使用。</li>
+</ul>
+<h3 id="JOIN-连接多个表进行查询"><a href="#JOIN-连接多个表进行查询" class="headerlink" title="JOIN - 连接多个表进行查询"></a>JOIN - 连接多个表进行查询</h3><h4 id="语法格式-33"><a href="#语法格式-33" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT columns<br>FROM table1<br>[INNER | LEFT | RIGHT | CROSS] JOIN table2<br>ON join_condition;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-32"><a href="#常见参数-32" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>INNER JOIN</strong>：返回两个表中满足联接条件的交集记录，也可以直接写 <code>JOIN</code>，默认即为 <code>INNER JOIN</code>。</li>
+<li>**LEFT JOIN (LEFT OUTER JOIN)**：返回左表的所有记录及右表中满足联接条件的记录，右表无匹配时返回 <code>NULL</code>。</li>
+<li>**RIGHT JOIN (RIGHT OUTER JOIN)**：返回右表的所有记录及左表中满足联接条件的记录，左表无匹配时返回 <code>NULL</code>。</li>
+<li><strong>CROSS JOIN</strong>：返回两个表的笛卡尔积。</li>
+</ul>
+<h4 id="示例-33"><a href="#示例-33" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT u.username, o.order_date<br>FROM users u<br>INNER JOIN orders o<br>ON u.id = o.user_id;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-33"><a href="#注意事项-33" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>联接条件（<code>ON</code> 子句）必须正确指定，否则可能导致数据重复或返回不正确结果。</li>
+<li>不同的 <code>JOIN</code> 类型会影响结果集内容和性能，选择时应根据业务逻辑和数据量进行判断。</li>
+<li>多表联接时建议为关联字段建立索引，以提高查询效率。</li>
+</ul>
+<h3 id="UNION-合并多个查询结果集"><a href="#UNION-合并多个查询结果集" class="headerlink" title="UNION - 合并多个查询结果集"></a>UNION - 合并多个查询结果集</h3><h4 id="语法格式-34"><a href="#语法格式-34" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT columns FROM table1<br>UNION [ALL]<br>SELECT columns FROM table2;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-33"><a href="#常见参数-33" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>UNION ALL</strong>：返回所有记录，包括重复数据，不进行去重操作。默认 <code>UNION</code> 会自动去重，即返回不重复的记录集。</li>
+</ul>
+<h4 id="示例-34"><a href="#示例-34" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT username FROM users<br>UNION<br>SELECT username FROM admins;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-34"><a href="#注意事项-34" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>联合的各个 <code>SELECT</code> 语句的字段数及对应数据类型必须一致。</li>
+<li>使用 <code>UNION</code> 时，默认进行去重处理，可能会增加额外的排序开销，若允许重复可使用 <code>UNION ALL</code>。</li>
+<li><code>UNION</code> 适用于合并来自不同表或查询的结果，但不支持 <code>ORDER BY</code> 用于每个子查询，只能在最外层使用。</li>
+</ul>
+<h3 id="EXISTS-判断子查询是否返回结果"><a href="#EXISTS-判断子查询是否返回结果" class="headerlink" title="EXISTS - 判断子查询是否返回结果"></a>EXISTS - 判断子查询是否返回结果</h3><h4 id="语法格式-35"><a href="#语法格式-35" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT columns<br>FROM table_name<br>WHERE EXISTS (subquery);<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-34"><a href="#常见参数-34" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>subquery</strong>：子查询，通常返回一列数据，用于检查是否存在满足条件的记录。<code>EXISTS</code> 子句返回布尔值，如果子查询至少返回一行数据，则为 <code>TRUE</code>，否则为 <code>FALSE</code>。</li>
+<li><strong>NOT EXISTS</strong>：子查询逻辑取反。</li>
+</ul>
+<h4 id="示例-35"><a href="#示例-35" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT username<br>FROM users<br>WHERE EXISTS (<br>    SELECT 1<br>    FROM orders<br>    WHERE orders.user_id = users.id<br>);<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-35"><a href="#注意事项-35" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><code>EXISTS</code> 子查询通常用于相关子查询，能在检查条件时较快返回结果。</li>
+<li>与 <code>IN</code> 子查询相比，<code>EXISTS</code> 在处理大量数据时可能更高效，尤其当子查询结果集较大时。</li>
+<li>子查询中的 <code>SELECT</code> 子句一般不需要返回具体数据，常用 <code>SELECT 1</code> 或 <code>SELECT *</code>。</li>
+</ul>
+<h3 id="IN-判断值是否属于某个集合"><a href="#IN-判断值是否属于某个集合" class="headerlink" title="IN - 判断值是否属于某个集合"></a>IN - 判断值是否属于某个集合</h3><h4 id="语法格式-36"><a href="#语法格式-36" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT columns<br>FROM table_name<br>WHERE column IN (value1, value2, ...);<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-35"><a href="#常见参数-35" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>NOT IN</strong>：判断逻辑取反。</li>
+<li>列表中的值可以是常量列表，也可以是子查询返回的结果集，支持嵌套使用，与 <code>NOT IN</code> 类似用于排除指定值。</li>
+</ul>
+<h4 id="示例-36"><a href="#示例-36" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT username<br>FROM users<br>WHERE country IN (&#x27;USA&#x27;, &#x27;Canada&#x27;, &#x27;UK&#x27;);<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-36"><a href="#注意事项-36" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>使用 <code>IN</code> (子查询) 时，子查询返回的值应与外层比较字段数据类型一致。</li>
+<li>对于较大的常量列表，IN 子句可能影响查询效率，此时可以考虑将数据存储到临时表中进行联接查询。</li>
+<li>当子查询返回 <code>NULL</code> 时，需注意与 <code>NOT IN</code> 的区别可能引发意外结果。</li>
+</ul>
+<h3 id="LIKE-模糊匹配查询"><a href="#LIKE-模糊匹配查询" class="headerlink" title="LIKE - 模糊匹配查询"></a>LIKE - 模糊匹配查询</h3><h4 id="语法格式-37"><a href="#语法格式-37" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT columns<br>FROM table_name<br>WHERE column LIKE pattern;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-36"><a href="#常见参数-36" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>NOT LIKE</strong>：模糊匹配逻辑取反。</li>
+<li><strong>pattern</strong>：指定匹配模式，可以包含通配符<ul>
+<li>**%**：匹配任意数量（零个或多个）任意字符</li>
+<li>**_**：匹配单个任意字符</li>
 </ul>
 </li>
-<li>约束<ul>
-<li>primary key：主键约束</li>
-<li>foreign key：外键约束</li>
-<li>not null：非空约束</li>
-<li>unique：唯一性约束</li>
-<li>default：默认值约束</li>
-<li>auto_increment：字段值自增</li>
-<li>unsigned：无符号约束</li>
-<li>character set：字符集约束</li>
+</ul>
+<h4 id="示例-37"><a href="#示例-37" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT username<br>FROM users<br>WHERE username LIKE &#x27;A%&#x27;;  -- 匹配以 A 开头的用户名<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-37"><a href="#注意事项-37" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><code>LIKE</code> 匹配是大小写敏感或不敏感取决于字符集和校对规则。</li>
+<li>使用通配符开头（如 <code>%abc</code>）可能导致全表扫描，影响查询性能。</li>
+<li>对需要频繁模糊查询的字段可考虑建立全文索引。</li>
+</ul>
+<h3 id="AS-为字段或表设置别名"><a href="#AS-为字段或表设置别名" class="headerlink" title="AS - 为字段或表设置别名"></a>AS - 为字段或表设置别名</h3><h4 id="语法格式-38"><a href="#语法格式-38" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT expression AS alias_name<br>FROM table_name;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-37"><a href="#常见参数-37" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>alias_name</strong>：指定给列或表的别名，便于结果集阅读或简化查询语句。别名可以用于列、表达式，甚至表名，便于后续引用。</li>
+</ul>
+<h4 id="示例-38"><a href="#示例-38" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT username AS user, email AS contact_email<br>FROM users;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-38"><a href="#注意事项-38" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><code>AS</code> 是可选关键字，可以直接用空格分隔表达式和别名。</li>
+<li>在复杂查询中使用别名能提高 SQL 的可读性和维护性。</li>
+<li>别名应避免与表中字段名冲突，且尽量采用易于理解的命名。</li>
+</ul>
+<h3 id="SUBQUERY（子查询）-在查询中嵌套其他查询"><a href="#SUBQUERY（子查询）-在查询中嵌套其他查询" class="headerlink" title="SUBQUERY（子查询） - 在查询中嵌套其他查询"></a>SUBQUERY（子查询） - 在查询中嵌套其他查询</h3><h4 id="语法格式-39"><a href="#语法格式-39" class="headerlink" title="语法格式"></a>语法格式</h4><p>子查询可以出现在 <code>SELECT</code>、<code>FROM</code>、<code>WHERE</code>、<code>HAVING</code> 等子句中，基本格式如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT columns<br>FROM table_name<br>WHERE column operator (SELECT sub_columns FROM sub_table WHERE condition);<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-38"><a href="#常见参数-38" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><p><strong>相关子查询</strong>：子查询中引用外层查询的列。</p>
+</li>
+<li><p><strong>非相关子查询</strong>：子查询独立执行，与外层无直接关联。</p>
+<p>（子查询可用于 <code>EXISTS</code>、<code>IN</code>、比较运算符等上下文中。）</p>
+</li>
+</ul>
+<h4 id="示例-39"><a href="#示例-39" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">-- 非相关子查询示例<br>SELECT username, email<br>FROM users<br>WHERE id IN (SELECT user_id FROM orders WHERE order_date &gt; &#x27;2023-01-01&#x27;);<br><br>-- 相关子查询示例<br>SELECT username,<br>       (SELECT COUNT(*) FROM orders WHERE orders.user_id = users.id) AS order_count<br>FROM users;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-39"><a href="#注意事项-39" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>子查询应尽量避免返回大量数据，以免影响整体查询性能。</li>
+<li>当子查询中使用相关列时，每行外层数据都需执行一次子查询，可能导致效率问题。</li>
+<li>可使用 <code>JOIN</code> 或 <code>EXISTS</code> 等方式重构子查询以提高性能和可维护性。</li>
+<li>复杂子查询可以先通过临时表或视图分解，降低调试难度和提高执行效率。</li>
+</ul>
+<h2 id="TCL"><a href="#TCL" class="headerlink" title="TCL"></a>TCL</h2><p>事务控制语言。</p>
+<h3 id="START-TRANSACTION-开启事务"><a href="#START-TRANSACTION-开启事务" class="headerlink" title="START TRANSACTION - 开启事务"></a>START TRANSACTION - 开启事务</h3><h4 id="语法格式-40"><a href="#语法格式-40" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">START TRANSACTION;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-39"><a href="#常见参数-39" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li>与 <code>BEGIN</code> 作用相同，用于标识事务的开始。</li>
+<li>可与 <code>SET TRANSACTION</code> 结合使用，指定事务的隔离级别及读写属性（须在事务开始后立即设置）。</li>
+</ul>
+<h4 id="示例-40"><a href="#示例-40" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">START TRANSACTION;<br>UPDATE accounts SET balance = balance - 100 WHERE account_id = 1;<br>UPDATE accounts SET balance = balance + 100 WHERE account_id = 2;<br>COMMIT;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-40"><a href="#注意事项-40" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>事务一旦启动，后续的修改操作不会立即生效，只有提交（<code>COMMIT</code>）后才会永久保存，若出现错误可使用 <code>ROLLBACK</code> 进行回滚。</li>
+<li>请确保使用的存储引擎（如 <code>InnoDB</code>）支持事务操作。</li>
+<li>长事务可能占用资源和锁定数据，建议尽快提交或回滚。</li>
+</ul>
+<h3 id="COMMIT-提交事务"><a href="#COMMIT-提交事务" class="headerlink" title="COMMIT - 提交事务"></a>COMMIT - 提交事务</h3><h4 id="语法格式-41"><a href="#语法格式-41" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">COMMIT;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-40"><a href="#常见参数-40" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li>无额外参数，直接提交当前事务中所有已执行的修改操作。</li>
+</ul>
+<h4 id="示例-41"><a href="#示例-41" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">START TRANSACTION;<br>UPDATE accounts SET balance = balance - 100 WHERE account_id = 1;<br>UPDATE accounts SET balance = balance + 100 WHERE account_id = 2;<br>COMMIT;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-41"><a href="#注意事项-41" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><code>COMMIT</code> 会使当前事务中的所有修改永久生效，无法回退，在执行前请确保数据正确性。</li>
+<li>对于长事务，建议及时提交以减少锁等待和资源占用。</li>
+<li>某些存储引擎（如 <code>InnoDB</code>）支持事务，而其他（如 <code>MyISAM</code>）则不支持，使用前请确认存储引擎类型。</li>
+</ul>
+<h3 id="ROLLBACK-回滚事务"><a href="#ROLLBACK-回滚事务" class="headerlink" title="ROLLBACK - 回滚事务"></a>ROLLBACK - 回滚事务</h3><h4 id="语法格式-42"><a href="#语法格式-42" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">ROLLBACK;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-41"><a href="#常见参数-41" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li>无额外参数，用于撤销当前事务中自上次 <code>COMMIT</code> 或事务开始以来的所有修改。</li>
+</ul>
+<h4 id="示例-42"><a href="#示例-42" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">START TRANSACTION;<br>UPDATE accounts SET balance = balance - 100 WHERE account_id = 1;<br>-- 发现错误或业务逻辑有问题，执行回滚<br>ROLLBACK;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-42"><a href="#注意事项-42" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><code>ROLLBACK</code> 只能撤销当前事务内尚未提交的操作，一旦 <code>COMMIT</code> 后，无法使用 <code>ROLLBACK</code> 恢复。</li>
+<li>在使用事务时，应结合应用逻辑判断错误场景，及时执行 <code>ROLLBACK</code> 以保持数据一致性。</li>
+<li>某些复杂操作（例如涉及外部系统的数据同步）可能无法简单回滚，需谨慎设计事务边界。</li>
+</ul>
+<h3 id="SAVEPOINT-设置事务保存点"><a href="#SAVEPOINT-设置事务保存点" class="headerlink" title="SAVEPOINT - 设置事务保存点"></a>SAVEPOINT - 设置事务保存点</h3><h4 id="语法格式-43"><a href="#语法格式-43" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SAVEPOINT savepoint_name;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-42"><a href="#常见参数-42" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>savepoint_name</strong>：自定义的保存点名称，用于标识当前事务中一个中间状态。</li>
+</ul>
+<h4 id="示例-43"><a href="#示例-43" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">START TRANSACTION;<br>UPDATE accounts SET balance = balance - 100 WHERE account_id = 1;<br>SAVEPOINT sp1;<br>UPDATE accounts SET balance = balance + 100 WHERE account_id = 2;<br>-- 若后续操作出错，只回滚到保存点 sp1<br>ROLLBACK TO SAVEPOINT sp1;<br>COMMIT;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-43"><a href="#注意事项-43" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><code>SAVEPOINT</code> 允许在事务中设置多个回滚点，便于部分撤销操作而非整个事务回滚。</li>
+<li>保存点只在当前事务有效，事务结束后自动失效。</li>
+<li><code>SAVEPOINT</code> 操作会增加事务管理的复杂度，使用时应明确各保存点对应的业务逻辑阶段。</li>
+</ul>
+<h3 id="RELEASE-SAVEPOINT-删除指定的保存点"><a href="#RELEASE-SAVEPOINT-删除指定的保存点" class="headerlink" title="RELEASE SAVEPOINT - 删除指定的保存点"></a>RELEASE SAVEPOINT - 删除指定的保存点</h3><h4 id="语法格式-44"><a href="#语法格式-44" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">RELEASE SAVEPOINT savepoint_name;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-43"><a href="#常见参数-43" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>savepoint_name</strong>：指定需要删除的保存点名称。</li>
+</ul>
+<h4 id="示例-44"><a href="#示例-44" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">START TRANSACTION;<br>UPDATE orders SET status = &#x27;processing&#x27; WHERE order_id = 123;<br>SAVEPOINT sp_order;<br>-- 执行部分操作后，确认不需要再回滚到该保存点时，释放它<br>RELEASE SAVEPOINT sp_order;<br>COMMIT;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-44"><a href="#注意事项-44" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><code>RELEASE SAVEPOINT</code> 会删除指定保存点，释放与该保存点相关的资源，一旦释放，不能再回滚到该保存点。</li>
+<li>删除保存点对事务后续操作没有影响，但应在确定不需要部分回滚后再执行。</li>
+<li>释放保存点后，事务依然处于原来的状态，不会自动提交或回滚。</li>
+</ul>
+<h3 id="SET-TRANSACTION-设置事务隔离级别"><a href="#SET-TRANSACTION-设置事务隔离级别" class="headerlink" title="SET TRANSACTION - 设置事务隔离级别"></a>SET TRANSACTION - 设置事务隔离级别</h3><h4 id="语法格式-45"><a href="#语法格式-45" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SET TRANSACTION [transaction_option [, transaction_option] ...];<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-44"><a href="#常见参数-44" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>transaction_option 主要包括</strong>：<ul>
+<li><strong>ISOLATION LEVEL level</strong>：设置事务的隔离级别（如 <code>READ UNCOMMITTED</code>、<code>READ COMMITTED</code>、<code>REPEATABLE READ</code>、<code>SERIALIZABLE</code>）。</li>
+<li><strong>READ WRITE 或 READ ONLY</strong>：指定事务是否允许写操作。</li>
+</ul>
+</li>
+<li><code>SET TRANSACTION</code> 必须在事务开始之前（即在 <code>START TRANSACTION</code> 或 <code>BEGIN</code> 之后立即执行，否则不会生效）。</li>
+</ul>
+<h4 id="示例-45"><a href="#示例-45" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ WRITE;<br>START TRANSACTION;<br>-- 执行事务操作...<br>COMMIT;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-45"><a href="#注意事项-45" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><code>SET TRANSACTION</code> 的设置仅影响当前事务，事务结束后恢复默认设置。</li>
+<li>不同隔离级别对并发控制、锁策略及性能有较大影响，选择时应根据业务需求权衡一致性和性能。</li>
+<li>一般建议在事务开始后立即设置事务属性，以确保整个事务按照预期运行，否则可能需要重启事务。</li>
+</ul>
+<h2 id="DCL"><a href="#DCL" class="headerlink" title="DCL"></a>DCL</h2><p>数据控制语言。</p>
+<h3 id="GRANT-授予用户权限"><a href="#GRANT-授予用户权限" class="headerlink" title="GRANT - 授予用户权限"></a>GRANT - 授予用户权限</h3><h4 id="语法格式-46"><a href="#语法格式-46" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">GRANT privilege_list ON object TO &#x27;username&#x27;@&#x27;host&#x27; [IDENTIFIED BY &#x27;password&#x27;] [WITH GRANT OPTION];<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-45"><a href="#常见参数-45" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>privilege_list</strong>：可以是单个权限（如 <code>SELECT</code>、<code>INSERT</code> 等）或 <code>ALL PRIVILEGES</code>。</li>
+<li><strong>object</strong>：通常指定数据库对象，如 <code>.</code> 表示所有数据库的所有对象，<code>db_name.*</code> 表示某个数据库。</li>
+<li><strong>WITH GRANT OPTION</strong>：允许被授权用户将其拥有的权限继续授权给其他用户。</li>
+<li>可在创建用户时同时设置密码（<code>IDENTIFIED BY</code>）。</li>
+</ul>
+<h4 id="示例-46"><a href="#示例-46" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">GRANT SELECT, INSERT, UPDATE ON mydb.* TO &#x27;alice&#x27;@&#x27;localhost&#x27; IDENTIFIED BY &#x27;securePwd&#x27; WITH GRANT OPTION;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-46"><a href="#注意事项-46" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><code>GRANT</code> 命令不仅分配权限，还可能隐式创建用户（视 MySQL 版本而定）。</li>
+<li>授予权限时要注意最小权限原则，避免授予不必要的高级权限。</li>
+<li>授权后若修改了权限表，建议使用 <code>FLUSH PRIVILEGES</code> 使更改生效（某些情况下系统自动刷新）。</li>
+</ul>
+<h3 id="REVOKE-撤销用户权限"><a href="#REVOKE-撤销用户权限" class="headerlink" title="REVOKE - 撤销用户权限"></a>REVOKE - 撤销用户权限</h3><h4 id="语法格式-47"><a href="#语法格式-47" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">REVOKE privilege_list ON object FROM &#x27;username&#x27;@&#x27;host&#x27;;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-46"><a href="#常见参数-46" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>privilege_list</strong>：需要撤销的权限列表。</li>
+<li><strong>object</strong>：权限对应的数据库或表。</li>
+<li>指定用户时要与 <code>GRANT</code> 命令中一致。</li>
+</ul>
+<h4 id="示例-47"><a href="#示例-47" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">REVOKE INSERT, UPDATE ON mydb.* FROM &#x27;alice&#x27;@&#x27;localhost&#x27;;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-47"><a href="#注意事项-47" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>撤销权限后，用户相应的操作将被禁止。</li>
+<li>若用户同时拥有多个权限来源（如继承或通过角色），撤销时需核查各个来源的权限。</li>
+<li>撤销权限后若有权限缓存，可能需要 <code>FLUSH PRIVILEGES</code> 来刷新。</li>
+</ul>
+<h3 id="CREATE-USER-创建新用户"><a href="#CREATE-USER-创建新用户" class="headerlink" title="CREATE USER - 创建新用户"></a>CREATE USER - 创建新用户</h3><h4 id="语法格式-48"><a href="#语法格式-48" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">CREATE USER &#x27;username&#x27;@&#x27;host&#x27; IDENTIFIED BY &#x27;password&#x27;;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-47"><a href="#常见参数-47" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li>**‘username‘@’host’**：用户名及允许登录的主机，如 <code>&#39;bob&#39;@&#39;localhost&#39;</code> 或 <code>&#39;bob&#39;@&#39;%&#39;</code>（允许任意主机）。</li>
+<li>**IDENTIFIED BY ‘password’**：指定用户的登录密码，部分版本支持更多认证插件设置。</li>
+</ul>
+<h4 id="示例-48"><a href="#示例-48" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">CREATE USER &#x27;bob&#x27;@&#x27;localhost&#x27; IDENTIFIED BY &#x27;bobPwd&#x27;;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-48"><a href="#注意事项-48" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>用户名和主机名共同决定了一个唯一用户。</li>
+<li>密码应足够复杂，保障安全性。</li>
+<li>MySQL 8.0 及以上版本推荐使用更加灵活的认证插件设置。</li>
+</ul>
+<h3 id="DROP-USER-删除用户"><a href="#DROP-USER-删除用户" class="headerlink" title="DROP USER - 删除用户"></a>DROP USER - 删除用户</h3><h4 id="语法格式-49"><a href="#语法格式-49" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">DROP USER &#x27;username&#x27;@&#x27;host&#x27;[, &#x27;username&#x27;@&#x27;host&#x27;];<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-48"><a href="#常见参数-48" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li>指定要删除的用户，必须与创建时的用户名及主机名匹配。</li>
+</ul>
+<h4 id="示例-49"><a href="#示例-49" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">DROP USER &#x27;bob&#x27;@&#x27;localhost&#x27;;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-49"><a href="#注意事项-49" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>删除用户会移除该用户所有的登录权限，注意核查是否有依赖关系（如定时任务、存储过程中的调用等）。</li>
+<li>若用户不存在，建议使用 <code>IF EXISTS</code>（部分 MySQL 版本支持）以避免错误。</li>
+<li>删除用户操作不可逆，需谨慎操作。</li>
+</ul>
+<h3 id="SET-PASSWORD-设置或修改用户密码"><a href="#SET-PASSWORD-设置或修改用户密码" class="headerlink" title="SET PASSWORD - 设置或修改用户密码"></a>SET PASSWORD - 设置或修改用户密码</h3><h4 id="语法格式-50"><a href="#语法格式-50" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SET PASSWORD FOR &#x27;username&#x27;@&#x27;host&#x27; = PASSWORD(&#x27;new_password&#x27;);<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-49"><a href="#常见参数-49" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li>**‘username‘@’host’**：指定要修改密码的用户。</li>
+<li>**PASSWORD(‘new_password’)**：对新密码进行加密，MySQL 早期版本常用该函数。</li>
+</ul>
+<h4 id="示例-50"><a href="#示例-50" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SET PASSWORD FOR &#x27;alice&#x27;@&#x27;localhost&#x27; = PASSWORD(&#x27;newSecurePwd&#x27;);<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-50"><a href="#注意事项-50" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>旧版本中使用 <code>PASSWORD()</code> 函数，但在 MySQL 8.0 中已弃用，建议使用 <code>ALTER USER … IDENTIFIED BY …</code>。</li>
+<li>修改密码后用户需要使用新密码登录。</li>
+<li>修改密码操作应确保安全传输，避免泄露。</li>
+</ul>
+<h3 id="SHOW-GRANTS-查看用户的权限"><a href="#SHOW-GRANTS-查看用户的权限" class="headerlink" title="SHOW GRANTS - 查看用户的权限"></a>SHOW GRANTS - 查看用户的权限</h3><h4 id="语法格式-51"><a href="#语法格式-51" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SHOW GRANTS FOR &#x27;username&#x27;@&#x27;host&#x27;;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-50"><a href="#常见参数-50" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li>指定用户及主机，如 <code>&#39;alice&#39;@&#39;localhost&#39;</code>。若省略 <code>FOR</code> 子句，则显示当前登录用户的权限。</li>
+</ul>
+<h4 id="示例-51"><a href="#示例-51" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SHOW GRANTS FOR &#x27;alice&#x27;@&#x27;localhost&#x27;;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-51"><a href="#注意事项-51" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>显示的权限信息包括所有通过 <code>GRANT</code> 命令赋予用户的权限。</li>
+<li>该命令用于审核和确认用户权限，便于安全管理。</li>
+<li>不同版本显示格式可能略有差异。</li>
+</ul>
+<h3 id="FLUSH-PRIVILEGES-刷新权限，使修改生效"><a href="#FLUSH-PRIVILEGES-刷新权限，使修改生效" class="headerlink" title="FLUSH PRIVILEGES - 刷新权限，使修改生效"></a>FLUSH PRIVILEGES - 刷新权限，使修改生效</h3><h4 id="语法格式-52"><a href="#语法格式-52" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">FLUSH PRIVILEGES;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-51"><a href="#常见参数-51" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li>无其他参数，直接执行命令使权限表的更改在内存中生效。</li>
+</ul>
+<h4 id="示例-52"><a href="#示例-52" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">FLUSH PRIVILEGES;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-52"><a href="#注意事项-52" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>在直接修改 MySQL 权限表后，必须执行 <code>FLUSH PRIVILEGES</code> 才能使修改生效。</li>
+<li>通过 <code>GRANT</code>、<code>REVOKE</code>、<code>CREATE USER</code> 等命令修改权限时，系统通常会自动刷新。</li>
+<li>若修改权限文件后遇到权限不一致问题，可尝试执行此命令解决。</li>
+</ul>
+<h2 id="SCL"><a href="#SCL" class="headerlink" title="SCL"></a>SCL</h2><p>会话控制语言。</p>
+<h3 id="SET-设置会话变量"><a href="#SET-设置会话变量" class="headerlink" title="SET - 设置会话变量"></a>SET - 设置会话变量</h3><h4 id="语法格式-53"><a href="#语法格式-53" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql"># 设置单个变量<br>SET variable_name = value;<br><br># 设置多个变量<br>SET var1 = value1, var2 = value2, ...;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-52"><a href="#常见参数-52" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>系统变量</strong>：如 <code>autocommit</code>、<code>sql_mode</code>、<code>character_set_server</code> 等。</li>
+<li><strong>用户变量</strong>：前面加 <code>@</code> 符号，例如 <code>SET @var = 10;</code>。</li>
+</ul>
+<h4 id="示例-53"><a href="#示例-53" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql"># 设置系统变量<br>SET autocommit = 0;<br>SET sql_mode = &#x27;STRICT_TRANS_TABLES&#x27;;<br><br># 设置用户变量<br>SET @counter = 100;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-53"><a href="#注意事项-53" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><code>SET</code> 语句用于配置会话或全局级别的变量，影响当前连接的行为。</li>
+<li>对于系统变量，若要全局生效，可使用 <code>SET GLOBAL variable_name = value;</code>（需要相应权限）。</li>
+<li>设置用户变量时，变量作用域仅限当前会话，不会在多个连接间共享。</li>
+</ul>
+<h3 id="SHOW-显示变量信息"><a href="#SHOW-显示变量信息" class="headerlink" title="SHOW - 显示变量信息"></a>SHOW - 显示变量信息</h3><h4 id="语法格式-54"><a href="#语法格式-54" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SHOW [FULL] &#123;DATABASES | TABLES | COLUMNS FROM table_name | WARNINGS | ...&#125;;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-53"><a href="#常见参数-53" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>DATABASES</strong>：显示所有数据库。</li>
+<li><strong>TABLES</strong>：显示当前数据库中的所有表。</li>
+<li><strong>COLUMNS/FIELDS</strong>：显示指定表的列信息。</li>
+<li><strong>其他</strong>：还包括 <code>SHOW INDEX</code>、<code>SHOW CREATE TABLE</code>、<code>SHOW ENGINE</code> 等。</li>
+</ul>
+<h4 id="示例-54"><a href="#示例-54" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql"># 显示所有数据库<br>SHOW DATABASES;<br><br># 显示当前数据库中的所有表<br>SHOW TABLES;<br><br># 显示指定表的字段信息<br>SHOW COLUMNS FROM users;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-54"><a href="#注意事项-54" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><code>SHOW</code> 命令主要用于查看数据库的元数据和运行状态。</li>
+<li>具体支持的选项和显示内容可能会因 MySQL 版本而有所不同。</li>
+<li>加上 <code>FULL</code> 关键字可获得更详细的信息（如在 <code>SHOW PROCESSLIST FULL</code> 中显示完整查询）。</li>
+</ul>
+<h3 id="USE-选择数据库"><a href="#USE-选择数据库" class="headerlink" title="USE - 选择数据库"></a>USE - 选择数据库</h3><h4 id="语法格式-55"><a href="#语法格式-55" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">USE database_name;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-54"><a href="#常见参数-54" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li>仅需指定目标数据库的名称，切换当前会话的默认数据库。</li>
+</ul>
+<h4 id="示例-55"><a href="#示例-55" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">USE mydb;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-55"><a href="#注意事项-55" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>执行 <code>USE</code> 命令后，后续的 SQL 语句若不指定数据库名，则默认在该数据库中执行。</li>
+<li>在多数据库环境中，确保在操作前已切换至正确的数据库。</li>
+<li>若指定的数据库不存在，会返回错误信息。</li>
+</ul>
+<h2 id="DTL"><a href="#DTL" class="headerlink" title="DTL"></a>DTL</h2><p>用于导入、导出数据。</p>
+<h3 id="LOAD-DATA-INFILE-从文件导入数据"><a href="#LOAD-DATA-INFILE-从文件导入数据" class="headerlink" title="LOAD DATA INFILE - 从文件导入数据"></a>LOAD DATA INFILE - 从文件导入数据</h3><h4 id="语法格式-56"><a href="#语法格式-56" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">LOAD DATA [LOW_PRIORITY | CONCURRENT] [LOCAL] INFILE &#x27;file_path&#x27;<br>[REPLACE | IGNORE]<br>INTO TABLE table_name<br>[CHARACTER SET charset_name]<br>[FIELDS<br>    [TERMINATED BY &#x27;string&#x27;]<br>    [OPTIONALLY] ENCLOSED BY &#x27;char&#x27;]<br>[LINES<br>    [STARTING BY &#x27;string&#x27;]<br>    [TERMINATED BY &#x27;string&#x27;]]<br>[IGNORE number LINES]<br>[(column1, column2, ...)];<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-55"><a href="#常见参数-55" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>LOCAL</strong>：指定文件位于客户端。</li>
+<li><strong>REPLACE/IGNORE</strong>：定义遇到重复记录时的处理策略。</li>
+<li><strong>CHARACTER SET</strong>：设置文件字符集。</li>
+<li><strong>FIELDS</strong> 与 <strong>LINES</strong>：指定字段与行的分隔符、包围符和换行符。</li>
+<li><strong>IGNORE n LINES</strong>：跳过文件开头的 n 行（通常用于忽略标题行）。</li>
+</ul>
+<h4 id="示例-56"><a href="#示例-56" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">LOAD DATA LOCAL INFILE &#x27;/path/to/data.csv&#x27;<br>INTO TABLE users<br>CHARACTER SET utf8mb4<br>FIELDS TERMINATED BY &#x27;,&#x27; ENCLOSED BY &#x27;&quot;&#x27;<br>LINES TERMINATED BY &#x27;\n&#x27;<br>IGNORE 1 LINES;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-56"><a href="#注意事项-56" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>MySQL 服务器或客户端需要有相应的文件读取权限。</li>
+<li>文件路径是基于服务器或客户端（加 <code>LOCAL</code> 时）的文件系统。</li>
+<li>参数设置应与文件实际格式保持一致，否则可能导致数据导入错误。</li>
+<li>大量数据导入时，注意事务控制和错误处理。</li>
+</ul>
+<h3 id="SELECT-INTO-OUTFILE-导出数据到文件"><a href="#SELECT-INTO-OUTFILE-导出数据到文件" class="headerlink" title="SELECT INTO OUTFILE - 导出数据到文件"></a>SELECT INTO OUTFILE - 导出数据到文件</h3><h4 id="语法格式-57"><a href="#语法格式-57" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT columns<br>FROM table_name<br>[WHERE condition]<br>[ORDER BY ...]<br>INTO OUTFILE &#x27;file_path&#x27;<br>[FIELDS<br>    [TERMINATED BY &#x27;string&#x27;]<br>    [OPTIONALLY] ENCLOSED BY &#x27;char&#x27;]<br>[LINES<br>    [STARTING BY &#x27;string&#x27;]<br>    [TERMINATED BY &#x27;string&#x27;];<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-56"><a href="#常见参数-56" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>INTO OUTFILE</strong>：指定导出文件的完整路径（服务器端路径）。</li>
+<li><strong>FIELDS 与 LINES</strong>：用于定义导出文件中字段和行的格式、分隔符和换行符。</li>
+</ul>
+<h4 id="示例-57"><a href="#示例-57" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT username, email<br>FROM users<br>WHERE status = &#x27;active&#x27;<br>ORDER BY username<br>INTO OUTFILE &#x27;/tmp/active_users.csv&#x27;<br>FIELDS TERMINATED BY &#x27;,&#x27; ENCLOSED BY &#x27;&quot;&#x27;<br>LINES TERMINATED BY &#x27;\n&#x27;;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-57"><a href="#注意事项-57" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>文件将被写入服务器所在的文件系统，因此必须保证服务器对指定路径有写权限。</li>
+<li>文件路径必须不存在，否则会报错。</li>
+<li>导出时要确保字段分隔符、行终止符等与目标格式相符。</li>
+<li>适用于数据备份和离线分析，但要注意文件安全性。</li>
+</ul>
+<h2 id="系统环境命令"><a href="#系统环境命令" class="headerlink" title="系统环境命令"></a>系统环境命令</h2><p>用于管理 MySQL 服务器的状态、性能等。</p>
+<h3 id="SHOW-PROCESSLIST-查看当前正在执行的查询"><a href="#SHOW-PROCESSLIST-查看当前正在执行的查询" class="headerlink" title="SHOW PROCESSLIST - 查看当前正在执行的查询"></a>SHOW PROCESSLIST - 查看当前正在执行的查询</h3><h4 id="语法格式-58"><a href="#语法格式-58" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SHOW [FULL] PROCESSLIST;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-57"><a href="#常见参数-57" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>FULL</strong>：显示完整的查询信息（不截断长查询语句）。</li>
+</ul>
+<h4 id="示例-58"><a href="#示例-58" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SHOW PROCESSLIST;<br><br>SHOW FULL PROCESSLIST;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-58"><a href="#注意事项-58" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>此命令用于查看当前 MySQL 服务器正在执行的线程和查询，便于诊断性能问题或死锁。</li>
+<li>普通用户只能查看自己的线程信息，管理员用户可以查看所有线程。</li>
+<li>监控信息中包括每个线程的 ID、用户、主机、数据库、命令、时间、状态和当前执行的 SQL 语句。</li>
+<li>频繁执行可能会对性能产生轻微影响，建议合理使用。</li>
+</ul>
+<h3 id="SHOW-STATUS-查看服务器状态信息"><a href="#SHOW-STATUS-查看服务器状态信息" class="headerlink" title="SHOW STATUS - 查看服务器状态信息"></a>SHOW STATUS - 查看服务器状态信息</h3><h4 id="语法格式-59"><a href="#语法格式-59" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SHOW [GLOBAL | SESSION] STATUS;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-58"><a href="#常见参数-58" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>GLOBAL</strong>：显示服务器级别的状态信息。</li>
+<li><strong>SESSION</strong>：显示当前会话的状态信息（默认）。</li>
+</ul>
+<h4 id="示例-59"><a href="#示例-59" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql"># 查看全局状态<br>SHOW GLOBAL STATUS;<br><br># 查看当前会话状态<br>SHOW SESSION STATUS;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-59"><a href="#注意事项-59" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><p>状态信息包括连接数、查询数、缓存命中率、慢查询等指标，有助于性能调优。</p>
+</li>
+<li><p>全局状态反映整个服务器的运行情况，<code>SESSION</code> 状态仅涉及当前连接。</p>
+</li>
+<li><p>数据较多时，可结合 <code>LIKE</code> 子句过滤关键字，如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SHOW GLOBAL STATUS LIKE &#x27;Connections&#x27;;<br></code></pre></div></td></tr></table></figure></li>
+</ul>
+<h3 id="SHOW-VARIABLES-查看服务器系统变量"><a href="#SHOW-VARIABLES-查看服务器系统变量" class="headerlink" title="SHOW VARIABLES - 查看服务器系统变量"></a>SHOW VARIABLES - 查看服务器系统变量</h3><h4 id="语法格式-60"><a href="#语法格式-60" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SHOW [GLOBAL | SESSION] VARIABLES;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-59"><a href="#常见参数-59" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><p><strong>GLOBAL</strong>：显示服务器全局变量。</p>
+</li>
+<li><p><strong>SESSION</strong>：显示当前会话变量（默认）。</p>
+</li>
+<li><p>可结合 <code>LIKE</code> 子句筛选变量名，如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SHOW VARIABLES LIKE &#x27;max_connections&#x27;;<br></code></pre></div></td></tr></table></figure></li>
+</ul>
+<h4 id="示例-60"><a href="#示例-60" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql"># 查看所有全局变量<br>SHOW GLOBAL VARIABLES;<br><br># 查看特定变量<br>SHOW SESSION VARIABLES LIKE &#x27;character_set%&#x27;;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-60"><a href="#注意事项-60" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>变量用于控制 MySQL 的行为和配置，调整前建议详细了解含义。</li>
+<li><code>GLOBAL</code> 变量修改后需重启或执行相应命令使新值生效，<code>SESSION</code> 变量仅影响当前连接。</li>
+<li>查看变量可以帮助确认当前服务器配置及诊断性能问题。</li>
+</ul>
+<h2 id="系统管理命令"><a href="#系统管理命令" class="headerlink" title="系统管理命令"></a>系统管理命令</h2><h3 id="mysql-连接-MySQL"><a href="#mysql-连接-MySQL" class="headerlink" title="mysql - 连接 MySQL"></a>mysql - 连接 MySQL</h3><h4 id="语法格式-61"><a href="#语法格式-61" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh">mysql -u username -p [options] [database_name]<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-60"><a href="#常见参数-60" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>-u username</strong>：指定登录用户名。</li>
+<li><strong>-p</strong>：提示输入密码。</li>
+<li><strong>-h host</strong>：指定服务器地址，默认 <code>localhost</code>。</li>
+<li><strong>-P port</strong>：指定端口号，默认 <code>3306</code>。</li>
+<li>**-e “SQL语句”**：执行 “SQL 语句” 后退出。</li>
+<li><strong>–default-character-set</strong>：指定连接使用的字符集。</li>
+</ul>
+<h4 id="示例-61"><a href="#示例-61" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 交互式登录并切换到数据库</span><br>mysql -u root -p mydb<br><br><span class="hljs-comment"># 直接执行 SQL 语句</span><br>mysql -u root -p -e <span class="hljs-string">&quot;SHOW DATABASES;&quot;</span><br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-61"><a href="#注意事项-61" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>确保使用正确的用户名、密码和服务器地址。</li>
+<li>使用 <code>-e</code> 参数时，执行后会自动退出客户端，适合脚本调用。</li>
+<li>登录后可以使用 <code>USE database_name;</code> 切换数据库。</li>
+</ul>
+<h3 id="mysqladmin-服务器管理"><a href="#mysqladmin-服务器管理" class="headerlink" title="mysqladmin - 服务器管理"></a>mysqladmin - 服务器管理</h3><h4 id="语法格式-62"><a href="#语法格式-62" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh">mysqladmin -u username -p [options] <span class="hljs-built_in">command</span><br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数及命令"><a href="#常见参数及命令" class="headerlink" title="常见参数及命令"></a>常见参数及命令</h4><ul>
+<li><strong>status</strong>：显示服务器当前状态（连接数、查询数等）。</li>
+<li><strong>processlist</strong>：显示当前活动进程列表（类似 <code>SHOW PROCESSLIST</code>）。</li>
+<li><strong>variables</strong>：显示服务器变量信息。</li>
+<li><strong>shutdown</strong>：关闭 MySQL 服务器。</li>
+<li><strong>flush-hosts</strong>：刷新主机缓存，解除因连接过多引起的阻塞。</li>
+<li><strong>kill id</strong>：终止指定线程（<code>id</code> 为进程 ID）。</li>
+</ul>
+<h4 id="示例-62"><a href="#示例-62" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 查看服务器状态</span><br>mysqladmin -u root -p status<br><br><span class="hljs-comment"># 关闭服务器</span><br>mysqladmin -u root -p shutdown<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-62"><a href="#注意事项-62" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>执行某些命令（如 <code>shutdown</code>）需要管理员权限。</li>
+<li>普通用户通常只能查看自己的进程信息。</li>
+<li>使用 <code>kill</code> 命令时请谨慎，误杀进程可能影响业务运行。</li>
+</ul>
+<h3 id="mysqlcheck-检查与修复"><a href="#mysqlcheck-检查与修复" class="headerlink" title="mysqlcheck -  检查与修复"></a>mysqlcheck -  检查与修复</h3><h4 id="语法格式-63"><a href="#语法格式-63" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh">mysqlcheck -u username -p [options] database_name [table_name ...]<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-61"><a href="#常见参数-61" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>–check</strong>：检查表是否损坏（默认操作）。</li>
+<li><strong>–repair</strong>：修复损坏的表（适用于 <code>MyISAM</code> 表）。</li>
+<li><strong>–optimize</strong>：优化表，重建索引。</li>
+<li><strong>–analyze</strong>：分析表数据，帮助优化查询计划。</li>
+<li><strong>–all-databases</strong>：对所有数据库执行操作。</li>
+</ul>
+<h4 id="示例-63"><a href="#示例-63" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 优化 mydb 数据库中所有表</span><br>mysqlcheck -u root -p --optimize mydb<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-63"><a href="#注意事项-63" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>对于 <code>InnoDB</code> 表，通常建议使用在线 <code>ALTER TABLE</code> 操作。</li>
+<li>运行 <code>mysqlcheck</code> 时建议在低峰期执行，避免对业务造成影响。</li>
+<li>部分操作可能会加锁表，注意影响并发访问。</li>
+</ul>
+<h3 id="mysqlbinlog-查看二进制日志"><a href="#mysqlbinlog-查看二进制日志" class="headerlink" title="mysqlbinlog - 查看二进制日志"></a>mysqlbinlog - 查看二进制日志</h3><h4 id="语法格式-64"><a href="#语法格式-64" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh">mysqlbinlog [options] binlog_file ...<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-62"><a href="#常见参数-62" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li>**–start-datetime=”YYYY-MM-DD HH:MM:SS”**：指定起始时间。</li>
+<li>**–stop-datetime=”YYYY-MM-DD HH:MM:SS”**：指定终止时间。</li>
+<li><strong>–start-position=pos</strong>、**–stop-position=pos**：以日志文件中的位置范围过滤。</li>
+<li><strong>–database=dbname</strong>：只解析指定数据库的日志记录。</li>
+</ul>
+<h4 id="示例-64"><a href="#示例-64" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 查看指定时间段内的 binlog 内容</span><br>mysqlbinlog --start-datetime=<span class="hljs-string">&quot;2024-06-01 10:00:00&quot;</span> --stop-datetime=<span class="hljs-string">&quot;2024-06-01 12:00:00&quot;</span> /var/lib/mysql/binlog.000001<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-64"><a href="#注意事项-64" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>必须在 MySQL 配置中启用了 <code>binlog</code>（如在 <code>my.cnf</code> 中设置 <code>log_bin</code>）。</li>
+<li><code>binlog</code> 文件可能较大，解析时需注意系统资源。</li>
+<li>输出的日志内容包含敏感操作，管理时注意权限控制。</li>
+</ul>
+<h3 id="mysqldump-数据库备份"><a href="#mysqldump-数据库备份" class="headerlink" title="mysqldump - 数据库备份"></a>mysqldump - 数据库备份</h3><h4 id="语法格式-65"><a href="#语法格式-65" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh">mysqldump -u username -p [options] database_name [table_name ...] &gt; backup.sql<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-63"><a href="#常见参数-63" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>–databases</strong>：导出一个或多个数据库（包括 <code>CREATE DATABASE</code> 语句）。</li>
+<li><strong>–all-databases</strong>：导出所有数据库。</li>
+<li><strong>–no-data</strong>：只导出表结构，不包含数据。</li>
+<li><strong>–single-transaction</strong>：针对 <code>InnoDB</code> 表的事务性备份，保证数据一致性。</li>
+<li><strong>–routines</strong>：包含存储过程和函数。</li>
+<li><strong>–triggers</strong>：导出触发器（默认包含）。</li>
+</ul>
+<h4 id="示例-65"><a href="#示例-65" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 备份单个数据库 mydb</span><br>mysqldump -u root -p mydb &gt; mydb_backup.sql<br><br><span class="hljs-comment"># 备份所有数据库</span><br>mysqldump -u root -p --all-databases &gt; all_backup.sql<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-65"><a href="#注意事项-65" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><code>mysqldump</code> 适合逻辑备份，对于数据量较大时，可能备份速度较慢。</li>
+<li>使用 <code>--single-transaction</code> 时，适用于 <code>InnoDB</code> 表，确保备份数据一致。</li>
+<li>备份文件中包含敏感信息（如数据和结构），请注意文件权限和传输安全。</li>
+</ul>
+<h3 id="myisamchk-MyISAM-表维护"><a href="#myisamchk-MyISAM-表维护" class="headerlink" title="myisamchk - MyISAM 表维护"></a>myisamchk - MyISAM 表维护</h3><h4 id="语法格式-66"><a href="#语法格式-66" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh">myisamchk [options] /path/to/database/table_name.MYI<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-64"><a href="#常见参数-64" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>-c 或 –check</strong>：检查表是否损坏。</li>
+<li><strong>-r 或 –recover</strong>：修复损坏的表。</li>
+<li><strong>-o 或 –optimize</strong>：优化表，提高查询速度。</li>
+<li><strong>-q</strong>：快速检查，速度较快但详细性较低。</li>
+</ul>
+<h4 id="示例-66"><a href="#示例-66" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 检查表是否有错误</span><br>myisamchk -c /var/lib/mysql/mydb/users.MYI<br><br><span class="hljs-comment"># 修复损坏的表</span><br>myisamchk -r /var/lib/mysql/mydb/users.MYI<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-66"><a href="#注意事项-66" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>使用 <code>myisamchk</code> 前建议停止 MySQL 服务或确保表处于离线状态，否则可能引起数据不一致。</li>
+<li>仅适用于 <code>MyISAM</code> 表，不适用于 <code>InnoDB</code> 表。</li>
+<li>修复过程中请先备份数据，以免操作不当造成数据丢失。</li>
+</ul>
+<h3 id="mysqld-safe-安全启动-MySQL"><a href="#mysqld-safe-安全启动-MySQL" class="headerlink" title="mysqld_safe - 安全启动 MySQL"></a>mysqld_safe - 安全启动 MySQL</h3><h4 id="语法格式-67"><a href="#语法格式-67" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh">mysqld_safe [options] &amp;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-65"><a href="#常见参数-65" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>–skip-grant-tables</strong>：跳过权限表验证，常用于忘记密码时恢复。</li>
+<li><strong>–log-error=/path/to/error.log</strong>：指定错误日志文件。</li>
+<li><strong>–port=port_number</strong>：指定 MySQL 服务监听的端口。</li>
+<li><strong>–datadir</strong>：指定数据目录路径。</li>
+</ul>
+<h4 id="示例-67"><a href="#示例-67" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 以安全模式启动并跳过权限验证（仅用于故障排查）</span><br>mysqld_safe --skip-grant-tables &amp;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-67"><a href="#注意事项-67" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li>使用 <code>--skip-grant-tables</code> 会使数据库在无权限保护状态下运行，应在维护期间短暂使用。</li>
+<li><code>mysqld_safe</code> 通常用作后台进程，确保使用合适的日志文件路径。</li>
+<li>启动后建议检查错误日志，确认服务器运行正常。</li>
+</ul>
+<h3 id="mysqlslap-压力测试"><a href="#mysqlslap-压力测试" class="headerlink" title="mysqlslap - 压力测试"></a>mysqlslap - 压力测试</h3><h4 id="语法格式-68"><a href="#语法格式-68" class="headerlink" title="语法格式"></a>语法格式</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh">mysqlslap [options]<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="常见参数-66"><a href="#常见参数-66" class="headerlink" title="常见参数"></a>常见参数</h4><ul>
+<li><strong>–user, –password</strong>：指定测试的数据库用户和密码。</li>
+<li><strong>–concurrency</strong>：模拟的并发连接数。</li>
+<li><strong>–iterations</strong>：测试运行的次数。</li>
+<li><strong>–query</strong>：指定要执行的 SQL 语句。</li>
+<li><strong>–create-schema</strong>：指定测试使用的数据库名称。</li>
+<li><strong>–engine</strong>：指定使用的存储引擎。</li>
+</ul>
+<h4 id="示例-68"><a href="#示例-68" class="headerlink" title="示例"></a>示例</h4><figure class="highlight sh"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-comment"># 对查询 “SELECT COUNT(*) FROM orders;” 进行压力测试，模拟 50 个并发连接，执行 10 次</span><br>mysqlslap --user=root --password=root --concurrency=50 --iterations=10 --query=<span class="hljs-string">&quot;SELECT COUNT(*) FROM orders;&quot;</span><br></code></pre></div></td></tr></table></figure>
+
+<h4 id="注意事项-68"><a href="#注意事项-68" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><code>mysqlslap</code> 适用于测试环境，不建议在生产数据库上直接运行。</li>
+<li>压力测试时可能对数据库性能产生较大影响，应在低峰期或专用测试服务器上执行。</li>
+<li>调整 <code>--concurrency</code> 和 <code>--iterations</code> 参数以模拟不同的负载场景，并综合分析结果来定位性能瓶颈。</li>
+</ul>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><h3 id="字符集及其校对规则"><a href="#字符集及其校对规则" class="headerlink" title="字符集及其校对规则"></a>字符集及其校对规则</h3><h4 id="定义与作用"><a href="#定义与作用" class="headerlink" title="定义与作用"></a>定义与作用</h4><ul>
+<li><strong>字符集</strong>：是一组字符编码方案，用于存储文本数据，确保不同语言文字能正确编码和解码。</li>
+<li><strong>校对规则</strong>：定义了字符的比较、排序和匹配规则，比如是否区分大小写或重音符号。</li>
+<li><strong>作用</strong>：保证数据的存储、比较和排序遵循统一的编码标准，支持多语言环境，并影响查询时的排序和过滤行为。</li>
+</ul>
+<h4 id="常见的字符集及适用场景"><a href="#常见的字符集及适用场景" class="headerlink" title="常见的字符集及适用场景"></a>常见的字符集及适用场景</h4><ul>
+<li><strong>latin1</strong>：适用于主要使用西欧语言（如英语、法语等）的场景，占用空间较小，但不支持中文。</li>
+<li><strong>utf8</strong>：支持 <code>Unicode</code> 字符，适用于多种语言，但最多支持 3 字节编码，对部分特殊字符（如部分表情）支持有限。</li>
+<li><strong>utf8mb4</strong>：完全支持 <code>Unicode</code> 字符集（4 字节编码），适用于需要存储表情符号、特殊字符或多语言内容的场景，是目前推荐的选择。</li>
+</ul>
+<h4 id="常见校对规则"><a href="#常见校对规则" class="headerlink" title="常见校对规则"></a>常见校对规则</h4><ul>
+<li>如 <code>utf8mb4_general_ci</code>（通用、不区分大小写）和 <code>utf8mb4_bin</code>（按二进制比较，区分大小写），可根据具体业务对排序和比较规则的要求进行选择。</li>
+</ul>
+<h3 id="数据类型和约束"><a href="#数据类型和约束" class="headerlink" title="数据类型和约束"></a>数据类型和约束</h3><h4 id="定义与作用-1"><a href="#定义与作用-1" class="headerlink" title="定义与作用"></a>定义与作用</h4><ul>
+<li><strong>数据类型</strong>：指定字段存储的数据种类和存储空间，确保数据的格式和范围。</li>
+<li><strong>约束</strong>：对数据输入施加限制，保证数据的完整性和正确性，避免不合法或重复数据。</li>
+</ul>
+<h4 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a><strong>数据类型</strong></h4><ul>
+<li><strong>数值类型</strong><ul>
+<li><strong>INT</strong>：常用于存储整数。4 个字节长度。</li>
+<li><strong>BIGINT</strong>：能存放更大范围的整数，常用于存储主键 ID。8 个字节长度。</li>
+<li>**DECIMAL(M, D)**：适合存储精确数值，如货币金额。M取值 1-65，D取值 0-30。</li>
+<li><strong>FLOAT/DOUBLE</strong>：用于存储浮点数，但存在精度问题，适用于对精度要求不高的场景。<code>FLOAT</code> 为 4 个字节长度，<code>DOUBLE</code> 为 8 个字节长度。</li>
+<li><strong>其他</strong>：<code>BIT</code>（0 或 1，长度为 1 比特）、<code>TINYINT</code>（整数，长度为 1 个字节）、<code>SMALLINT</code>（整数，长度为 2 个字节）、<code>MEDIUMINT</code>（整数，长度为 3 个字节）。</li>
+</ul>
+</li>
+<li><strong>字符串类型</strong><ul>
+<li><strong>CHAR</strong>：固定长度字符串，适用于存储固定格式的数据（如国家代码）。最大 256 个字节长度。</li>
+<li><strong>VARCHAR</strong>：可变长度字符串，适合存储长度不定的文本，如用户名、电子邮件。最大 65535 个字节长度。</li>
+<li><strong>TEXT</strong>：用于存储大量文本数据，如文章内容。最大 65535 个字节长度。</li>
+<li><strong>其他</strong>：<code>TINYTEXT</code>（最大 256 个字节长度）、<code>MEDIUMTEXT</code>（最大 16MB）、<code>LONGTEXT</code>（最大 4GB）。</li>
+</ul>
+</li>
+<li><strong>日期和时间类型</strong><ul>
+<li><strong>YEAR、MONTH、DATE、TIME、DATETIME、TIMESTAMP</strong>：用于存储年、月、日期、时间或时间戳，适合记录事件发生时间等。</li>
+</ul>
+</li>
+<li><strong>其他</strong><ul>
+<li><strong>枚举型</strong>：<code>ENUM</code>。</li>
+<li><strong>集合型</strong>：<code>SET</code>。</li>
+<li><strong>二进制</strong>：<code>BINARY</code>、<code>VARBINARY</code>、<code>TINYBLOG</code>、<code>BLOG</code>、<code>MEDIUMBLOB</code>、<code>LONGBLOB</code>。</li>
 </ul>
 </li>
 </ul>
-<h3 id="视图"><a href="#视图" class="headerlink" title="视图"></a>视图</h3><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">-- 创建/修改<br>create [or replace]<br>[algorithm = &#123;undefined | merge | temptable&#125;]<br>view 视图名称 [(字段列表)]<br>as 查询语句<br>[with [cascaded|local] check option];<br><br>-- 查看<br>show tables;<br>desc|describe 视图名称;<br>show table status like &#x27;视图名称&#x27;;<br>show create view 视图名称;<br><br>-- 修改<br>alter view 视图名称 as 查询语句;<br><br>-- 删除<br>drop view if exists 视图名称 [, 视图名称2, ...];<br></code></pre></div></td></tr></table></figure>
-
-<h2 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h2><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">-- 查看所有全局变量<br>show global variables [like &#x27;%xxxx%&#x27;];<br><br>-- 查看所有会话变量<br>show session variables [like &#x27;%xxxx%&#x27;];<br>show variables [like &#x27;%xxxx%&#x27;];<br></code></pre></div></td></tr></table></figure>
-
-<h2 id="DML"><a href="#DML" class="headerlink" title="DML"></a>DML</h2><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">-- 添加数据<br>insert into 表名 set 字段名1=值1[,字段名2=值2,...];<br>insert into 表名[(字段名1,字段名2,...)]values(值1,值2,...)[,(值1,值2,...)...];<br>insert into 表名(字段1,字段2,...)select...<br><br>-- 更新数据<br>update 表名 set 字段名1=值1[,字段名2=值2,...] [where 条件表达式];<br><br>-- 删除数据<br>delete from 表名 [where 条件表达式];<br>truncate [table] 表名;<br><br>-- 替换或更新数据<br>replace into 表名 set 字段名1=值1[,字段名2=值2,...];<br>replace into 表名[(字段名1,字段名2,...)]values(值1,值2,...)[,(值1,值2,...)...];<br>replace into 表名(字段1,字段2,...)select...<br></code></pre></div></td></tr></table></figure>
-
-<h2 id="DQL"><a href="#DQL" class="headerlink" title="DQL"></a>DQL</h2><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">-- 简单查询<br>select * from 表名;<br><br>-- 按条件查询<br>select * from 表名 where 条件表达式 [and 条件表达式];<br>select * from 表名 where 条件表达式 [or 条件表达式];<br>select * from 表名 where 字段名 [not] in(元素1,元素2,......);<br>select * from 表名 where 字段名 [not] between 值1 and 值2;<br>select * from 表名 where 字段名 is [not] null;<br>select * from 表名 where 字段名 [not] like &#x27;匹配字符串&#x27; [escape &#x27;特殊字符&#x27;];<br>select * from 表名 where 字段名 regexp &#x27;正则表达式&#x27;;<br><br>-- 去重查询<br>select distinct 字段名 from 表名;<br><br>-- 排序查询<br>select 字段名1,字段名2,... from 表名 order by 字段名1 [asc|desc],字段名2 [asc|desc]...;<br><br>-- 分组查询<br>select 字段名1,字段名2,... from 表名 group by 字段名1, 字段名2, ... [having 条件表达式] [with rollup];<br><br>-- 限制查询<br>select 字段名1,字段名2,... from 表名 limit [位置偏移量, ] 记录数;<br><br>-- 取别名<br>select * from 表名 [as] 别名;<br><br>-- 交叉连接查询<br>select * from 表1, 表2 where 表1.字段 = 表2.字段 [and 条件];<br>select * from 表1 [[cross] join] 表2 where 表1.字段 = 表2.字段 [and 条件];<br><br>-- 内连接查询<br>select * from 表1 [inner] join 表2 on 表1.关系字段 = 表2.关系字段;<br><br>-- 外连接查询<br>select * from 表1 left | right | [outer] join 表2 on 表1.关系字段 = 表2.关系字段 where 条件;<br><br>-- 自然连接<br>select * from 表1 natural join 表2;<br><br>-- USING连接<br>select * from 表1 join 表2 using(关系字段);<br><br>-- 合并查询<br>select 字段 from 表1 UNION [ALL] select 字段 from 表2;<br><br>-- 复合查询<br>select * from 表1 where x in (select x from 表2);<br>select * from 表1 where x = (select x from 表2);<br>select * from 表1 where x &gt; | &lt; any(select x from 表2);<br>select * from 表1 where x &gt; | &lt; all(select x from 表2);<br>select * from 表1 where exists(select x from 表2);<br><br>-- 总<br>select distinct ... from ... join ... on ... where ... group by ... having ... order by ... limit ...;<br></code></pre></div></td></tr></table></figure>
-
-<h2 id="TCL"><a href="#TCL" class="headerlink" title="TCL"></a>TCL</h2><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">-- 开启事务<br>start transaction;<br><br>-- 提交事务<br>commit;<br><br>-- 取消事务（回滚，只能针对未提交的事务）<br>rollback;<br><br>-- 设置隔离级别<br>set session transaction isolation level read uncommitted;<br>set session transaction isolation level read committed;<br>set session transaction isolation level repeatable read;<br>set session transaction isolation level serializable;<br></code></pre></div></td></tr></table></figure>
-
-<h2 id="DCL"><a href="#DCL" class="headerlink" title="DCL"></a>DCL</h2><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">-- 创建用户<br>create user &#x27;用户名&#x27;@&#x27;主机名&#x27; identified by &#x27;密码&#x27;;<br>insert into mysql.user(Host,User,Password,ssl_cipher,x509_issuer,x509_subject)values(&#x27;主机名&#x27;,&#x27;用户名&#x27;,password(&#x27;密码&#x27;),&#x27;,&#x27;,&#x27;,&#x27;);<br><br>-- 删除用户<br>drop user &#x27;用户名&#x27;@&#x27;主机地址&#x27;;<br>delete from mysql.user where user=&#x27;用户名&#x27; and host=&#x27;主机名&#x27;;<br><br>-- 修改root密码<br>set password = password(&#x27;新密码&#x27;);<br>update user set password=password(&#x27;新密码&#x27;) where user=&#x27;用户名&#x27; and host=&#x27;主机名&#x27;;<br><br>-- 修改普通用户密码<br>grant usage on 数据库.表 to &#x27;用户名&#x27;@&#x27;主机名&#x27; identified by [password]&#x27;new_password&#x27;;<br>update mysql.user set password=password(&#x27;新密码&#x27;) where user=&#x27;用户名&#x27; and host=&#x27;主机名&#x27;;<br>set password for &#x27;用户名&#x27;@&#x27;主机名&#x27;=password(&#x27;新密码&#x27;);<br><br>-- 普通用户修改密码<br>set password = password(&#x27;新密码&#x27;);<br><br>-- 授权<br>grant 权限 [(columns)][,privileges[(columns)]] on 数据库.表 to &#x27;用户名&#x27;@&#x27;主机&#x27; [identified by [密码] [,&#x27;用户名&#x27;@&#x27;主机&#x27; [identified by 密码] ... [with grant option ...]<br><br>-- 查看权限<br>show grants for &#x27;用户名&#x27;@&#x27;主机&#x27;;<br><br>-- 回收权限<br>revoke privileges [columns][,privileges[(columns)]] on 数据库.表 from &#x27;用户名&#x27;@&#x27;主机&#x27;;<br>revoke all privileges,grant option from &#x27;用户名&#x27;@&#x27;主机&#x27;;<br></code></pre></div></td></tr></table></figure>
-
-<ul>
-<li>权限：all privileges表示所有权限，其余可通过 <strong>show privileges</strong> 查看</li>
-<li>columns：表示权限作用于某一列，省略不写则权限作用于整个表</li>
-<li>grant option：将自己的权限授予其他用户</li>
+<h4 id="约束"><a href="#约束" class="headerlink" title="约束"></a>约束</h4><ul>
+<li><strong>NOT NULL</strong>：确保字段必须有值，防止出现空数据。</li>
+<li><strong>DEFAULT</strong>：为字段设定默认值，保证插入数据时若未指定字段值时使用预设值。</li>
+<li><strong>PRIMARY KEY</strong>：定义主键，确保每条记录唯一，并常用于建立聚集索引以加速查询。</li>
+<li><strong>UNIQUE</strong>：确保字段值唯一，避免重复数据。</li>
+<li><strong>FOREIGN KEY</strong>：确保数据之间的参照完整性，维护表与表之间的关联关系。</li>
+<li><strong>AUTO_INCREMENT</strong>：自动生成唯一递增的数值，常用于主键字段。</li>
+<li><strong>CHECK</strong>（在部分版本中支持）：用来限制字段可接受的值范围或格式。</li>
+<li><strong>UNSIGNED</strong>：无符号约束，限制列的取值范围只能是非负数。</li>
+<li><strong>CHARACTER SET</strong>：字符集约束，用于定义值的字符集。</li>
 </ul>
-<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 备份单个数据库</span><br>mysqldump -uusername -ppassword dbname&gt;filename.sql<br><br><span class="hljs-comment"># 备份多个数据库</span><br>mysqldump -uusername -ppassword --databases dbname1 dbname2...&gt;filename.sql<br><br><span class="hljs-comment"># 备份所有数据库</span><br>mysqldump -uusername -ppassword --all-databases&gt;filename.sql<br><br><span class="hljs-comment"># 数据库还原（注意，还原的只是数据，库不能被还原）</span><br>mysql -uusername -ppassword dbname&lt;filename.sql<br><br><span class="hljs-comment"># 修改密码</span><br>mysqladmin -uusername -ppassword password 新密码<br></code></pre></div></td></tr></table></figure>
-
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过本文的学习，开发者应能够掌握MySQL数据库的各项基础和高级命令，包括数据库的创建和修改、数据表的管理、数据的增删改查、事务的控制以及用户权限的设置等。这些命令是数据库日常管理和优化中不可或缺的工具，能够帮助开发者更高效地处理数据库相关的任务，确保数据的安全性和稳定性。随着对这些命令更深入的理解和应用，开发者将能更自信地管理和优化其数据库环境。</p>
+<h3 id="创建表选项"><a href="#创建表选项" class="headerlink" title="创建表选项"></a>创建表选项</h3><h4 id="定义与作用-2"><a href="#定义与作用-2" class="headerlink" title="定义与作用"></a>定义与作用</h4><ul>
+<li><strong>table_options</strong>：是在创建数据表时附加的选项，用来设定表级别的特性和属性，直接影响表的存储方式、性能及维护性。</li>
+</ul>
+<h4 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h4><ul>
+<li><p><strong>ENGINE</strong></p>
+<ul>
+<li><p>如 <code>InnoDB</code>（支持事务、行级锁、外键约束）适合高并发和数据一致性要求较高的应用。</p>
+</li>
+<li><p><code>MyISAM</code>（读性能较好，但不支持事务）适用于只读或对事务要求不高的场景。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>DEFAULT CHARSET 和 COLLATE</strong></p>
+<ul>
+<li>决定表中字符数据的编码方式和比较规则，适用于确保数据在多语言环境下正确存储和排序。</li>
+</ul>
+</li>
+<li><p><strong>AUTO_INCREMENT</strong></p>
+<ul>
+<li>定义自增字段的起始值和增长方式，常用于主键字段。</li>
+</ul>
+</li>
+<li><p><strong>COMMENT</strong></p>
+<ul>
+<li>用于对表进行注释，说明表的用途，便于维护和团队协作。</li>
+</ul>
+</li>
+<li><p><strong>ROW_FORMAT</strong></p>
+<ul>
+<li>如 <code>COMPACT</code>、<code>DYNAMIC</code> 等，可调整数据行的存储格式，影响空间利用率和 I/O 性能，通常根据实际存储需求选择。</li>
+</ul>
+</li>
+</ul>
+<h3 id="常见变量"><a href="#常见变量" class="headerlink" title="常见变量"></a>常见变量</h3><h4 id="连接与会话相关"><a href="#连接与会话相关" class="headerlink" title="连接与会话相关"></a>连接与会话相关</h4><ul>
+<li><strong>max_connections</strong>：控制允许同时连接 MySQL 的最大客户端数量。</li>
+<li><strong>wait_timeout</strong>：非交互式连接空闲超时时间，超过该时间未有活动，连接将被关闭。</li>
+<li><strong>interactive_timeout</strong>：交互式连接的超时时间，主要影响使用命令行客户端的连接。</li>
+</ul>
+<h4 id="SQL-模式和行为控制"><a href="#SQL-模式和行为控制" class="headerlink" title="SQL 模式和行为控制"></a>SQL 模式和行为控制</h4><ul>
+<li><strong>sql_mode</strong>：指定 SQL 的行为模式，如严格模式（<code>STRICT_TRANS_TABLES</code>）、<code>ANSI</code> 模式等，决定数据验证、错误处理等细节。</li>
+</ul>
+<h4 id="字符集与排序规则"><a href="#字符集与排序规则" class="headerlink" title="字符集与排序规则"></a>字符集与排序规则</h4><ul>
+<li><strong>character_set_server</strong>：服务器默认的字符集，决定新建数据库、表的默认编码。</li>
+<li><strong>collation_server</strong>：服务器默认的排序规则，与字符集配合决定字符串比较和排序行为。</li>
+</ul>
+<h4 id="InnoDB-存储引擎相关"><a href="#InnoDB-存储引擎相关" class="headerlink" title="InnoDB 存储引擎相关"></a>InnoDB 存储引擎相关</h4><ul>
+<li><strong>innodb_buffer_pool_size</strong>：<code>InnoDB</code> 缓冲池大小，用于缓存数据和索引，直接影响性能。</li>
+<li><strong>innodb_log_file_size</strong>：<code>InnoDB</code> 日志文件的大小，影响事务日志的写入和恢复性能。</li>
+</ul>
+<h4 id="内存与缓存设置"><a href="#内存与缓存设置" class="headerlink" title="内存与缓存设置"></a>内存与缓存设置</h4><ul>
+<li><strong>max_allowed_packet</strong>：单个数据包的最大允许大小，影响大数据传输和 <code>BLOB</code> 数据处理。</li>
+<li><strong>tmp_table_size</strong> 与 <strong>max_heap_table_size</strong>：控制临时表的大小，影响复杂查询（如排序、分组）时使用内存表的容量。</li>
+<li><strong>query_cache_size</strong>（在部分 MySQL 版本中有效）：指定查询缓存的大小，有助于加快相同查询的响应速度（注意 MySQL 8.0 已移除该功能）。</li>
+</ul>
+<h4 id="复制和服务器标识"><a href="#复制和服务器标识" class="headerlink" title="复制和服务器标识"></a>复制和服务器标识</h4><ul>
+<li><strong>server_id</strong>：在主从复制环境中，每个服务器的唯一标识符。</li>
+</ul>
+<h4 id="其他常见变量"><a href="#其他常见变量" class="headerlink" title="其他常见变量"></a>其他常见变量</h4><ul>
+<li><strong>port</strong>：MySQL 监听的端口号（通常为 <code>3306</code>）。</li>
+<li><strong>log_error</strong>：指定错误日志的存储位置，用于排查问题。</li>
+<li><strong>version</strong>：显示 MySQL 的版本信息。</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文将常见的 MySQL 命令按照 <code>DDL</code>、<code>DML</code>、<code>DQL</code>、<code>DCL</code>、<code>TCL</code>、<code>SCL</code>、<code>DTL</code> 等类别进行了系统梳理，每部分都包含语法、参数、示例和注意事项，方便读者检索和记忆。另一方面，本文从基本的数据表操作（<code>CREATE TABLE</code>, <code>ALTER TABLE</code> 等）到高级的存储过程、触发器，再到服务器管理和备份恢复工具（<code>mysqldump</code>、<code>mysqladmin</code> 等），涵盖面全面，直接适用于日常开发和运维场景。通过深入了解并熟练运用本文所述命令，读者能够更高效地进行数据库建模、数据操作、性能调优以及安全管理。无论是开发还是运维层面，这些命令都是 MySQL 使用中不可或缺的基础工具。</p>
 
             </div>
             <hr>
@@ -363,9 +1394,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2021/07/10/mysql-functions/">
+                      <a href="/2021/08/01/javase-cp-thread/">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">MySQL常用函数</span>
+                        <span class="hidden-mobile">Java并发编程——线程</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     

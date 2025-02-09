@@ -1,0 +1,832 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="引言在数据库高并发应用中，对数据进行安全并行读写的关键技术之一便是锁。MySQL 在不同存储引擎与不同层面（全局、表、行、元数据等）都提供了多种锁机制来保障数据一致性与并发性能。其中，InnoDB 通过行级锁与多版本并发控制（MVCC）实现了高并发与事务隔离的平衡，而 MyISAM 则依赖简单的表级锁适用于读多写少场景。本文将从全局锁、表级锁、行级锁等多方面系统介绍 MySQL 的锁体系，探讨从锁">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL锁机制">
+<meta property="og:url" content="http://example.com/2022/08/08/mysql-lock/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="引言在数据库高并发应用中，对数据进行安全并行读写的关键技术之一便是锁。MySQL 在不同存储引擎与不同层面（全局、表、行、元数据等）都提供了多种锁机制来保障数据一致性与并发性能。其中，InnoDB 通过行级锁与多版本并发控制（MVCC）实现了高并发与事务隔离的平衡，而 MyISAM 则依赖简单的表级锁适用于读多写少场景。本文将从全局锁、表级锁、行级锁等多方面系统介绍 MySQL 的锁体系，探讨从锁">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/mysql-windows-function.webp">
+<meta property="article:published_time" content="2022-08-07T17:46:43.000Z">
+<meta property="article:modified_time" content="2022-08-07T17:46:43.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="MySQL">
+<meta property="article:tag" content="MySQL锁机制">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/mysql-windows-function.webp">
+  
+  
+  <title>MySQL锁机制 - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/mysql-windows-function.webp') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="MySQL锁机制">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-08-08 01:46" pubdate>
+        2022年8月8日 凌晨
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      7.7k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      13 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">MySQL锁机制</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：3 年前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>在数据库高并发应用中，对数据进行安全并行读写的关键技术之一便是锁。MySQL 在不同存储引擎与不同层面（全局、表、行、元数据等）都提供了多种锁机制来保障数据一致性与并发性能。其中，<code>InnoDB</code> 通过行级锁与多版本并发控制（<code>MVCC</code>）实现了高并发与事务隔离的平衡，而 <code>MyISAM</code> 则依赖简单的表级锁适用于读多写少场景。本文将从全局锁、表级锁、行级锁等多方面系统介绍 MySQL 的锁体系，探讨从锁的分类、适用场景到死锁处理、锁优化等关键话题，帮助开发者在设计与运维中能更好地掌控数据库的并发行为。</p>
+<h2 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h2><h3 id="全局锁（Global-Lock）"><a href="#全局锁（Global-Lock）" class="headerlink" title="全局锁（Global Lock）"></a>全局锁（Global Lock）</h3><h4 id="定义与作用"><a href="#定义与作用" class="headerlink" title="定义与作用"></a>定义与作用</h4><p>全局锁是作用于整个 MySQL 实例的锁，通常用于对所有数据库或整个实例进行操作时，防止数据发生变化。最典型的使用场景包括数据备份和主从复制的一致性维护。</p>
+<h4 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h4><ul>
+<li>锁定范围大，覆盖整个实例所有的数据库和表。</li>
+<li>使用时需要特别注意锁的释放，否则会导致数据库不可写，影响正常业务。</li>
+</ul>
+<h4 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h4><ul>
+<li><strong>数据备份</strong>：在进行物理备份或冷备份时，通过全局锁保证数据一致性。</li>
+<li><strong>主从复制配置</strong>：在配置复制时，确保主库数据在复制过程中不会发生写入操作，便于建立稳定的复制关系。</li>
+</ul>
+<h4 id="使用示例"><a href="#使用示例" class="headerlink" title="使用示例"></a>使用示例</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">FLUSH TABLES WITH READ LOCK;<br></code></pre></div></td></tr></table></figure>
+
+<p>该命令会锁住所有打开的表，期间所有写操作（<code>INSERT</code>、<code>UPDATE</code>、<code>DELETE</code> 等）都会被阻塞，直至锁释放。</p>
+<h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><strong>锁定范围广</strong>：全局锁会影响整个实例，因此在生产环境中使用时必须非常谨慎，避免长时间持锁导致业务不可写。</li>
+<li><strong>释放锁</strong>：全局锁一般在当前连接断开或显式执行解锁操作时释放。开发者应确保在备份或配置工作完成后及时释放锁，否则可能影响系统性能。</li>
+<li><strong>业务中断风险</strong>：由于全局锁会阻塞所有写请求，建议在业务低峰期或维护窗口内使用。</li>
+</ul>
+<h3 id="表级锁（Table-Lock）"><a href="#表级锁（Table-Lock）" class="headerlink" title="表级锁（Table Lock）"></a>表级锁（Table Lock）</h3><h4 id="定义与作用-1"><a href="#定义与作用-1" class="headerlink" title="定义与作用"></a>定义与作用</h4><p>表级锁是对整个数据表进行加锁，常见于 <code>MyISAM</code> 和 <code>Memory</code> 存储引擎，也可能出现在 <code>InnoDB</code> 的某些场景中。</p>
+<p>表级锁可以明确分为两种模式：读锁、写锁。</p>
+<h4 id="适用场景-1"><a href="#适用场景-1" class="headerlink" title="适用场景"></a>适用场景</h4><ul>
+<li><strong>批量操作</strong>：当需要对表进行一系列操作并保证数据在整个操作期间不被其他连接修改时，可以使用表级锁。</li>
+<li><strong>MyISAM 存储引擎</strong>：由于 <code>MyISAM</code> 只支持表级锁，因此在该引擎下所有的并发控制都依赖于这种锁机制。</li>
+</ul>
+<h4 id="使用示例-1"><a href="#使用示例-1" class="headerlink" title="使用示例"></a>使用示例</h4><ol>
+<li><p>使用 <code>LOCK TABLES</code> 语句进行锁定，注意需要指明锁的种类</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql"># 对指定表加读锁，允许其他会话读取，但禁止写入。<br>LOCK TABLES table_name READ;<br><br># 对指定表加写锁，其他会话既不能读取也不能写入。<br>LOCK TABLES table_name WRITE;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>使用完毕释放锁</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">UNLOCK TABLES;<br></code></pre></div></td></tr></table></figure></li>
+</ol>
+<h4 id="注意事项-1"><a href="#注意事项-1" class="headerlink" title="注意事项"></a>注意事项</h4><ul>
+<li><strong>锁的粒度</strong>：由于表级锁锁定的是整张表，可能会导致不必要的阻塞，特别是在高并发场景下。使用时应权衡并发性与一致性要求。</li>
+<li><strong>事务与锁无关</strong>：表级锁通常不在事务中自动释放（除非使用事务性引擎），开发者需要手动调用 <code>UNLOCK TABLES</code> 进行释放。</li>
+<li><strong>避免死锁</strong>：如果多个连接需要锁定多个表，必须严格按照相同的顺序加锁，以避免死锁风险。</li>
+</ul>
+<h3 id="元数据锁（Metadata-Lock-MDL）"><a href="#元数据锁（Metadata-Lock-MDL）" class="headerlink" title="元数据锁（Metadata Lock, MDL）"></a>元数据锁（Metadata Lock, MDL）</h3><h4 id="定义与作用-2"><a href="#定义与作用-2" class="headerlink" title="定义与作用"></a>定义与作用</h4><p>元数据锁并非由用户直接控制，而是由 MySQL 内部在执行 <code>DDL</code>（如 <code>ALTER</code>、<code>DROP</code>、<code>RENAME</code> 等）时自动加上的锁。其主要目的是保护表的结构和定义，防止在执行 <code>DDL</code> 操作时，<code>DML</code> 操作对表结构造成冲突或不一致。</p>
+<h4 id="特点-1"><a href="#特点-1" class="headerlink" title="特点"></a>特点</h4><ul>
+<li><code>MDL</code> 是在每次访问表时都会隐式加上的锁，既存在于读操作，也存在于写操作中。</li>
+<li>与显式的表级锁不同，<code>MDL</code> 的管理更透明，通常不需要开发人员手动干预。</li>
+</ul>
+<h4 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h4><p>在高并发环境下执行 <code>DDL</code> 可能产生长时间阻塞，或使读写操作被阻塞，就是 <code>MDL</code> 的影响，所以在业务繁忙时期一律禁止执行 <code>DDL</code> 操作。</p>
+<h3 id="行级锁（Row-Lock）"><a href="#行级锁（Row-Lock）" class="headerlink" title="行级锁（Row Lock）"></a>行级锁（Row Lock）</h3><p>行级锁主要由 <code>InnoDB</code> 存储引擎实现，其粒度较细，能够提高并发处理能力。行级锁可以进一步细分为多种类型，根据不同的场景选择合适的锁定方式。</p>
+<h4 id="共享锁（Shared-Lock）"><a href="#共享锁（Shared-Lock）" class="headerlink" title="共享锁（Shared Lock）"></a>共享锁（Shared Lock）</h4><p><strong>定义与作用</strong></p>
+<ul>
+<li>允许其他事务同时加共享锁读取相同的数据行，但不允许其他事务对这些数据行加排他锁进行修改。</li>
+<li>保证在当前事务期间，数据不会被其他事务修改，从而保持读取数据的一致性。</li>
+</ul>
+<p><strong>适用场景</strong></p>
+<ul>
+<li><p>当需要读取数据并确保在当前事务内数据不被更新时使用共享锁。</p>
+</li>
+<li><p>适用于需要多事务并发读取但不希望数据发生变动的场景，例如统计、报表等只读操作。</p>
+</li>
+</ul>
+<p><strong>使用示例</strong></p>
+<p>使用 <code>LOCK IN SHARE MODE</code> 表示对查询结果集中的每一行加共享锁。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">START TRANSACTION;<br>SELECT * FROM your_table WHERE condition LOCK IN SHARE MODE;<br>-- 后续可以进行其他操作<br>COMMIT;<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>注意事项</strong></p>
+<ul>
+<li><strong>锁持有时间</strong>：共享锁会一直持有到事务结束（提交或回滚），因此应尽快完成相关操作，避免长时间持锁导致并发性能下降。</li>
+<li><strong>并发影响</strong>：多个事务可以同时获取共享锁，但如果有事务试图对相同数据加排他锁，则会被阻塞，直到所有共享锁释放。</li>
+<li><strong>与事务隔离级别的关系</strong>：在 <code>REPEATABLE READ</code> 或 <code>SERIALIZABLE</code> 隔离级别下，MySQL 可能会自动加锁来防止幻读，显式加共享锁时应注意与自动加锁行为的交互。</li>
+<li><strong>使用索引</strong>：建议在查询条件中使用索引，以避免锁定过多无关数据行，减少锁竞争和可能的性能问题。</li>
+</ul>
+<h4 id="排他锁（Exclusive-Lock）"><a href="#排他锁（Exclusive-Lock）" class="headerlink" title="排他锁（Exclusive Lock）"></a>排他锁（Exclusive Lock）</h4><p><strong>定义与作用</strong></p>
+<ul>
+<li>排他锁允许事务对数据进行修改，同时禁止其他事务对同一数据进行读取或修改。</li>
+</ul>
+<p><strong>适用场景</strong></p>
+<ul>
+<li><strong>数据修改操作</strong>：排他锁主要用于更新、删除或插入操作前，确保当前事务对数据拥有完全的控制权，防止其他事务并发修改相同数据，造成数据不一致。</li>
+<li><strong>预防并发问题</strong>：在某些需要强制序列化操作的业务场景下，显式加排他锁可以避免因并发修改引起的竞争和死锁问题（前提是锁粒度和锁顺序设计合理）。</li>
+</ul>
+<p><strong>使用示例</strong></p>
+<p>使用 <code>FOR UPDATE</code> 表示对查询结果中的每一行加排他锁。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">START TRANSACTION;<br>SELECT * FROM your_table WHERE condition FOR UPDATE;<br>-- 进行更新或其他修改操作<br>COMMIT;<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>注意事项</strong></p>
+<ul>
+<li><strong>锁的范围与精确性</strong>：使用 <code>FOR UPDATE</code> 时，尽可能通过精确的查询条件或利用索引，避免锁定不必要的数据行，减少潜在的锁冲突和死锁风险。如果查询条件不够精准，可能会锁定超出预期范围的数据，从而影响其他事务的执行。</li>
+<li><strong>锁持有时间</strong>：同共享锁一样，排他锁会一直持有到事务结束。因此，建议在获取锁后尽快完成修改操作，并及时提交或回滚事务，避免长时间持锁阻塞其他事务。</li>
+<li><strong>死锁风险</strong>：排他锁的使用不当容易导致死锁。设计事务时应确保所有事务遵循相同的加锁顺序，减少交叉锁定的情况。在开发过程中，可通过 <code>SHOW ENGINE INNODB STATUS</code> 来监控和诊断死锁问题，并根据日志信息进行相应优化。</li>
+<li><strong>与自动加锁机制的关系</strong>：在某些情况下，<code>InnoDB</code> 会自动为数据修改操作加排他锁。开发者在显式使用 <code>FOR UPDATE</code> 时，应了解数据库自动加锁的行为，避免重复锁定或逻辑混淆。</li>
+</ul>
+<h4 id="意向锁（Intention-Lock）"><a href="#意向锁（Intention-Lock）" class="headerlink" title="意向锁（Intention Lock）"></a>意向锁（Intention Lock）</h4><p><strong>定义</strong></p>
+<ul>
+<li>意向锁是 <code>InnoDB</code> 为了兼顾表级锁和行级锁之间的协调而引入的锁机制。</li>
+<li>它并不直接锁定数据行，而是表示事务打算在这些行上加何种类型的锁。</li>
+</ul>
+<p><strong>作用</strong></p>
+<ul>
+<li>通过意向锁，<code>InnoDB</code> 可以在对表进行锁定时快速判断是否存在行级锁，从而避免不必要的锁冲突。</li>
+<li>意向锁和表级锁兼容，帮助实现锁粒度的逐级检查。</li>
+</ul>
+<p><strong>分类</strong></p>
+<ul>
+<li><strong>意向共享锁（IS）：</strong> 表示事务准备在行级上加共享锁。</li>
+<li><strong>意向排他锁（IX）：</strong> 表示事务准备在行级上加排他锁。</li>
+</ul>
+<h4 id="间隙锁（Gap-Lock）"><a href="#间隙锁（Gap-Lock）" class="headerlink" title="间隙锁（Gap Lock）"></a>间隙锁（Gap Lock）</h4><p><strong>定义与作用</strong></p>
+<ul>
+<li>间隙锁锁定的是索引值之间的 “间隙” 区域，而不是具体的记录。</li>
+<li>主要用于防止其他事务在已锁定的范围内插入新的数据，从而避免幻读现象。</li>
+</ul>
+<p><strong>使用场景</strong></p>
+<ul>
+<li>在 <code>REPEATABLE READ</code> 隔离级别下，<code>InnoDB</code> 会自动使用间隙锁来防止幻读。</li>
+<li>常见于范围查询操作，例如 <code>SELECT ... FOR UPDATE WHERE id BETWEEN ...</code>。</li>
+</ul>
+<h4 id="临键锁（Next-Key-Lock）"><a href="#临键锁（Next-Key-Lock）" class="headerlink" title="临键锁（Next-Key Lock）"></a>临键锁（Next-Key Lock）</h4><p><strong>定义与作用</strong></p>
+<ul>
+<li>临键锁是行锁与间隙锁的组合，既锁定了索引记录本身，也锁定了该记录前面的间隙。</li>
+<li>这种锁机制主要用于防止幻读，在范围查询中非常常见。</li>
+</ul>
+<p><strong>使用场景</strong></p>
+<ul>
+<li>当查询条件涉及索引的连续范围时，<code>InnoDB</code> 会采用临键锁来确保整个范围内的数据状态稳定。</li>
+</ul>
+<h4 id="记录锁"><a href="#记录锁" class="headerlink" title="记录锁"></a>记录锁</h4><p><strong>定义与作用</strong></p>
+<ul>
+<li>记录锁是对数据行本身的锁定，不包括记录间的间隙。</li>
+<li>在某些场景下（如精确索引查找），<code>InnoDB</code> 只对命中的行加记录锁，而不必对间隙加锁，从而提高并发性能。</li>
+</ul>
+<p><strong>使用场景</strong></p>
+<ul>
+<li>对于基于主键或唯一索引的精确查找，<code>InnoDB</code> 通常只加记录锁，而避免额外的间隙锁。</li>
+</ul>
+<h4 id="自增锁（AUTO-INC-Lock）"><a href="#自增锁（AUTO-INC-Lock）" class="headerlink" title="自增锁（AUTO-INC Lock）"></a>自增锁（AUTO-INC Lock）</h4><p><strong>定义与作用</strong></p>
+<ul>
+<li>自增锁是 <code>InnoDB</code> 针对 <code>AUTO_INCREMENT</code> 列设计的特殊锁。</li>
+<li>它保证在并发插入数据时，生成的自增值不会冲突，并且保持有序性。</li>
+</ul>
+<p><strong>使用场景</strong></p>
+<ul>
+<li>当一个表中存在 <code>AUTO_INCREMENT</code> 字段时，在执行插入操作时，<code>InnoDB</code> 会临时获取一个轻量级的自增锁，确保当前事务生成的自增值不会被其他事务干扰。</li>
+</ul>
+<h2 id="存储引擎与锁"><a href="#存储引擎与锁" class="headerlink" title="存储引擎与锁"></a>存储引擎与锁</h2><p>MySQL 支持多种存储引擎，不同引擎的锁机制有较大差异，主要体现在锁粒度、锁类型和并发控制方式上。</p>
+<h3 id="InnoDB"><a href="#InnoDB" class="headerlink" title="InnoDB"></a>InnoDB</h3><h4 id="主要特点"><a href="#主要特点" class="headerlink" title="主要特点"></a>主要特点</h4><p><code>InnoDB</code> 是 MySQL 默认的事务型存储引擎，支持 <code>ACID</code> 事务，采用行级锁和多版本并发控制（<code>MVCC</code>）来提高并发性能和数据一致性。</p>
+<h4 id="锁粒度与锁类型"><a href="#锁粒度与锁类型" class="headerlink" title="锁粒度与锁类型"></a>锁粒度与锁类型</h4><ul>
+<li><p><strong>行级锁</strong>：</p>
+<ul>
+<li><strong>共享锁（S Lock） 和 排他锁（X Lock）</strong>：用于控制单行数据的读取和修改。</li>
+<li><strong>记录锁</strong>：锁定实际存在的数据行。</li>
+<li><strong>间隙锁（Gap Lock）</strong>：锁定索引记录之间的间隙，防止幻读。</li>
+<li><strong>临键锁（Next-Key Lock）</strong>：行锁与间隙锁的组合，既锁定记录也锁定其前的间隙。</li>
+</ul>
+</li>
+<li><p><strong>意向锁（Intention Lock）</strong>：</p>
+<p>用于表级的标记，表明事务打算在行级上加共享锁或排他锁，便于存储引擎在处理表级操作时迅速判断行锁情况。</p>
+</li>
+<li><p><strong>自增锁</strong>：</p>
+<p>针对 <code>AUTO_INCREMENT</code> 列设计的轻量级锁，保证并发插入时生成的自增值顺序性和唯一性。</p>
+</li>
+</ul>
+<h4 id="并发控制机制"><a href="#并发控制机制" class="headerlink" title="并发控制机制"></a>并发控制机制</h4><ul>
+<li>采用 <code>MVCC</code>，允许非锁定读取，通过保存数据的历史版本（<code>Undo Log</code>）来实现一致性读。</li>
+<li>依靠锁与版本控制共同维护事务隔离，同时在高并发场景下降低锁竞争。</li>
+</ul>
+<h3 id="MyISAM"><a href="#MyISAM" class="headerlink" title="MyISAM"></a>MyISAM</h3><h4 id="主要特点-1"><a href="#主要特点-1" class="headerlink" title="主要特点"></a>主要特点</h4><p><code>MyISAM</code> 为非事务型存储引擎，主要特点是查询速度较快，但不支持事务和行级锁。</p>
+<h4 id="锁粒度与锁类型-1"><a href="#锁粒度与锁类型-1" class="headerlink" title="锁粒度与锁类型"></a>锁粒度与锁类型</h4><ul>
+<li><strong>表级锁</strong>：<ul>
+<li>对整个表加锁，所有的读写操作都必须等待当前操作释放锁。</li>
+<li>表级锁简单且开销小，但在并发写入场景下容易形成瓶颈。</li>
+</ul>
+</li>
+</ul>
+<h4 id="并发控制机制-1"><a href="#并发控制机制-1" class="headerlink" title="并发控制机制"></a>并发控制机制</h4><ul>
+<li><code>MyISAM</code> 采用简单的表级锁机制来实现并发控制，在高并发写操作时容易导致阻塞或锁等待，因此适合读多写少的场景。</li>
+</ul>
+<h3 id="Memory（HEAP）"><a href="#Memory（HEAP）" class="headerlink" title="Memory（HEAP）"></a>Memory（HEAP）</h3><h4 id="主要特点-2"><a href="#主要特点-2" class="headerlink" title="主要特点"></a>主要特点</h4><p><code>Memory</code> 存储引擎的数据全部保存在内存中，访问速度极快，但数据在服务器重启后会丢失。</p>
+<h4 id="锁粒度与锁类型-2"><a href="#锁粒度与锁类型-2" class="headerlink" title="锁粒度与锁类型"></a>锁粒度与锁类型</h4><ul>
+<li><strong>表级锁</strong>：<ul>
+<li>和 <code>MyISAM</code> 类似，<code>Memory</code> 引擎也采用表级锁机制，因此在并发操作时同样可能出现锁竞争问题。</li>
+</ul>
+</li>
+</ul>
+<h4 id="适用场景-2"><a href="#适用场景-2" class="headerlink" title="适用场景"></a>适用场景</h4><ul>
+<li>主要适用于临时表、缓存或对数据一致性要求不高但需要极快响应的场景。</li>
+</ul>
+<h3 id="NDB-Cluster"><a href="#NDB-Cluster" class="headerlink" title="NDB Cluster"></a>NDB Cluster</h3><h4 id="主要特点-3"><a href="#主要特点-3" class="headerlink" title="主要特点"></a>主要特点</h4><p><code>NDB Cluster</code> 是 MySQL 的分布式存储引擎，适用于高可用和大规模数据的分布式环境。</p>
+<h4 id="锁机制"><a href="#锁机制" class="headerlink" title="锁机制"></a>锁机制</h4><ul>
+<li><code>NDB Cluster</code> 实现了一套分布式锁机制，在数据节点上采用行级锁来保证数据一致性。</li>
+<li>由于数据分布在多个节点上，锁的协调涉及网络通信和全局一致性协议，因此在高并发和分布式环境中会有特殊的延迟和同步考虑。</li>
+</ul>
+<h3 id="其他存储引擎"><a href="#其他存储引擎" class="headerlink" title="其他存储引擎"></a>其他存储引擎</h3><p><code>Archive</code>、<code>CSV</code> 等引擎：这些引擎通常不支持事务，锁机制较简单，或者依赖于操作系统层面的文件锁，不适合高并发场景。</p>
+<h2 id="事务与锁"><a href="#事务与锁" class="headerlink" title="事务与锁"></a>事务与锁</h2><h3 id="隐式加锁"><a href="#隐式加锁" class="headerlink" title="隐式加锁"></a>隐式加锁</h3><ul>
+<li>在 <code>InnoDB</code> 中，<code>DML</code> 操作（如 <code>SELECT ... FOR UPDATE</code>、<code>UPDATE</code>、<code>DELETE</code> 等）会根据操作类型和事务隔离级别自动加锁，通常加行级锁（共享锁或排他锁），以确保数据在事务期间的一致性。</li>
+<li>在 <code>REPEATABLE READ</code> 隔离级别下，<code>InnoDB</code> 会对符合条件的数据行加上临键锁（<code>next-key lock</code>），既锁定了数据记录也锁定了相邻间隙，从而防止幻读现象。</li>
+</ul>
+<h3 id="锁的持有与事务边界"><a href="#锁的持有与事务边界" class="headerlink" title="锁的持有与事务边界"></a>锁的持有与事务边界</h3><ul>
+<li>在事务内加的锁会一直保持到事务提交或回滚时释放。因此，长事务可能导致锁长时间持有，从而影响其他事务的并发性能。</li>
+<li><strong>自动释放</strong>：事务结束后，<code>InnoDB</code> 会自动释放事务持有的所有行锁、意向锁和自增锁，而全局锁和显式的表锁（如 <code>LOCK TABLES</code>）则需要开发者主动释放。</li>
+</ul>
+<h3 id="隔离级别对锁行为的影响"><a href="#隔离级别对锁行为的影响" class="headerlink" title="隔离级别对锁行为的影响"></a>隔离级别对锁行为的影响</h3><ul>
+<li><strong>READ UNCOMMITTED</strong>：不加锁读取，但容易产生脏读，不常用于生产。</li>
+<li><strong>READ COMMITTED</strong>：不加锁读取，因此可能出现不可重复读。</li>
+<li><strong>REPEATABLE READ</strong>：默认隔离级别，保证同一事务内多次读取同一数据时结果一致，为此会加临键锁和间隙锁，防止幻读，但也容易引发死锁。</li>
+<li><strong>SERIALIZABLE</strong>：最严格的隔离级别，所有读取操作都被当作 <code>SELECT ... FOR UPDATE</code> 执行，会加全表锁或行级锁，性能开销较大。</li>
+</ul>
+<h3 id="事务并发与锁竞争"><a href="#事务并发与锁竞争" class="headerlink" title="事务并发与锁竞争"></a>事务并发与锁竞争</h3><ul>
+<li>在多事务并发执行过程中，不同事务对相同数据记录加锁会产生竞争。如果锁粒度较小（如行级锁），并发性能更高，但也更容易出现死锁；如果使用表级锁，则锁范围大，简单但可能造成大量阻塞。</li>
+<li>开发者需要设计好事务的执行顺序和 SQL 语句的查询条件，确保锁尽可能精细，从而减少锁冲突和死锁的风险。</li>
+</ul>
+<h3 id="MVCC-与锁的协同"><a href="#MVCC-与锁的协同" class="headerlink" title="MVCC 与锁的协同"></a>MVCC 与锁的协同</h3><ul>
+<li><code>InnoDB</code> 的多版本并发控制（<code>MVCC</code>）允许在避免加锁读取，通过读取历史版本实现一致性视图，从而在大部分查询中不需要等待锁释放。</li>
+<li>但在执行涉及数据修改或显式锁定的操作时，仍需依赖行锁、意向锁等机制来确保数据的并发安全。</li>
+</ul>
+<h2 id="死锁"><a href="#死锁" class="headerlink" title="死锁"></a>死锁</h2><h3 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h3><ul>
+<li><strong>锁竞争与加锁顺序不一致</strong>：当两个或多个事务以不同的顺序获取锁时，可能出现循环等待的情况。例如，事务 <code>A</code> 锁定了数据行 <code>1</code> 后请求数据行 <code>2</code>，而事务 <code>B</code> 锁定了数据行 <code>2</code> 后请求数据行 <code>1</code>，就会形成循环等待。</li>
+<li><strong>锁类型与范围</strong>：使用行级锁时，如果查询条件不够精确，可能导致锁定更多的数据行（例如使用了间隙锁或临键锁），从而增加死锁概率。</li>
+<li><strong>长事务或锁持有时间过长</strong>：如果事务执行时间过长，锁长期占用也容易与其他事务产生冲突。</li>
+</ul>
+<h3 id="检测"><a href="#检测" class="headerlink" title="检测"></a>检测</h3><h4 id="SHOW-ENGINE-INNODB-STATUS"><a href="#SHOW-ENGINE-INNODB-STATUS" class="headerlink" title="SHOW ENGINE INNODB STATUS"></a>SHOW ENGINE INNODB STATUS</h4><figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SHOW ENGINE INNODB STATUS\G<br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li><strong>用途</strong>：返回 <code>InnoDB</code> 引擎的详细状态信息，其中包含了最近一次死锁的详细信息，如参与死锁的事务、锁等待情况、锁资源等。</li>
+<li><strong>使用场景</strong>：当应用中出现异常或事务超时时，可以用此命令查看死锁日志，帮助定位问题所在。</li>
+</ul>
+<h4 id="INFORMATION-SCHEMA"><a href="#INFORMATION-SCHEMA" class="headerlink" title="INFORMATION_SCHEMA"></a>INFORMATION_SCHEMA</h4><p>MySQL 提供了一些 <code>INFORMATION_SCHEMA</code> 中的表来监控锁的状态：</p>
+<ul>
+<li><strong>INNODB_LOCKS</strong>：显示当前被持有的锁信息。</li>
+<li><strong>INNODB_LOCK_WAITS</strong>：显示锁等待情况，指出哪些事务正在等待其他事务释放锁。</li>
+<li><strong>INNODB_TRX</strong>：显示当前正在执行的事务信息。</li>
+</ul>
+<p><strong>示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCKS;<br>SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCK_WAITS;<br>SELECT * FROM INFORMATION_SCHEMA.INNODB_TRX;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="处理"><a href="#处理" class="headerlink" title="处理"></a>处理</h3><ul>
+<li><code>InnoDB</code> 内置死锁检测机制，当检测到死锁时，会自动选择一个事务作为牺牲者回滚，以打破循环等待。</li>
+<li>应用程序在捕获到死锁错误（错误码 <code>1213</code>，通常提示 <code>Deadlock found when trying to get lock; try restarting transaction</code>）后，应实现重试逻辑，即回滚当前事务后重新执行。</li>
+</ul>
+<h3 id="避免"><a href="#避免" class="headerlink" title="避免"></a>避免</h3><ul>
+<li><p><strong>统一加锁顺序</strong>：确保在多个事务中访问相同的资源时，以相同的顺序加锁，降低循环等待的概率。</p>
+</li>
+<li><p><strong>尽量减少锁持有时间</strong>：尽快完成事务操作，避免在事务中执行不必要的操作或等待用户交互，从而缩短锁的持有时间。</p>
+</li>
+<li><p><strong>优化 SQL 语句和索引</strong>：使用精确的 <code>WHERE</code> 条件和适当的索引，减少扫描和锁定的行数，降低锁冲突。</p>
+</li>
+<li><p><strong>减少范围锁（如间隙锁）的影响</strong>：在设计查询时注意尽可能精确地定位数据，避免因范围过大而锁定不必要的记录或间隙。</p>
+</li>
+<li><p><strong>调整锁等待超时参数</strong>：可以通过设置系统变量 <code>innodb_lock_wait_timeout</code> 来控制事务等待锁的最长时间：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SET innodb_lock_wait_timeout = 50;<br></code></pre></div></td></tr></table></figure>
+
+<p>虽然这不能完全避免死锁，但可以让死锁发生时及时释放等待，避免长时间阻塞。</p>
+</li>
+<li><p><strong>使用最新版本的 MySQL 特性</strong>：部分新版本 MySQL 支持诸如 <code>NOWAIT</code> 和 <code>SKIP LOCKED</code> 等语法（主要在 PostgreSQL 中较为常见），MySQL 在未来版本中也可能会进一步优化并发控制和锁机制。</p>
+</li>
+</ul>
+<h2 id="索引失效导致锁表"><a href="#索引失效导致锁表" class="headerlink" title="索引失效导致锁表"></a>索引失效导致锁表</h2><h3 id="原因-1"><a href="#原因-1" class="headerlink" title="原因"></a>原因</h3><p>在 <code>InnoDB</code> 中，行锁是基于索引实现的，而如果查询条件无法正确利用索引，则会导致 <code>InnoDB</code> 进行全表扫描，从而锁住所有符合查询条件的行，这可能会导致：</p>
+<ul>
+<li>所有符合查询条件的行都被加锁</li>
+<li>新插入或更新的行可能受影响</li>
+<li>多个事务因等待锁释放而阻塞，类似表锁的效果</li>
+</ul>
+<h3 id="示例分析"><a href="#示例分析" class="headerlink" title="示例分析"></a>示例分析</h3><p>在 <code>users</code> 表中 <code>phone_number</code> 字段是没有索引的，因此以下 SQL 会导致 <code>InnoDB</code> 执行全表扫描，从而对所有扫描到的行加锁：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">BEGIN;<br>SELECT * FROM users WHERE phone_number = &#x27;123456789&#x27; FOR UPDATE;<br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li><code>phone_number</code> 没有索引，MySQL 只能执行全表扫描。</li>
+<li><code>FOR UPDATE</code> 要求对所有符合条件的行加 排他锁，而由于是全表扫描，所有行都被锁住。</li>
+<li>这会导致其他事务对 <code>users</code> 表的任何写入（<code>UPDATE</code>、<code>DELETE</code>、<code>INSERT</code>）都可能被阻塞，行锁表现得像一个表锁。</li>
+</ul>
+<h3 id="避免-1"><a href="#避免-1" class="headerlink" title="避免"></a>避免</h3><ul>
+<li><p><strong>确保查询使用索引</strong>：必要时使用 <code>FORCE INDEX</code> 强制使用特定索引，让 <code>InnoDB</code> 仅对匹配的行加锁，而不会锁住整个表，如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT * FROM users FORCE INDEX(idx_phone_number) WHERE phone_number = &#x27;123456789&#x27; FOR UPDATE;<br></code></pre></div></td></tr></table></figure></li>
+<li><p><strong>限制锁的范围</strong>：如果无法避免全表扫描，考虑减少锁定范围，如在 <code>FOR UPDATE</code> 后面加上 <code>LIMIT</code> 关键字只锁定特定行数，如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT * FROM users WHERE phone_number = &#x27;123456789&#x27; FOR UPDATE LIMIT 1;<br></code></pre></div></td></tr></table></figure></li>
+<li><p><strong>修改锁竞争策略</strong>：在 <code>FOR UPDATE</code> 后面使用 <code>NOWAIT</code> 立即返回、不等待锁释放，或使用 <code>SKIP LOCKED</code> 跳过已锁定的行，如</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">SELECT * FROM users WHERE phone_number = &#x27;123456789&#x27; FOR UPDATE NOWAIT;<br><br>SELECT * FROM users WHERE phone_number = &#x27;123456789&#x27; FOR UPDATE SKIP LOCKED;<br></code></pre></div></td></tr></table></figure></li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>MySQL 锁机制为数据库在并发环境下提供了多层次的保护，从全局锁到表级锁、行级锁及元数据锁，兼顾了数据安全与性能需求。在应用中，开发者应只有深入了解各种锁类型的特性与兼容关系、合理掌控锁粒度、理解 MySQL 事务与锁的联系、再配合完善的监控及调优方案，才能充分发挥 MySQL 在并发处理方面的高效与安全性，为业务的持续增长打下稳固的数据库基础。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/MySQL/">MySQL</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/MySQL/">MySQL</a>
+                    
+                      <a class="hover-with-bg" href="/tags/MySQL%E9%94%81%E6%9C%BA%E5%88%B6/">MySQL锁机制</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/12/03/mysql-functions/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">MySQL常用函数</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/08/07/mybatis-spring-boot/">
+                        <span class="hidden-mobile">Spring Boot整合MyBatis</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
