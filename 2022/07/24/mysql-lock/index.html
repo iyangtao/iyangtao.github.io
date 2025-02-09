@@ -19,18 +19,18 @@
     <meta name="description" content="引言在数据库高并发应用中，对数据进行安全并行读写的关键技术之一便是锁。MySQL 在不同存储引擎与不同层面（全局、表、行、元数据等）都提供了多种锁机制来保障数据一致性与并发性能。其中，InnoDB 通过行级锁与多版本并发控制（MVCC）实现了高并发与事务隔离的平衡，而 MyISAM 则依赖简单的表级锁适用于读多写少场景。本文将从全局锁、表级锁、行级锁等多方面系统介绍 MySQL 的锁体系，探讨从锁">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MySQL锁机制">
-<meta property="og:url" content="http://example.com/2022/08/08/mysql-lock/index.html">
+<meta property="og:url" content="http://example.com/2022/07/24/mysql-lock/index.html">
 <meta property="og:site_name" content="Yangtao&#39;s space">
 <meta property="og:description" content="引言在数据库高并发应用中，对数据进行安全并行读写的关键技术之一便是锁。MySQL 在不同存储引擎与不同层面（全局、表、行、元数据等）都提供了多种锁机制来保障数据一致性与并发性能。其中，InnoDB 通过行级锁与多版本并发控制（MVCC）实现了高并发与事务隔离的平衡，而 MyISAM 则依赖简单的表级锁适用于读多写少场景。本文将从全局锁、表级锁、行级锁等多方面系统介绍 MySQL 的锁体系，探讨从锁">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/mysql-windows-function.webp">
-<meta property="article:published_time" content="2022-08-07T17:46:43.000Z">
-<meta property="article:modified_time" content="2022-08-07T17:46:43.000Z">
+<meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/mysql.webp">
+<meta property="article:published_time" content="2022-07-23T17:46:43.000Z">
+<meta property="article:modified_time" content="2022-07-23T17:46:43.000Z">
 <meta property="article:author" content="Yangtao">
 <meta property="article:tag" content="MySQL">
 <meta property="article:tag" content="MySQL锁机制">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/mysql-windows-function.webp">
+<meta name="twitter:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/mysql.webp">
   
   
   <title>MySQL锁机制 - Yangtao&#39;s space</title>
@@ -186,7 +186,7 @@
 </nav>
 
     <div class="banner" id="banner" parallax=true
-         style="background: url('https://picgo-1304850123.cos.ap-guangzhou.myqcloud.com/mysql-windows-function.webp') no-repeat center center;
+         style="background: url('https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/mysql.webp') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
@@ -206,8 +206,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2022-08-08 01:46" pubdate>
-        2022年8月8日 凌晨
+      <time datetime="2022-07-24 01:46" pubdate>
+        2022年7月24日 凌晨
       </time>
     </span>
   
@@ -580,9 +580,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2022/12/03/mysql-functions/">
+                      <a href="/2022/08/01/mybatis-base/">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">MySQL常用函数</span>
+                        <span class="hidden-mobile">MyBatis简介</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -590,8 +590,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2022/08/07/mybatis-spring-boot/">
-                        <span class="hidden-mobile">Spring Boot整合MyBatis</span>
+                      <a href="/2022/07/18/mysql-transaction/">
+                        <span class="hidden-mobile">MySQL事务</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
