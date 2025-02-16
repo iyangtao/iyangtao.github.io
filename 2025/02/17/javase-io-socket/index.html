@@ -1,0 +1,1139 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="引言网络 IO (Network IO) 是分布式系统和互联网应用的基础。在 Java 生态中，从最初的 Socket &#x2F; ServerSocket（阻塞式 BIO）到基于 Selector 的 NIO、再到 AIO（异步 IO）和高性能框架 Netty，都为不同规模的网络应用提供了丰富的选择。本文将介绍 Java 网络编程中常见的 TCP&#x2F;UDP 套接字用法，并进一步探讨在高并发场景下广泛应用的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java IO——网络IO">
+<meta property="og:url" content="http://example.com/2025/02/17/javase-io-socket/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="引言网络 IO (Network IO) 是分布式系统和互联网应用的基础。在 Java 生态中，从最初的 Socket &#x2F; ServerSocket（阻塞式 BIO）到基于 Selector 的 NIO、再到 AIO（异步 IO）和高性能框架 Netty，都为不同规模的网络应用提供了丰富的选择。本文将介绍 Java 网络编程中常见的 TCP&#x2F;UDP 套接字用法，并进一步探讨在高并发场景下广泛应用的">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/java-io-logo.png">
+<meta property="article:published_time" content="2025-02-16T20:45:17.000Z">
+<meta property="article:modified_time" content="2025-02-16T20:45:17.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="JavaSE">
+<meta property="article:tag" content="Java IO">
+<meta property="article:tag" content="网络IO">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/java-io-logo.png">
+  
+  
+  <title>Java IO——网络IO - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/java-io-logo.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Java IO——网络IO">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2025-02-17 04:45" pubdate>
+        2025年2月17日 凌晨
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      15k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      26 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Java IO——网络IO</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：2 分钟前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>网络 IO (Network IO) 是分布式系统和互联网应用的基础。在 Java 生态中，从最初的 <code>Socket</code> / <code>ServerSocket</code>（阻塞式 BIO）到基于 <code>Selector</code> 的 NIO、再到 AIO（异步 IO）和高性能框架 Netty，都为不同规模的网络应用提供了丰富的选择。本文将介绍 Java 网络编程中常见的 TCP/UDP 套接字用法，并进一步探讨在高并发场景下广泛应用的Netty框架和零拷贝技术。</p>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>网络IO（Network IO）指的是计算机通过网络进行数据传输的输入与输出操作，通常基于 Socket（套接字）进行通信。Socket是操作系统提供的编程接口（API），用于在不同设备或进程间建立网络连接，并进行数据收发。</p>
+<h2 id="网络-IO-模式"><a href="#网络-IO-模式" class="headerlink" title="网络 IO 模式"></a>网络 IO 模式</h2><p>网络IO可以分为不同的模式：</p>
+<ul>
+<li><strong>阻塞 IO（BIO, Blocking IO）</strong><ul>
+<li>服务器为每个客户端维护一个线程，适用于连接数较少的场景。</li>
+<li>典型实现：<code>ServerSocket</code> 和 <code>Socket</code>。</li>
+</ul>
+</li>
+<li><strong>非阻塞 IO（NIO, Non-blocking IO）</strong><ul>
+<li>采用多路复用（Selector），可以管理多个Socket连接，提高性能。</li>
+<li>适用于高并发场景，如 Netty 框架。</li>
+</ul>
+</li>
+<li><strong>异步 IO（AIO, Asynchronous IO）</strong><ul>
+<li>使用回调机制，完全异步非阻塞，适用于高吞吐需求的应用。</li>
+</ul>
+</li>
+</ul>
+<h2 id="Socket-与-ServerSocket"><a href="#Socket-与-ServerSocket" class="headerlink" title="Socket 与 ServerSocket"></a>Socket 与 ServerSocket</h2><h3 id="Socket-通信模型"><a href="#Socket-通信模型" class="headerlink" title="Socket 通信模型"></a>Socket 通信模型</h3><p>基于Socket的网络IO通信模型一般包含以下几个关键步骤：</p>
+<ul>
+<li><strong>服务器端</strong><ol>
+<li>创建Socket（<code>ServerSocket</code>）。</li>
+<li>绑定端口，监听客户端连接。</li>
+<li>等待客户端连接（<code>accept()</code>）。</li>
+<li>读取/发送数据（<code>InputStream</code> / <code>OutputStream</code>）。</li>
+<li>关闭连接。</li>
+</ol>
+</li>
+<li><strong>客户端</strong><ol>
+<li>创建Socket并连接服务器（<code>Socket</code>）。</li>
+<li>发送/接收数据。</li>
+<li>关闭连接。</li>
+</ol>
+</li>
+</ul>
+<p>在 Java 中，<code>Socket</code> 和 <code>ServerSocket</code> 主要用于基于 TCP 协议的网络通信。<code>ServerSocket</code> 用于服务器端监听连接，<code>Socket</code> 用于客户端与服务器端通信。</p>
+<h3 id="ServerSocket（服务器端）"><a href="#ServerSocket（服务器端）" class="headerlink" title="ServerSocket（服务器端）"></a>ServerSocket（服务器端）</h3><p><code>ServerSocket</code> 主要用于监听客户端的连接请求，一旦接受连接，它会返回一个新的 <code>Socket</code> 实例与客户端进行通信。</p>
+<h4 id="主要方法"><a href="#主要方法" class="headerlink" title="主要方法"></a>主要方法</h4><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ServerSocket(int port)</code></td>
+<td>创建绑定到指定端口的服务器套接字</td>
+</tr>
+<tr>
+<td><code>accept()</code></td>
+<td>监听并接受客户端连接（阻塞式）</td>
+</tr>
+<tr>
+<td><code>close()</code></td>
+<td>关闭服务器套接字</td>
+</tr>
+<tr>
+<td><code>setSoTimeout(int timeout)</code></td>
+<td>设置 <code>accept()</code> 方法的超时时间</td>
+</tr>
+<tr>
+<td><code>getInetAddress()</code></td>
+<td>获取服务器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>getLocalPort()</code></td>
+<td>获取服务器监听的端口号</td>
+</tr>
+</tbody></table>
+<h4 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h4><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SimpleServer</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        <span class="hljs-keyword">int</span> port = <span class="hljs-number">8080</span>; <span class="hljs-comment">// 监听端口</span><br>        <span class="hljs-keyword">try</span> (ServerSocket serverSocket = <span class="hljs-keyword">new</span> ServerSocket(port)) &#123;<br>            System.out.println(<span class="hljs-string">&quot;服务器启动，监听端口：&quot;</span> + port);<br><br>            <span class="hljs-keyword">while</span> (<span class="hljs-keyword">true</span>) &#123;<br>                Socket socket = serverSocket.accept(); <span class="hljs-comment">// 阻塞等待客户端连接</span><br>                System.out.println(<span class="hljs-string">&quot;客户端连接：&quot;</span> + socket.getInetAddress());<br><br>                <span class="hljs-keyword">new</span> Thread(() -&gt; handleClient(socket)).start();<br>            &#125;<br>        &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>            e.printStackTrace();<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">handleClient</span><span class="hljs-params">(Socket socket)</span> </span>&#123;<br>        <span class="hljs-keyword">try</span> (BufferedReader reader = <span class="hljs-keyword">new</span> BufferedReader(<span class="hljs-keyword">new</span> InputStreamReader(socket.getInputStream()));<br>             BufferedWriter writer = <span class="hljs-keyword">new</span> BufferedWriter(<span class="hljs-keyword">new</span> OutputStreamWriter(socket.getOutputStream()))) &#123;<br><br>            String message;<br>            <span class="hljs-keyword">while</span> ((message = reader.readLine()) != <span class="hljs-keyword">null</span>) &#123;<br>                System.out.println(<span class="hljs-string">&quot;收到客户端消息: &quot;</span> + message);<br>                writer.write(<span class="hljs-string">&quot;服务端回复: &quot;</span> + message + <span class="hljs-string">&quot;\n&quot;</span>);<br>                writer.flush();<br>            &#125;<br>        &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>            e.printStackTrace();<br>        &#125; <span class="hljs-keyword">finally</span> &#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                socket.close();<br>            &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>                e.printStackTrace();<br>            &#125;<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h4><ul>
+<li><code>ServerSocket</code> 监听端口 <code>8080</code>，等待客户端连接。</li>
+<li>每个连接由一个独立的线程处理，读取数据并回传给客户端。</li>
+</ul>
+<h3 id="Socket（客户端）"><a href="#Socket（客户端）" class="headerlink" title="Socket（客户端）"></a>Socket（客户端）</h3><p><code>Socket</code> 负责建立连接并进行数据收发。</p>
+<h4 id="主要方法-1"><a href="#主要方法-1" class="headerlink" title="主要方法"></a>主要方法</h4><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Socket(String host, int port)</code></td>
+<td>连接到指定主机和端口</td>
+</tr>
+<tr>
+<td><code>getInputStream()</code></td>
+<td>获取输入流（接收数据）</td>
+</tr>
+<tr>
+<td><code>getOutputStream()</code></td>
+<td>获取输出流（发送数据）</td>
+</tr>
+<tr>
+<td><code>close()</code></td>
+<td>关闭套接字</td>
+</tr>
+<tr>
+<td><code>getInetAddress()</code></td>
+<td>获取远程服务器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>setSoTimeout(int timeout)</code></td>
+<td>设置读取数据的超时时间</td>
+</tr>
+</tbody></table>
+<h4 id="代码示例-1"><a href="#代码示例-1" class="headerlink" title="代码示例"></a>代码示例</h4><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SimpleClient</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        String serverAddress = <span class="hljs-string">&quot;127.0.0.1&quot;</span>; <span class="hljs-comment">// 本机服务器</span><br>        <span class="hljs-keyword">int</span> port = <span class="hljs-number">8080</span>; <span class="hljs-comment">// 服务器端口</span><br><br>        <span class="hljs-keyword">try</span> (Socket socket = <span class="hljs-keyword">new</span> Socket(serverAddress, port);<br>             BufferedReader reader = <span class="hljs-keyword">new</span> BufferedReader(<span class="hljs-keyword">new</span> InputStreamReader(socket.getInputStream()));<br>             BufferedWriter writer = <span class="hljs-keyword">new</span> BufferedWriter(<span class="hljs-keyword">new</span> OutputStreamWriter(socket.getOutputStream()));<br>             BufferedReader console = <span class="hljs-keyword">new</span> BufferedReader(<span class="hljs-keyword">new</span> InputStreamReader(System.in))) &#123;<br><br>            System.out.println(<span class="hljs-string">&quot;已连接到服务器 &quot;</span> + serverAddress + <span class="hljs-string">&quot;:&quot;</span> + port);<br><br>            String userInput;<br>            <span class="hljs-keyword">while</span> ((userInput = console.readLine()) != <span class="hljs-keyword">null</span>) &#123;<br>                writer.write(userInput + <span class="hljs-string">&quot;\n&quot;</span>);<br>                writer.flush();<br><br>                String response = reader.readLine();<br>                System.out.println(<span class="hljs-string">&quot;服务器回复: &quot;</span> + response);<br>            &#125;<br>        &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>            e.printStackTrace();<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="说明-1"><a href="#说明-1" class="headerlink" title="说明"></a>说明</h4><ul>
+<li>连接服务器 <code>127.0.0.1:8080</code>。</li>
+<li>通过 <code>BufferedWriter</code> 发送消息，读取服务器的响应。</li>
+</ul>
+<h3 id="运行流程"><a href="#运行流程" class="headerlink" title="运行流程"></a>运行流程</h3><ol>
+<li><p><strong>运行服务器</strong>：先启动 <code>SimpleServer</code>，服务器会监听 <code>8080</code> 端口，等待客户端连接。</p>
+</li>
+<li><p><strong>运行客户端</strong>：启动 <code>SimpleClient</code>，成功连接服务器后，可以在终端输入消息。服务器收到消息后，会原样返回。</p>
+</li>
+<li><p><strong>示例交互</strong>：</p>
+<ol>
+<li><p>服务器启动：</p>
+<figure class="highlight"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs">服务器启动，监听端口：8080<br></code></pre></div></td></tr></table></figure></li>
+<li><p>客户端启动：</p>
+<figure class="highlight dns"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs dns">已连接到服务器 <span class="hljs-number">127.0.0.1</span>:<span class="hljs-number">8080</span><br></code></pre></div></td></tr></table></figure></li>
+<li><p>服务器连接成功：</p>
+<figure class="highlight dns"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs dns">客户端连接：/<span class="hljs-number">127.0.0.1</span><br></code></pre></div></td></tr></table></figure></li>
+<li><p>客户端发送消息：</p>
+<figure class="highlight dns"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs dns">已连接到服务器 <span class="hljs-number">127.0.0.1</span>:<span class="hljs-number">8080</span><br>hello<br></code></pre></div></td></tr></table></figure></li>
+<li><p>服务器收到消息并自动响应：</p>
+<figure class="highlight dns"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs dns">服务器启动，监听端口：<span class="hljs-number">8080</span><br>客户端连接：/<span class="hljs-number">127.0.0.1</span><br>收到客户端消息: hello<br></code></pre></div></td></tr></table></figure></li>
+<li><p>客户端接收到服务器的响应：</p>
+<figure class="highlight dns"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs dns">已连接到服务器 <span class="hljs-number">127.0.0.1</span>:<span class="hljs-number">8080</span><br>hello<br>服务器回复: 服务端回复: hello<br></code></pre></div></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+<h3 id="底层原理"><a href="#底层原理" class="headerlink" title="底层原理"></a>底层原理</h3><h4 id="TCP-通信特性"><a href="#TCP-通信特性" class="headerlink" title="TCP 通信特性"></a>TCP 通信特性</h4><ul>
+<li><strong>面向连接</strong>：必须先建立连接（三次握手）。</li>
+<li><strong>可靠传输</strong>：数据按序到达，无丢失（超时重传、流量控制、拥塞控制）。</li>
+<li><strong>流式传输</strong>：数据以字节流方式传输，接收端需要解析数据边界。</li>
+</ul>
+<h4 id="TCP-底层实现"><a href="#TCP-底层实现" class="headerlink" title="TCP 底层实现"></a>TCP 底层实现</h4><p>TCP 的底层基于操作系统内核协议栈完成数据传输，主要包括：</p>
+<ol>
+<li><p>三次握手建立连接，当 <code>Socket</code> 进行 <code>connect()</code> 时，操作系统会执行 TCP 三次握手，过程如下：</p>
+<ol>
+<li>客户端发送 <code>SYN</code> 包给服务器，请求建立连接。</li>
+<li>服务器返回 <code>SYN + ACK</code>，表示接受连接请求。</li>
+<li>客户端回复 <code>ACK</code>，完成握手，连接建立。</li>
+</ol>
+<p>三次握手后，<code>Socket</code> 连接才真正建立，之后可以进行数据传输。</p>
+</li>
+<li><p>数据传输：</p>
+<ul>
+<li><p>TCP 使用滑动窗口和 ACK 确认机制保证数据可靠性。</p>
+</li>
+<li><p>TCP 会对数据进行分片和重组（MSS），并处理乱序、丢失的数据包（重传机制）。</p>
+</li>
+</ul>
+</li>
+<li><p>关闭连接（四次挥手），当 <code>Socket</code> 关闭时，会执行 TCP 四次挥手：</p>
+<ol>
+<li>客户端发送 <code>FIN</code>，请求断开连接。</li>
+<li>服务器返回 <code>ACK</code>，表示收到请求。</li>
+<li>服务器发送 <code>FIN</code>，请求关闭连接。</li>
+<li>客户端发送 <code>ACK</code>，确认关闭。</li>
+</ol>
+<p>四次挥手完成后，操作系统释放 <code>Socket</code> 相关资源。</p>
+</li>
+</ol>
+<h2 id="DatagramSocket"><a href="#DatagramSocket" class="headerlink" title="DatagramSocket"></a>DatagramSocket</h2><h3 id="DatagramSocket（UDP-套接字）"><a href="#DatagramSocket（UDP-套接字）" class="headerlink" title="DatagramSocket（UDP 套接字）"></a>DatagramSocket（UDP 套接字）</h3><p><code>DatagramSocket</code> 用于在发送端和接收端创建 UDP 连接。</p>
+<ul>
+<li>发送方用于发送 <code>DatagramPacket</code>。</li>
+<li>接收方用于接收 <code>DatagramPacket</code>。</li>
+</ul>
+<h3 id="主要方法-2"><a href="#主要方法-2" class="headerlink" title="主要方法"></a><strong>主要方法</strong></h3><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>DatagramSocket()</code></td>
+<td>创建默认端口的 UDP 套接字</td>
+</tr>
+<tr>
+<td><code>DatagramSocket(int port)</code></td>
+<td>绑定指定端口的 UDP 套接字</td>
+</tr>
+<tr>
+<td><code>send(DatagramPacket p)</code></td>
+<td>发送数据包</td>
+</tr>
+<tr>
+<td><code>receive(DatagramPacket p)</code></td>
+<td>接收数据包（阻塞等待）</td>
+</tr>
+<tr>
+<td><code>setSoTimeout(int timeout)</code></td>
+<td>设置接收超时时间</td>
+</tr>
+<tr>
+<td><code>close()</code></td>
+<td>关闭套接字</td>
+</tr>
+</tbody></table>
+<h3 id="DatagramPacket（UDP-数据包）"><a href="#DatagramPacket（UDP-数据包）" class="headerlink" title="DatagramPacket（UDP 数据包）"></a>DatagramPacket（UDP 数据包）</h3><p><code>DatagramPacket</code> 用于封装要发送和接收的数据。</p>
+<ul>
+<li><strong>发送方</strong>：指定目标地址、端口、数据内容。</li>
+<li><strong>接收方</strong>：用于存储接收到的数据。</li>
+</ul>
+<p><strong>构造方法</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>DatagramPacket(byte[] buf, int length, InetAddress address, int port)</code></td>
+<td>创建用于发送的 UDP 数据包</td>
+</tr>
+<tr>
+<td><code>DatagramPacket(byte[] buf, int length)</code></td>
+<td>创建用于接收的 UDP 数据包</td>
+</tr>
+</tbody></table>
+<h3 id="代码示例-2"><a href="#代码示例-2" class="headerlink" title="代码示例"></a>代码示例</h3><p>UDP 是无连接的，因此不需要像 TCP 那样建立 <code>Socket</code> 连接。下面是一个 UDP 通信的完整示例，包括服务器端（接收）和客户端（发送）。</p>
+<h4 id="UDP-服务器端"><a href="#UDP-服务器端" class="headerlink" title="UDP 服务器端"></a>UDP 服务器端</h4><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Slf4j</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UDPServer</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        <span class="hljs-keyword">int</span> port = <span class="hljs-number">8080</span>; <span class="hljs-comment">// 监听端口</span><br>        <span class="hljs-keyword">try</span> (DatagramSocket socket = <span class="hljs-keyword">new</span> DatagramSocket(port)) &#123;<br>            System.out.println(<span class="hljs-string">&quot;UDP 服务器已启动，监听端口：&quot;</span> + port);<br><br>            <span class="hljs-keyword">byte</span>[] buffer = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[<span class="hljs-number">1024</span>]; <span class="hljs-comment">// 数据接收缓冲区</span><br>            DatagramPacket packet = <span class="hljs-keyword">new</span> DatagramPacket(buffer, buffer.length);<br><br>            <span class="hljs-keyword">while</span> (<span class="hljs-keyword">true</span>) &#123;<br>                socket.receive(packet); <span class="hljs-comment">// 阻塞等待接收数据</span><br>                String receivedData = <span class="hljs-keyword">new</span> String(packet.getData(), <span class="hljs-number">0</span>, packet.getLength());<br>                System.out.println(<span class="hljs-string">&quot;收到消息: &quot;</span> + receivedData + <span class="hljs-string">&quot; 来自 &quot;</span> + packet.getAddress() + <span class="hljs-string">&quot;:&quot;</span> + packet.getPort());<br><br>                <span class="hljs-comment">// 服务器回复消息</span><br>                String response = <span class="hljs-string">&quot;服务器已收到：&quot;</span> + receivedData;<br>                <span class="hljs-keyword">byte</span>[] responseData = response.getBytes();<br>                DatagramPacket responsePacket = <span class="hljs-keyword">new</span> DatagramPacket(<br>                        responseData, responseData.length, packet.getAddress(), packet.getPort());<br>                socket.send(responsePacket);<br>            &#125;<br>        &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>            log.error(<span class="hljs-string">&quot;服务器异常&quot;</span>, e);<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>说明</strong>：</p>
+<ul>
+<li>服务器创建 <code>DatagramSocket</code> 监听 <code>8080</code> 端口。</li>
+<li>通过 <code>socket.receive(packet)</code> 接收 UDP 数据包（阻塞等待）。</li>
+<li>解析 <code>packet.getData()</code> 获取消息内容。</li>
+<li>服务器收到消息后，使用 <code>socket.send(responsePacket)</code> 发送回复消息。</li>
+</ul>
+<h4 id="UDP-客户端"><a href="#UDP-客户端" class="headerlink" title="UDP 客户端"></a>UDP 客户端</h4><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Slf4j</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UDPClient</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        String serverAddress = <span class="hljs-string">&quot;127.0.0.1&quot;</span>; <span class="hljs-comment">// 服务器地址</span><br>        <span class="hljs-keyword">int</span> serverPort = <span class="hljs-number">8080</span>; <span class="hljs-comment">// 服务器端口</span><br><br>        <span class="hljs-keyword">try</span> (DatagramSocket socket = <span class="hljs-keyword">new</span> DatagramSocket();<br>             Scanner scanner = <span class="hljs-keyword">new</span> Scanner(System.in)) &#123;<br>            InetAddress serverInetAddress = InetAddress.getByName(serverAddress);<br><br>            <span class="hljs-keyword">while</span> (<span class="hljs-keyword">true</span>) &#123;<br>                System.out.print(<span class="hljs-string">&quot;请输入消息: &quot;</span>);<br>                String message = scanner.nextLine();<br>                <span class="hljs-keyword">byte</span>[] sendData = message.getBytes();<br><br>                <span class="hljs-comment">// 发送数据包</span><br>                DatagramPacket sendPacket = <span class="hljs-keyword">new</span> DatagramPacket(sendData, sendData.length, serverInetAddress, serverPort);<br>                socket.send(sendPacket);<br><br>                <span class="hljs-comment">// 接收服务器的回复</span><br>                <span class="hljs-keyword">byte</span>[] receiveBuffer = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[<span class="hljs-number">1024</span>];<br>                DatagramPacket receivePacket = <span class="hljs-keyword">new</span> DatagramPacket(receiveBuffer, receiveBuffer.length);<br>                socket.receive(receivePacket);<br><br>                String response = <span class="hljs-keyword">new</span> String(receivePacket.getData(), <span class="hljs-number">0</span>, receivePacket.getLength());<br>                System.out.println(<span class="hljs-string">&quot;服务器回复: &quot;</span> + response);<br>            &#125;<br>        &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>            log.error(<span class="hljs-string">&quot;客户端异常&quot;</span>, e);<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>说明</strong>：</p>
+<ul>
+<li>客户端创建 <code>DatagramSocket</code> 用于发送数据包。</li>
+<li>通过 <code>DatagramPacket</code> 发送数据到 <strong><code>127.0.0.1:8080</code></strong> 服务器端。</li>
+<li>发送后，阻塞等待服务器的响应并打印出来。</li>
+</ul>
+<h3 id="运行流程-1"><a href="#运行流程-1" class="headerlink" title="运行流程"></a>运行流程</h3><ol>
+<li><p><strong>运行服务器</strong>：先启动 <code>UDPServer</code>，服务器会在 <code>8080</code> 端口监听 UDP 数据包，等待客户端连接。</p>
+</li>
+<li><p><strong>运行客户端</strong>：启动 <code>UDPClient</code>，成功连接服务器后，可以在终端输入消息。服务器收到消息后，会原样返回。</p>
+</li>
+<li><p><strong>示例交互</strong>：</p>
+<ol>
+<li><p>服务器启动：</p>
+<figure class="highlight apache"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">UDP</span> 服务器已启动，监听端口：<span class="hljs-number">8080</span><br></code></pre></div></td></tr></table></figure></li>
+<li><p>客户端启动连接。</p>
+</li>
+<li><p>服务器连接成功。</p>
+</li>
+<li><p>客户端发送消息：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs makefile"><span class="hljs-section">请输入消息: hello</span><br></code></pre></div></td></tr></table></figure></li>
+<li><p>服务器收到消息并自动响应：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs nginx"><span class="hljs-attribute">UDP</span> 服务器已启动，监听端口：<span class="hljs-number">8080</span><br>收到消息: hello 来自 /<span class="hljs-number">127.0.0.1:56379</span><br></code></pre></div></td></tr></table></figure></li>
+<li><p>客户端接收到服务器的响应：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs makefile"><span class="hljs-section">请输入消息: hello</span><br><span class="hljs-section">服务器回复: 服务器已收到：hello</span><br><span class="hljs-section">请输入消息: </span><br></code></pre></div></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+<h3 id="底层原理-1"><a href="#底层原理-1" class="headerlink" title="底层原理"></a>底层原理</h3><h4 id="UDP-通信特性"><a href="#UDP-通信特性" class="headerlink" title="UDP 通信特性"></a>UDP 通信特性</h4><ul>
+<li><strong>无连接</strong>：数据直接发送，无需建立连接。</li>
+<li><strong>不可靠</strong>：不保证数据到达、顺序，也不处理丢包。</li>
+<li><strong>面向数据报</strong>：UDP 以数据报（<code>DatagramPacket</code>）的方式发送和接收。</li>
+</ul>
+<h4 id="UDP-底层实现"><a href="#UDP-底层实现" class="headerlink" title="UDP 底层实现"></a>UDP 底层实现</h4><p>UDP 依赖 IP 层+UDP 协议进行数据传输，主要流程如下：</p>
+<ol>
+<li><p>发送数据</p>
+<ul>
+<li><p>用户数据封装成 <code>DatagramPacket</code>（包括数据、目标 IP/端口）。</p>
+</li>
+<li><p><code>UDP</code> 协议在数据前面添加 UDP 头部（源端口、目标端口、长度、校验和）。</p>
+</li>
+<li><p><code>IP</code> 层负责查找路由，将数据发送到目标主机。</p>
+</li>
+</ul>
+<p>UDP 头部只有 8 字节，比 TCP 小很多，传输效率更高。</p>
+</li>
+<li><p>接收数据：</p>
+<ul>
+<li><p>操作系统监听 UDP 端口，接收符合条件的数据报文。</p>
+</li>
+<li><p>UDP 解析数据报头，去掉 UDP 头部后，将数据传递给应用层。</p>
+</li>
+</ul>
+<p>UDP 不会自动重传丢失数据，应用层需要自己实现超时重传机制。</p>
+</li>
+</ol>
+<h2 id="Socket-模型对比"><a href="#Socket-模型对比" class="headerlink" title="Socket 模型对比"></a>Socket 模型对比</h2><table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>TCP（<code>Socket</code>）</th>
+<th>UDP（<code>DatagramSocket</code>）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>是否连接</strong></td>
+<td>需要建立连接（三次握手）</td>
+<td>无连接，直接发送</td>
+</tr>
+<tr>
+<td><strong>可靠性</strong></td>
+<td>可靠，保证数据到达、顺序、完整性</td>
+<td>不可靠，可能丢包、乱序</td>
+</tr>
+<tr>
+<td><strong>传输方式</strong></td>
+<td>面向流，按字节流传输</td>
+<td>面向数据报，每个 <code>DatagramPacket</code> 是独立数据</td>
+</tr>
+<tr>
+<td><strong>头部大小</strong></td>
+<td>20-60 字节（TCP 头部）</td>
+<td>8 字节（UDP 头部）</td>
+</tr>
+<tr>
+<td><strong>速度</strong></td>
+<td>较慢（有流控和拥塞控制）</td>
+<td>快（无流控、无握手）</td>
+</tr>
+<tr>
+<td><strong>适用场景</strong></td>
+<td>文件传输、Web 服务、数据库连接</td>
+<td>直播、语音通话、游戏</td>
+</tr>
+</tbody></table>
+<ul>
+<li><code>DatagramSocket</code> 用于 UDP 通信，无需建立连接，适用于高速数据传输。</li>
+<li><code>DatagramPacket</code> 封装 UDP 数据，可用于发送或接收数据包。</li>
+<li>UDP 适用于实时性高、对数据完整性要求不高的场景，如：<ul>
+<li>视频直播</li>
+<li>语音通话</li>
+<li>在线游戏</li>
+<li>IoT 设备通信</li>
+</ul>
+</li>
+</ul>
+<h2 id="高性能网络框架-Netty"><a href="#高性能网络框架-Netty" class="headerlink" title="高性能网络框架 Netty"></a><strong>高性能网络框架 Netty</strong></h2><h3 id="简介-1"><a href="#简介-1" class="headerlink" title="简介"></a>简介</h3><p>Netty 是基于 Java NIO（非阻塞 IO） 开发的异步、高性能、事件驱动的网络通信框架，广泛用于高并发的网络应用，如 IM、RPC、网关、游戏服务器等。具有如下特性：</p>
+<ul>
+<li>原生 NIO 复杂（如 <code>Selector</code>、<code>ByteBuffer</code>、多线程管理）</li>
+<li>Netty 封装了 NIO，提供高效、简洁的 API</li>
+<li>适用于 TCP、UDP、WebSocket 等多种协议</li>
+</ul>
+<h3 id="底层架构"><a href="#底层架构" class="headerlink" title="底层架构"></a>底层架构</h3><p>Netty 的核心架构包括：</p>
+<ul>
+<li>Bootstrap &amp; ServerBootstrap（启动器）</li>
+<li>EventLoopGroup（事件循环线程组）</li>
+<li>Channel &amp; ChannelPipeline（通道 &amp; 处理管道）</li>
+<li>ChannelHandler（事件处理器）</li>
+<li>ByteBuf（高效数据缓冲区）</li>
+</ul>
+<h3 id="核心组件解析"><a href="#核心组件解析" class="headerlink" title="核心组件解析"></a>核心组件解析</h3><h4 id="Bootstrap-ServerBootstrap"><a href="#Bootstrap-ServerBootstrap" class="headerlink" title="Bootstrap / ServerBootstrap"></a>Bootstrap / ServerBootstrap</h4><ul>
+<li><code>Bootstrap</code>：用于客户端启动 Netty。</li>
+<li><code>ServerBootstrap</code>：用于服务器端启动 Netty。</li>
+</ul>
+<h4 id="EventLoopGroup（事件循环组）"><a href="#EventLoopGroup（事件循环组）" class="headerlink" title="EventLoopGroup（事件循环组）"></a>EventLoopGroup（事件循环组）</h4><ul>
+<li><code>BossGroup</code>：处理客户端连接。</li>
+<li><code>WorkerGroup</code>：处理具体数据读写。</li>
+<li>每个 EventLoop 绑定一个 <code>Selector</code>，监听 Channel 事件（如 read、write）。</li>
+</ul>
+<h4 id="Channel（通道）"><a href="#Channel（通道）" class="headerlink" title="Channel（通道）"></a>Channel（通道）</h4><ul>
+<li>封装底层 <code>SocketChannel</code>，用于数据读写。</li>
+</ul>
+<h4 id="ChannelPipeline（处理管道）"><a href="#ChannelPipeline（处理管道）" class="headerlink" title="ChannelPipeline（处理管道）"></a>ChannelPipeline（处理管道）</h4><ul>
+<li>多个 <code>ChannelHandler</code> 组成的责任链，依次处理数据。</li>
+<li>事件流转：<code>Inbound（入站）</code> → <code>Outbound（出站）</code>。</li>
+</ul>
+<h4 id="ChannelHandler（事件处理器）"><a href="#ChannelHandler（事件处理器）" class="headerlink" title="ChannelHandler（事件处理器）"></a>ChannelHandler（事件处理器）</h4><ul>
+<li>入站处理器（处理读事件）</li>
+<li>出站处理器（处理写事件）</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@ChannelHandler</span>.Sharable<br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyHandler</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">ChannelInboundHandlerAdapter</span> </span>&#123;<br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">channelRead</span><span class="hljs-params">(ChannelHandlerContext ctx, Object msg)</span> </span>&#123;<br>        System.out.println(<span class="hljs-string">&quot;收到消息: &quot;</span> + msg);<br>        ctx.writeAndFlush(<span class="hljs-string">&quot;Server Ack\n&quot;</span>);<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="Netty-服务器端代码"><a href="#Netty-服务器端代码" class="headerlink" title="Netty 服务器端代码"></a>Netty 服务器端代码</h3><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">NettyServer</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> InterruptedException </span>&#123;<br>        EventLoopGroup bossGroup = <span class="hljs-keyword">new</span> NioEventLoopGroup(<span class="hljs-number">1</span>);<br>        EventLoopGroup workerGroup = <span class="hljs-keyword">new</span> NioEventLoopGroup();<br>        <br>        <span class="hljs-keyword">try</span> &#123;<br>            ServerBootstrap bootstrap = <span class="hljs-keyword">new</span> ServerBootstrap();<br>            bootstrap.group(bossGroup, workerGroup)<br>                .channel(NioServerSocketChannel.class)<br>                .childHandler(<span class="hljs-keyword">new</span> ChannelInitializer&lt;SocketChannel&gt;() &#123;<br>                    <span class="hljs-meta">@Override</span><br>                    <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">void</span> <span class="hljs-title">initChannel</span><span class="hljs-params">(SocketChannel ch)</span> </span>&#123;<br>                        ch.pipeline().addLast(<span class="hljs-keyword">new</span> MyServerHandler());<br>                    &#125;<br>                &#125;);<br><br>            ChannelFuture future = bootstrap.bind(<span class="hljs-number">8080</span>).sync();<br>            System.out.println(<span class="hljs-string">&quot;Netty 服务器启动！&quot;</span>);<br>            future.channel().closeFuture().sync();<br>        &#125; <span class="hljs-keyword">finally</span> &#123;<br>            bossGroup.shutdownGracefully();<br>            workerGroup.shutdownGracefully();<br>        &#125;<br>    &#125;<br>&#125;<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyServerHandler</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">ChannelInboundHandlerAdapter</span> </span>&#123;<br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">channelRead</span><span class="hljs-params">(ChannelHandlerContext ctx, Object msg)</span> </span>&#123;<br>        System.out.println(<span class="hljs-string">&quot;收到客户端消息: &quot;</span> + msg);<br>        ctx.writeAndFlush(<span class="hljs-string">&quot;Server Ack\n&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">exceptionCaught</span><span class="hljs-params">(ChannelHandlerContext ctx, Throwable cause)</span> </span>&#123;<br>        cause.printStackTrace();<br>        ctx.close();<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="Netty-客户端代码"><a href="#Netty-客户端代码" class="headerlink" title="Netty 客户端代码"></a>Netty 客户端代码</h3><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">NettyClient</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> InterruptedException </span>&#123;<br>        EventLoopGroup group = <span class="hljs-keyword">new</span> NioEventLoopGroup();<br><br>        <span class="hljs-keyword">try</span> &#123;<br>            Bootstrap bootstrap = <span class="hljs-keyword">new</span> Bootstrap();<br>            bootstrap.group(group)<br>                .channel(NioSocketChannel.class)<br>                .handler(<span class="hljs-keyword">new</span> ChannelInitializer&lt;Channel&gt;() &#123;<br>                    <span class="hljs-meta">@Override</span><br>                    <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">void</span> <span class="hljs-title">initChannel</span><span class="hljs-params">(Channel ch)</span> </span>&#123;<br>                        ch.pipeline().addLast(<span class="hljs-keyword">new</span> MyClientHandler());<br>                    &#125;<br>                &#125;);<br><br>            ChannelFuture future = bootstrap.connect(<span class="hljs-string">&quot;127.0.0.1&quot;</span>, <span class="hljs-number">8080</span>).sync();<br>            System.out.println(<span class="hljs-string">&quot;客户端连接成功！&quot;</span>);<br>            future.channel().closeFuture().sync();<br>        &#125; <span class="hljs-keyword">finally</span> &#123;<br>            group.shutdownGracefully();<br>        &#125;<br>    &#125;<br>&#125;<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyClientHandler</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">SimpleChannelInboundHandler</span>&lt;<span class="hljs-title">String</span>&gt; </span>&#123;<br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">channelActive</span><span class="hljs-params">(ChannelHandlerContext ctx)</span> </span>&#123;<br>        ctx.writeAndFlush(<span class="hljs-string">&quot;Hello Netty Server!\n&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">void</span> <span class="hljs-title">channelRead0</span><span class="hljs-params">(ChannelHandlerContext ctx, String msg)</span> </span>&#123;<br>        System.out.println(<span class="hljs-string">&quot;收到服务器回复: &quot;</span> + msg);<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="Netty-VS-原生-NIO"><a href="#Netty-VS-原生-NIO" class="headerlink" title="Netty VS 原生 NIO"></a>Netty VS 原生 NIO</h3><table>
+<thead>
+<tr>
+<th>对比项</th>
+<th><strong>Netty</strong></th>
+<th><strong>Java NIO</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>API 简洁性</strong></td>
+<td>封装好，使用简单</td>
+<td>复杂，需要手动管理</td>
+</tr>
+<tr>
+<td><strong>线程管理</strong></td>
+<td>自动优化 <code>EventLoopGroup</code></td>
+<td>需手动创建 <code>Selector</code>、<code>ThreadPool</code></td>
+</tr>
+<tr>
+<td><strong>数据处理</strong></td>
+<td><code>ByteBuf</code> 更高效</td>
+<td><code>ByteBuffer</code> 操作繁琐</td>
+</tr>
+<tr>
+<td><strong>支持协议</strong></td>
+<td>TCP、UDP、WebSocket、HTTP</td>
+<td>仅支持 TCP/UDP</td>
+</tr>
+<tr>
+<td><strong>扩展性</strong></td>
+<td>支持插件、拦截器、编解码器</td>
+<td>需手写业务逻辑</td>
+</tr>
+</tbody></table>
+<h3 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h3><ul>
+<li>IM 即时通讯（如微信、QQ、聊天室）</li>
+<li>RPC 远程调用（Dubbo、gRPC）</li>
+<li>网关、代理服务器（如 Nginx、Kong）</li>
+<li>游戏服务器（高并发，低延迟）</li>
+<li>高性能 WebSocket 应用</li>
+</ul>
+<h2 id="零拷贝"><a href="#零拷贝" class="headerlink" title="零拷贝"></a>零拷贝</h2><h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><p>在传统的 IO 模型中，数据通常需要在用户空间和内核空间之间多次拷贝。例如，从磁盘读取数据到内核空间，然后再将其拷贝到用户空间，接着再从用户空间拷贝回内核空间，最后才发送到网络或写入到另一个文件。这种反复拷贝过程会带来额外的 CPU 开销和内存带宽消耗。</p>
+<p>零拷贝（Zero Copy）技术通过利用操作系统（OS）的底层支持，将数据在文件（或其他数据源）与网络或另一数据目标之间直接在内核空间完成传输，从而省去或减少不必要的用户态-内核态数据拷贝。零拷贝并不是绝对 “零”，而是指对用户态来说不再进行额外拷贝，极大地减少了数据在用户空间与内核空间之间的来回移动。</p>
+<h3 id="机制"><a href="#机制" class="headerlink" title="机制"></a>机制</h3><h4 id="FileChannel-的-transferTo-transferFrom"><a href="#FileChannel-的-transferTo-transferFrom" class="headerlink" title="FileChannel 的 transferTo / transferFrom"></a>FileChannel 的 transferTo / transferFrom</h4><p>在 Java 的 NIO 中，<code>FileChannel</code> 提供了两个方法来支持零拷贝式的数据传输：</p>
+<ol>
+<li><code>transferTo(long position, long count, WritableByteChannel target)</code><ul>
+<li>可以将当前文件通道的数据直接传输到目标通道（比如网络通道或另一个文件通道）。</li>
+<li>底层可能调用操作系统的 <code>sendfile</code> 等本地方法，避免了用户空间的拷贝。</li>
+</ul>
+</li>
+<li><code>transferFrom(ReadableByteChannel src, long position, long count)</code><ul>
+<li>与 <code>transferTo</code> 相反，将数据从可读通道直接传输到当前文件通道。</li>
+</ul>
+</li>
+</ol>
+<p><strong>工作原理</strong>：</p>
+<ul>
+<li>如果操作系统及其底层驱动支持 “零拷贝” 功能（如 Linux 的 <code>sendfile()</code> 系统调用），Java NIO 就能利用这些系统调用将数据直接从文件通道拷贝到网络或另一个文件通道的内核缓冲区。</li>
+<li>这样做的好处是：数据并不会再返回到 Java 用户态中，从而显著降低了 CPU 消耗和内存带宽的占用。</li>
+</ul>
+<h4 id="MappedByteBuffer-与内存映射文件"><a href="#MappedByteBuffer-与内存映射文件" class="headerlink" title="MappedByteBuffer 与内存映射文件"></a>MappedByteBuffer 与内存映射文件</h4><p>在 Java NIO 中，还可以使用 <code>MappedByteBuffer</code>（通过 <code>FileChannel.map</code> 方法）将文件直接映射到内存中，这也是一种 “零拷贝” 的思想体现。</p>
+<ul>
+<li>当文件被映射到内存之后，就可以像操作内存数组一样对文件进行读写，而实际上读写的过程由操作系统负责将磁盘数据加载到内存（往往使用分页和缓存）。</li>
+<li>对于大文件，操作系统会根据需要分段将数据加载到内存，且会使用缺页中断技术实现部分加载；对文件的写操作也可以 “懒加载” 或 “延时写回”。</li>
+<li>这样也避免了传统 IO 对文件内容进行多次复制，有助于提升 IO 性能。</li>
+</ul>
+<p>需要注意的是，<code>MappedByteBuffer</code> 常用于大文件或随机读写场景，且要留意可能出现的 “直接内存” 占用过大或文件锁问题。</p>
+<h3 id="底层原理-2"><a href="#底层原理-2" class="headerlink" title="底层原理"></a>底层原理</h3><p>以 Linux 平台为例，在使用零拷贝进行文件到网络的传输时，一般会调用操作系统的 <code>sendfile()</code> 或者更先进的 <code>splice()</code>、<code>sendfile64()</code> 之类的系统调用，整体流程可以概括如下：</p>
+<ol>
+<li><p><strong>内核读取文件页缓存</strong>：</p>
+<p>当需要将文件数据发送到网络时，操作系统首先会将文件对应的磁盘数据读入到内核空间的页缓存（page cache）中（如果先前还没在缓存里）。</p>
+</li>
+<li><p><strong>直接将内核缓存数据传送到 Socket 缓冲区</strong>：</p>
+<p>通过零拷贝方法（如 <code>sendfile()</code>），文件数据不需要再拷贝到用户空间，而是直接在内核态将数据从页缓存复制（或映射）到 Socket 缓冲区。</p>
+</li>
+<li><p><strong>DMA（Direct Memory Access）驱动的数据发送</strong>：</p>
+<p>网络接口卡（NIC）在发送数据时，会由 DMA 控制器直接从 Socket 缓冲区中读取数据并发送到网络上，这一步也不需要 CPU 参与数据拷贝。</p>
+</li>
+</ol>
+<p>整个过程中，CPU 不再需要进行数据的用户态/内核态切换拷贝，大幅减少了复制开销。</p>
+<h3 id="对比传统网络-IO"><a href="#对比传统网络-IO" class="headerlink" title="对比传统网络 IO"></a>对比传统网络 IO</h3><h4 id="传统-Socket-发送文件流程"><a href="#传统-Socket-发送文件流程" class="headerlink" title="传统 Socket 发送文件流程"></a>传统 Socket 发送文件流程</h4><p>当应用使用 <code>read()</code> 读取磁盘文件并通过 <code>Socket</code> 发送时，数据会经历多个拷贝：</p>
+<pre><code class=" mermaid">sequenceDiagram
+    autonumber
+    participant 应用层
+    participant 用户态缓冲区
+    participant 内核态缓冲区
+    participant 磁盘
+    participant 网卡
+
+    rect rgb(255, 204, 204)
+    应用层-&gt;&gt;磁盘: read()
+    磁盘--&gt;&gt;内核态缓冲区: DMA拷贝（磁盘-&gt;内核）
+    内核态缓冲区--&gt;&gt;用户态缓冲区: CPU拷贝（内核-&gt;用户）
+    用户态缓冲区--&gt;&gt;内核态缓冲区: CPU拷贝（用户-&gt;内核）
+    内核态缓冲区--&gt;&gt;网卡: DMA拷贝（内核-&gt;网卡）
+    end
+</code></pre>
+
+<ol>
+<li><code>read()</code>：数据从磁盘拷贝到内核缓冲区（Page Cache）（DMA 拷贝）。</li>
+<li>拷贝到用户态：数据从内核缓冲区拷贝到用户缓冲区（CPU 拷贝）。</li>
+<li><code>write()</code>：用户缓冲区数据拷贝回内核 Socket 缓冲区（CPU 拷贝）。</li>
+<li>数据发送：数据从 Socket 缓冲区拷贝到网卡缓冲区（DMA 拷贝）。</li>
+</ol>
+<p><strong>问题</strong>：有 4 次数据拷贝，其中 2 次 CPU 拷贝（用户态 ⇄ 内核态）会造成 CPU 额外开销。</p>
+<h4 id="零拷贝-sendfile-方式"><a href="#零拷贝-sendfile-方式" class="headerlink" title="零拷贝 sendfile() 方式"></a>零拷贝 sendfile() 方式</h4><p><code>sendfile()</code> 是 Linux 提供的零拷贝系统调用，用于高效传输文件：</p>
+<pre><code class=" mermaid">sequenceDiagram
+    autonumber
+    participant 应用层
+    participant 用户态缓冲区
+    participant 内核态缓冲区
+    participant 磁盘
+    participant 网卡
+
+    rect rgb(204, 255, 204)
+    磁盘--&gt;&gt;内核态缓冲区: DMA拷贝（磁盘-&gt;内核）
+    内核态缓冲区--&gt;&gt;网卡: DMA拷贝（内核-&gt;网卡）
+    end
+</code></pre>
+
+<ol>
+<li><code>sendfile(fd, socket, offset, length)</code> 直接让内核缓冲区数据通过 DMA 传输送到 Socket 缓冲区。</li>
+<li>数据直接传输到网卡，不进入用户态，减少 CPU 参与。</li>
+</ol>
+<p><strong>优势</strong>：</p>
+<ul>
+<li>少了 CPU 拷贝（不进入用户态），极大地减少了 CPU 消耗。</li>
+<li>适用于大文件传输，如文件服务器、Web 服务器。</li>
+</ul>
+<h4 id="更高级的-mmap-sendfile（splice-技术）"><a href="#更高级的-mmap-sendfile（splice-技术）" class="headerlink" title="更高级的 mmap + sendfile（splice 技术）"></a>更高级的 mmap + sendfile（splice 技术）</h4><p>Linux 2.6 之后，提供了 <code>mmap + sendfile()</code> 或 <code>splice()</code>：</p>
+<ul>
+<li><code>mmap()</code>：将文件映射到用户态虚拟地址空间，避免 <code>read()</code> 时拷贝到用户态。</li>
+<li><code>sendfile()</code> 或 <code>splice()</code>：直接从 Page Cache 传输到 Socket 缓冲区。</li>
+</ul>
+<p>这样，数据只在内核中流转，不需要进入用户态，大大提高高吞吐场景 的性能。</p>
+<h3 id="Java-Netty-零拷贝"><a href="#Java-Netty-零拷贝" class="headerlink" title="Java Netty 零拷贝"></a>Java Netty 零拷贝</h3><p>Netty 广泛使用零拷贝技术，以下是 Netty 相关的零拷贝机制：</p>
+<h4 id="Netty-FileRegion-实现零拷贝"><a href="#Netty-FileRegion-实现零拷贝" class="headerlink" title="Netty FileRegion 实现零拷贝"></a>Netty FileRegion 实现零拷贝</h4><p>在 Netty 服务器中，可以使用 <code>DefaultFileRegion</code> 直接将文件数据传输到 <code>SocketChannel</code>，避免数据进入用户态：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">File file = <span class="hljs-keyword">new</span> File(<span class="hljs-string">&quot;largeFile.txt&quot;</span>);<br>RandomAccessFile raf = <span class="hljs-keyword">new</span> RandomAccessFile(file, <span class="hljs-string">&quot;r&quot;</span>);<br>FileRegion region = <span class="hljs-keyword">new</span> DefaultFileRegion(raf.getChannel(), <span class="hljs-number">0</span>, file.length());<br>ctx.writeAndFlush(region);<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>原理</strong>：直接调用 <code>sendfile()</code> 发送数据，不经过 <code>ByteBuf</code>，避免数据拷贝，提高效率。</p>
+<h4 id="Netty-ByteBuf-的零拷贝"><a href="#Netty-ByteBuf-的零拷贝" class="headerlink" title="Netty ByteBuf 的零拷贝"></a>Netty ByteBuf 的零拷贝</h4><p>Netty 通过 <code>ByteBuf</code> 优化数据存储，减少拷贝：</p>
+<ul>
+<li><code>CompositeByteBuf</code>（组合缓冲区）：多个 <code>ByteBuf</code> 共享数据，避免 <code>byte[]</code> 拷贝。</li>
+<li><code>slice()</code>（数据切片）：共享数据，而不是复制数据。</li>
+<li><code>DirectByteBuf</code>（直接缓冲区）：绕过 JVM 堆，直接使用 <code>ByteBuffer.allocateDirect()</code> 进行零拷贝。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">ByteBuf buf = Unpooled.directBuffer(<span class="hljs-number">1024</span>);<br>buf.writeBytes(<span class="hljs-string">&quot;Zero Copy Test&quot;</span>.getBytes());<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>优势</strong>：</p>
+<ul>
+<li>减少 <code>byte[]</code> 数组拷贝</li>
+<li>直接使用 NIO <code>ByteBuffer</code>，减少 Java 堆 GC 开销</li>
+<li>高效的网络数据处理</li>
+</ul>
+<h3 id="优势与适用场景"><a href="#优势与适用场景" class="headerlink" title="优势与适用场景"></a>优势与适用场景</h3><h4 id="优势"><a href="#优势" class="headerlink" title="优势"></a>优势</h4><ol>
+<li><p><strong>减少数据拷贝次数</strong>：</p>
+<p>传统 IO 模型需要多次在用户态和内核态之间进行数据拷贝，而零拷贝大幅减少了这些拷贝次数。</p>
+</li>
+<li><p><strong>降低 CPU 占用</strong>：</p>
+<p>由于减少了内核态-用户态的拷贝操作，CPU 不再需要消耗额外的计算资源来进行大规模的数据搬运。</p>
+</li>
+<li><p><strong>提高数据吞吐量</strong>：</p>
+<p>减少拷贝与减少 CPU 开销相结合，可以提升整体吞吐量。对于大文件传输或高并发场景，性能改进尤其明显。</p>
+</li>
+</ol>
+<h4 id="典型适用场景"><a href="#典型适用场景" class="headerlink" title="典型适用场景"></a>典型适用场景</h4><ol>
+<li><p><strong>文件服务器或大文件传输</strong>：</p>
+<p>比如实现一个高效的文件下载服务器，把本地磁盘文件通过网络 Socket 发给客户端，这时可以使用 <code>FileChannel.transferTo()</code> 实现高效的零拷贝传输。</p>
+</li>
+<li><p><strong>Log 传输 / 实时流媒体</strong>：</p>
+<p>对于需要快速推送大批量数据的日志系统或流媒体服务器，也可以利用零拷贝来减少负载。</p>
+</li>
+<li><p><strong>高并发、高吞吐网络应用</strong>：</p>
+<p>在 Netty 等高性能网络框架中，也常常依赖操作系统底层的零拷贝机制来提升 IO 性能。</p>
+</li>
+</ol>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><ol>
+<li><p><strong>操作系统及硬件支持</strong>：</p>
+<p>零拷贝通常依赖底层操作系统（如 Linux）的特定系统调用，以及硬件（如 NIC）对 DMA 的支持，不同操作系统上的实现和限制可能有所不同。</p>
+</li>
+<li><p><strong>在某些情况下仍有拷贝</strong>：</p>
+<ul>
+<li>如果要对数据进行修改或处理（比如加密、压缩、数据格式转换等），那必须由用户态程序拿到数据再进行操作，这时就无法完全规避拷贝。</li>
+<li>如果数据目标通道不支持零拷贝特性，也可能会退回到传统方式传输。</li>
+</ul>
+</li>
+<li><p><strong>transferTo 和 transferFrom 可能会有大小限制</strong>：</p>
+<p>在一些操作系统版本或某些 JDK 实现中，对可传输的字节数有一定限制，需要分段传输大文件。</p>
+</li>
+<li><p><strong>MappedByteBuffer 占用直接内存</strong>：</p>
+<p>映射文件时操作系统会分配 “直接内存”，如果映射文件非常大或未及时释放，可能造成内存紧张甚至 <code>OutOfMemoryError</code>。</p>
+</li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Java 网络编程既可以使用阻塞 IO（BIO）搭配 <code>Socket</code> / <code>ServerSocket</code> 来编写简单直接的服务端与客户端，也能借助 NIO（非阻塞 IO）和 <code>Selector</code> 实现单线程管理多连接的高并发模型。对于需要更强性能、可扩展性的场景，如即时通讯、大规模并发连接或实时数据传输，Netty 框架提供了事件驱动、线程池分工以及强大的编解码处理能力，让网络开发更高效。</p>
+<p>此外，零拷贝技术与 Netty 的 <code>FileRegion</code>、<code>ByteBuf</code> 等特性更是通过操作系统底层优化极大降低了复制开销，进一步提高了吞吐量。在选择合适的网络 IO 模型时，应结合应用需求（延迟、吞吐、并发数、数据可靠性等）进行权衡，从而在正确的场景下用合适的技术发挥最大的效能。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Java-IO/">Java IO</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/JavaSE/">JavaSE</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Java-IO/">Java IO</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E7%BD%91%E7%BB%9CIO/">网络IO</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/02/14/javase-io-nio/">
+                        <span class="hidden-mobile">Java IO——NIO</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

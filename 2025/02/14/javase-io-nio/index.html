@@ -1,0 +1,984 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="引言Java NIO（New I&#x2F;O）是从 Java 1.4 开始引入，并在后续版本不断完善的一套高性能 I&#x2F;O 编程模型。它在保留传统流式 I&#x2F;O 的基础上，提供了更灵活的缓冲区（Buffer） 与通道（Channel）机制，并加入了非阻塞 I&#x2F;O和多路复用（Selector）等概念，极大地提升了高并发环境下的吞吐量。本篇文章将从缓冲区与通道的基本用法讲起，逐步剖析异步文件读写、网络编程，以及基">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java IO——NIO">
+<meta property="og:url" content="http://example.com/2025/02/14/javase-io-nio/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="引言Java NIO（New I&#x2F;O）是从 Java 1.4 开始引入，并在后续版本不断完善的一套高性能 I&#x2F;O 编程模型。它在保留传统流式 I&#x2F;O 的基础上，提供了更灵活的缓冲区（Buffer） 与通道（Channel）机制，并加入了非阻塞 I&#x2F;O和多路复用（Selector）等概念，极大地提升了高并发环境下的吞吐量。本篇文章将从缓冲区与通道的基本用法讲起，逐步剖析异步文件读写、网络编程，以及基">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/java-io-logo.png">
+<meta property="article:published_time" content="2025-02-14T12:25:38.000Z">
+<meta property="article:modified_time" content="2025-02-14T12:25:38.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="JavaSE">
+<meta property="article:tag" content="Java IO">
+<meta property="article:tag" content="NIO">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/java-io-logo.png">
+  
+  
+  <title>Java IO——NIO - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/java-io-logo.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Java IO——NIO">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2025-02-14 20:25" pubdate>
+        2025年2月14日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      16k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      27 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Java IO——NIO</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：2 天前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>Java NIO（New I/O）是从 Java 1.4 开始引入，并在后续版本不断完善的一套高性能 I/O 编程模型。它在保留传统流式 I/O 的基础上，提供了更灵活的缓冲区（Buffer） 与通道（Channel）机制，并加入了非阻塞 I/O和多路复用（Selector）等概念，极大地提升了高并发环境下的吞吐量。本篇文章将从缓冲区与通道的基本用法讲起，逐步剖析异步文件读写、网络编程，以及基于 Selector 的非阻塞服务器模型，帮助读者深入掌握 Java NIO。</p>
+<h2 id="缓冲区-Buffer"><a href="#缓冲区-Buffer" class="headerlink" title="缓冲区 Buffer"></a>缓冲区 Buffer</h2><h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>在 NIO 中，所有数据都是通过缓冲区（Buffer）来处理的。Buffer 本质上是一个容器，用于存储不同数据类型的数据（如 <code>ByteBuffer</code>、<code>CharBuffer</code>、<code>IntBuffer</code> 等）。数据的读写都必须经过 Buffer，Channel 与 Buffer 搭配使用，完成数据在程序与底层设备间的传输。</p>
+<h3 id="主要属性"><a href="#主要属性" class="headerlink" title="主要属性"></a>主要属性</h3><h4 id="mark"><a href="#mark" class="headerlink" title="mark"></a>mark</h4><ul>
+<li><strong>作用：</strong> 用于记录一个特定的位置。调用 <code>mark()</code> 方法后，Buffer 会保存当前位置，后续可以通过 <code>reset()</code> 方法将 <code>position</code> 重置到该位置。</li>
+<li><strong>注意：</strong> 一旦调用 <code>reset()</code>，如果 <code>mark</code> 不存在则会抛出异常。</li>
+</ul>
+<h4 id="position"><a href="#position" class="headerlink" title="position"></a>position</h4><ul>
+<li><strong>作用：</strong> 表示当前读写操作的位置。每次读或写操作后，<code>position</code> 会自动前移。</li>
+<li><strong>特点：</strong> 在切换模式时（如调用 <code>flip()</code> 或 <code>rewind()</code>），<code>position</code> 会被相应调整。</li>
+</ul>
+<h4 id="limit"><a href="#limit" class="headerlink" title="limit"></a>limit</h4><ul>
+<li><strong>作用：</strong> 表示当前缓冲区中可以操作的最大范围。对于写操作来说，<code>limit</code> 通常等于 <code>capacity</code>；而对于读操作来说，<code>limit</code> 指定了数据的末尾位置。</li>
+<li><strong>注意：</strong> 超过 <code>limit</code> 的位置是不可访问的。</li>
+</ul>
+<h4 id="capacity"><a href="#capacity" class="headerlink" title="capacity"></a>capacity</h4><ul>
+<li><strong>作用：</strong> 表示缓冲区的固定大小，即能容纳的最大元素数。一经分配便不能改变。</li>
+<li><strong>特点：</strong> <code>capacity</code> 决定了缓冲区分配时的总内存大小。</li>
+</ul>
+<h4 id="address"><a href="#address" class="headerlink" title="address"></a>address</h4><ul>
+<li><strong>作用：</strong> 对于直接缓冲区（Direct Buffer）来说，该属性表示分配的内存地址。</li>
+<li><strong>注意：</strong> 这是底层实现细节，一般仅用于性能优化或与本地代码交互的场景。</li>
+</ul>
+<h3 id="关键方法"><a href="#关键方法" class="headerlink" title="关键方法"></a>关键方法</h3><h4 id="构造方法"><a href="#构造方法" class="headerlink" title="构造方法"></a>构造方法</h4><ul>
+<li><code>Buffer(int mark, int pos, int lim, int cap)</code>：构造方法（受保护）用来初始化 Buffer 的 <code>mark</code>、<code>position</code>、<code>limit</code> 与 <code>capacity</code>。通常在子类（如 <code>ByteBuffer</code>）中调用，不直接在应用中使用。</li>
+</ul>
+<h4 id="设置和获取属性"><a href="#设置和获取属性" class="headerlink" title="设置和获取属性"></a>设置和获取属性</h4><ul>
+<li><code>int capacity()</code>：返回缓冲区的容量。</li>
+<li><code>int position()</code>：返回当前的 <code>position</code>。</li>
+<li><code>Buffer position(int newPosition)</code>：设置新的 <code>position</code>，并返回当前 Buffer 实例，便于链式调用。调用时会检查 <code>newPosition</code> 是否在合法范围内。</li>
+<li><code>int limit()</code>：返回当前的 <code>limit</code>。</li>
+<li><code>Buffer limit(int newLimit)</code>：设置新的 <code>limit</code>，返回当前 Buffer 实例，同样会进行范围检查。</li>
+<li><code>Buffer mark()</code>：在当前 <code>position</code> 处设置 <code>mark</code>，便于后续的 <code>reset</code> 操作。</li>
+<li><code>Buffer reset()</code>：将 <code>position</code> 重置为之前保存的 <code>mark</code>。若 <code>mark</code> 不存在，将抛出异常。</li>
+</ul>
+<h4 id="模式转换操作"><a href="#模式转换操作" class="headerlink" title="模式转换操作"></a>模式转换操作</h4><ul>
+<li><code>Buffer clear()</code>：重置缓冲区，设置 <code>position</code> 为 0，<code>limit</code> 为 <code>capacity</code>，同时丢弃 <code>mark</code>。通常用于写操作前的准备。</li>
+<li><code>Buffer flip()</code>：将缓冲区从写模式切换到读模式。<code>flip()</code> 方法会将 <code>limit</code> 设置为当前 <code>position</code> 的值，然后将 <code>position</code> 重置为 0，同时丢弃 <code>mark</code>。用于写入完毕后准备读取数据。</li>
+<li><code>Buffer rewind()</code>：将 <code>position</code> 重置为 0（保留 <code>limit</code> 不变），常用于重新读取缓冲区中的数据，而不需要重新写入数据。</li>
+</ul>
+<h4 id="数据剩余和状态检查"><a href="#数据剩余和状态检查" class="headerlink" title="数据剩余和状态检查"></a>数据剩余和状态检查</h4><ul>
+<li><code>int remaining()</code>：返回缓冲区中剩余可读或可写的元素数量（<code>limit - position</code>）。</li>
+<li><code>boolean hasRemaining()</code>：判断缓冲区中是否还有未处理的数据（<code>remaining() &gt; 0</code>）。</li>
+<li><code>boolean isReadOnly()</code>：检查当前缓冲区是否为只读模式。</li>
+<li><code>boolean hasArray()</code>：判断缓冲区是否有一个可公开访问的底层数组（例如堆缓冲区通常支持）。</li>
+<li><code>Object array()</code>：返回底层数组（如果存在），用于直接操作缓冲区数据。</li>
+<li><code>int arrayOffset()</code>：返回底层数组中与缓冲区起始位置相关的偏移量。</li>
+<li><code>boolean isDirect()</code>：判断缓冲区是否为直接缓冲区。直接缓冲区在操作系统内核层面分配内存，通常具有更高的 I/O 性能。</li>
+</ul>
+<h4 id="内部索引和边界检查方法"><a href="#内部索引和边界检查方法" class="headerlink" title="内部索引和边界检查方法"></a>内部索引和边界检查方法</h4><p>以下方法大多为包内或内部使用，用于确保索引操作的安全性。</p>
+<ul>
+<li><code>int nextGetIndex()</code> / <code>int nextGetIndex(int nb)</code>：用于在读取数据时获取下一个索引位置，后者支持一次性读取多个数据。内部会检查是否越界。</li>
+<li><code>int nextPutIndex()</code> / <code>int nextPutIndex(int nb)</code>：用于写入数据时获取下一个写入索引，同样支持批量操作，并进行越界检查。</li>
+<li><code>int checkIndex(int i)</code> / <code>int checkIndex(int i, int nb)</code>：用于检查单个索引或一段连续区域是否在合法范围内，防止数组越界异常。</li>
+<li><code>int markValue()</code>：返回当前保存的 <code>mark</code> 值。</li>
+<li><code>void truncate()</code>：内部方法，可能用于截断缓冲区数据（具体实现依赖于子类）。</li>
+<li><code>void discardMark()</code>：丢弃已设置的 <code>mark</code>，通常在调用 <code>clear()</code> 或 <code>flip()</code> 时自动执行。</li>
+<li><code>void checkBounds(int off, int len, int size)</code>：用于检查操作的起始偏移和长度是否在规定范围内。确保 <code>off</code> 和 <code>len</code> 的组合不超过指定 <code>size</code>。</li>
+</ul>
+<h3 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h3><p>使用缓冲区通常会涉及以下几个步骤：</p>
+<ol>
+<li><strong>写入数据</strong>：将数据放入 Buffer 中，此时 <code>position</code> 会递增。</li>
+<li><strong>切换读模式</strong>：调用 <code>flip()</code> 方法，将 <code>position</code> 置为 0，同时将 <code>limit</code> 设置为之前写入的数据量。</li>
+<li><strong>读取数据</strong>：从 Buffer 中取出数据。</li>
+<li><strong>清理或压缩</strong>：调用 <code>clear()</code> 方法重置缓冲区或调用 <code>compact()</code> 方法保留未读数据以继续写入。</li>
+</ol>
+<h3 id="字节数据缓冲区"><a href="#字节数据缓冲区" class="headerlink" title="字节数据缓冲区"></a>字节数据缓冲区</h3><p>字节数据缓冲区 <code>ByteBuffer</code> 是最常用的缓冲区类型，用于存储和操作字节数据。在文件 I/O、网络通信等场景中，我们经常需要通过 <code>ByteBuffer</code> 来处理原始数据流。ByteBuffer 支持多种操作，如读写、切换模式、标记和复位等。</p>
+<p><strong>示例</strong>：使用 <code>ByteBuffer</code> 进行基本的读写操作。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ByteBufferDemo</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        <span class="hljs-comment">// 分配一个 32 字节大小的 ByteBuffer</span><br>        ByteBuffer buffer = ByteBuffer.allocate(<span class="hljs-number">32</span>);<br><br>        <span class="hljs-comment">// 写入数据到缓冲区</span><br>        String input = <span class="hljs-string">&quot;Hello, NIO ByteBuffer!&quot;</span>;<br>        buffer.put(input.getBytes(StandardCharsets.UTF_8));<br><br>        <span class="hljs-comment">// 切换到读模式</span><br>        buffer.flip();<br><br>        <span class="hljs-comment">// 从缓冲区中读取数据</span><br>        <span class="hljs-keyword">byte</span>[] bytes = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[buffer.remaining()];<br>        buffer.get(bytes);<br>        String output = <span class="hljs-keyword">new</span> String(bytes, StandardCharsets.UTF_8);<br><br>        System.out.println(<span class="hljs-string">&quot;读取数据：&quot;</span> + output);<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="字符数据缓冲区"><a href="#字符数据缓冲区" class="headerlink" title="字符数据缓冲区"></a>字符数据缓冲区</h3><p>字符数据缓冲区 <code>CharBuffer</code> 专用于存储字符数据，在处理文本时十分常用。与 <code>ByteBuffer</code> 类似，<code>CharBuffer</code> 也具有 <code>position</code>、<code>limit</code> 和 <code>capacity</code> 属性，并提供相应的读写操作。它特别适合需要对字符或字符串进行操作的场景，如文件字符编码转换、字符数据处理等。</p>
+<p><strong>示例</strong>：使用 <code>ByteBuffer</code> 进行基本的读写操作。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CharBufferDemo</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        <span class="hljs-comment">// 分配一个容量为 20 的 CharBuffer</span><br>        CharBuffer charBuffer = CharBuffer.allocate(<span class="hljs-number">20</span>);<br><br>        <span class="hljs-comment">// 写入字符数据</span><br>        String message = <span class="hljs-string">&quot;Hello, CharBuffer!&quot;</span>;<br>        charBuffer.put(message);<br><br>        <span class="hljs-comment">// 切换到读模式</span><br>        charBuffer.flip();<br><br>        <span class="hljs-comment">// 读取字符数据</span><br>        StringBuilder output = <span class="hljs-keyword">new</span> StringBuilder();<br>        <span class="hljs-keyword">while</span> (charBuffer.hasRemaining()) &#123;<br>            output.append(charBuffer.get());<br>        &#125;<br><br>        System.out.println(<span class="hljs-string">&quot;读取字符数据：&quot;</span> + output.toString());<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="其他类型缓冲区"><a href="#其他类型缓冲区" class="headerlink" title="其他类型缓冲区"></a>其他类型缓冲区</h3><p>除了 <code>ByteBuffer</code> 和 <code>CharBuffer</code>，<code>NIO</code> 还提供了其他多种缓冲区类型，分别对应不同的数据类型，如：</p>
+<ul>
+<li><code>IntBuffer</code>：用于存储整数。</li>
+<li><code>LongBuffer</code>：用于存储长整型数据。</li>
+<li><code>FloatBuffer</code>：用于存储单精度浮点数。</li>
+<li><code>DoubleBuffer</code>：用于存储双精度浮点数。</li>
+</ul>
+<p>这些缓冲区的使用方式与 <code>ByteBuffer</code> 和 <code>CharBuffer</code> 类似，都支持基本的写入、读取、重置等操作。在需要处理非字节数据时，选择合适的缓冲区类型能够大幅提高程序的可读性和性能。</p>
+<h2 id="通道-Channel"><a href="#通道-Channel" class="headerlink" title="通道 Channel"></a>通道 Channel</h2><h3 id="概述-1"><a href="#概述-1" class="headerlink" title="概述"></a>概述</h3><p>通道 Channel 是 Java NIO 中用于进行数据传输的组件。与传统 I/O 中的流不同，Channel 是双向的，即它既能进行读操作，也能进行写操作。常见的 Channel 包括：</p>
+<ul>
+<li><code>FileChannel</code>：用于文件的读写操作。</li>
+<li><code>SocketChannel</code>：用于网络通信的读写操作。</li>
+<li><code>ServerSocketChannel</code>：用于监听客户端连接请求。</li>
+<li><code>DatagramChannel</code>：用于 UDP 网络通信。</li>
+</ul>
+<h3 id="与-Buffer-的配合"><a href="#与-Buffer-的配合" class="headerlink" title="与 Buffer 的配合"></a>与 Buffer 的配合</h3><p>Channel 不能直接操作数据，而是需要借助 Buffer。通过 Channel 将数据读入 Buffer，再由 Buffer 将数据写出到 Channel。这样的设计使得数据操作更加灵活，同时也便于实现非阻塞 I/O。</p>
+<h3 id="FileChannel"><a href="#FileChannel" class="headerlink" title="FileChannel"></a>FileChannel</h3><h4 id="概述-2"><a href="#概述-2" class="headerlink" title="概述"></a>概述</h4><p><code>FileChannel</code> 用于文件的读写操作。它不直接存储数据，而是依靠 Buffer 作为数据的容器。<code>FileChannel</code> 支持随机访问，因此可以在文件的任意位置进行读取或写入操作。注意：<code>FileChannel</code> 无法设置为非阻塞模式，但它提供了高效的文件 I/O 操作，例如文件拷贝和内存映射文件等。</p>
+<h4 id="常用操作"><a href="#常用操作" class="headerlink" title="常用操作"></a>常用操作</h4><ul>
+<li><strong>打开文件</strong>：通过 <code>open(Path path, OpenOption... options)</code> 方法打开一个文件。</li>
+<li><strong>读取数据</strong>：通过 <code>read(ByteBuffer)</code> 方法将数据从文件读取到缓冲区。</li>
+<li><strong>写入数据</strong>：通过 <code>write(ByteBuffer)</code> 方法将数据从缓冲区写入文件。</li>
+<li><strong>文件定位</strong>：可以通过 <code>position()</code> 方法获取或设置文件中的当前位置，实现随机读取/写入。</li>
+</ul>
+<h3 id="打开模式"><a href="#打开模式" class="headerlink" title="打开模式"></a>打开模式</h3><p>通过 <code>open</code> 方法打开文件时，支持以下打开模式：</p>
+<table>
+<thead>
+<tr>
+<th><strong>模式</strong></th>
+<th><strong>作用</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>READ</code></td>
+<td>只读模式</td>
+</tr>
+<tr>
+<td><code>WRITE</code></td>
+<td>只写模式</td>
+</tr>
+<tr>
+<td><code>APPEND</code></td>
+<td>拼接的方式进行写操作</td>
+</tr>
+<tr>
+<td><code>TRUNCATE_EXISTING</code></td>
+<td>先将长度截断为 0（清空文件），再进行写操作</td>
+</tr>
+<tr>
+<td><code>CREATE</code></td>
+<td>文件不存在时创建</td>
+</tr>
+<tr>
+<td><code>CREATE_NEW</code></td>
+<td>只在文件不存在时创建（否则抛异常）</td>
+</tr>
+<tr>
+<td><code>DELETE_ON_CLOSE</code></td>
+<td>关闭时删除文件</td>
+</tr>
+<tr>
+<td><code>SPARSE</code></td>
+<td>允许创建稀疏文件</td>
+</tr>
+<tr>
+<td><code>SYNC</code></td>
+<td>文件内容或元数据的每次更新都立即同步文写入底层存储设备</td>
+</tr>
+<tr>
+<td><code>DSYNC</code></td>
+<td>文件内容的每次更新都立即同步文写入底层存储设备</td>
+</tr>
+</tbody></table>
+<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><p>下面的示例演示了如何使用 <code>FileChannel</code> 读取一个文本文件，并将读取到的数据输出到控制台。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Slf4j</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FileChannelDemo</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception </span>&#123;<br>        String filePath = <span class="hljs-string">&quot;test.txt&quot;</span>;<br>        Charset charset = StandardCharsets.UTF_8; <span class="hljs-comment">// 确保读写使用相同的字符集</span><br><br>        <span class="hljs-comment">// 写入文件</span><br>        <span class="hljs-keyword">try</span> (RandomAccessFile file = <span class="hljs-keyword">new</span> RandomAccessFile(filePath, <span class="hljs-string">&quot;rw&quot;</span>);<br>             FileChannel fileChannel = file.getChannel()) &#123;<br><br>            String content = <span class="hljs-string">&quot;你好，FileChannel！&quot;</span>;<br>            ByteBuffer buffer = charset.encode(content); <span class="hljs-comment">// 将字符串编码为 ByteBuffer</span><br>            fileChannel.write(buffer);<br>        &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>            log.error(<span class="hljs-string">&quot;写入文件失败&quot;</span>, e);<br>        &#125;<br><br>        <span class="hljs-comment">// 读取文件</span><br>        <span class="hljs-keyword">try</span> (RandomAccessFile file = <span class="hljs-keyword">new</span> RandomAccessFile(filePath, <span class="hljs-string">&quot;r&quot;</span>);<br>             FileChannel fileChannel = file.getChannel()) &#123;<br><br>            ByteBuffer buffer = ByteBuffer.allocate(<span class="hljs-number">1024</span>);<br>            fileChannel.read(buffer);<br><br>            buffer.flip(); <span class="hljs-comment">// 切换到读模式</span><br>            String result = charset.decode(buffer).toString(); <span class="hljs-comment">// 解码为字符串</span><br>            System.out.println(<span class="hljs-string">&quot;读取内容: &quot;</span> + result);<br>        &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>            log.error(<span class="hljs-string">&quot;读取文件失败&quot;</span>, e);<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>在该示例中，我们首先打开一个文件并获取其 <code>FileChannel</code>，然后利用 <code>ByteBuffer</code> 将文件数据分段读取到内存中，并输出到控制台。</p>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li><strong>写入时</strong>： <code>Charset.encode(content)</code> 将字符串转换为 <code>ByteBuffer</code>。</li>
+<li><strong>读取时</strong>： <code>Charset.decode(buffer)</code> 进行解码。</li>
+</ul>
+<h3 id="AsynchronousFileChannel"><a href="#AsynchronousFileChannel" class="headerlink" title="AsynchronousFileChannel"></a>AsynchronousFileChannel</h3><h4 id="概述-3"><a href="#概述-3" class="headerlink" title="概述"></a>概述</h4><p><code>AsynchronousFileChannel</code> 是 Java 7 引入的异步文件 I/O 通道，位于 <code>java.nio.channels</code> 包中。它支持非阻塞文件读写，使文件操作可以异步执行，特别适用于高并发文件访问、日志系统、文件服务器等场景。</p>
+<p>相比于 <code>FileChannel</code>（同步 I/O），<code>AsynchronousFileChannel</code> 允许：</p>
+<ul>
+<li>读写操作异步执行，不阻塞主线程</li>
+<li>支持 <code>CompletionHandler</code> 回调</li>
+<li>支持 <code>Future</code> 机制</li>
+<li>适用于高性能 I/O（如日志、数据存储）</li>
+</ul>
+<h4 id="对比-FileChannel"><a href="#对比-FileChannel" class="headerlink" title="对比 FileChannel"></a>对比 FileChannel</h4><table>
+<thead>
+<tr>
+<th><strong>特性</strong></th>
+<th><strong>FileChannel</strong></th>
+<th><strong>AsynchronousFileChannel</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>I/O 模型</strong></td>
+<td>同步</td>
+<td>异步</td>
+</tr>
+<tr>
+<td><strong>线程阻塞</strong></td>
+<td>可能阻塞</td>
+<td>不阻塞</td>
+</tr>
+<tr>
+<td><strong>适用场景</strong></td>
+<td>小型文件读写、普通 I/O</td>
+<td>高并发文件访问、大型文件</td>
+</tr>
+<tr>
+<td><strong>调用方式</strong></td>
+<td><code>read()</code> / <code>write()</code></td>
+<td><code>read()</code> / <code>write()</code>（带 <code>Future</code> 或 <code>CompletionHandler</code>）</td>
+</tr>
+<tr>
+<td><strong>并发支持</strong></td>
+<td>需要手动同步</td>
+<td>线程安全，支持多个并发操作</td>
+</tr>
+</tbody></table>
+<p><strong>适用场景</strong>：</p>
+<ul>
+<li><code>FileChannel</code> 适用于单线程文件操作。</li>
+<li><code>AsynchronousFileChannel</code> 适用于多线程并发访问。</li>
+</ul>
+<h4 id="打开模式-1"><a href="#打开模式-1" class="headerlink" title="打开模式"></a>打开模式</h4><p>见 <code>FileChannel</code>。</p>
+<h4 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h4><ul>
+<li><p>使用 <code>Future</code> 进行异步读取。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AsyncReadDemo</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception </span>&#123;<br>        Path path = Paths.get(<span class="hljs-string">&quot;example_utf8.txt&quot;</span>);<br><br>        <span class="hljs-comment">// 确保文件存在，并使用 UTF-8 编码写入测试内容</span><br>        <span class="hljs-keyword">if</span> (!Files.exists(path)) &#123;<br>            Files.write(path, <span class="hljs-string">&quot;你好，AsynchronousFileChannel！&quot;</span>.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);<br>        &#125;<br><br>        AsynchronousFileChannel channel = AsynchronousFileChannel.open(path, StandardOpenOption.READ);<br><br>        ByteBuffer buffer = ByteBuffer.allocate(<span class="hljs-number">1024</span>);<br>        <span class="hljs-keyword">long</span> position = <span class="hljs-number">0</span>;<br><br>        <span class="hljs-comment">// 异步读取</span><br>        Future&lt;Integer&gt; future = channel.read(buffer, position);<br><br>        <span class="hljs-comment">// 这里可以执行其他任务...</span><br><br>        <span class="hljs-comment">// 获取读取结果</span><br>        <span class="hljs-keyword">int</span> bytesRead = future.get();<br>        buffer.flip();<br>        String content = StandardCharsets.UTF_8.decode(buffer).toString();<br>        System.out.println(<span class="hljs-string">&quot;读取内容: &quot;</span> + content);<br><br>        channel.close();<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>使用 <code>CompletionHandler</code> 进行异步读取。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AsyncReadWithHandlerDemo</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> IOException, InterruptedException </span>&#123;<br>        Path path = Paths.get(<span class="hljs-string">&quot;example_utf8.txt&quot;</span>);<br><br>        <span class="hljs-comment">// 确保文件存在，并使用 UTF-8 编码写入测试内容</span><br>        <span class="hljs-keyword">if</span> (!Files.exists(path)) &#123;<br>            Files.write(path, <span class="hljs-string">&quot;你好，AsynchronousFileChannel！&quot;</span>.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);<br>        &#125;<br><br>        AsynchronousFileChannel channel = AsynchronousFileChannel.open(path, StandardOpenOption.READ);<br><br>        ByteBuffer buffer = ByteBuffer.allocate(<span class="hljs-number">1024</span>);<br>        <span class="hljs-keyword">long</span> position = <span class="hljs-number">0</span>;<br><br>        <span class="hljs-comment">// 使用 CompletionHandler 进行非阻塞读取</span><br>        channel.read(buffer, position, buffer, <span class="hljs-keyword">new</span> java.nio.channels.CompletionHandler&lt;Integer, ByteBuffer&gt;() &#123;<br>            <span class="hljs-meta">@Override</span><br>            <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">completed</span><span class="hljs-params">(Integer bytesRead, ByteBuffer attachment)</span> </span>&#123;<br>                attachment.flip();<br>                String content = StandardCharsets.UTF_8.decode(attachment).toString();<br>                System.out.println(<span class="hljs-string">&quot;读取内容: &quot;</span> + content);<br>            &#125;<br><br>            <span class="hljs-meta">@Override</span><br>            <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">failed</span><span class="hljs-params">(Throwable exc, ByteBuffer attachment)</span> </span>&#123;<br>                System.out.println(<span class="hljs-string">&quot;读取失败: &quot;</span> + exc.getMessage());<br>            &#125;<br>        &#125;);<br><br>        TimeUnit.SECONDS.sleep(<span class="hljs-number">2</span>); <span class="hljs-comment">// 让主线程等待异步任务完成</span><br>        channel.close();<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+</ul>
+<h3 id="SocketChannel"><a href="#SocketChannel" class="headerlink" title="SocketChannel"></a>SocketChannel</h3><h4 id="概述-4"><a href="#概述-4" class="headerlink" title="概述"></a>概述</h4><p><code>SocketChannel</code> 是用于网络通信的通道，主要用来实现基于 TCP 的客户端操作。它既支持阻塞模式，也支持非阻塞模式，特别适合需要进行异步网络 I/O 的场景。通过 <code>SocketChannel</code>，客户端可以连接到远程服务器，并发送/接收数据。</p>
+<h4 id="常用操作-1"><a href="#常用操作-1" class="headerlink" title="常用操作"></a>常用操作</h4><ul>
+<li><strong>建立连接</strong>：使用 <code>connect(SocketAddress)</code> 方法连接到服务器。</li>
+<li><strong>读取数据</strong>：使用 <code>read(ByteBuffer)</code> 从通道中读取数据。</li>
+<li><strong>写入数据</strong>：使用 <code>write(ByteBuffer)</code> 向通道中写入数据。</li>
+<li><strong>非阻塞模式</strong>：通过 <code>configureBlocking(false)</code> 将 <code>SocketChannel</code> 设置为非阻塞模式，以便在进行网络 I/O 时不被阻塞。</li>
+</ul>
+<h3 id="ServerSocketChannel"><a href="#ServerSocketChannel" class="headerlink" title="ServerSocketChannel"></a>ServerSocketChannel</h3><h4 id="概述-5"><a href="#概述-5" class="headerlink" title="概述"></a>概述</h4><p><code>ServerSocketChannel</code> 是用于监听客户端连接请求的通道。它与传统的 <code>ServerSocket</code> 类似，但同样支持非阻塞模式，并且可与 <code>Selector</code> 配合使用，实现高效的多路复用。使用 <code>ServerSocketChannel</code> 可以在单线程中处理大量并发连接。</p>
+<h4 id="常用操作-2"><a href="#常用操作-2" class="headerlink" title="常用操作"></a>常用操作</h4><ul>
+<li><strong>绑定端口</strong>：通过 <code>bind(SocketAddress)</code> 方法绑定服务器监听的地址和端口。</li>
+<li><strong>接收连接</strong>：通过 <code>accept()</code> 方法接收客户端连接请求，该方法在非阻塞模式下返回 null 表示当前没有连接。</li>
+<li><strong>设置非阻塞</strong>：通过 <code>configureBlocking(false)</code> 将通道设置为非阻塞模式。</li>
+</ul>
+<h2 id="选择器-Selector"><a href="#选择器-Selector" class="headerlink" title="选择器 Selector"></a>选择器 Selector</h2><h3 id="概述-6"><a href="#概述-6" class="headerlink" title="概述"></a>概述</h3><p><code>Selector</code> 是 Java NIO 提供的多路复用（Multiplexing） 机制，可以通过单个线程监听多个 <code>Channel</code>（通道）的事件（如可读、可写、连接等）。这样可以减少线程数量，提高系统的吞吐量，适用于高并发的网络服务器，如 HTTP 服务器、聊天服务器等。</p>
+<p>传统的阻塞 I/O 需要为每个连接创建一个独立的线程，而 <code>Selector</code> 允许一个线程管理多个连接，实现非阻塞 I/O，大大减少了线程切换的开销。</p>
+<h3 id="核心组件"><a href="#核心组件" class="headerlink" title="核心组件"></a>核心组件</h3><h4 id="Channel（通道）"><a href="#Channel（通道）" class="headerlink" title="Channel（通道）"></a>Channel（通道）</h4><ul>
+<li>例如 <code>SocketChannel</code>（TCP 客户端）、<code>ServerSocketChannel</code>（TCP 服务器）、<code>DatagramChannel</code>（UDP）。</li>
+<li><code>Channel</code> 必须设置为非阻塞模式，才能配合 <code>Selector</code> 工作。</li>
+</ul>
+<h4 id="SelectionKey（选择键）"><a href="#SelectionKey（选择键）" class="headerlink" title="SelectionKey（选择键）"></a>SelectionKey（选择键）</h4><ul>
+<li><p>代表 <code>Selector</code> 监听的事件，如：</p>
+<ul>
+<li><code>OP_ACCEPT</code>：连接就绪。</li>
+<li><code>OP_READ</code>：可读。</li>
+<li><code>OP_WRITE</code>：可写。</li>
+<li><code>OP_CONNECT</code>：连接完成。</li>
+</ul>
+</li>
+<li><p><code>SelectionKey</code> 绑定了 <code>Channel</code> 和 <code>Selector</code>，用于标识哪个通道准备好了特定的操作。</p>
+</li>
+</ul>
+<h4 id="Selector（选择器）"><a href="#Selector（选择器）" class="headerlink" title="Selector（选择器）"></a>Selector（选择器）</h4><ul>
+<li>负责监视多个 <code>Channel</code> 的事件变化，避免传统 <code>while(true)</code> 的轮询方式。</li>
+</ul>
+<h3 id="关键方法-1"><a href="#关键方法-1" class="headerlink" title="关键方法"></a>关键方法</h3><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Selector.open()</code></td>
+<td>创建 Selector</td>
+</tr>
+<tr>
+<td><code>select()</code></td>
+<td>阻塞等待至少一个通道就绪</td>
+</tr>
+<tr>
+<td><code>select(long timeout)</code></td>
+<td>超时等待指定时间（毫秒）</td>
+</tr>
+<tr>
+<td><code>selectNow()</code></td>
+<td>非阻塞检查就绪通道</td>
+</tr>
+<tr>
+<td><code>selectedKeys()</code></td>
+<td>获取已选择的 SelectionKey 集合</td>
+</tr>
+<tr>
+<td><code>keys()</code></td>
+<td>获取所有注册的 SelectionKey</td>
+</tr>
+<tr>
+<td><code>wakeup()</code></td>
+<td>让一个阻塞的 <code>select()</code> 方法立即返回</td>
+</tr>
+<tr>
+<td><code>close()</code></td>
+<td>关闭 Selector</td>
+</tr>
+</tbody></table>
+<h3 id="工作流程"><a href="#工作流程" class="headerlink" title="工作流程"></a>工作流程</h3><ol>
+<li><p>创建 <code>Selector</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">Selector selector = Selector.open();<br></code></pre></div></td></tr></table></figure></li>
+<li><p>将 <code>Channel</code> 注册到 <code>Selector</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">ServerSocketChannel serverChannel = ServerSocketChannel.open();<br>serverChannel.configureBlocking(<span class="hljs-keyword">false</span>);  <span class="hljs-comment">// 设置非阻塞</span><br>serverChannel.register(selector, SelectionKey.OP_ACCEPT);<br></code></pre></div></td></tr></table></figure></li>
+<li><p>轮询就绪事件。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">while</span> (<span class="hljs-keyword">true</span>) &#123;<br>    selector.select();  <span class="hljs-comment">// 阻塞，直到至少有一个事件发生</span><br>    Set&lt;SelectionKey&gt; selectedKeys = selector.selectedKeys();<br>    Iterator&lt;SelectionKey&gt; iterator = selectedKeys.iterator();<br>    <span class="hljs-keyword">while</span> (iterator.hasNext()) &#123;<br>        SelectionKey key = iterator.next();<br>        <span class="hljs-comment">// 处理 key</span><br>        iterator.remove();  <span class="hljs-comment">// 处理后删除，防止重复处理</span><br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+</ol>
+<h3 id="SelectionKey-的操作类型"><a href="#SelectionKey-的操作类型" class="headerlink" title="SelectionKey 的操作类型"></a>SelectionKey 的操作类型</h3><p><code>Selector</code> 监听的事件包括：</p>
+<table>
+<thead>
+<tr>
+<th>操作类型</th>
+<th>常量</th>
+<th>适用于</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>接收连接</td>
+<td><code>SelectionKey.OP_ACCEPT</code></td>
+<td><code>ServerSocketChannel</code></td>
+<td>监听新的客户端连接</td>
+</tr>
+<tr>
+<td>连接完成</td>
+<td><code>SelectionKey.OP_CONNECT</code></td>
+<td><code>SocketChannel</code></td>
+<td>检查客户端连接是否完成</td>
+</tr>
+<tr>
+<td>读取数据</td>
+<td><code>SelectionKey.OP_READ</code></td>
+<td><code>SocketChannel</code></td>
+<td>监听通道是否有数据可读</td>
+</tr>
+<tr>
+<td>写入数据</td>
+<td><code>SelectionKey.OP_WRITE</code></td>
+<td><code>SocketChannel</code></td>
+<td>监听通道是否可写</td>
+</tr>
+</tbody></table>
+<h3 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h3><p>以下是一个基于 Java NIO（非阻塞 I/O）实现的多人聊天室，包括服务器和客户端。该代码实现了一个基于 <code>Selector</code> 的非阻塞 TCP 服务器，能够同时支持多个客户端进行聊天。</p>
+<h4 id="功能概述"><a href="#功能概述" class="headerlink" title="功能概述"></a>功能概述</h4><ul>
+<li>支持多客户端连接。</li>
+<li>客户端可以发送消息到服务器。</li>
+<li>服务器收到消息后会响应客户端发送的消息。</li>
+<li>使用 <code>Selector</code> 管理多个 <code>SocketChannel</code>，提高性能。</li>
+<li>非阻塞 I/O，适用于高并发聊天应用。</li>
+</ul>
+<h4 id="服务器代码"><a href="#服务器代码" class="headerlink" title="服务器代码"></a>服务器代码</h4><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">NioChatServer</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> PORT = <span class="hljs-number">5000</span>;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        <span class="hljs-comment">// 1. 创建 Selector</span><br>        Selector selector = Selector.open();<br><br>        <span class="hljs-comment">// 2. 创建 ServerSocketChannel 并绑定端口</span><br>        ServerSocketChannel serverChannel = ServerSocketChannel.open();<br>        serverChannel.bind(<span class="hljs-keyword">new</span> InetSocketAddress(PORT));<br>        serverChannel.configureBlocking(<span class="hljs-keyword">false</span>); <span class="hljs-comment">// 设置非阻塞</span><br>        serverChannel.register(selector, SelectionKey.OP_ACCEPT);<br><br>        System.out.println(<span class="hljs-string">&quot;NIO 聊天服务器已启动，监听端口：&quot;</span> + PORT);<br><br>        <span class="hljs-comment">// 3. 轮询 Selector 监听事件</span><br>        <span class="hljs-keyword">while</span> (<span class="hljs-keyword">true</span>) &#123;<br>            selector.select(); <span class="hljs-comment">// 阻塞直到有事件发生</span><br>            Set&lt;SelectionKey&gt; selectedKeys = selector.selectedKeys();<br>            Iterator&lt;SelectionKey&gt; iterator = selectedKeys.iterator();<br><br>            <span class="hljs-keyword">while</span> (iterator.hasNext()) &#123;<br>                SelectionKey key = iterator.next();<br>                iterator.remove(); <span class="hljs-comment">// 处理完后删除，防止重复处理</span><br><br>                <span class="hljs-keyword">if</span> (key.isAcceptable()) &#123;<br>                    <span class="hljs-comment">// 处理新的客户端连接</span><br>                    ServerSocketChannel server = (ServerSocketChannel) key.channel();<br>                    SocketChannel clientChannel = server.accept();<br>                    clientChannel.configureBlocking(<span class="hljs-keyword">false</span>);<br>                    clientChannel.register(selector, SelectionKey.OP_READ);<br>                    System.out.println(<span class="hljs-string">&quot;新客户端连接：&quot;</span> + clientChannel.getRemoteAddress());<br>                &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (key.isReadable()) &#123;<br>                    <span class="hljs-comment">// 处理客户端发送的消息</span><br>                    SocketChannel clientChannel = (SocketChannel) key.channel();<br>                    ByteBuffer buffer = ByteBuffer.allocate(<span class="hljs-number">1024</span>);<br>                    <span class="hljs-keyword">int</span> bytesRead = clientChannel.read(buffer);<br><br>                    <span class="hljs-keyword">if</span> (bytesRead == -<span class="hljs-number">1</span>) &#123;<br>                        <span class="hljs-comment">// 客户端断开连接</span><br>                        System.out.println(<span class="hljs-string">&quot;客户端断开：&quot;</span> + clientChannel.getRemoteAddress());<br>                        clientChannel.close();<br>                    &#125; <span class="hljs-keyword">else</span> &#123;<br>                        buffer.flip();<br>                        String message = <span class="hljs-keyword">new</span> String(buffer.array(), <span class="hljs-number">0</span>, buffer.limit());<br>                        System.out.println(<span class="hljs-string">&quot;收到消息：&quot;</span> + message);<br>                        <span class="hljs-comment">// 为了方便测试，这里只回复消息给发送者</span><br>                        clientChannel.write(ByteBuffer.wrap((<span class="hljs-string">&quot;你发送的消息是：&quot;</span> + message).getBytes()));<br>                    &#125;<br>                &#125;<br>            &#125;<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="客户端代码"><a href="#客户端代码" class="headerlink" title="客户端代码"></a>客户端代码</h4><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">NioChatClient</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> String SERVER_ADDRESS = <span class="hljs-string">&quot;localhost&quot;</span>;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> PORT = <span class="hljs-number">5000</span>;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        <span class="hljs-comment">// 1. 创建 SocketChannel 并连接服务器</span><br>        SocketChannel clientChannel = SocketChannel.open();<br>        clientChannel.configureBlocking(<span class="hljs-keyword">false</span>);<br>        clientChannel.connect(<span class="hljs-keyword">new</span> InetSocketAddress(SERVER_ADDRESS, PORT));<br><br>        <span class="hljs-keyword">while</span> (!clientChannel.finishConnect()) &#123;<br>            <span class="hljs-comment">// 等待连接完成</span><br>        &#125;<br><br>        System.out.println(<span class="hljs-string">&quot;已连接到聊天服务器，输入消息发送：&quot;</span>);<br><br>        <span class="hljs-comment">// 启动新线程监听服务器消息</span><br>        <span class="hljs-keyword">new</span> Thread(() -&gt; &#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                ByteBuffer buffer = ByteBuffer.allocate(<span class="hljs-number">1024</span>);<br>                <span class="hljs-keyword">while</span> (<span class="hljs-keyword">true</span>) &#123;<br>                    buffer.clear();<br>                    <span class="hljs-keyword">int</span> bytesRead = clientChannel.read(buffer);<br>                    <span class="hljs-keyword">if</span> (bytesRead &gt; <span class="hljs-number">0</span>) &#123;<br>                        buffer.flip();<br>                        System.out.println(<span class="hljs-keyword">new</span> String(buffer.array(), <span class="hljs-number">0</span>, buffer.limit()));<br>                    &#125;<br>                &#125;<br>            &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>                System.out.println(<span class="hljs-string">&quot;服务器已断开！&quot;</span>);<br>            &#125;<br>        &#125;).start();<br><br>        <span class="hljs-comment">// 主线程负责发送消息</span><br>        Scanner scanner = <span class="hljs-keyword">new</span> Scanner(System.in);<br>        <span class="hljs-keyword">while</span> (scanner.hasNextLine()) &#123;<br>            String message = scanner.nextLine();<br>            clientChannel.write(ByteBuffer.wrap(message.getBytes()));<br>        &#125;<br><br>        clientChannel.close();<br>        scanner.close();<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="运行流程"><a href="#运行流程" class="headerlink" title="运行流程"></a>运行流程</h4><ol>
+<li><p>启动服务器，服务器控制台打印如下：</p>
+<figure class="highlight apache"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">NIO</span> 聊天服务器已启动，监听端口：<span class="hljs-number">5000</span><br></code></pre></div></td></tr></table></figure></li>
+<li><p>启动客户端，客户端控制台打印如下：</p>
+<figure class="highlight"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs">已连接到聊天服务器，输入消息发送：<br></code></pre></div></td></tr></table></figure></li>
+<li><p>服务器收到客户端的连接信息：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs nginx"><span class="hljs-attribute">NIO</span> 聊天服务器已启动，监听端口：<span class="hljs-number">5000</span><br>新客户端连接：/<span class="hljs-number">127.0.0.1:49791</span><br></code></pre></div></td></tr></table></figure></li>
+<li><p>使用客户端发送消息：</p>
+<figure class="highlight brainfuck"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs brainfuck"><span class="hljs-comment">已连接到聊天服务器，输入消息发送：</span><br><span class="hljs-comment">你好，这里是客户端a。</span><br></code></pre></div></td></tr></table></figure></li>
+<li><p>服务器收到客户端发送的消息：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs nginx"><span class="hljs-attribute">NIO</span> 聊天服务器已启动，监听端口：<span class="hljs-number">5000</span><br>新客户端连接：/<span class="hljs-number">127.0.0.1:49791</span><br>收到消息：你好，这里是客户端a。<br></code></pre></div></td></tr></table></figure></li>
+<li><p>客户端收到服务器响应的消息：</p>
+<figure class="highlight brainfuck"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs brainfuck"><span class="hljs-comment">已连接到聊天服务器，输入消息发送：</span><br><span class="hljs-comment">你好，这里是客户端a。</span><br><span class="hljs-comment">你发送的消息是：你好，这里是客户端a。</span><br></code></pre></div></td></tr></table></figure></li>
+</ol>
+<h4 id="优势"><a href="#优势" class="headerlink" title="优势"></a>优势</h4><ul>
+<li><strong>单线程管理多个连接</strong>：相比于传统阻塞 I/O（每个连接需要一个线程），<code>Selector</code> 允许单个线程高效管理多个连接。</li>
+<li><strong>减少上下文切换</strong>：使用非阻塞 I/O 可以避免线程切换的开销，提高性能。</li>
+<li><strong>使用 ByteBuffer 进行数据传输</strong>：确保数据的高效读取和写入。</li>
+<li><strong>适用于高并发场景</strong>：如聊天室、HTTP 服务器、WebSockets、游戏服务器等。</li>
+</ul>
+<h2 id="非阻塞模型总结"><a href="#非阻塞模型总结" class="headerlink" title="非阻塞模型总结"></a>非阻塞模型总结</h2><h3 id="工作流程-1"><a href="#工作流程-1" class="headerlink" title="工作流程"></a>工作流程</h3><ol>
+<li><p><strong>打开通道（Channel）</strong></p>
+<ul>
+<li>服务器端：调用 <code>ServerSocketChannel.open()</code> 创建服务器通道，用于监听客户端连接请求。</li>
+<li>客户端：调用 <code>SocketChannel.open()</code> 创建客户端通道，用于发起连接。</li>
+</ul>
+</li>
+<li><p><strong>配置通道为非阻塞模式</strong></p>
+<ul>
+<li>对于 <code>ServerSocketChannel</code> 或 <code>SocketChannel</code> 执行 <code>configureBlocking(false)</code>，表示使用非阻塞模式。</li>
+</ul>
+</li>
+<li><p><strong>创建选择器（Selector）</strong></p>
+<ul>
+<li>调用 <code>Selector.open()</code> 获得一个选择器实例。</li>
+</ul>
+</li>
+<li><p><strong>通道注册到选择器（register）</strong></p>
+<ul>
+<li><p>服务器端示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">ServerSocketChannel serverChannel = ServerSocketChannel.open();<br>serverChannel.configureBlocking(<span class="hljs-keyword">false</span>);<br>serverChannel.bind(<span class="hljs-keyword">new</span> InetSocketAddress(port));<br>serverChannel.register(selector, SelectionKey.OP_ACCEPT);<br></code></pre></div></td></tr></table></figure></li>
+<li><p>表示该服务器通道对 “接受连接（OP_ACCEPT）” 事件感兴趣。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>事件循环（轮询就绪通道）</strong></p>
+<ul>
+<li>在主循环中调用 <code>selector.select()</code>，阻塞等待就绪事件，或调用 <code>selector.selectNow()</code> 做非阻塞检测。</li>
+<li>当有就绪事件时，<code>selector.selectedKeys()</code> 中包含了所有就绪的 <code>SelectionKey</code>。然后对这些 key 逐一处理：</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">Set&lt;SelectionKey&gt; selectedKeys = selector.selectedKeys();<br>Iterator&lt;SelectionKey&gt; iter = selectedKeys.iterator();<br><span class="hljs-keyword">while</span> (iter.hasNext()) &#123;<br>    SelectionKey key = iter.next();<br>    <span class="hljs-keyword">if</span> (key.isAcceptable()) &#123;<br>        <span class="hljs-comment">// 处理接受连接</span><br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (key.isReadable()) &#123;<br>        <span class="hljs-comment">// 处理读事件</span><br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (key.isWritable()) &#123;<br>        <span class="hljs-comment">// 处理写事件</span><br>    &#125;<br>    iter.remove(); <span class="hljs-comment">// 移除已处理的key</span><br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p><strong>处理具体读/写操作</strong></p>
+<ul>
+<li>如果事件是 <code>isReadable()</code>，就拿到对应的通道（如 <code>SocketChannel</code>）进行 <code>read()</code> 操作。读操作会将数据读入到 <code>ByteBuffer</code>。在非阻塞模式下，如果此时对方并没有发送数据可读，<code>read()</code> 调用会返回 0 或 -1（连接关闭），而不会阻塞线程。</li>
+<li>如果事件是 <code>isWritable()</code>，就可以将数据从 <code>ByteBuffer</code> 写到通道中。如果通道暂时无法写满数据，也不会阻塞，可以下次继续写。</li>
+<li>在需要的情况下，还可以根据当前处理流程动态修改对通道感兴趣的事件，比如读完后需要写，就把通道在选择器上注册为对写事件感兴趣。</li>
+</ul>
+</li>
+</ol>
+<p>通过上述流程，便可以在单线程或少量线程下管理成百上千的连接。只有当某个通道真正就绪时，才会触发相应的处理逻辑，大大提高了并发效率。</p>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><ol>
+<li><strong>选择器实现依赖于操作系统</strong><ul>
+<li>在不同平台上，<code>Selector</code> 可能基于 <code>select</code>、<code>poll</code> 或 <code>epoll</code>。在高并发场景下，需要注意操作系统对文件描述符数量或内核参数的限制。</li>
+</ul>
+</li>
+<li><strong>Selector 的空轮询（空转）问题</strong><ul>
+<li>某些版本的 JDK（尤其在 Linux epoll 上）可能会出现空轮询 bug，导致 CPU 飙升。可以通过升级 JDK 或更改配置来解决。</li>
+</ul>
+</li>
+<li><strong>读写时的缓冲区管理</strong><ul>
+<li>建议重复使用 <code>ByteBuffer</code>，以减少对象创建的开销。或者使用内存池做统一管理。</li>
+</ul>
+</li>
+<li><strong>与传统阻塞 IO 的配合</strong><ul>
+<li>同一个通道要么是阻塞模式，要么是非阻塞模式。若业务中有阻塞操作，需确保不会影响非阻塞通道的高并发特性。</li>
+</ul>
+</li>
+<li><strong>适用场景</strong><ul>
+<li>非阻塞 IO 在大量短连接（如聊天服务器、游戏服务器、消息推送）或需要同时处理成百上千连接的场景特别有效。</li>
+<li>如果连接数较少，但数据吞吐量大且需要稳定的流式处理，传统阻塞式 BIO 或者基于多线程的 I/O 也可能是可行的选择。</li>
+</ul>
+</li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Java NIO 的核心在于使用 Channel + Buffer 的数据传输模型，以及通过 Selector 实现单线程管理多连接的高并发特性。缓冲区让数据的读写更灵活可控，通道抽象出多种 I/O 形态（文件、网络、异步），Selector 解决了大量并发连接的线程切换难题。在实际项目中，NIO 非阻塞模式尤其适合网络服务器、代理、聊天系统等需要同时处理大量连接的场景。当然，对于小规模文件处理或简单网络通信，传统的阻塞 I/O 依然易于理解和维护。根据应用场景选择合适的 I/O 模型，才能更好地发挥 Java I/O 的威力。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Java-IO/">Java IO</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/JavaSE/">JavaSE</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Java-IO/">Java IO</a>
+                    
+                      <a class="hover-with-bg" href="/tags/NIO/">NIO</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/02/17/javase-io-socket/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Java IO——网络IO</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/02/08/javase-io-utils/">
+                        <span class="hidden-mobile">Java IO——IO工具</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
