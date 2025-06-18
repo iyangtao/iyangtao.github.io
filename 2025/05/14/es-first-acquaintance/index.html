@@ -1,0 +1,754 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="初识ES引言在海量信息面前，快速、准确地找到内容是搜索引擎的本事。而 Elasticsearch，简称 ES，就是一款既能 “搜” 又能“分析”的神器。它不仅能搜索百度一样从数据库里秒查数据，还能顺手算出统计结果、画图表。本文将讲述 Elasticsearch 能做什么、怎么做、和 MySQL 有啥不一样，以及如何用 Docker 快速搭建一个自己的 ES 系统。 简介Elasticsearch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Yangtao&#39;s space">
+<meta property="og:url" content="http://example.com/2025/05/14/es-first-acquaintance/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="初识ES引言在海量信息面前，快速、准确地找到内容是搜索引擎的本事。而 Elasticsearch，简称 ES，就是一款既能 “搜” 又能“分析”的神器。它不仅能搜索百度一样从数据库里秒查数据，还能顺手算出统计结果、画图表。本文将讲述 Elasticsearch 能做什么、怎么做、和 MySQL 有啥不一样，以及如何用 Docker 快速搭建一个自己的 ES 系统。 简介Elasticsearch">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-05-14T14:48:13.922Z">
+<meta property="article:modified_time" content="2025-05-14T14:53:00.000Z">
+<meta property="article:author" content="Yangtao">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/BannerImg/%E6%B5%B7%E7%8E%8B%E6%98%9F.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2025-05-14 22:48" pubdate>
+        2025年5月14日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      6.3k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      11 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none"></h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：1 个月前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <hr>
+<h2 id="初识ES"><a href="#初识ES" class="headerlink" title="初识ES"></a>初识ES</h2><h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>在海量信息面前，快速、准确地找到内容是搜索引擎的本事。而 Elasticsearch，简称 ES，就是一款既能 “搜” 又能“分析”的神器。它不仅能搜索百度一样从数据库里秒查数据，还能顺手算出统计结果、画图表。本文将讲述 Elasticsearch 能做什么、怎么做、和 MySQL 有啥不一样，以及如何用 Docker 快速搭建一个自己的 ES 系统。</p>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Elasticsearch 是一个基于分布式 RESTful 接口的搜索和分析引擎，底层构建在 Apache Lucene 之上。它能够对海量数据进行近实时的全文检索、结构化检索、分析和可视化，并具有高可扩展性和高可用性。</p>
+<p><strong>核心特点</strong>：</p>
+<ol>
+<li><strong>基于 Lucene</strong>：利用 Lucene 倒排索引、打分模型（TF-IDF/ BM25）等能力，对外暴露更友好的 REST 接口与集群能力。</li>
+<li><strong>分布式</strong>：内置分片（Shard）与副本（Replica）机制，支持自动故障转移、水平扩容。</li>
+<li><strong>近实时</strong>：默认 1 s 刷新（refresh）一次，将新写入的数据变为可搜索状态，可按需手动/关闭刷新平衡写入吞吐。</li>
+<li><strong>灵活的数据模型</strong>：以 JSON 文档为核心，没有 “固定列” 束缚；动态映射可按需自动扩展字段。</li>
+<li><strong>搜索 + 聚合</strong>：一套查询 DSL 同时支持全文检索、结构化过滤与多层聚合分析，在 “检索-分析-可视化” 闭环中角色统一。</li>
+</ol>
+<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><ul>
+<li><strong>站内全文搜索</strong>：电商、社区、知识库等业务的关键词查询、自动补全、个性化排序。</li>
+<li>**日志 / 监控 (ELK/ Elastic Stack)**：集中收集应用、系统、容器日志，实时检索与可视化告警。</li>
+<li><strong>指标分析 &amp; 报表</strong>：基于 “聚合 + Pipeline” 快速出多维统计，与 BI 可视化结合。</li>
+<li><strong>推荐 / 排序引擎</strong>：利用 Function Score、Rescore 等特性结合用户画像做实时召回与排序。</li>
+<li><strong>安全情报 &amp; APM</strong>：搭配 Beats、Elastic APM 做链路追踪、威胁检测。</li>
+</ul>
+<h2 id="发展里程碑"><a href="#发展里程碑" class="headerlink" title="发展里程碑"></a>发展里程碑</h2><table>
+<thead>
+<tr>
+<th>年份</th>
+<th>事件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2010</td>
+<td>Elasticsearch 0.4 首次开源（Apache 2.0）。</td>
+</tr>
+<tr>
+<td>2015</td>
+<td>Elastic Stack 5.x：Logstash、Kibana、Beats 品牌合并。</td>
+</tr>
+<tr>
+<td>2018</td>
+<td>6.x 彻底移除多类型 index；7.x 引入 CCR、ILM、异步搜索。</td>
+</tr>
+<tr>
+<td>2021</td>
+<td>7.11 起默认改用 <strong>Elastic License / SSPL</strong>；社区 fork 出 OpenSearch。</td>
+</tr>
+<tr>
+<td>2022</td>
+<td>8.x 默认启用 TLS 与内置安全特性；向量检索（knn_vector）进入 GA。</td>
+</tr>
+</tbody></table>
+<h2 id="索引原理"><a href="#索引原理" class="headerlink" title="索引原理"></a>索引原理</h2><p>在理解 Elasticsearch 或搜索引擎原理时，常常需要理解 <strong>正向索引</strong> 和 <strong>倒排索引</strong> 的概念。</p>
+<h3 id="正向索引"><a href="#正向索引" class="headerlink" title="正向索引"></a>正向索引</h3><ul>
+<li><strong>概念</strong>：正向索引（Forward Index）是按文档来组织的索引结构。简单来说，它会为每个文档存储文档 ID 以及文档中包含的所有词。</li>
+<li><strong>结构</strong>：形如 <code>&#123;文档 ID -&gt; [词1, 词2, 词3, ...]&#125;</code>。</li>
+<li><strong>用途</strong>：对于获取某个文档包含哪些词非常方便。但是如果要通过 “词” 来检索包含它的文档，则要遍历所有文档才能筛选到这些词在哪些文档中，效率较低。</li>
+</ul>
+<h3 id="倒排索引"><a href="#倒排索引" class="headerlink" title="倒排索引"></a>倒排索引</h3><ul>
+<li><strong>概念</strong>：倒排索引（Inverted Index）是现在搜索引擎最常用的一种索引结构。它以 “词” 或 “关键词” 为主键来查找相关的文档 ID。</li>
+<li><strong>结构</strong>：形如 <code>&#123;词 -&gt; [文档 ID1, 文档 ID2, ...]&#125;</code>。</li>
+<li><strong>用途</strong>：根据 “词” 可以直接找到含有该词的文档列表。这样当我们需要 “搜索一个关键词” 时，首先定位该关键词在索引中的位置，随后就能快速找出包含这个关键词的文档。</li>
+</ul>
+<p>Elasticsearch 以及其底层 Lucene 都是通过 <strong>倒排索引</strong> 来实现全文检索功能的。</p>
+<h2 id="要点"><a href="#要点" class="headerlink" title="要点"></a>要点</h2><h3 id="文档-Document"><a href="#文档-Document" class="headerlink" title="文档 (Document)"></a>文档 (Document)</h3><ul>
+<li>Elasticsearch 中存储和检索的基本单位是 “文档” (Document)，对应的是一个 JSON 对象。</li>
+<li>一个 “文档” 可能包含多个字段 (Field)，可以简单理解为类似数据库表中的一行，但是它是以 JSON 结构来表达。</li>
+</ul>
+<h3 id="字段-Field"><a href="#字段-Field" class="headerlink" title="字段 (Field)"></a>字段 (Field)</h3><ul>
+<li>文档中会包含一个或多个字段，每个字段都有相应的数据类型（文本类型、数值类型、日期类型、布尔类型等）。</li>
+<li>在索引时，字段会被分词器处理并生成倒排索引，或者直接创建排序、聚合用的字段数据结构。</li>
+</ul>
+<h3 id="词条-Term"><a href="#词条-Term" class="headerlink" title="词条 (Term)"></a>词条 (Term)</h3><ul>
+<li>对于文本字段，为了实现全文搜索，需要先对文本进行分词、过滤等处理，最终把文本切分成一个个最基本的 “词条” (Term)。</li>
+<li>在 Elasticsearch 中，这些词条就是构建倒排索引的关键。</li>
+</ul>
+<h3 id="映射-Mapping"><a href="#映射-Mapping" class="headerlink" title="映射 (Mapping)"></a>映射 (Mapping)</h3><ul>
+<li><strong>映射</strong> (Mapping) 相当于传统数据库中的 “表结构定义”，但在 Elasticsearch 中它要描述文档中字段的类型和分词方式。</li>
+<li>映射通常包含字段类型、分词器（Analyzer）、是否建立索引、是否存储等信息。</li>
+<li>可以对字段配置不同的分词器和搜索分析器，从而影响搜索效果。</li>
+</ul>
+<h3 id="索引-Index"><a href="#索引-Index" class="headerlink" title="索引 (Index)"></a>索引 (Index)</h3><ul>
+<li>在 Elasticsearch 中，一个 “索引” (Index) 类似于传统数据库中的 “数据库或表” 的概念（它有点混合的意思，里面可以放多个类型的文档）。</li>
+<li>我们常说的 “索引” 有时也在更底层上对应 Lucene 中的实际索引结构。</li>
+<li>不同数据需要划分到不同的索引里，以便做不同的搜索或权限控制等。</li>
+</ul>
+<h3 id="分片与副本-Shards-amp-Replicas"><a href="#分片与副本-Shards-amp-Replicas" class="headerlink" title="分片与副本 (Shards &amp; Replicas)"></a>分片与副本 (Shards &amp; Replicas)</h3><ul>
+<li>为了实现分布式扩展和高可用，Elasticsearch 会把索引切分为多个 “主分片” (Primary Shard)，然后可以配置相应数量的 “副本分片” (Replica Shard)。</li>
+<li>主分片用于写入数据，副本分片用于容错与读扩展。当其中一个主分片发生故障时，副本可自动提升为新的主分片。</li>
+</ul>
+<h3 id="集群、节点-Cluster-amp-Node"><a href="#集群、节点-Cluster-amp-Node" class="headerlink" title="集群、节点 (Cluster &amp; Node)"></a>集群、节点 (Cluster &amp; Node)</h3><ul>
+<li><strong>集群</strong>：由一个或多个节点组成，同一个集群内可共享数据、负载均衡、故障转移等。</li>
+<li><strong>节点</strong>：集群中的单个实例，每个节点可持有若干分片。</li>
+<li>通过集群和节点的配合，就可以在分布式环境中横向扩展 Elasticsearch。</li>
+</ul>
+<h2 id="与MySQL对比"><a href="#与MySQL对比" class="headerlink" title="与MySQL对比"></a>与MySQL对比</h2><p>下面我们从数据模型、查询、适用场景等角度，将 Elasticsearch 与 MySQL 做一个简单对比。</p>
+<table>
+<thead>
+<tr>
+<th>比较维度</th>
+<th>MySQL（关系型数据库）</th>
+<th>Elasticsearch（分布式搜索引擎）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>数据模型</strong></td>
+<td>以行、列为基础的关系型表结构，需要预先定义表结构</td>
+<td>基于 JSON 文档的模型，相对灵活，可以在不同文档中包含不同字段</td>
+</tr>
+<tr>
+<td><strong>查询方式</strong></td>
+<td>标准 SQL，支持事务、联表查询、多种约束等</td>
+<td>RESTful + JSON DSL，侧重于全文检索和聚合分析</td>
+</tr>
+<tr>
+<td><strong>索引机制</strong></td>
+<td>通常是 B+ 树等结构的主键索引、二级索引</td>
+<td>核心使用倒排索引，另外也支持列式存储来辅助聚合<br />ES 在倒排索引之外，还使用 <strong>列式 doc_values</strong> 加速排序/聚合</td>
+</tr>
+<tr>
+<td><strong>扩展与分片</strong></td>
+<td>一般只支持 “主从复制” 或分库分表，需要应用自行实现分片逻辑</td>
+<td>内置分布式、自动分片副本机制，水平扩展较为便捷</td>
+</tr>
+<tr>
+<td><strong>适用场景</strong></td>
+<td>适合事务型应用、结构化数据、多表关联</td>
+<td>适合大规模文本搜索、日志分析、实时数据分析等</td>
+</tr>
+<tr>
+<td><strong>全文检索性能</strong></td>
+<td>一般依赖 like、全文索引功能，性能和灵活性较有限</td>
+<td>专门为全文搜索设计，分词、相关度计算、功能丰富</td>
+</tr>
+<tr>
+<td><strong>强一致性</strong></td>
+<td>支持事务，保证 ACID 属性</td>
+<td>默认是近实时一致性，写入后会有极短时间的延迟才能被检索到</td>
+</tr>
+</tbody></table>
+<p>可以看到，MySQL 与 Elasticsearch 在数据结构、查询方式、侧重点上都有很大差异。MySQL 更适合强一致性的结构化事务场景，而 Elasticsearch 适合在海量数据中进行实时的搜索和分析。大多数实践中，它们往往协同使用：MySQL 作为核心事务数据库，Elasticsearch 负责索引和搜索分析。</p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><h3 id="1-创建-Docker-网络"><a href="#1-创建-Docker-网络" class="headerlink" title="1. 创建 Docker 网络"></a>1. 创建 Docker 网络</h3><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">docker network create es-net<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>说明</strong>：该网络用于让 Elasticsearch 与 Kibana 两个容器互联，方便 Kibana 访问 Elasticsearch。<br><strong>验证</strong>：执行完成后，可运行以下命令查看 <code>es-net</code> 是否创建成功：</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">docker network ls<br></code></pre></div></td></tr></table></figure>
+
+<p>如果列表中出现 <code>es-net</code> 则说明已成功创建。</p>
+<h3 id="2-运行-Elasticsearch-容器"><a href="#2-运行-Elasticsearch-容器" class="headerlink" title="2. 运行 Elasticsearch 容器"></a>2. 运行 Elasticsearch 容器</h3><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">docker run -d \<br>    --name es \<br>    -e ES_JAVA_OPTS=<span class="hljs-string">&quot;-Xms1g -Xmx1g&quot;</span> \<br>    -e discovery.type=single-node \<br>    -e xpack.security.enabled=<span class="hljs-literal">false</span> \   <span class="hljs-comment"># 仅学习环境可关闭安全</span><br>    -e bootstrap.memory_lock=<span class="hljs-literal">true</span> \<br>    --<span class="hljs-built_in">ulimit</span> memlock=-1:-1 \<br>    -v es-data:/usr/share/elasticsearch/data \<br>    -v es-plugins:/usr/share/elasticsearch/plugins \<br>    --privileged \<br>    --network es-net \<br>    -p 9200:9200 \<br>    -p 9300:9300 \<br>    elasticsearch:7.12.1<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>参数说明</strong>：</p>
+<ol>
+<li><code>ES_JAVA_OPTS</code>：设置 JVM 堆内存大小为 1GB。</li>
+<li><code>discovery.type=single-node</code>：指定以单节点模式运行，适合本地开发或测试。</li>
+<li><code>bootstrap.memory_lock</code> + <code>--ulimit</code>：避免 Linux 交换 (swap) 导致 OOM。</li>
+<li><code>-v es-data:/usr/share/elasticsearch/data</code>：将容器内的数据目录映射到宿主机的 <code>es-data</code> 卷。</li>
+<li><code>-v es-plugins:/usr/share/elasticsearch/plugins</code>：将插件目录也映射出来，方便在宿主机管理插件。</li>
+<li><code>-p 9200:9200 -p 9300:9300</code>：映射宿主机端口到容器内端口，便于外部访问。</li>
+</ol>
+<p><strong>验证</strong>：</p>
+<ol>
+<li><p>通过 <code>docker ps</code> 查看容器是否已启动。</p>
+</li>
+<li><p>在宿主机上执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">curl http://localhost:9200<br></code></pre></div></td></tr></table></figure>
+
+<p>如果能返回包含 Elasticsearch 版本和集群信息的 JSON，说明 Elasticsearch 已启动成功。</p>
+</li>
+</ol>
+<h3 id="3-安装并运行-Kibana-容器"><a href="#3-安装并运行-Kibana-容器" class="headerlink" title="3. 安装并运行 Kibana 容器"></a>3. 安装并运行 Kibana 容器</h3><figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">docker run -d \<br>    --name kibana \<br>    -e ELASTICSEARCH_HOSTS=http://es:9200 \<br>    --network=es-net \<br>    -p 5601:5601 \<br>    kibana:7.12.1<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>参数说明</strong>：</p>
+<ol>
+<li><code>ELASTICSEARCH_HOSTS=http://es:9200</code>：指定 Kibana 通过网络别名 <code>es</code> 连接到 Elasticsearch 容器。</li>
+<li><code>-p 5601:5601</code>：将 Kibana 的访问端口映射到宿主机。</li>
+</ol>
+<p><strong>验证</strong>：</p>
+<ol>
+<li>确认容器启动：<code>docker ps | grep kibana</code>。</li>
+<li>打开浏览器访问 <code>http://localhost:5601</code>，若能看到 Kibana 的登录或欢迎页面，则 Kibana 启动成功。</li>
+</ol>
+<h3 id="4-安装-IK-分词器插件"><a href="#4-安装-IK-分词器插件" class="headerlink" title="4. 安装 IK 分词器插件"></a>4. 安装 IK 分词器插件</h3><p>在 ES 容器内部，进入 Elasticsearch 安装目录后，执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs bash">bin/elasticsearch-plugin install https://get.infini.cloud/elasticsearch/analysis-ik/7.12.1<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>说明</strong>：</p>
+<ul>
+<li>IK 分词器是中文分词常用插件，安装后 Elasticsearch 可支持中文文本的智能分词、搜索。</li>
+<li>上述链接仅为示例，具体请使用与 Elasticsearch 版本相匹配的 IK 分词器版本。</li>
+<li>若是通过挂载 <code>plugins</code> 目录或者在宿主机上安装，也可将插件文件下载至本地后再安装。</li>
+</ul>
+<p><strong>验证</strong>：</p>
+<ol>
+<li><p>安装成功后可重启 Elasticsearch 容器。</p>
+</li>
+<li><p>进入 Kibana 控制台 (Dev Tools) 或通过命令行调用 <code>_cat/plugins</code> API，确认 <code>analysis-ik</code> 插件已加载：</p>
+<figure class="highlight http"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs http">GET _cat/plugins?v<br></code></pre></div></td></tr></table></figure>
+
+<p>如果看到 <code>analysis-ik</code> 列表项，表示插件安装成功。</p>
+</li>
+</ol>
+<h3 id="5-IK-分词器常用模式"><a href="#5-IK-分词器常用模式" class="headerlink" title="5. IK 分词器常用模式"></a>5. IK 分词器常用模式</h3><p>IK 分词器主要有以下两种模式，可根据需求在映射（Mapping）或查询时指定：</p>
+<ul>
+<li><code>ik_smart</code>：最粗粒度分词，速度较快但可能会遗漏一些关键词。</li>
+<li><code>ik_max_word</code>：最细粒度分词，包含更全面的词条，但分词量更大，内存消耗更大。</li>
+</ul>
+<p>可在创建索引或更新映射时指定分词器，如：</p>
+<figure class="highlight dts"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs dts">PUT <span class="hljs-class">my_index</span><br><span class="hljs-class"></span>&#123;<br>  <span class="hljs-string">&quot;mappings&quot;</span>: &#123;<br>    <span class="hljs-string">&quot;properties&quot;</span>: &#123;<br>      <span class="hljs-string">&quot;title&quot;</span>: &#123;<br>        <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;text&quot;</span>,<br>        <span class="hljs-string">&quot;analyzer&quot;</span>: <span class="hljs-string">&quot;ik_max_word&quot;</span>,<br>        <span class="hljs-string">&quot;search_analyzer&quot;</span>: <span class="hljs-string">&quot;ik_smart&quot;</span><br>      &#125;<br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="6-IK-分词器配置扩展词和禁用词"><a href="#6-IK-分词器配置扩展词和禁用词" class="headerlink" title="6. IK 分词器配置扩展词和禁用词"></a>6. IK 分词器配置扩展词和禁用词</h3><p>IK 分词器允许通过修改配置文件，实现自定义词典、停用词等功能。通常在插件目录下，会有 <code>analysis-ik/config</code> 文件夹，其中包含文件 <code>IKAnalyzer.cfg.xml</code> 如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-meta-keyword">properties</span> <span class="hljs-meta-keyword">SYSTEM</span> <span class="hljs-meta-string">&quot;http://java.sun.com/dtd/properties.dtd&quot;</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">properties</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">comment</span>&gt;</span>IK Analyzer 扩展配置<span class="hljs-tag">&lt;/<span class="hljs-name">comment</span>&gt;</span><br>        <span class="hljs-comment">&lt;!--用户可以在这里配置自己的扩展字典 --&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">entry</span> <span class="hljs-attr">key</span>=<span class="hljs-string">&quot;ext_dict&quot;</span>&gt;</span>ext.dic<span class="hljs-tag">&lt;/<span class="hljs-name">entry</span>&gt;</span><br>         <span class="hljs-comment">&lt;!--用户可以在这里配置自己的扩展停止词字典--&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">entry</span> <span class="hljs-attr">key</span>=<span class="hljs-string">&quot;ext_stopwords&quot;</span>&gt;</span>stopword.dic<span class="hljs-tag">&lt;/<span class="hljs-name">entry</span>&gt;</span><br>        <span class="hljs-comment">&lt;!--用户可以在这里配置远程扩展字典 --&gt;</span><br>        <span class="hljs-comment">&lt;!-- &lt;entry key=&quot;remote_ext_dict&quot;&gt;words_location&lt;/entry&gt; --&gt;</span><br>        <span class="hljs-comment">&lt;!--用户可以在这里配置远程扩展停止词字典--&gt;</span><br>        <span class="hljs-comment">&lt;!-- &lt;entry key=&quot;remote_ext_stopwords&quot;&gt;words_location&lt;/entry&gt; --&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">properties</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+
+<p>你可以在 <code>custom.ext.dic</code> 中添加你的自定义词语，也可在 <code>stopwords.dic</code> 中添加需要屏蔽的词。</p>
+<p>修改完成后，一般需要重启 Elasticsearch 容器或 reload 分析器配置，使新的词典生效。</p>
+<p><strong>验证</strong>：</p>
+<ol>
+<li><p>在 Kibana Dev Tools 中对包含上述自定义词的文本执行 <code>_analyze</code> 请求，查看分词结果是否正确：</p>
+<figure class="highlight http"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs http">POST _analyze<br>&#123;<br>  &quot;text&quot;: &quot;Elasticsearch 7.12.1 安装记录&quot;,<br>  &quot;analyzer&quot;: &quot;ik_max_word&quot;<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>若返回的 <code>tokens</code> 中包含你添加的自定义词，即表示自定义词典生效；如果停用词未出现在结果中，则说明停用词设置有效。</p>
+</li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>看完这篇文章，你应该对 Elasticsearch 有了一个大概的印象：它不是用来替代数据库的，而是 “又快又准地查东西”，还能顺带分析数据、画图、监控系统。一句话总结：<strong>查得快、算得快、还好扩展，Elasticsearch 是数据处理的加速器。</strong></p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/06/17/redis-distributed-lock-annotation/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Redis——分布式锁注解</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/05/11/websocket/">
+                        <span class="hidden-mobile">WebSocket实战</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

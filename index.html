@@ -203,6 +203,94 @@
     
     
       <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2025/06/17/redis-distributed-lock-annotation/" target="_blank">
+          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png" alt="Redis——分布式锁注解">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2025/06/17/redis-distributed-lock-annotation/" target="_blank">
+          Redis——分布式锁注解
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2025/06/17/redis-distributed-lock-annotation/" target="_blank">
+          
+          引言在分布式 Java 应用中，锁是保证并发安全的常见手段。Redisson 基于 Redis，可提供分布式、可重入、阻塞式的 RLock。为了避免在业务层重复编写锁获取&#x2F;释放逻辑，本文通过 自定义注解 + Spring AOP 封装一套轻量级分布式锁方案，既保持了 Redisson 的强大特性，又让业务代码足够「clean」。 方案设计目标   目标 说明    零侵入 业务侧仅需加一个注解即可
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-06-17 20:22" pubdate>
+              2025-06-17
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Redis/">Redis</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Redis/">Redis</a>
+            
+              <a href="/tags/NoSQL/">NoSQL</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2025/05/14/es-first-acquaintance/" target="_blank">
+          
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2025/05/14/es-first-acquaintance/" target="_blank">
+          
+          初识ES引言在海量信息面前，快速、准确地找到内容是搜索引擎的本事。而 Elasticsearch，简称 ES，就是一款既能 “搜” 又能“分析”的神器。它不仅能搜索百度一样从数据库里秒查数据，还能顺手算出统计结果、画图表。本文将讲述 Elasticsearch 能做什么、怎么做、和 MySQL 有啥不一样，以及如何用 Docker 快速搭建一个自己的 ES 系统。 简介Elasticsearch
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-05-14 22:48" pubdate>
+              2025-05-14
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2025/05/11/websocket/" target="_blank">
           <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/websocket.png" alt="WebSocket实战">
         </a>
@@ -628,120 +716,6 @@
             <i class="iconfont icon-date"></i>
             <time datetime="2024-12-25 20:53" pubdate>
               2024-12-25
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/categories/Redis/">Redis</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Redis/">Redis</a>
-            
-              <a href="/tags/NoSQL/">NoSQL</a>
-            
-              <a href="/tags/Redis%E5%AE%9E%E6%88%98/">Redis实战</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-      <div class="col-12 col-md-4 m-auto index-img">
-        <a href="/2024/12/25/redis-practice-cache/" target="_blank">
-          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png" alt="Redis实战——缓存">
-        </a>
-      </div>
-    
-    <article class="col-12 col-md-8 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2024/12/25/redis-practice-cache/" target="_blank">
-          Redis实战——缓存
-        </a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/2024/12/25/redis-practice-cache/" target="_blank">
-          
-          引言在现代软件系统中，缓存已成为提升性能、减少数据库压力和提高响应速度的重要手段。尤其是在高并发、分布式环境中，缓存往往是架构中的“加速器”。Redis由于其高性能、丰富的数据结构以及良好的生态支持，被广泛用作缓存层。本篇文章将围绕“Redis作为缓存”这一主题，详细探讨缓存的概念、适用场景、更新策略、常见问题以及与流行框架的结合。 缓存概念缓存是一个存储层，旨在存储部分数据的副本，以减少从数据库
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-12-25 01:59" pubdate>
-              2024-12-25
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/categories/Redis/">Redis</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Redis/">Redis</a>
-            
-              <a href="/tags/NoSQL/">NoSQL</a>
-            
-              <a href="/tags/Redis%E5%AE%9E%E6%88%98/">Redis实战</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-      <div class="col-12 col-md-4 m-auto index-img">
-        <a href="/2024/12/19/redis-practice-codes-tokens/" target="_blank">
-          <img src="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png" alt="Redis实战——验证码和Token的存储与管理">
-        </a>
-      </div>
-    
-    <article class="col-12 col-md-8 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2024/12/19/redis-practice-codes-tokens/" target="_blank">
-          Redis实战——验证码和Token的存储与管理
-        </a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/2024/12/19/redis-practice-codes-tokens/" target="_blank">
-          
-          引言随着互联网应用的快速发展，用户认证方式也在不断演进。传统的用户名密码登录方式虽然广泛使用，但存在密码泄露、暴力破解等安全隐患。基于验证码的登录方式，尤其是通过邮箱验证码进行登录，因其操作简便、安全性高而受到越来越多应用的青睐。 在微服务架构下，多个服务协同工作，用户认证与授权需要具备高可用性和可扩展性。Redis作为高性能的内存数据存储系统，凭借其快速的数据读写能力和丰富的数据结构，成为实现分
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-12-19 22:18" pubdate>
-              2024-12-19
             </time>
           </div>
         

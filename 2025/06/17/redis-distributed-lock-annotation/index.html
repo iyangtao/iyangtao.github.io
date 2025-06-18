@@ -1,0 +1,672 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="引言在分布式 Java 应用中，锁是保证并发安全的常见手段。Redisson 基于 Redis，可提供分布式、可重入、阻塞式的 RLock。为了避免在业务层重复编写锁获取&#x2F;释放逻辑，本文通过 自定义注解 + Spring AOP 封装一套轻量级分布式锁方案，既保持了 Redisson 的强大特性，又让业务代码足够「clean」。 方案设计目标   目标 说明    零侵入 业务侧仅需加一个注解即可">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis——分布式锁注解">
+<meta property="og:url" content="http://example.com/2025/06/17/redis-distributed-lock-annotation/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="引言在分布式 Java 应用中，锁是保证并发安全的常见手段。Redisson 基于 Redis，可提供分布式、可重入、阻塞式的 RLock。为了避免在业务层重复编写锁获取&#x2F;释放逻辑，本文通过 自定义注解 + Spring AOP 封装一套轻量级分布式锁方案，既保持了 Redisson 的强大特性，又让业务代码足够「clean」。 方案设计目标   目标 说明    零侵入 业务侧仅需加一个注解即可">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png">
+<meta property="article:published_time" content="2025-06-17T12:22:51.000Z">
+<meta property="article:modified_time" content="2025-06-17T12:22:51.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="Redis">
+<meta property="article:tag" content="NoSQL">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png">
+  
+  
+  <title>Redis——分布式锁注解 - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/redis-logo.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Redis——分布式锁注解">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2025-06-17 20:22" pubdate>
+        2025年6月17日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      6.2k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      11 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Redis——分布式锁注解</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：13 小时前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>在分布式 Java 应用中，锁是保证并发安全的常见手段。Redisson 基于 Redis，可提供分布式、可重入、阻塞式的 <code>RLock</code>。为了避免在业务层重复编写锁获取/释放逻辑，本文通过 <strong>自定义注解 + Spring AOP</strong> 封装一套轻量级分布式锁方案，既保持了 Redisson 的强大特性，又让业务代码足够「clean」。</p>
+<h2 id="方案设计目标"><a href="#方案设计目标" class="headerlink" title="方案设计目标"></a>方案设计目标</h2><table>
+<thead>
+<tr>
+<th>目标</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>零侵入</strong></td>
+<td>业务侧仅需加一个注解即可完成加解锁</td>
+</tr>
+<tr>
+<td><strong>灵活拼锁</strong></td>
+<td>支持 SpEL 表达式，自由组合多维度键（如用户 ID、业务单号）</td>
+</tr>
+<tr>
+<td><strong>超时可控</strong></td>
+<td>兼容显式 <code>leaseTime</code> 与 Redisson 自带 <em>watch-dog</em> 机制</td>
+</tr>
+<tr>
+<td><strong>异常兜底</strong></td>
+<td>获取锁失败、业务异常、释放锁失败均有友好的提示与日志</td>
+</tr>
+</tbody></table>
+<h2 id="注解"><a href="#注解" class="headerlink" title="注解"></a>注解</h2><h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><p>创建注解 RLock 如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Target(ElementType.METHOD)</span><br><span class="hljs-meta">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="hljs-keyword">public</span> <span class="hljs-meta">@interface</span> RLock &#123;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 锁的前缀</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function">String <span class="hljs-title">prefix</span><span class="hljs-params">()</span> <span class="hljs-keyword">default</span> &quot;&quot;</span>;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 锁的名称，使用SpEL表达式（若非#开头，则直接使用该字符串作为锁名称）</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function">String <span class="hljs-title">expr</span><span class="hljs-params">()</span> <span class="hljs-keyword">default</span> &quot;&quot;</span>;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 获取锁等待时间</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">long</span> <span class="hljs-title">waitTime</span><span class="hljs-params">()</span> <span class="hljs-keyword">default</span> 0L</span>;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 锁超时释放时间，为0则启用watchdog机制</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">long</span> <span class="hljs-title">leaseTime</span><span class="hljs-params">()</span> <span class="hljs-keyword">default</span> 30 * 1000L</span>;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 锁的时间单位</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function">TimeUnit <span class="hljs-title">unit</span><span class="hljs-params">()</span> <span class="hljs-keyword">default</span> TimeUnit.MILLISECONDS</span>;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 错误提示信息</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function">String <span class="hljs-title">errorMessage</span><span class="hljs-params">()</span> <span class="hljs-keyword">default</span> &quot;当前操作正在进行中，请稍后再试&quot;</span>;<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="关键点"><a href="#关键点" class="headerlink" title="关键点"></a>关键点</h3><ol>
+<li><strong>prefix</strong><ul>
+<li>用于区分不同业务域，建议与业务缩写保持一致，如 <code>ORDER</code>、<code>PAY</code>。</li>
+</ul>
+</li>
+<li><strong>expr</strong><ul>
+<li>为空：使用「方法全限定名 + 用户 ID」默认拼锁。</li>
+<li><code>#</code>开头：按照 SpEL 解析，动态读取方法入参。</li>
+<li>其他：视为普通字符串。</li>
+</ul>
+</li>
+<li><strong>waitTime / leaseTime</strong><ul>
+<li><code>waitTime</code> 决定阻塞时间；到达上限仍未抢到锁，则抛异常。</li>
+<li><code>leaseTime</code> &gt; 0：固定持锁时长； = 0：开启 <strong>watch-dog</strong>，Redisson 默认每 10 s 自动续期，直到线程正常释放锁或宕机超时。</li>
+</ul>
+</li>
+</ol>
+<h2 id="切面定义"><a href="#切面定义" class="headerlink" title="切面定义"></a>切面定义</h2><h3 id="流程代码"><a href="#流程代码" class="headerlink" title="流程代码"></a>流程代码</h3><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Slf4j</span><br><span class="hljs-meta">@Aspect</span><br><span class="hljs-meta">@Component</span><br><span class="hljs-meta">@RequiredArgsConstructor</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RLockAspect</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> String LOCK_KEY_PREFIX = <span class="hljs-string">&quot;REDISSON_LOCK&quot;</span>;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> RedissonClient redissonClient;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> SpelExpressionParser parser = <span class="hljs-keyword">new</span> SpelExpressionParser();<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> ParameterNameDiscoverer nameDiscoverer = <span class="hljs-keyword">new</span> DefaultParameterNameDiscoverer();<br><br>    <span class="hljs-meta">@Pointcut(&quot;@annotation(me.zhengjie.annotation.RLock)&quot;)</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">pointcut</span><span class="hljs-params">()</span> </span>&#123;<br>    &#125;<br><br>    <span class="hljs-meta">@Around(&quot;pointcut()&quot;)</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">around</span><span class="hljs-params">(ProceedingJoinPoint joinPoint)</span> <span class="hljs-keyword">throws</span> Throwable </span>&#123;<br>        <span class="hljs-comment">// 签名及注解</span><br>        MethodSignature signature = (MethodSignature) joinPoint.getSignature();<br>        Method signatureMethod = signature.getMethod();<br>        RLock annotation = signatureMethod.getAnnotation(RLock.class);<br><br>        <span class="hljs-comment">// 获取锁名称</span><br>        String lockKey = getKey(joinPoint);<br><br>        <span class="hljs-comment">// 上锁</span><br>        org.redisson.api.RLock lock = redissonClient.getLock(lockKey);<br>        <span class="hljs-keyword">boolean</span> isLocked = lock.tryLock(annotation.waitTime(), annotation.leaseTime(), annotation.unit());<br>        <span class="hljs-keyword">if</span> (!isLocked) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> BadRequestException(annotation.errorMessage());<br>        &#125;<br><br>        <span class="hljs-comment">// 执行方法</span><br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-keyword">return</span> joinPoint.proceed();<br>        &#125; <span class="hljs-keyword">catch</span> (Throwable throwable) &#123;<br>            log.error(<span class="hljs-string">&quot;执行方法时发生异常: &#123;&#125;&quot;</span>, throwable.getMessage(), throwable);<br>            <span class="hljs-keyword">throw</span> throwable;<br>        &#125; <span class="hljs-keyword">finally</span> &#123;<br>            <span class="hljs-comment">// 释放锁</span><br>            <span class="hljs-keyword">try</span> &#123;<br>                <span class="hljs-keyword">if</span> (lock.isLocked() &amp;&amp; lock.isHeldByCurrentThread()) &#123;<br>                    lock.unlock();<br>                &#125;<br>            &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>                log.error(<span class="hljs-string">&quot;释放锁 &#123;&#125; 时发生异常: &#123;&#125;&quot;</span>, lockKey, e.getMessage(), e);<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> String <span class="hljs-title">getKey</span><span class="hljs-params">(ProceedingJoinPoint joinPoint)</span> </span>&#123;<br>        <span class="hljs-comment">// 见下文</span><br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="运行机制"><a href="#运行机制" class="headerlink" title="运行机制"></a>运行机制</h3><table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>细节</th>
+<th>风险点 &amp; 处理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>① <strong>解析注解</strong></td>
+<td>通过 <code>MethodSignature</code> 拿到 <code>RLock</code> 实例</td>
+<td>——</td>
+</tr>
+<tr>
+<td>② <strong>拼接锁名</strong></td>
+<td><code>getKey()</code> 将全局前缀、业务前缀、表达式结果合并成<br /> <code>LOCK_KEY_PREFIX:prefix:expr</code></td>
+<td>解析失败即抛业务异常，避免锁名为 <code>null</code></td>
+</tr>
+<tr>
+<td>③ <strong>尝试加锁</strong></td>
+<td><code>tryLock(wait, lease, unit)</code>  <br />- 返回 <code>true</code>：进入临界区  <br />- 返回 <code>false</code>：直接抛自定义提示</td>
+<td>防止「假死」：未获取锁立即失败</td>
+</tr>
+<tr>
+<td>④ <strong>执行业务</strong></td>
+<td><code>joinPoint.proceed()</code></td>
+<td>业务异常无论何时抛出皆进入 <code>finally</code></td>
+</tr>
+<tr>
+<td>⑤ <strong>释放锁</strong></td>
+<td>仅当前线程且锁仍持有时调用 <code>unlock()</code></td>
+<td>避免误解锁他人持有的锁；<br />释放失败打印 error 日志</td>
+</tr>
+</tbody></table>
+<h3 id="获取锁名称"><a href="#获取锁名称" class="headerlink" title="获取锁名称"></a>获取锁名称</h3><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">private</span> String <span class="hljs-title">getKey</span><span class="hljs-params">(ProceedingJoinPoint joinPoint)</span> </span>&#123;<br>    <span class="hljs-comment">// 签名及注解</span><br>    MethodSignature signature = (MethodSignature) joinPoint.getSignature();<br>    Method signatureMethod = signature.getMethod();<br>    RLock annotation = signatureMethod.getAnnotation(RLock.class);<br><br>    <span class="hljs-comment">// 获取锁名称表达式</span><br>    String expr = annotation.expr();<br>    String prefix = StrUtil.blankToDefault(annotation.prefix(), <span class="hljs-string">&quot;DEFAULT&quot;</span>);<br>    <span class="hljs-comment">// 如果表达式为空，则获取 全限定方法名 + 用户ID 作为锁名称</span><br>    <span class="hljs-keyword">if</span> (StrUtil.isBlank(expr)) &#123;<br>        String userId = <span class="hljs-keyword">null</span>;<br>        <span class="hljs-keyword">try</span> &#123;<br>            userId = SecurityUtils.getCurrentUserId().toString();<br>        &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>            log.warn(<span class="hljs-string">&quot;获取用户ID失败，使用默认值: &#123;&#125;&quot;</span>, e.getMessage());<br>        &#125;<br>        <span class="hljs-keyword">return</span> StrUtil.format(<span class="hljs-string">&quot;&#123;&#125;:&#123;&#125;:&#123;&#125;:&#123;&#125;&quot;</span>,<br>                LOCK_KEY_PREFIX,<br>                prefix,<br>                signatureMethod.getDeclaringClass().getName() + <span class="hljs-string">&quot;.&quot;</span> + signatureMethod.getName(),<br>                userId);<br>    &#125;<br>    <span class="hljs-comment">// EL表达式</span><br>    <span class="hljs-keyword">if</span> (expr.startsWith(<span class="hljs-string">&quot;#&quot;</span>)) &#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();<br>            EvaluationContext ctx = <span class="hljs-keyword">new</span> MethodBasedEvaluationContext(<span class="hljs-keyword">null</span>, method, joinPoint.getArgs(), nameDiscoverer);<br>            Object val = parser.parseExpression(expr).getValue(ctx);<br>            <span class="hljs-keyword">if</span> (val == <span class="hljs-keyword">null</span>) &#123;<br>                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> BadRequestException(<span class="hljs-string">&quot;锁名称表达式计算结果为null，请检查表达式: &quot;</span> + expr);<br>            &#125;<br>            <span class="hljs-keyword">return</span> StrUtil.format(<span class="hljs-string">&quot;&#123;&#125;:&#123;&#125;:&#123;&#125;&quot;</span>, LOCK_KEY_PREFIX, prefix, String.valueOf(val));<br>        &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>            log.error(<span class="hljs-string">&quot;解析锁名称表达式失败: &#123;&#125;&quot;</span>, expr, e);<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> BadRequestException(<span class="hljs-string">&quot;锁名称表达式解析失败，请检查表达式: &quot;</span> + expr);<br>        &#125;<br>    &#125;<br>    <span class="hljs-comment">// 普通字符串直接作为锁名称</span><br>    <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-keyword">return</span> StrUtil.format(<span class="hljs-string">&quot;&#123;&#125;:&#123;&#125;:&#123;&#125;&quot;</span>, LOCK_KEY_PREFIX, prefix, expr);<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>关键思路</strong>：</p>
+<ul>
+<li><strong>多维度唯一性</strong>：<code>LOCK_KEY_PREFIX</code> 与 <code>prefix</code> 避免跨业务冲突；表达式或方法签名确保同业务不同场景隔离。</li>
+<li><strong>弹性 Fallback</strong>：开发者若忘记写 <code>expr</code>，亦能拿到一个规则化且唯一的锁键。</li>
+<li><strong>SpEL 灵活取值</strong>：支持链式取参（<code>#param.sub.id</code>），适配复杂入参结构。</li>
+</ul>
+<h2 id="实践"><a href="#实践" class="headerlink" title="实践"></a>实践</h2><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@RestController</span><br><span class="hljs-meta">@RequestMapping(&quot;/test&quot;)</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TestController</span> </span>&#123;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 固定名称锁测试</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@RequestMapping(&quot;/1&quot;)</span><br>    <span class="hljs-meta">@RLock(prefix = &quot;test&quot;, expr = &quot;11&quot;)</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">test1</span><span class="hljs-params">()</span> </span>&#123;<br>        System.out.println(<span class="hljs-string">&quot;Hello, World!&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 路径变量锁测试</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@GetMapping(&quot;/2/&#123;id&#125;&quot;)</span><br>    <span class="hljs-meta">@RLock(prefix = &quot;test&quot;, expr = &quot;#id&quot;)</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">test2</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable(&quot;id&quot;)</span> <span class="hljs-keyword">long</span> id)</span> </span>&#123;<br>        System.out.println(<span class="hljs-string">&quot;Hello, World!&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 请求体参数锁测试</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@PostMapping(&quot;/3/&#123;pathVar&#125;&quot;)</span><br>    <span class="hljs-meta">@RLock(prefix = &quot;test&quot;, expr = &quot;#param.param2.id&quot;)</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">test3</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable(&quot;pathVar&quot;)</span> String pathVar, <span class="hljs-meta">@RequestBody</span> TestParam param)</span> </span>&#123;<br>        System.out.println(<span class="hljs-string">&quot;Hello, World!&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 全局锁（方法 + 用户）测试</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@GetMapping(&quot;/4&quot;)</span><br>    <span class="hljs-meta">@RLock(prefix = &quot;test4&quot;)</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">test4</span><span class="hljs-params">()</span> </span>&#123;<br>        System.out.println(<span class="hljs-string">&quot;Hello, World!&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-meta">@Setter</span><br>    <span class="hljs-meta">@Getter</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TestParam</span> </span>&#123;<br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">long</span> id;<br>        <span class="hljs-keyword">private</span> TestParam2 param2;<br><br>    &#125;<br><br>    <span class="hljs-meta">@Setter</span><br>    <span class="hljs-meta">@Getter</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TestParam2</span> </span>&#123;<br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">long</span> id;<br>        <span class="hljs-keyword">private</span> String name;<br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="实战建议"><a href="#实战建议" class="headerlink" title="实战建议"></a>实战建议</h3><ol>
+<li><strong>锁范围越小越好</strong><ul>
+<li>只对真正存在并发风险的代码块加锁，避免长事务。</li>
+</ul>
+</li>
+<li><strong>waitTime 合理设置</strong><ul>
+<li>UI 请求链建议 ≤ 1 s，定时任务可适当放宽。</li>
+</ul>
+</li>
+<li><strong>leaseTime 建议为 0</strong><ul>
+<li>交由 Redisson watch-dog 自动续约，不易因单机 GC 暂停误释放。</li>
+</ul>
+</li>
+<li><strong>锁粒度设计</strong><ul>
+<li>订单、库存等按「业务主键」锁；</li>
+<li>全量任务或定时脚本可用固定字符串，如 <code>&quot;GLOBAL&quot;</code>。</li>
+</ul>
+</li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过 <code>@RLock</code> + <code>RLockAspect</code>，我们将分布式锁逻辑彻底下沉，业务侧只需关注「业务前缀 + 唯一键」即可安全并发。与原生 Redisson 相比，此封装：</p>
+<ul>
+<li>去除了样板代码，降低认知负担；</li>
+<li>保持了 Redisson 高可用、高性能的优势；</li>
+<li>通过 SpEL 提供了高度自定义的锁粒度；</li>
+<li>兼容 watch-dog 机制，稳定性更佳。</li>
+</ul>
+<p><strong>一句话</strong>：让分布式锁像 <code>@Transactional</code> 一样自然。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Redis/">Redis</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Redis/">Redis</a>
+                    
+                      <a class="hover-with-bg" href="/tags/NoSQL/">NoSQL</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/05/14/es-first-acquaintance/">
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
