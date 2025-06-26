@@ -1,0 +1,1054 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="引言在现代 Web 应用中，实时能力已经从「可选」演进为「必需」。浏览器与服务器之间不仅要“快”，还要“流畅”，既能及时把后台事件推送到前端，又能让用户在等待 AI 或大数据任务时看到源源不断的结果。Server-Sent Events（SSE）凭借 单向、轻量、浏览器原生、自动重连 等特性，成为“只需服务器推流、不必客户端回写”的理想方案。本文章系统梳理了 SSE 的协议细节、与长轮询 &#x2F; We">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Server-Sent Events基础">
+<meta property="og:url" content="http://example.com/2025/06/26/sse/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="引言在现代 Web 应用中，实时能力已经从「可选」演进为「必需」。浏览器与服务器之间不仅要“快”，还要“流畅”，既能及时把后台事件推送到前端，又能让用户在等待 AI 或大数据任务时看到源源不断的结果。Server-Sent Events（SSE）凭借 单向、轻量、浏览器原生、自动重连 等特性，成为“只需服务器推流、不必客户端回写”的理想方案。本文章系统梳理了 SSE 的协议细节、与长轮询 &#x2F; We">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/java-sse.png">
+<meta property="article:published_time" content="2025-06-26T06:09:00.000Z">
+<meta property="article:modified_time" content="2025-06-26T06:09:00.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="SSE">
+<meta property="article:tag" content="计算机网络">
+<meta property="article:tag" content="网络协议">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/java-sse.png">
+  
+  
+  <title>Server-Sent Events基础 - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/java-sse.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Server-Sent Events基础">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2025-06-26 14:09" pubdate>
+        2025年6月26日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      27k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      45 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Server-Sent Events基础</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：2 分钟前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>在现代 Web 应用中，实时能力已经从「可选」演进为「必需」。浏览器与服务器之间不仅要“快”，还要“流畅”，既能及时把后台事件推送到前端，又能让用户在等待 AI 或大数据任务时看到源源不断的结果。Server-Sent Events（SSE）凭借 <strong>单向、轻量、浏览器原生、自动重连</strong> 等特性，成为“只需服务器推流、不必客户端回写”的理想方案。本文章系统梳理了 SSE 的协议细节、与长轮询 / WebSocket / gRPC 的横向对比，以及在 Spring MVC、Spring WebFlux 两种编程模型中的落地姿势；同时给出了生产级别的缓冲关闭、心跳、监控、分布式广播以及流式 AI 输出的完整示例，旨在帮助开发者从 <strong>“为什么选 SSE”</strong> 到 <strong>“如何优雅地在生产环境跑起来”</strong> 形成一条清晰的技术脉络。</p>
+<h2 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h2><h3 id="协议定义"><a href="#协议定义" class="headerlink" title="协议定义"></a>协议定义</h3><p>SSE（Server-Sent Events，服务器发送事件）是一种基于HTTP协议的单向通信技术，允许服务器主动向浏览器推送数据。与传统的轮询不同，SSE 建立的是一个长连接，服务器可以在连接存续期间持续不断地将事件消息发送给客户端。浏览器端通过原生的 <code>EventSource</code> API 即可轻松接入，不需要额外库，使用简单、资源开销低。SSE 适用于如实时消息推送、系统通知、进度更新等场景。它相比 WebSocket 实现更轻量，尤其在不需要客户端反向通信的场景下，是一种稳定、高效的实时通信方案。</p>
+<h3 id="协议对比"><a href="#协议对比" class="headerlink" title="协议对比"></a>协议对比</h3><h4 id="SSE（Server-Sent-Events）"><a href="#SSE（Server-Sent-Events）" class="headerlink" title="SSE（Server-Sent Events）"></a>SSE（Server-Sent Events）</h4><ul>
+<li><strong>通信方式</strong>：单向（服务器 → 客户端）</li>
+<li><strong>协议层</strong>：基于 HTTP/1.1，MIME 类型为 <code>text/event-stream</code></li>
+<li><strong>使用场景</strong>：实时推送数据，如：股票行情、系统通知、直播评论等</li>
+<li><strong>优点</strong>：<ul>
+<li>使用简单：前端只需 <code>EventSource</code>，后端返回特定格式数据即可</li>
+<li>支持自动重连</li>
+<li>浏览器原生支持（不需要额外库）</li>
+</ul>
+</li>
+<li><strong>缺点</strong>：<ul>
+<li>只能单向通信，客户端不能主动发消息</li>
+<li>不适合二进制数据传输</li>
+</ul>
+</li>
+</ul>
+<h4 id="长轮询（Long-Polling）"><a href="#长轮询（Long-Polling）" class="headerlink" title="长轮询（Long Polling）"></a>长轮询（Long Polling）</h4><ul>
+<li><strong>通信方式</strong>：模拟实时，通过客户端不断轮询实现近似实时</li>
+<li><strong>原理</strong>：客户端发出请求，服务器挂起请求直到有新数据或超时返回，然后客户端再重新请求</li>
+<li><strong>缺点</strong>：<ul>
+<li>资源浪费（频繁建连）</li>
+<li>实现复杂（需处理超时、队列、资源回收等）</li>
+</ul>
+</li>
+</ul>
+<h4 id="WebSocket"><a href="#WebSocket" class="headerlink" title="WebSocket"></a>WebSocket</h4><ul>
+<li><strong>通信方式</strong>：双向（客户端 ↔ 服务器）</li>
+<li><strong>协议层</strong>：独立协议，基于 HTTP 完成握手后升级为 <code>ws://</code> 或 <code>wss://</code></li>
+<li><strong>使用场景</strong>：聊天、协同编辑、游戏、音视频信令等</li>
+<li><strong>优点</strong>：<ul>
+<li>真正的全双工通信，延迟极低</li>
+<li>支持自定义协议（可定义数据结构如 JSON、Protobuf）</li>
+</ul>
+</li>
+<li><strong>缺点</strong>：<ul>
+<li>实现复杂度略高（需要手动管理连接和心跳）</li>
+</ul>
+</li>
+</ul>
+<h4 id="gRPC"><a href="#gRPC" class="headerlink" title="gRPC"></a>gRPC</h4><ul>
+<li><strong>通信方式</strong>：<ul>
+<li>支持一元调用（单次请求响应）</li>
+<li>服务器流（类似 SSE）</li>
+<li>客户端流、双向流（类似 WebSocket）</li>
+</ul>
+</li>
+<li><strong>协议层</strong>：基于 HTTP/2 的远程调用框架，默认使用 Protobuf 编码</li>
+<li><strong>使用场景</strong>：微服务间通信、高性能数据交换</li>
+<li><strong>优点</strong>：<ul>
+<li>高性能、强类型、支持多语言</li>
+<li>内建双向流和连接复用</li>
+</ul>
+</li>
+<li><strong>缺点</strong>：<ul>
+<li>学习成本高</li>
+<li>不适合浏览器直接调用（需要 gRPC-Web）</li>
+</ul>
+</li>
+</ul>
+<h3 id="MIME-类型与持久连接"><a href="#MIME-类型与持久连接" class="headerlink" title="MIME 类型与持久连接"></a>MIME 类型与持久连接</h3><h4 id="text-event-stream"><a href="#text-event-stream" class="headerlink" title="text/event-stream"></a>text/event-stream</h4><ul>
+<li><p>SSE 的 MIME 类型。</p>
+</li>
+<li><p>表示这个 HTTP 响应是一个流（stream），并不会立即结束。</p>
+</li>
+<li><p>示例响应头：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs yaml"><span class="hljs-attr">Content-Type:</span> <span class="hljs-string">text/event-stream</span><br><span class="hljs-attr">Cache-Control:</span> <span class="hljs-literal">no</span><span class="hljs-string">-cache</span><br><span class="hljs-attr">Connection:</span> <span class="hljs-string">keep-alive</span><br></code></pre></div></td></tr></table></figure></li>
+</ul>
+<h4 id="持久连接（HTTP-keep-alive）"><a href="#持久连接（HTTP-keep-alive）" class="headerlink" title="持久连接（HTTP keep-alive）"></a>持久连接（HTTP keep-alive）</h4><ul>
+<li>SSE 利用 HTTP/1.1 的持久连接特性，使得连接不被关闭。</li>
+<li>服务器不断地向客户端写入事件消息，不结束响应体。</li>
+</ul>
+<h4 id="响应不会关闭"><a href="#响应不会关闭" class="headerlink" title="响应不会关闭"></a>响应不会关闭</h4><ul>
+<li>与传统请求不同，SSE 的响应体会持续输出，不会 <code>Content-Length</code> 限定大小。</li>
+<li>必须刷新缓冲区 <code>flush()</code> 以确保消息即时传递。</li>
+</ul>
+<h3 id="事件格式"><a href="#事件格式" class="headerlink" title="事件格式"></a>事件格式</h3><p>SSE 每条事件数据的格式如下，每条事件之间用两个换行分隔：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs yaml"><span class="hljs-attr">event:</span> <span class="hljs-string">customEventName</span><br><span class="hljs-attr">id:</span> <span class="hljs-number">1234</span><br><span class="hljs-attr">retry:</span> <span class="hljs-number">5000</span><br><span class="hljs-attr">data:</span> <span class="hljs-string">first</span> <span class="hljs-string">line</span> <span class="hljs-string">of</span> <span class="hljs-string">message</span><br><span class="hljs-attr">data:</span> <span class="hljs-string">second</span> <span class="hljs-string">line</span> <span class="hljs-string">of</span> <span class="hljs-string">message</span><br></code></pre></div></td></tr></table></figure>
+
+<h3 id="字段说明："><a href="#字段说明：" class="headerlink" title="字段说明："></a>字段说明：</h3><ul>
+<li><p><code>event</code>：自定义事件名，对应浏览器中监听的事件<code>eventSource.addEventListener(&#39;customEventName&#39;, ...)</code>。</p>
+</li>
+<li><p><code>id</code>：消息 ID，浏览器断线重连时会通过 <code>Last-Event-ID</code> 请求头携带该值，服务端可以据此避免重复推送。</p>
+</li>
+<li><p><code>retry</code>：告诉浏览器在连接断开后等待多少毫秒再重连（非必需）。</p>
+</li>
+<li><p><code>data</code>：消息体，每个 <code>data:</code> 行会被合并为一个消息文本，支持多行。</p>
+</li>
+<li><p>示例合并规则：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs yaml"><span class="hljs-attr">data:</span> <span class="hljs-string">line1</span><br><span class="hljs-attr">data:</span> <span class="hljs-string">line2</span><br></code></pre></div></td></tr></table></figure>
+
+<p>最终事件内容为：</p>
+<figure class="highlight gcode"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs gcode">li<span class="hljs-symbol">ne1</span><br>li<span class="hljs-symbol">ne2</span><br></code></pre></div></td></tr></table></figure></li>
+</ul>
+<h3 id="EventSource-API"><a href="#EventSource-API" class="headerlink" title="EventSource API"></a>EventSource API</h3><h4 id="创建连接"><a href="#创建连接" class="headerlink" title="创建连接"></a>创建连接</h4><figure class="highlight javascript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs javascript"><span class="hljs-keyword">const</span> eventSource = <span class="hljs-keyword">new</span> EventSource(<span class="hljs-string">&#x27;http://localhost:8080/sse&#x27;</span>);<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="监听消息"><a href="#监听消息" class="headerlink" title="监听消息"></a>监听消息</h4><figure class="highlight javascript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs javascript"><span class="hljs-comment">// 默认消息（event字段未指定）</span><br>eventSource.onmessage = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">event</span>) </span>&#123;<br>  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;Message:&#x27;</span>, event.data);<br>&#125;;<br><br><span class="hljs-comment">// 监听自定义事件</span><br>eventSource.addEventListener(<span class="hljs-string">&#x27;customEvent&#x27;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">event</span>) </span>&#123;<br>  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;Custom Event:&#x27;</span>, event.data);<br>&#125;);<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="错误处理"><a href="#错误处理" class="headerlink" title="错误处理"></a>错误处理</h4><figure class="highlight javascript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs javascript">eventSource.onerror = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>&#123;<br>  <span class="hljs-built_in">console</span>.error(<span class="hljs-string">&#x27;EventSource failed:&#x27;</span>, err);<br>&#125;;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="关闭连接"><a href="#关闭连接" class="headerlink" title="关闭连接"></a>关闭连接</h4><figure class="highlight javascript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs javascript">eventSource.close();<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="自动重连特性"><a href="#自动重连特性" class="headerlink" title="自动重连特性"></a>自动重连特性</h4><ul>
+<li>默认自动重连机制，若服务端响应中指定了 <code>retry:</code> 行，浏览器会按其值重试连接。</li>
+<li>客户端自动附带 <code>Last-Event-ID</code> 请求头。</li>
+</ul>
+<h2 id="Spring-MVC-中的-SSE-实现"><a href="#Spring-MVC-中的-SSE-实现" class="headerlink" title="Spring MVC 中的 SSE 实现"></a>Spring MVC 中的 SSE 实现</h2><h3 id="SseEmitter-核心类与生命周期"><a href="#SseEmitter-核心类与生命周期" class="headerlink" title="SseEmitter 核心类与生命周期"></a>SseEmitter 核心类与生命周期</h3><h4 id="类概述"><a href="#类概述" class="headerlink" title="类概述"></a>类概述</h4><ul>
+<li><strong>包路径</strong>：<code>org.springframework.web.servlet.mvc.method.annotation.SseEmitter</code></li>
+<li><strong>功能</strong>：基于 Servlet 的长连接机制，封装了向客户端推送 Server-Sent Events 的能力。</li>
+</ul>
+<h4 id="构造与超时"><a href="#构造与超时" class="headerlink" title="构造与超时"></a>构造与超时</h4><ul>
+<li><p><strong>构造器</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">SseEmitter</span><span class="hljs-params">()</span></span>;               <span class="hljs-comment">// 默认超时：30 000ms</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">SseEmitter</span><span class="hljs-params">(Long timeout)</span></span>;   <span class="hljs-comment">// 自定义超时，传 0L 表示永不超时</span><br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li><strong>超时处理</strong>：若在指定时间内没有任何消息发送，容器会触发超时回调并关闭连接。</li>
+</ul>
+</li>
+</ul>
+<h4 id="主要方法"><a href="#主要方法" class="headerlink" title="主要方法"></a>主要方法</h4><ul>
+<li><code>send(Object)</code>：向客户端发送一条事件（Content-Type 自动设为 text/event-stream）。</li>
+<li><code>send(SseEventBuilder)</code>：更灵活地构造事件：可指定 <code>id</code>、<code>event</code>、<code>retry</code>、<code>data</code>。</li>
+<li><code>complete()</code>：正常结束，向客户端发送终止符并关闭连接。</li>
+<li><code>completeWithError(Throwable)</code>：带错误结束，发送错误并关闭连接。</li>
+<li><code>onCompletion(Runnable)</code>：注册「正常完成时」的回调。</li>
+<li><code>onTimeout(Runnable)</code>：注册「超时」的回调。</li>
+<li><code>onError(Consumer&lt;Throwable&gt;)</code>：注册「发送异常」时的回调。</li>
+</ul>
+<h4 id="生命周期流程"><a href="#生命周期流程" class="headerlink" title="生命周期流程"></a>生命周期流程</h4><ol>
+<li><strong>实例化</strong><ul>
+<li>Controller 中创建 <code>new SseEmitter(timeout)</code>，返回给 DispatcherServlet。</li>
+</ul>
+</li>
+<li><strong>挂起请求</strong><ul>
+<li>Servlet 容器保留该请求，不立即返回响应结束。</li>
+</ul>
+</li>
+<li><strong>数据推送</strong><ul>
+<li>在异步线程中反复调用 <code>emitter.send(...)</code>，每次都会 flush 到客户端。</li>
+</ul>
+</li>
+<li><strong>完成或超时</strong><ul>
+<li><strong>正常完成</strong>：调用 <code>complete()</code>；</li>
+<li><strong>超时</strong>：超过 <code>timeout</code> 未发送数据，容器自动调用 registered <code>onTimeout</code> 回调并关闭；</li>
+<li><strong>异常</strong>：<code>send()</code> 抛出 <code>IOException</code>，可在 <code>onError</code> 回调中处理，并调用 <code>completeWithError</code>。</li>
+</ul>
+</li>
+<li><strong>回调触发</strong><ul>
+<li>调用完 <code>complete()</code> 或超时后，会触发对应的回调，可以做资源清理、日志记录等。</li>
+</ul>
+</li>
+</ol>
+<h3 id="普通Controller示例"><a href="#普通Controller示例" class="headerlink" title="普通Controller示例"></a>普通Controller示例</h3><p>下面示例展示如何在 Spring MVC/Boot 的普通 Controller 中使用 <code>SseEmitter</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@RestController</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SseController</span> </span>&#123;<br><br>    <span class="hljs-comment">// 可复用线程池</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> ExecutorService executor = Executors.newSingleThreadExecutor();<br><br>    <span class="hljs-meta">@GetMapping(&quot;/sse/stream&quot;)</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> SseEmitter <span class="hljs-title">streamEvents</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-comment">// 创建一个永不超时的 emitter</span><br>        SseEmitter emitter = <span class="hljs-keyword">new</span> SseEmitter(<span class="hljs-number">0L</span>);<br><br>        <span class="hljs-comment">// 注册超时和完成回调</span><br>        emitter.onTimeout(() -&gt; &#123;<br>            System.out.println(<span class="hljs-string">&quot;SSE 连接超时，进行清理&quot;</span>);<br>            emitter.complete();<br>        &#125;);<br>        emitter.onCompletion(() -&gt; System.out.println(<span class="hljs-string">&quot;SSE 连接已关闭&quot;</span>));<br><br>        <span class="hljs-comment">// 异步推送示例数据</span><br>        executor.execute(() -&gt; &#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">1</span>; i &lt;= <span class="hljs-number">5</span>; i++) &#123;<br>                    <span class="hljs-comment">// 构造一个带事件名和 ID 的 SSE 消息</span><br>                    emitter.send(<br>                        SseEmitter.event()<br>                                  .id(String.valueOf(i))<br>                                  .name(<span class="hljs-string">&quot;heartbeat&quot;</span>)<br>                                  .data(<span class="hljs-string">&quot;服务器心跳 &quot;</span> + i)<br>                                  .reconnectTime(<span class="hljs-number">3000</span>)<br>                    );<br>                    <span class="hljs-comment">// 模拟业务处理间隔</span><br>                    TimeUnit.SECONDS.sleep(<span class="hljs-number">2</span>);<br>                &#125;<br>                <span class="hljs-comment">// 发送完成，关闭连接</span><br>                emitter.complete();<br>            &#125; <span class="hljs-keyword">catch</span> (IOException | InterruptedException ex) &#123;<br>                <span class="hljs-comment">// 出现异常时带错误结束</span><br>                emitter.completeWithError(ex);<br>            &#125;<br>        &#125;);<br><br>        <span class="hljs-keyword">return</span> emitter;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>关键点说明</strong>：</p>
+<ol>
+<li><p><strong>永不超时</strong></p>
+<ul>
+<li>用 <code>new SseEmitter(0L)</code> 保证连接常驻，适合频繁推送场景；</li>
+<li>若希望自动中断，请设定非 0 的超时时间（单位 ms）。</li>
+</ul>
+</li>
+<li><p><strong>异步推送</strong></p>
+<ul>
+<li>Controller 方法立即返回 <code>SseEmitter</code>，Servlet 容器挂起响应，由另一个线程不断调用 <code>send()</code>。</li>
+</ul>
+</li>
+<li><p><strong>事件构造</strong></p>
+<ul>
+<li><p>使用 <code>SseEmitter.event()</code> 构造器可链式设置：</p>
+<ul>
+<li><p><code>id(...)</code>：消息 ID，用于断线重连时续流；</p>
+</li>
+<li><p><code>name(...)</code>：事件名，前端可通过 <code>addEventListener</code> 精确监听；</p>
+</li>
+<li><p><code>data(...)</code>：实际推送内容；</p>
+</li>
+<li><p><code>reconnectTime(...)</code>：重连间隔，覆盖客户端默认值。</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>关闭与异常</strong></p>
+<ul>
+<li>正常流程结束后必须调用 <code>complete()</code> 关闭连接；</li>
+<li>若发送过程中发生 IO 异常，应调用 <code>completeWithError()</code>，前端会收到错误并关闭；</li>
+<li>可通过 <code>onCompletion</code>、<code>onTimeout</code>、<code>onError</code> 注册回调做清理或日志。</li>
+</ul>
+</li>
+</ol>
+<h3 id="阻塞和异步"><a href="#阻塞和异步" class="headerlink" title="阻塞和异步"></a>阻塞和异步</h3><h4 id="阻塞式处理"><a href="#阻塞式处理" class="headerlink" title="阻塞式处理"></a>阻塞式处理</h4><p>默认情况下，Spring MVC 每个请求占用一个 Servlet 线程。如果在同一个线程里循环调用 <code>SseEmitter.send()</code> 并 <code>sleep()</code>，就会一直占用该线程，导致服务器吞吐量急剧下降。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@GetMapping(&quot;/sse/blocking&quot;)</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> SseEmitter <span class="hljs-title">blockingStream</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> InterruptedException, IOException </span>&#123;<br>    SseEmitter emitter = <span class="hljs-keyword">new</span> SseEmitter(<span class="hljs-number">0L</span>);<br>    <span class="hljs-comment">// 这是阻塞式：在当前线程里循环发送并 sleep</span><br>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">1</span>; i &lt;= <span class="hljs-number">5</span>; i++) &#123;<br>        emitter.send(<span class="hljs-string">&quot;message &quot;</span> + i);<br>        Thread.sleep(<span class="hljs-number">2000</span>);<br>    &#125;<br>    emitter.complete();<br>    <span class="hljs-keyword">return</span> emitter;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<blockquote>
+<p><strong>问题</strong>：每个客户端连接都占用 1 个线程，连接数量多时容易导致线程耗尽。</p>
+</blockquote>
+<h4 id="异步方案一：-Async"><a href="#异步方案一：-Async" class="headerlink" title="异步方案一：@Async"></a>异步方案一：@Async</h4><ol>
+<li>在业务层使用 Spring 的异步方法释放请求线程；</li>
+<li>Controller 立即返回 <code>SseEmitter</code>，真正的推送逻辑在异步线程中进行。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Service</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SseService</span> </span>&#123;<br><br>    <span class="hljs-meta">@Async</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">pushEvents</span><span class="hljs-params">(SseEmitter emitter)</span> </span>&#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">1</span>; i &lt;= <span class="hljs-number">5</span>; i++) &#123;<br>                emitter.send(SseEmitter.event()<br>                    .id(String.valueOf(i))<br>                    .data(<span class="hljs-string">&quot;Async message &quot;</span> + i));<br>                Thread.sleep(<span class="hljs-number">2000</span>);<br>            &#125;<br>            emitter.complete();<br>        &#125; <span class="hljs-keyword">catch</span> (Exception ex) &#123;<br>            emitter.completeWithError(ex);<br>        &#125;<br>    &#125;<br><br>&#125;<br><br><span class="hljs-meta">@RestController</span><br><span class="hljs-meta">@RequiredArgsConstructor</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SseController</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> SseService sseService;<br><br>    <span class="hljs-meta">@GetMapping(&quot;/sse/async&quot;)</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> SseEmitter <span class="hljs-title">asyncStream</span><span class="hljs-params">()</span> </span>&#123;<br>        SseEmitter emitter = <span class="hljs-keyword">new</span> SseEmitter(<span class="hljs-number">0L</span>);<br>        sseService.pushEvents(emitter);  <span class="hljs-comment">// 异步执行</span><br>        <span class="hljs-keyword">return</span> emitter;                  <span class="hljs-comment">// 立即释放请求线程</span><br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="异步方案二：DeferredResult"><a href="#异步方案二：DeferredResult" class="headerlink" title="异步方案二：DeferredResult"></a>异步方案二：DeferredResult</h4><ol>
+<li>使用 <code>DeferredResult&lt;SseEmitter&gt;</code>，在子线程里构造并返回 <code>SseEmitter</code>；</li>
+<li>同样释放 Servlet 请求线程，提高吞吐量。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@GetMapping(&quot;/sse/deferred&quot;)</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> DeferredResult&lt;SseEmitter&gt; <span class="hljs-title">deferredStream</span><span class="hljs-params">()</span> </span>&#123;<br>    DeferredResult&lt;SseEmitter&gt; result = <span class="hljs-keyword">new</span> DeferredResult&lt;&gt;();<br>    executor.execute(() -&gt; &#123;<br>        SseEmitter emitter = <span class="hljs-keyword">new</span> SseEmitter(<span class="hljs-number">0L</span>);<br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">1</span>; i &lt;= <span class="hljs-number">5</span>; i++) &#123;<br>                emitter.send(<span class="hljs-string">&quot;Deferred message &quot;</span> + i);<br>                Thread.sleep(<span class="hljs-number">2000</span>);<br>            &#125;<br>            emitter.complete();<br>            result.setResult(emitter);     <span class="hljs-comment">// 设置返回值</span><br>        &#125; <span class="hljs-keyword">catch</span> (Exception ex) &#123;<br>            emitter.completeWithError(ex);<br>            result.setErrorResult(ex);<br>        &#125;<br>    &#125;);<br>    <span class="hljs-keyword">return</span> result;  <span class="hljs-comment">// 立即释放请求线程</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="简单心跳与重连"><a href="#简单心跳与重连" class="headerlink" title="简单心跳与重连"></a>简单心跳与重连</h3><h4 id="服务端定时发送心跳注释"><a href="#服务端定时发送心跳注释" class="headerlink" title="服务端定时发送心跳注释"></a>服务端定时发送心跳注释</h4><p>SSE 规范支持“注释行”（以 <code>:</code> 开头），客户端收到注释也会重置重连计时器，但不会触发 <code>message</code> 事件。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@GetMapping(&quot;/sse/heartbeat&quot;)</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> SseEmitter <span class="hljs-title">heartbeatStream</span><span class="hljs-params">()</span> </span>&#123;<br>    SseEmitter emitter = <span class="hljs-keyword">new</span> SseEmitter(<span class="hljs-number">0L</span>);<br>    <span class="hljs-comment">// 定时发送注释做心跳，间隔 15 秒</span><br>    ScheduledFuture&lt;?&gt; future = scheduler.scheduleAtFixedRate(() -&gt; &#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-comment">// 发送注释行，客户端不触发 onmessage</span><br>            emitter.send(SseEmitter.event()<br>                    .comment(<span class="hljs-string">&quot;ping&quot;</span>));<br>        &#125; <span class="hljs-keyword">catch</span> (IOException ex) &#123;<br>            emitter.completeWithError(ex);<br>        &#125;<br>    &#125;, <span class="hljs-number">0</span>, <span class="hljs-number">15</span>, TimeUnit.SECONDS);<br><br>    <span class="hljs-comment">// 连接关闭时取消心跳任务</span><br>    emitter.onCompletion(() -&gt; future.cancel(<span class="hljs-keyword">true</span>));<br>    emitter.onTimeout(() -&gt; &#123;<br>        future.cancel(<span class="hljs-keyword">true</span>);<br>        emitter.complete();<br>    &#125;);<br>    <span class="hljs-keyword">return</span> emitter;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="客户端自动重连与事件监听"><a href="#客户端自动重连与事件监听" class="headerlink" title="客户端自动重连与事件监听"></a>客户端自动重连与事件监听</h4><p>浏览器原生 <code>EventSource</code> 会在网络断开后自动重连，默认等待 3 000 ms，可由服务器通过 <code>retry:</code> 指定：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs javascript"><span class="hljs-keyword">const</span> es = <span class="hljs-keyword">new</span> EventSource(<span class="hljs-string">&#x27;/sse/heartbeat&#x27;</span>);<br><br><span class="hljs-comment">// 监听连接打开</span><br>es.onopen = <span class="hljs-function">() =&gt;</span> <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;SSE 已连接&#x27;</span>);<br><br><span class="hljs-comment">// 监听默认消息（此例仅有注释心跳，不会触发）</span><br>es.onmessage = <span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;收到消息：&#x27;</span>, e.data);<br><br><span class="hljs-comment">// 监听错误（会在断线后自动重连）</span><br>es.onerror = <span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> <span class="hljs-built_in">console</span>.warn(<span class="hljs-string">&#x27;连接错误，正在重连...&#x27;</span>, err);<br><br><span class="hljs-comment">// 如果需要自定义重连时间，可在服务器端发送：</span><br><span class="hljs-comment">// SseEmitter.event().reconnectTime(5000) </span><br></code></pre></div></td></tr></table></figure>
+
+<blockquote>
+<p><strong>说明</strong></p>
+<ul>
+<li>注释行不会进入 <code>onmessage</code>，但可保持连接；</li>
+<li>服务器发送 <code>.reconnectTime(ms)</code> 会覆盖客户端重连时长；</li>
+<li>一旦连接失败，浏览器自动重连并带上 <code>Last-Event-ID</code>，由服务端决定是否重发漏掉的消息。</li>
+</ul>
+</blockquote>
+<h2 id="常见配置"><a href="#常见配置" class="headerlink" title="常见配置"></a>常见配置</h2><h3 id="应用服务器层面"><a href="#应用服务器层面" class="headerlink" title="应用服务器层面"></a>应用服务器层面</h3><ol>
+<li><p><strong>线程与连接池</strong></p>
+<ul>
+<li><strong>长连接数</strong>：SSE 连接会长期占用 HTTP 线程或 NIO 事件线程，需要适当增大 <code>server.tomcat.max-threads</code>（或 Jetty/Undertow 的对应参数），以承载并发的持久连接。</li>
+<li><strong>连接超时</strong>：默认的 <code>server.tomcat.connection-timeout</code>（如 20s）要调大，或者对于 SSE 路径单独设置为 0（永不超时）。</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs yaml"><span class="hljs-attr">server:</span><br>  <span class="hljs-attr">port:</span> <span class="hljs-number">8080</span><br>  <span class="hljs-attr">tomcat:</span><br>    <span class="hljs-attr">max-threads:</span> <span class="hljs-number">2000</span>           <span class="hljs-comment"># 支撑更多并发长连接</span><br>    <span class="hljs-attr">connection-timeout:</span> <span class="hljs-number">600000</span>  <span class="hljs-comment"># 600秒</span><br></code></pre></div></td></tr></table></figure></li>
+<li><p><strong>响应缓冲与分块</strong></p>
+<ul>
+<li><p><strong>禁用 HttpServletResponse 层面的缓冲</strong>：禁用 sse 路径的 HttpServletResponse 缓冲，同时告知代理层关闭缓冲。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Configuration</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SseBufferConfig</span> </span>&#123;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 注册一个 Servlet 过滤器，对 /sse/* 路径禁用 HttpServletResponse 层面的缓冲，</span><br><span class="hljs-comment">     * 并增加 Nginx 友好的 no-buffering 头部。</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Bean</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> FilterRegistrationBean&lt;Filter&gt; <span class="hljs-title">disableBufferingFilter</span><span class="hljs-params">()</span> </span>&#123;<br>        FilterRegistrationBean&lt;Filter&gt; bean = <span class="hljs-keyword">new</span> FilterRegistrationBean&lt;&gt;();<br>        bean.setFilter((request, response, chain) -&gt; &#123;<br>            <span class="hljs-keyword">if</span> (response <span class="hljs-keyword">instanceof</span> HttpServletResponse) &#123;<br>                HttpServletResponse resp = (HttpServletResponse) response;<br>                <span class="hljs-comment">// 禁用 servlet 输出缓冲</span><br>                resp.setBufferSize(<span class="hljs-number">0</span>);<br>                <span class="hljs-comment">// 如果前端有 Nginx/Envoy，可用此头告知关闭代理缓冲</span><br>                resp.setHeader(<span class="hljs-string">&quot;X-Accel-Buffering&quot;</span>, <span class="hljs-string">&quot;no&quot;</span>);<br>            &#125;<br>            chain.doFilter(request, response);<br>        &#125;);<br>        bean.addUrlPatterns(<span class="hljs-string">&quot;/sse/*&quot;</span>);<br>        bean.setName(<span class="hljs-string">&quot;disableBufferingFilter&quot;</span>);<br>        bean.setOrder(<span class="hljs-number">0</span>);<br>        <span class="hljs-keyword">return</span> bean;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p><strong>Chunked Transfer</strong>：HTTP1.1 下 SSE 默认走分块传输（chunked），确保代理层也支持。</p>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="反向代理-负载均衡"><a href="#反向代理-负载均衡" class="headerlink" title="反向代理 / 负载均衡"></a>反向代理 / 负载均衡</h3><p>大多数生产环境会在前面放 Nginx、HAProxy、Envoy 等，需要针对 SSE 调优：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs nginx"><span class="hljs-attribute">location</span> /sse/ &#123;<br>    <span class="hljs-attribute">proxy_pass</span>             http://app_servers;<br>    <span class="hljs-attribute">proxy_http_version</span>     <span class="hljs-number">1</span>.<span class="hljs-number">1</span>;<br>    <span class="hljs-attribute">proxy_set_header</span>       Connection <span class="hljs-string">&quot;&quot;</span>;          <span class="hljs-comment"># 保持底层长连接</span><br>    <span class="hljs-attribute">proxy_buffering</span>        <span class="hljs-literal">off</span>;                    <span class="hljs-comment"># 关掉响应缓冲</span><br>    <span class="hljs-attribute">proxy_read_timeout</span>     <span class="hljs-number">600s</span>;                   <span class="hljs-comment"># 读超时要比 SSE 最大空闲心跳间隔高</span><br>    <span class="hljs-attribute">proxy_send_timeout</span>     <span class="hljs-number">600s</span>;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li><code>proxy_buffering off</code>：保证服务器写入的每次 <code>data:</code> 都能实时下发给客户端。</li>
+<li><code>proxy_read_timeout</code>/<code>send_timeout</code>：调大（根据业务响应时长确定），防止代理主动断开空闲连接。</li>
+</ul>
+<h3 id="心跳与重连策略"><a href="#心跳与重连策略" class="headerlink" title="心跳与重连策略"></a>心跳与重连策略</h3><ul>
+<li><strong>后台心跳</strong>：定时发送注释行或空事件（例如每 15–30s 一次），用于穿透各种中间网络设备的空闲超时。</li>
+<li><strong>客户端重连</strong>：在服务端通过 <code>SseEmitter.event().reconnectTime(…)</code> 设定合理重连间隔，例如 <code>5000ms</code>。</li>
+</ul>
+<h3 id="安全与监控"><a href="#安全与监控" class="headerlink" title="安全与监控"></a>安全与监控</h3><ol>
+<li><strong>CORS 与认证</strong><ul>
+<li>SSE 的跨域和普通 REST 一样，可在 <code>WebMvcConfigurer</code> 或 <code>@CrossOrigin</code> 上单独为 <code>/sse/**</code> 路径放行。</li>
+<li>Token 鉴权时，要考虑长连接的认证续期和失效通知。</li>
+</ul>
+</li>
+<li><strong>连接监控</strong><ul>
+<li>统计当前打开的 SSE 连接数，以防资源泄漏。可以在 <code>onCompletion</code>、<code>onError</code>、<code>onTimeout</code> 回调里维护并发计数。</li>
+<li>在 Prometheus 或其他 APM 中暴露指标：<code>sse_open_connections</code>、<code>sse_messages_sent_total</code> 等。</li>
+</ul>
+</li>
+</ol>
+<h3 id="对比-REST-接口"><a href="#对比-REST-接口" class="headerlink" title="对比 REST 接口"></a>对比 REST 接口</h3><table>
+<thead>
+<tr>
+<th>配置项/特性</th>
+<th>普通 REST 接口</th>
+<th>SSE 接口</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>连接模型</td>
+<td>短连接，完成即关闭</td>
+<td>长连接，响应持续不断地输出</td>
+</tr>
+<tr>
+<td>响应超时</td>
+<td>20–60s 常见</td>
+<td>通常设置为 0（永不超时）或数分钟以上</td>
+</tr>
+<tr>
+<td>线程/资源占用</td>
+<td>请求处理完即释放</td>
+<td>连接存续期间持续占用线程/NIO 事件槽</td>
+</tr>
+<tr>
+<td>代理/缓存</td>
+<td>可开启缓冲、缓存</td>
+<td>必须关闭缓冲（<code>proxy_buffering off</code>），实时下发</td>
+</tr>
+<tr>
+<td>心跳与断线重连</td>
+<td>—</td>
+<td>需显式心跳注释行；客户端自动重连与 <code>Last-Event-ID</code> 续流</td>
+</tr>
+</tbody></table>
+<h2 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h2><h3 id="分布式消息推送"><a href="#分布式消息推送" class="headerlink" title="分布式消息推送"></a>分布式消息推送</h3><h4 id="链路"><a href="#链路" class="headerlink" title="链路"></a>链路</h4><p>使用 <strong>SseEmitter</strong> 建立浏览器长连接，结合 <strong>JWT 鉴权</strong> + <strong>Redis Pub/Sub</strong> 完成跨实例广播。整体链路同样可拆为三段：</p>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>关键动作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>握手</strong></td>
+<td>浏览器 <code>GET /sse/connect?token=xxx</code> <br />→ <code>JwtAuthInterceptor</code> 校验 <br />→ Controller 返回 <code>SseEmitter</code></td>
+</tr>
+<tr>
+<td><strong>本机路由</strong></td>
+<td><code>SseSessionManager</code> 维护 uid ↔ SseEmitter 映射；<br /><code>NotificationService</code> 负责发送</td>
+</tr>
+<tr>
+<td><strong>跨实例广播</strong></td>
+<td>业务代码/任务调度 <br />→ <code>RedisPublisher</code> 发布 <code>SseEvent</code> <br />→ <code>RedisSubscriber</code> 订阅并分派给本机用户</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>❗ 与 WebSocket 不同：浏览器 <strong>只收不发</strong>，业务侧想推消息时自行调用 <code>NotificationService</code>（或 REST API、MQ 监听任务）。</p>
+</blockquote>
+<h4 id="核心类及职责"><a href="#核心类及职责" class="headerlink" title="核心类及职责"></a>核心类及职责</h4><table>
+<thead>
+<tr>
+<th>类</th>
+<th>作用</th>
+<th>关键点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>JwtUtil</code></td>
+<td>解析 / 校验 JWT</td>
+<td><code>parseToken()</code> → 返回 userId</td>
+</tr>
+<tr>
+<td><code>JwtAuthInterceptor</code></td>
+<td><code>HandlerInterceptor</code></td>
+<td>从 <code>token</code> 取 uid，放入 <code>request.setAttribute(&quot;uid&quot;, …)</code></td>
+</tr>
+<tr>
+<td><code>SseController</code></td>
+<td>建立 SSE 连接</td>
+<td><code>connect()</code> 创建 <code>SseEmitter</code> 并注册到 <code>SseSessionManager</code></td>
+</tr>
+<tr>
+<td><code>SseEvent</code></td>
+<td>统一消息模型</td>
+<td><code>uid</code>、<code>event</code>、<code>data</code>、<code>broadcast</code> 四字段</td>
+</tr>
+<tr>
+<td><code>SseSessionManager</code></td>
+<td>本机 Emitter 池</td>
+<td><code>register / remove / sendTo / broadcast</code></td>
+</tr>
+<tr>
+<td><code>NotificationService</code></td>
+<td>业务入口</td>
+<td>调用 <code>RedisPublisher</code> 或直接 <code>sessionManager.xxx()</code></td>
+</tr>
+<tr>
+<td><code>RedisPublisher</code></td>
+<td>发布事件到 Redis Channel</td>
+<td><code>convertAndSend(&quot;sse-event&quot;, json)</code></td>
+</tr>
+<tr>
+<td><code>RedisSubscriber</code></td>
+<td>订阅 <code>sse-event</code> Channel</td>
+<td>解析 <code>SseEvent</code> → 定向 / 广播 给本机 <code>SseEmitter</code></td>
+</tr>
+<tr>
+<td><code>Sseutil</code></td>
+<td>定向推送或广播事件</td>
+<td>通过 SsePublisher 向 Redis 频道发布事件，多实例订阅 Redis 频道，判断是否需要向本机管理的 <code>SseEmitter</code> 发送事件，实现跨实例</td>
+</tr>
+</tbody></table>
+<h4 id="时序说明"><a href="#时序说明" class="headerlink" title="时序说明"></a>时序说明</h4><pre><code class=" mermaid">sequenceDiagram
+    participant B as Browser
+    participant G as Nginx / LB
+    participant A as Pod-A
+    participant R as Redis
+    participant B2 as Pod-B
+    participant S as 业务Service
+
+%% 握手阶段
+    B-&gt;&gt;G: GET /sse/connect?token=JWT
+    G-&gt;&gt;A: HTTP (粘性或随机)
+    A-&gt;&gt;A: JwtAuthInterceptor：解析 token → uid
+    A--&gt;&gt;B: 200 + text/event-stream(SseEmitter 建立)
+
+%% 服务端推送
+    S-&gt;&gt;A: NotificationService.push(uid,msg)
+    A-&gt;&gt;R: Redis PUBLISH sse-event
+    R--&gt;&gt;A: SUBSCRIBE
+    R--&gt;&gt;B2: SUBSCRIBE
+    A-&gt;&gt;A: SseSessionManager.sendTo(uid)
+    B2-&gt;&gt;B2: SseSessionManager.sendTo(uid)
+
+%% 广播
+    Note over S: broadcast=true\nSubscriber 调用\nbroadcast()
+</code></pre>
+
+<ol>
+<li><strong>握手</strong>：拦截器校验 JWT，将 <code>uid</code> 写入属性；Controller 生成 <code>SseEmitter</code> 并登记。</li>
+<li><strong>本机会话注册</strong>：<code>SseSessionManager.register(uid, emitter)</code>；在 <code>onCompletion/onTimeout/onError</code> 中注销。</li>
+<li><strong>消息入口</strong>：业务代码或定时任务调用 <code>NotificationService</code>；所有事件先写 Redis，保证分布式一致性。</li>
+<li><strong>跨实例分发</strong>：各实例的 <code>RedisSubscriber</code> 订阅 <code>sse-event</code>；按 <code>broadcast</code> 标记选择 <code>sendTo</code> 或 <code>broadcast</code>。</li>
+<li><strong>客户端渲染</strong>：前端用 <code>EventSource</code> 监听不同 <code>eventName</code> 做弹窗 / 列表追加等 UI 处理。</li>
+</ol>
+<h4 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h4><ol>
+<li><p>JWT 工具类，用于解析 JWT 令牌</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Component</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">JwtUtil</span> </span>&#123;<br><br>    <span class="hljs-meta">@Value(&quot;$&#123;jwt.secret&#125;&quot;)</span><br>    <span class="hljs-keyword">private</span> String secret;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">parseToken</span><span class="hljs-params">(String token)</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> Jwts.parser()<br>                .setSigningKey(secret.getBytes(StandardCharsets.UTF_8))<br>                .parseClaimsJws(token.replace(<span class="hljs-string">&quot;Bearer &quot;</span>, <span class="hljs-string">&quot;&quot;</span>))<br>                .getBody()<br>                .getSubject();<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>JWT 认证拦截器，用于验证请求中的 JWT 令牌</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Component</span><br><span class="hljs-meta">@RequiredArgsConstructor</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">JwtAuthInterceptor</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">HandlerInterceptor</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> JwtUtil jwtUtil;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">preHandle</span><span class="hljs-params">(HttpServletRequest request, HttpServletResponse response, Object handler)</span> </span>&#123;<br>        String token = request.getParameter(<span class="hljs-string">&quot;token&quot;</span>);<br>        <span class="hljs-keyword">try</span> &#123;<br>            req.setAttribute(<span class="hljs-string">&quot;uid&quot;</span>, jwt.parseToken(token));<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;<br>        &#125; <span class="hljs-keyword">catch</span> (JwtException e) &#123;<br>            response.setStatus(<span class="hljs-number">401</span>);<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>Web 配置，注册拦截器以及设置跨域</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Configuration</span><br><span class="hljs-meta">@RequiredArgsConstructor</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">WebConfig</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">WebMvcConfigurer</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> JwtAuthInterceptor jwtAuthInterceptor;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">addInterceptors</span><span class="hljs-params">(InterceptorRegistry registry)</span> </span>&#123;<br>        registry.addInterceptor(jwtAuthInterceptor)<br>                .addPathPatterns(<span class="hljs-string">&quot;/sse/**&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">addCorsMappings</span><span class="hljs-params">(CorsRegistry registry)</span> </span>&#123;<br>        registry.addMapping(<span class="hljs-string">&quot;/sse/**&quot;</span>)<br>                .allowedOrigins(<span class="hljs-string">&quot;*&quot;</span>)<br>                .allowedMethods(<span class="hljs-string">&quot;GET&quot;</span>);<br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>SSE 事件数据传输对象</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Data</span><br><span class="hljs-meta">@AllArgsConstructor</span><br><span class="hljs-meta">@NoArgsConstructor</span><br><span class="hljs-meta">@Accessors(chain = true)</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SseEvent</span> </span>&#123;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 目标用户，可空</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> String uid;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 事件名，如 HEARTBEAT、NOTICE</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> String event;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 数据：任意 JSON</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> Object data;     <br>    <br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 是否广播，默认为 false</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">boolean</span> broadcast;<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>会话管理器，用于管理和发送 SSE 事件</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Slf4j</span><br><span class="hljs-meta">@Component</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SseSessionManager</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">static</span> Map&lt;String, Set&lt;SseEmitter&gt;&gt; ALL_EMITTERS = <span class="hljs-keyword">new</span> ConcurrentHashMap&lt;&gt;();<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 注册一个新的 SSE emitter</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> uid 用户唯一标识符，用于区分不同用户的连接</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span> 返回一个新的 SseEmitter 实例</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> SseEmitter <span class="hljs-title">register</span><span class="hljs-params">(String uid)</span> </span>&#123;<br>        SseEmitter emitter = <span class="hljs-keyword">new</span> SseEmitter(<span class="hljs-number">0L</span>);   <span class="hljs-comment">// 永不超时</span><br>        ALL_EMITTERS.computeIfAbsent(uid, k -&gt; ConcurrentHashMap.newKeySet()).add(emitter);<br>        log.info(<span class="hljs-string">&quot;SSE emitter registered for UID: &#123;&#125;&quot;</span>, uid);<br>        Runnable clear = () -&gt; ALL_EMITTERS.computeIfPresent(uid, (k, emitters) -&gt; &#123;<br>            emitters.remove(emitter);<br>            log.info(<span class="hljs-string">&quot;SSE emitter removed for UID: &#123;&#125;&quot;</span>, uid);<br>            <span class="hljs-keyword">return</span> emitters.isEmpty() ? <span class="hljs-keyword">null</span> : emitters;<br>        &#125;);<br>        emitter.onCompletion(clear);<br>        emitter.onTimeout(clear);<br>        emitter.onError(t -&gt; clear.run());<br>        <span class="hljs-comment">// 关键：立刻发送首帧，强制 flush header</span><br>        <span class="hljs-keyword">try</span> &#123;<br>            emitter.send(SseEmitter.event()<br>                    .name(<span class="hljs-string">&quot;INIT&quot;</span>)<br>                    .data(<span class="hljs-string">&quot;CONNECTED&quot;</span>)<br>                    .reconnectTime(<span class="hljs-number">3000</span>));                <span class="hljs-comment">// 可选：告诉客户端重连间隔</span><br>        &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>            emitter.completeWithError(e);<br>        &#125;<br>        <span class="hljs-keyword">return</span> emitter;<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 定时任务，每30秒发送心跳事件到所有连接</span><br><span class="hljs-comment">     * 根据发送结果，自动清理失效的 emitter</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Scheduled(fixedRate = 30000)</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">heartbeat</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-comment">// 定时向所有的连接发送心跳事件</span><br>        ALL_EMITTERS.forEach((uid, emitters) -&gt; &#123;<br>            SseEvent heartbeatEvent = <span class="hljs-keyword">new</span> SseEvent(uid, <span class="hljs-string">&quot;HEARTBEAT&quot;</span>, <span class="hljs-string">&quot;PING&quot;</span>, <span class="hljs-keyword">false</span>);<br>            emitters.forEach(e -&gt; &#123;<br>                <span class="hljs-keyword">try</span> &#123;<br>                    e.send(SseEmitter.event().name(heartbeatEvent.getEvent()).data(heartbeatEvent.getData()));<br>                &#125; <span class="hljs-keyword">catch</span> (Exception ex) &#123;<br>                    log.error(<span class="hljs-string">&quot;Error sending heartbeat to UID: &#123;&#125;&quot;</span>, uid, ex);<br>                    e.completeWithError(ex);<br>                    emitters.remove(e);<br>                &#125;<br>            &#125;);<br>        &#125;);<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 发送指定事件到特定用户的所有连接</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> uid 用户唯一标识符</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> sseEvent 要发送的 SSE 事件</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">sendTo</span><span class="hljs-params">(String uid, SseEvent sseEvent)</span> </span>&#123;<br>        Set&lt;SseEmitter&gt; sendEmitters = ALL_EMITTERS.get(uid);<br>        <span class="hljs-keyword">if</span> (sendEmitters != <span class="hljs-keyword">null</span>) &#123;<br>            sendEmitters.forEach(e -&gt; send(sseEvent, e));<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 广播事件到所有连接</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> sseEvent 要广播的 SSE 事件</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">broadcast</span><span class="hljs-params">(SseEvent sseEvent)</span> </span>&#123;<br>        ALL_EMITTERS.values().forEach(emitters -&gt; &#123;<br>            <span class="hljs-keyword">if</span> (emitters != <span class="hljs-keyword">null</span>) &#123;<br>                emitters.forEach(e -&gt; send(sseEvent, e));<br>            &#125;<br>        &#125;);<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 发送事件到指定的 SSE emitter</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> sseEvent 要发送的 SSE 事件</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">send</span><span class="hljs-params">(SseEvent sseEvent, SseEmitter sseEmitter)</span> </span>&#123;<br>        <span class="hljs-keyword">if</span> (sseEmitter == <span class="hljs-keyword">null</span>) &#123;<br>            <span class="hljs-keyword">return</span>;<br>        &#125;<br>        <span class="hljs-keyword">try</span> &#123;<br>            sseEmitter.send(SseEmitter.event().name(sseEvent.getEvent()).data(sseEvent.getData()));<br>        &#125; <span class="hljs-keyword">catch</span> (Exception ex) &#123;<br>            sseEmitter.completeWithError(ex);<br>            <span class="hljs-comment">// 如果发送失败，移除该 emitter</span><br>            Set&lt;SseEmitter&gt; removeEmitters = ALL_EMITTERS.get(sseEvent.getUid());<br>            <span class="hljs-keyword">if</span> (removeEmitters != <span class="hljs-keyword">null</span>) &#123;<br>                removeEmitters.remove(sseEmitter);<br>                <span class="hljs-keyword">if</span> (removeEmitters.isEmpty()) &#123;<br>                    ALL_EMITTERS.remove(sseEvent.getUid());<br>                &#125;<br>            &#125;<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>Redis 发布者，用于发布事件到 SSE 频道</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Component</span><br><span class="hljs-meta">@RequiredArgsConstructor</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SsePublisher</span> </span>&#123;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> String CHANNEL = <span class="hljs-string">&quot;sse-event&quot;</span>;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> StringRedisTemplate stringRedisTemplate;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> ObjectMapper objectMapper = <span class="hljs-keyword">new</span> ObjectMapper();<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">publish</span><span class="hljs-params">(SseEvent sseEvent)</span> </span>&#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            stringRedisTemplate.convertAndSend(CHANNEL, objectMapper.writeValueAsString(sseEvent));<br>        &#125; <span class="hljs-keyword">catch</span> (JsonProcessingException ignored) &#123;<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>Redis 订阅者，用于从 SSE 频道接收事件</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Component</span><br><span class="hljs-meta">@RequiredArgsConstructor</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SseSubscriber</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">MessageListener</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> SseSessionManager sseSessionManager;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> ObjectMapper objectMapper = <span class="hljs-keyword">new</span> ObjectMapper();<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> StringRedisTemplate stringRedisTemplate;<br><br>    <span class="hljs-meta">@PostConstruct</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">init</span><span class="hljs-params">()</span> </span>&#123;<br>        Objects.requireNonNull(stringRedisTemplate.getConnectionFactory()).getConnection()<br>                .subscribe(<span class="hljs-keyword">this</span>, SsePublisher.CHANNEL.getBytes());<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">onMessage</span><span class="hljs-params">(Message rawMessage, <span class="hljs-keyword">byte</span>[] pattern)</span> </span>&#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            SseEvent sseEvent = objectMapper.readValue(rawMessage.getBody(), SseEvent.class);<br>            <span class="hljs-keyword">if</span> (sseEvent.isBroadcast()) &#123;<br>                sseSessionManager.broadcast(sseEvent);<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                sseSessionManager.sendTo(sseEvent.getUid(), sseEvent);<br>            &#125;<br>        &#125; <span class="hljs-keyword">catch</span> (IOException ignored) &#123;<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>SSE 连接接口</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@RestController</span><br><span class="hljs-meta">@RequestMapping(&quot;/sse&quot;)</span><br><span class="hljs-meta">@RequiredArgsConstructor</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SseController</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> SseSessionManager sessionManager;<br><br>    <span class="hljs-meta">@GetMapping(path = &quot;/connect&quot;, produces = MediaType.TEXT_EVENT_STREAM_VALUE)</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> SseEmitter <span class="hljs-title">connect</span><span class="hljs-params">(HttpServletRequest req)</span> </span>&#123;<br>        String uid = (String) req.getAttribute(<span class="hljs-string">&quot;uid&quot;</span>);<br>        <span class="hljs-keyword">return</span> sessionManager.register(uid);<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>SSE 工具类，用于推送事件到特定用户或全站广播（通过 Redis 实现跨实例的关键）</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Component</span><br><span class="hljs-meta">@RequiredArgsConstructor</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SseUtil</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> SsePublisher pub;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 定向推送</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">pushToUser</span><span class="hljs-params">(String uid, String msg, String event)</span> </span>&#123;<br>        pub.publish(<span class="hljs-keyword">new</span> SseEvent(uid, event, msg, <span class="hljs-keyword">false</span>));<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 全站广播</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">broadcast</span><span class="hljs-params">(String msg, String event)</span> </span>&#123;<br>        pub.publish(<span class="hljs-keyword">new</span> SseEvent(<span class="hljs-keyword">null</span>, event, msg, <span class="hljs-keyword">true</span>));<br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>测试接口</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Resource</span><br><span class="hljs-keyword">private</span> SseUtil sseUtil;<br><br><span class="hljs-meta">@GetMapping(&quot;/send/&#123;uid&#125;/&#123;message&#125;&quot;)</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">sendMessage</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable(&quot;uid&quot;)</span> String uid,</span></span><br><span class="hljs-params"><span class="hljs-function">                          <span class="hljs-meta">@PathVariable(&quot;message&quot;)</span> String message)</span> </span>&#123;<br>    sseUtil.pushToUser(uid, message, <span class="hljs-string">&quot;NOTICE&quot;</span>);<br>&#125;<br><br><span class="hljs-meta">@GetMapping(&quot;/broadcast/&#123;message&#125;&quot;)</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">broadcastMessage</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable(&quot;message&quot;)</span> String message)</span> </span>&#123;<br>    sseUtil.broadcast(message, <span class="hljs-string">&quot;NOTICE&quot;</span>);<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>测试 HTML 文件</p>
+<figure class="highlight html"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-meta-keyword">html</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">html</span> <span class="hljs-attr">lang</span>=<span class="hljs-string">&quot;zh-CN&quot;</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">&quot;UTF-8&quot;</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>SSE 测试页面<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">style</span>&gt;</span><span class="css"></span><br><span class="css">    <span class="hljs-selector-tag">body</span> &#123; <span class="hljs-attribute">font-family</span>: sans-serif; <span class="hljs-attribute">padding</span>: <span class="hljs-number">20px</span>; &#125;</span><br><span class="css">    <span class="hljs-selector-id">#log</span> &#123; <span class="hljs-attribute">margin-top</span>: <span class="hljs-number">20px</span>; <span class="hljs-attribute">white-space</span>: pre-wrap; <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-number">#ccc</span>; <span class="hljs-attribute">padding</span>: <span class="hljs-number">10px</span>; <span class="hljs-attribute">height</span>: <span class="hljs-number">200px</span>; <span class="hljs-attribute">overflow-y</span>: auto; &#125;</span><br><span class="css">    <span class="hljs-selector-tag">input</span>, <span class="hljs-selector-tag">button</span> &#123; <span class="hljs-attribute">font-size</span>: <span class="hljs-number">1rem</span>; <span class="hljs-attribute">padding</span>: <span class="hljs-number">5px</span>; <span class="hljs-attribute">margin-right</span>: <span class="hljs-number">5px</span>; &#125;</span><br><span class="css">  </span><span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>SSE 连接测试<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">label</span>&gt;</span><br>    Token:<br>    <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text&quot;</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;tokenInput&quot;</span> <span class="hljs-attr">placeholder</span>=<span class="hljs-string">&quot;输入 token&quot;</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">label</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;connectBtn&quot;</span>&gt;</span>连接 SSE<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;closeBtn&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>断开连接<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;log&quot;</span>&gt;</span>[日志输出区]<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span><br><br>  <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript"></span><br><span class="javascript">    <span class="hljs-keyword">const</span> btnConnect = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&#x27;connectBtn&#x27;</span>);</span><br><span class="javascript">    <span class="hljs-keyword">const</span> btnClose   = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&#x27;closeBtn&#x27;</span>);</span><br><span class="javascript">    <span class="hljs-keyword">const</span> tokenInput = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&#x27;tokenInput&#x27;</span>);</span><br><span class="javascript">    <span class="hljs-keyword">const</span> logEl      = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&#x27;log&#x27;</span>);</span><br><span class="javascript">    <span class="hljs-keyword">let</span> es;</span><br><span class="javascript"></span><br><span class="javascript">    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">log</span>(<span class="hljs-params">msg</span>) </span>&#123;</span><br><span class="javascript">      <span class="hljs-keyword">const</span> time = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>().toLocaleTimeString();</span><br><span class="javascript">      logEl.textContent += <span class="hljs-string">`\n[<span class="hljs-subst">$&#123;time&#125;</span>] <span class="hljs-subst">$&#123;msg&#125;</span>`</span>;</span><br><span class="javascript">      logEl.scrollTop = logEl.scrollHeight;</span><br><span class="javascript">    &#125;</span><br><span class="javascript"></span><br><span class="javascript">    btnConnect.addEventListener(<span class="hljs-string">&#x27;click&#x27;</span>, <span class="hljs-function">() =&gt;</span> &#123;</span><br><span class="javascript">      <span class="hljs-keyword">const</span> token = tokenInput.value.trim();</span><br><span class="javascript">      <span class="hljs-keyword">if</span> (!token) &#123;</span><br><span class="javascript">        alert(<span class="hljs-string">&#x27;请先输入 token&#x27;</span>);</span><br><span class="javascript">        <span class="hljs-keyword">return</span>;</span><br><span class="javascript">      &#125;</span><br><span class="javascript">      <span class="hljs-comment">// 如果已有连接，先关闭旧连接</span></span><br><span class="javascript">      <span class="hljs-keyword">if</span> (es) &#123;</span><br><span class="javascript">        es.close();</span><br><span class="javascript">        log(<span class="hljs-string">&#x27;已关闭旧连接&#x27;</span>);</span><br><span class="javascript">      &#125;</span><br><span class="javascript">      <span class="hljs-keyword">const</span> url = <span class="hljs-string">`http://localhost:8000/sse/connect?token=<span class="hljs-subst">$&#123;<span class="hljs-built_in">encodeURIComponent</span>(token)&#125;</span>`</span>;</span><br><span class="javascript">      log(<span class="hljs-string">`尝试连接：<span class="hljs-subst">$&#123;url&#125;</span>`</span>);</span><br><span class="javascript">      es = <span class="hljs-keyword">new</span> EventSource(url);</span><br><span class="javascript"></span><br><span class="javascript">      es.onopen = <span class="hljs-function">() =&gt;</span> &#123;</span><br><span class="javascript">        log(<span class="hljs-string">&#x27;SSE 通道已打开，等待服务器推送...&#x27;</span>);</span><br><span class="javascript">        btnClose.disabled = <span class="hljs-literal">false</span>;</span><br><span class="javascript">      &#125;;</span><br><span class="javascript">      es.onerror = <span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> &#123;</span><br><span class="javascript">        log(<span class="hljs-string">&#x27;连接出错或已关闭&#x27;</span>);</span><br><span class="javascript">        <span class="hljs-built_in">console</span>.error(err);</span><br><span class="javascript">        btnClose.disabled = <span class="hljs-literal">true</span>;</span><br><span class="javascript">      &#125;;</span><br><span class="javascript">      es.onmessage = <span class="hljs-function">(<span class="hljs-params">evt</span>) =&gt;</span> &#123;</span><br><span class="javascript">        log(<span class="hljs-string">`收到消息：<span class="hljs-subst">$&#123;evt.data&#125;</span>`</span>);</span><br><span class="javascript">      &#125;;</span><br><span class="javascript">      es.addEventListener(<span class="hljs-string">&#x27;NOTICE&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">evt</span>) =&gt;</span> &#123;</span><br><span class="javascript">        log(<span class="hljs-string">`自定义事件 NOTICE：<span class="hljs-subst">$&#123;evt.data&#125;</span>`</span>);</span><br><span class="javascript">      &#125;);</span><br><span class="javascript">    &#125;);</span><br><span class="javascript"></span><br><span class="javascript">    btnClose.addEventListener(<span class="hljs-string">&#x27;click&#x27;</span>, <span class="hljs-function">() =&gt;</span> &#123;</span><br><span class="javascript">      <span class="hljs-keyword">if</span> (es) &#123;</span><br><span class="javascript">        es.close();</span><br><span class="javascript">        log(<span class="hljs-string">&#x27;已主动关闭 SSE 连接&#x27;</span>);</span><br><span class="javascript">        btnClose.disabled = <span class="hljs-literal">true</span>;</span><br><span class="javascript">      &#125;</span><br><span class="javascript">    &#125;);</span><br><span class="javascript">  </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span><br></code></pre></div></td></tr></table></figure></li>
+</ol>
+<h3 id="流式响应"><a href="#流式响应" class="headerlink" title="流式响应"></a>流式响应</h3><h4 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h4><ul>
+<li><strong>AI 问答/文案生成</strong>：用户提交一个问题或提示（prompt），后端调用大模型逐 token 生成答案，浏览器边渲染边展示。</li>
+<li><strong>Markdown 实时渲染</strong>：用户在编辑器输入内容，服务端将解析后的 HTML 分段推送到客户端，实时预览效果。</li>
+<li><strong>代码编译/日志输出</strong>：提交编译任务后，后端实时推送编译日志或进度，让前端滚动展示。</li>
+<li><strong>数据处理进度</strong>：异步跑批任务时，通过 SSE 分段推送处理进度或结果，实时反馈给用户。</li>
+</ul>
+<p>这些场景都需要在同一次 HTTP 请求中，边处理边推送，无需等待整个结果完成后才返回。</p>
+<h4 id="代码示例-1"><a href="#代码示例-1" class="headerlink" title="代码示例"></a>代码示例</h4><ol>
+<li><p>后端接口</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@RestController</span><br><span class="hljs-meta">@RequestMapping(&quot;/sse/ai&quot;)</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AiStreamController</span> </span>&#123;<br><br>    <span class="hljs-comment">// 可复用线程池</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> ExecutorService executor = Executors.newSingleThreadExecutor();<br><br>    <span class="hljs-meta">@GetMapping(&quot;/stream&quot;)</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> SseEmitter <span class="hljs-title">streamAiResponse</span><span class="hljs-params">(<span class="hljs-meta">@RequestParam(required = false)</span> String prompt)</span> </span>&#123;<br>        <span class="hljs-comment">// 永不超时，直到 complete()/completeWithError()</span><br>        SseEmitter emitter = <span class="hljs-keyword">new</span> SseEmitter(<span class="hljs-number">0L</span>);<br><br>        executor.execute(() -&gt; &#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                <span class="hljs-comment">// 模拟 AI 按 token 生成输出</span><br>                String[] tokens = &#123;<br>                    <span class="hljs-string">&quot;这&quot;</span>, <span class="hljs-string">&quot;是&quot;</span>, <span class="hljs-string">&quot;一&quot;</span>, <span class="hljs-string">&quot;段&quot;</span>, <span class="hljs-string">&quot;模&quot;</span>, <span class="hljs-string">&quot;拟&quot;</span>, <span class="hljs-string">&quot;流&quot;</span>, <span class="hljs-string">&quot;式&quot;</span>, <span class="hljs-string">&quot;响&quot;</span>, <span class="hljs-string">&quot;应&quot;</span>, <span class="hljs-string">&quot;。&quot;</span><br>                &#125;;<br>                <span class="hljs-keyword">for</span> (String token : tokens) &#123;<br>                    <span class="hljs-comment">// 每个 token 单独发一次</span><br>                    emitter.send(SseEmitter.event()<br>                        .name(<span class="hljs-string">&quot;TOKEN&quot;</span>)<br>                        .data(token)<br>                    );<br>                    Thread.sleep(<span class="hljs-number">150</span>); <span class="hljs-comment">// 模拟生成延迟</span><br>                &#125;<br>                <span class="hljs-comment">// 通知前端结束</span><br>                emitter.send(SseEmitter.event()<br>                    .name(<span class="hljs-string">&quot;END&quot;</span>)<br>                    .data(<span class="hljs-string">&quot;[DONE]&quot;</span>)<br>                );<br>                emitter.complete();<br>            &#125; <span class="hljs-keyword">catch</span> (Exception ex) &#123;<br>                emitter.completeWithError(ex);<br>            &#125;<br>        &#125;);<br><br>        <span class="hljs-keyword">return</span> emitter;<br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>测试 HTML 文件</p>
+<figure class="highlight html"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-meta-keyword">html</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">html</span> <span class="hljs-attr">lang</span>=<span class="hljs-string">&quot;zh-CN&quot;</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">&quot;UTF-8&quot;</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>AI 流式响应示例<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">style</span>&gt;</span><span class="css"></span><br><span class="css">    <span class="hljs-selector-tag">body</span> &#123; <span class="hljs-attribute">font-family</span>: sans-serif; <span class="hljs-attribute">padding</span>: <span class="hljs-number">20px</span>; &#125;</span><br><span class="css">    <span class="hljs-selector-id">#output</span> &#123; <span class="hljs-attribute">white-space</span>: pre-wrap; <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-number">#ccc</span>; <span class="hljs-attribute">padding</span>: <span class="hljs-number">10px</span>; <span class="hljs-attribute">height</span>: <span class="hljs-number">200px</span>; <span class="hljs-attribute">overflow-y</span>: auto; &#125;</span><br><span class="css">    <span class="hljs-selector-id">#startBtn</span> &#123; <span class="hljs-attribute">padding</span>: <span class="hljs-number">10px</span> <span class="hljs-number">20px</span>; <span class="hljs-attribute">font-size</span>: <span class="hljs-number">16px</span>; &#125;</span><br><span class="css">  </span><span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span><br><br>  <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;startBtn&quot;</span>&gt;</span>开始 AI 流式响应<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;output&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span><br><br>  <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript"></span><br><span class="javascript">    <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&#x27;startBtn&#x27;</span>).addEventListener(<span class="hljs-string">&#x27;click&#x27;</span>, <span class="hljs-function">() =&gt;</span> &#123;</span><br><span class="javascript">      <span class="hljs-comment">// 清空上次输出</span></span><br><span class="javascript">      <span class="hljs-keyword">const</span> out = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&#x27;output&#x27;</span>);</span><br><span class="javascript">      out.textContent = <span class="hljs-string">&#x27;&#x27;</span>;</span><br><span class="javascript"></span><br><span class="javascript">      <span class="hljs-comment">// 建立 SSE 连接</span></span><br><span class="javascript">      <span class="hljs-keyword">const</span> es = <span class="hljs-keyword">new</span> EventSource(<span class="hljs-string">&#x27;http://localhost:8000/sse/ai/stream&#x27;</span>);</span><br><span class="javascript"></span><br><span class="javascript">      <span class="hljs-comment">// 接收每个 TOKEN 事件</span></span><br><span class="javascript">      es.addEventListener(<span class="hljs-string">&#x27;TOKEN&#x27;</span>, <span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> &#123;</span><br><span class="javascript">        out.textContent += e.data;</span><br><span class="javascript">        out.scrollTop = out.scrollHeight;</span><br><span class="javascript">      &#125;);</span><br><span class="javascript"></span><br><span class="javascript">      <span class="hljs-comment">// 接收结束事件</span></span><br><span class="javascript">      es.addEventListener(<span class="hljs-string">&#x27;END&#x27;</span>, <span class="hljs-function">() =&gt;</span> &#123;</span><br><span class="javascript">        out.textContent += <span class="hljs-string">&#x27;\n[流式响应结束]&#x27;</span>;</span><br><span class="javascript">        es.close();</span><br><span class="javascript">      &#125;);</span><br><span class="javascript"></span><br><span class="javascript">      <span class="hljs-comment">// 错误处理</span></span><br><span class="javascript">      es.onerror = <span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> &#123;</span><br><span class="javascript">        out.textContent += <span class="hljs-string">&#x27;\n[连接出错或已断开]&#x27;</span>;</span><br><span class="javascript">        es.close();</span><br><span class="javascript">      &#125;;</span><br><span class="javascript">    &#125;);</span><br><span class="javascript">  </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><br><br><span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span><br></code></pre></div></td></tr></table></figure></li>
+</ol>
+<h2 id="WebFlux-中的-SSE"><a href="#WebFlux-中的-SSE" class="headerlink" title="WebFlux 中的 SSE"></a>WebFlux 中的 SSE</h2><h3 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h3><ul>
+<li><p><strong>非阻塞响应式</strong></p>
+<p>Spring WebFlux 底层基于 Reactor 和 Netty（或 Undertow），采用事件循环（Event Loop）模型，能够用极少的线程处理大量并发连接。SSE 在 WebFlux 中就是把 <strong>Flux&lt;T&gt;</strong> 当作一个“无限流”，按需把每个元素序列化成 <code>text/event-stream</code> 的 chunk 发送给客户端。</p>
+</li>
+<li><p><strong>Media Type</strong></p>
+<p>使用 <code>MediaType.TEXT_EVENT_STREAM_VALUE</code>（即 <code>text/event-stream</code>）告诉框架和客户端这是一个 Server-Sent Events 流。HTTP1.1 下会自动启用 <strong>chunked transfer</strong>，不需要手动 flush；流结束时 Flux 完成，HTTP 响应关闭。</p>
+</li>
+<li><p><strong>Backpressure 与取消</strong></p>
+<p>客户端断开（如调用 <code> EventSource.close()</code> 或网络断开）时，Flux 会收到取消信号（cancel），可在 <code>.doOnCancel()</code> 中做资源清理。Reactor 自动处理下游背压，保证上游不会无限制生产。</p>
+</li>
+</ul>
+<h3 id="使用-Flux-创建-SSE"><a href="#使用-Flux-创建-SSE" class="headerlink" title="使用 Flux 创建 SSE"></a>使用 Flux 创建 SSE</h3><ul>
+<li><p><strong>注解方式</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@RestController</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ReactiveSseController</span> </span>&#123;<br>    <br>    <span class="hljs-meta">@GetMapping(value = &quot;/sse/reactive&quot;, produces = MediaType.TEXT_EVENT_STREAM_VALUE)</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> Flux&lt;String&gt; <span class="hljs-title">streamPlainText</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-comment">// 每秒一个字符串</span><br>        <span class="hljs-keyword">return</span> Flux.interval(Duration.ofSeconds(<span class="hljs-number">1</span>))<br>                .map(seq -&gt; <span class="hljs-string">&quot;tick: &quot;</span> + seq);<br>    &#125;<br>    <br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>以上代码会把每个 <code>String</code> 自动包成：</p>
+<figure class="highlight haskell"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs haskell"><span class="hljs-class"><span class="hljs-keyword">data</span>: tick: 0</span><br><span class="hljs-class"><span class="hljs-keyword">data</span>: tick: 1</span><br>…<br></code></pre></div></td></tr></table></figure></li>
+<li><p><strong>ServerSentEvent 构造</strong>：若要自定义事件名、ID 或重连时间，可返回 <code>Flux&lt;ServerSentEvent&lt;T&gt;&gt;</code>：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@GetMapping(value = &quot;/sse/events&quot;, produces = MediaType.TEXT_EVENT_STREAM_VALUE)</span><br><span class="hljs-keyword">public</span> Flux&lt;ServerSentEvent&lt;String&gt;&gt; streamEvents() &#123;<br>    <span class="hljs-keyword">return</span> Flux.interval(Duration.ofSeconds(<span class="hljs-number">1</span>))<br>            .map(seq -&gt; ServerSentEvent.&lt;String&gt;builder()<br>                    .id(String.valueOf(seq))<br>                    .event(<span class="hljs-string">&quot;heartbeat&quot;</span>)<br>                    .data(<span class="hljs-string">&quot;心跳 &quot;</span> + seq)<br>                    .retry(Duration.ofSeconds(<span class="hljs-number">5</span>))<br>                    .build()<br>            );<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+</ul>
+<h3 id="扩展示例：集成业务流"><a href="#扩展示例：集成业务流" class="headerlink" title="扩展示例：集成业务流"></a>扩展示例：集成业务流</h3><p>假设有一个业务服务不断推送消息给特定用户，使用 Reactive Kafka/Redis 也很简单：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Service</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">NotificationService</span> </span>&#123;<br>    <span class="hljs-comment">// 假设这是一个不断从消息队列来的 Flux&lt;SseEvent&gt;</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> Flux&lt;SseEvent&gt; <span class="hljs-title">notificationFlux</span><span class="hljs-params">(String userId)</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> kafkaReceiver.receive()<br>            .filter(msg -&gt; msg.getUserId().equals(userId))<br>            .map(msg -&gt; <span class="hljs-keyword">new</span> SseEvent(msg.getUserId(), <span class="hljs-string">&quot;notify&quot;</span>, msg.getContent()));<br>    &#125;<br>&#125;<br><br><span class="hljs-meta">@RestController</span><br><span class="hljs-meta">@RequiredArgsConstructor</span><br><span class="hljs-meta">@RequestMapping(&quot;/sse&quot;)</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ReactiveSseController</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> NotificationService notificationService;<br><br>    <span class="hljs-meta">@GetMapping(value = &quot;/notify/&#123;userId&#125;&quot;, produces = MediaType.TEXT_EVENT_STREAM_VALUE)</span><br>    <span class="hljs-keyword">public</span> Flux&lt;ServerSentEvent&lt;String&gt;&gt; notifyUser(<span class="hljs-meta">@PathVariable</span> String userId) &#123;<br>        <span class="hljs-keyword">return</span> notificationService.notificationFlux(userId)<br>            .map(ev -&gt; ServerSentEvent.builder(ev.getData())<br>                          .id(ev.getUserId() + <span class="hljs-string">&quot;-&quot;</span> + UUID.randomUUID())<br>                          .event(ev.getEvent())<br>                          .build()<br>            )<br>            .doOnCancel(() -&gt; System.out.println(<span class="hljs-string">&quot;用户 &quot;</span> + userId + <span class="hljs-string">&quot; 取消订阅&quot;</span>));<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li><code>notificationFlux</code> 可以是从 Kafka、Redis Pub/Sub、数据库 Tailable Cursor 等得到的 <code>Flux&lt;T&gt;</code>。</li>
+<li><code>.doOnCancel()</code> 用于客户端断开后的清理逻辑。</li>
+</ul>
+<h3 id="前端接入示例"><a href="#前端接入示例" class="headerlink" title="前端接入示例"></a>前端接入示例</h3><figure class="highlight html"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript"></span><br><span class="javascript">  <span class="hljs-keyword">const</span> userId = <span class="hljs-string">&quot;u123&quot;</span>;</span><br><span class="javascript">  <span class="hljs-keyword">const</span> es = <span class="hljs-keyword">new</span> EventSource(<span class="hljs-string">`/sse/notify/<span class="hljs-subst">$&#123;userId&#125;</span>`</span>);</span><br><span class="javascript"></span><br><span class="javascript">  es.addEventListener(<span class="hljs-string">&quot;notify&quot;</span>, <span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> &#123;</span><br><span class="javascript">    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;新通知：&quot;</span>, e.data);</span><br><span class="javascript">  &#125;);</span><br><span class="javascript"></span><br><span class="javascript">  es.onerror = <span class="hljs-function">() =&gt;</span> &#123;</span><br><span class="javascript">    <span class="hljs-built_in">console</span>.warn(<span class="hljs-string">&quot;连接异常或已关闭&quot;</span>);</span><br><span class="javascript">    es.close();</span><br><span class="javascript">  &#125;;</span><br><span class="javascript"></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><ul>
+<li><strong>WebFlux SSE</strong>：把响应式流 <code>Flux&lt;T&gt;</code> 直接映射为 SSE，不再依赖 <code>SseEmitter</code>；</li>
+<li><strong>高效非阻塞</strong>：少量线程即可支撑海量并发长连接；</li>
+<li><strong>灵活扩展</strong>：任意来源的 <code>Flux</code>（消息队列、定时器）都可无缝推送；</li>
+<li><strong>事件定制</strong>：借助 <code>ServerSentEvent</code> 构建 ID、event、retry 等字段。</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li><strong>协议层面</strong>：SSE 基于 HTTP/1.1 的 <code>text/event-stream</code> 长连接，天然支持浏览器自动重连与 <code>Last-Event-ID</code> 断点续传。</li>
+<li><strong>实现层面</strong>：<ul>
+<li>在 <strong>Spring MVC</strong> 中使用 <code>SseEmitter</code>；合理设置超时、异步线程和输出缓冲即可支撑高并发。</li>
+<li>在 <strong>Spring WebFlux</strong> 中直接返回 <code>Flux</code> 或 <code>ServerSentEvent</code>，利用 Reactor 的非阻塞背压模型稳定承载海量连接。</li>
+</ul>
+</li>
+<li><strong>生产运维</strong>：必须关闭应用服务器与 Nginx 的响应缓冲、配置心跳穿透代理超时、监控连接数与推送指标，并结合 JWT + Redis Pub/Sub 完成多实例广播。</li>
+<li><strong>应用场景</strong>：从系统通知、进度条、日志流，到 AI Token-by-Token 输出，凡是“服务端单向快速推流”皆可用 SSE 简洁高效地实现。</li>
+</ul>
+<p>掌握本文提供的最佳实践和代码骨架后，开发者可在单机或分布式环境中快速落地稳定、可扩展的 SSE 实时推送能力，让前端页面“活”起来，同时保持架构的简洁与可维护性。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/SSE/">SSE</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/SSE/">SSE</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/">网络协议</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/06/20/java-compressed-package/">
+                        <span class="hidden-mobile">Java基础压缩与解压</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

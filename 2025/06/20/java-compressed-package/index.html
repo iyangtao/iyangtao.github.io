@@ -1,0 +1,996 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="引言Java 中压缩包的必要性在企业级应用、数据处理、文件存储、接口交互等场景中，压缩包的处理能力已经成为 Java 后端服务不可或缺的一部分。常见原因包括：  节省带宽与存储：打包压缩减少传输体积，特别适用于大文件传输或归档存储。 批量文件打包：便于文件整体上传、下载、分发与管理。 第三方系统对接：很多政府采购、电商平台、ERP 系统上传资料要求为压缩包格式。 安全合规：通过压缩与加密结合实现敏">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java基础压缩与解压">
+<meta property="og:url" content="http://example.com/2025/06/20/java-compressed-package/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="引言Java 中压缩包的必要性在企业级应用、数据处理、文件存储、接口交互等场景中，压缩包的处理能力已经成为 Java 后端服务不可或缺的一部分。常见原因包括：  节省带宽与存储：打包压缩减少传输体积，特别适用于大文件传输或归档存储。 批量文件打包：便于文件整体上传、下载、分发与管理。 第三方系统对接：很多政府采购、电商平台、ERP 系统上传资料要求为压缩包格式。 安全合规：通过压缩与加密结合实现敏">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/java-compressed-package.png">
+<meta property="article:published_time" content="2025-06-20T07:23:07.000Z">
+<meta property="article:modified_time" content="2025-06-20T07:23:07.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="Java工具类">
+<meta property="article:tag" content="压缩">
+<meta property="article:tag" content="解压">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/java-compressed-package.png">
+  
+  
+  <title>Java基础压缩与解压 - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/java-compressed-package.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Java基础压缩与解压">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2025-06-20 15:23" pubdate>
+        2025年6月20日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      29k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      49 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Java基础压缩与解压</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：6 天前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><h3 id="Java-中压缩包的必要性"><a href="#Java-中压缩包的必要性" class="headerlink" title="Java 中压缩包的必要性"></a>Java 中压缩包的必要性</h3><p>在企业级应用、数据处理、文件存储、接口交互等场景中，压缩包的处理能力已经成为 Java 后端服务不可或缺的一部分。常见原因包括：</p>
+<ul>
+<li><strong>节省带宽与存储</strong>：打包压缩减少传输体积，特别适用于大文件传输或归档存储。</li>
+<li><strong>批量文件打包</strong>：便于文件整体上传、下载、分发与管理。</li>
+<li><strong>第三方系统对接</strong>：很多政府采购、电商平台、ERP 系统上传资料要求为压缩包格式。</li>
+<li><strong>安全合规</strong>：通过压缩与加密结合实现敏感数据保护。</li>
+</ul>
+<p>Java 提供了较为灵活的文件操作能力，但对非 ZIP 格式（如 7Z、RAR）的原生支持有限，这促使开发者寻求更强大、跨平台、可扩展的解决方案。</p>
+<h3 id="Java-对压缩的支持"><a href="#Java-对压缩的支持" class="headerlink" title="Java 对压缩的支持"></a>Java 对压缩的支持</h3><p>Java 8 标准库对压缩格式的支持如下：</p>
+<table>
+<thead>
+<tr>
+<th>格式</th>
+<th>原生支持</th>
+<th>支持程度</th>
+<th>是否可写</th>
+<th>是否可读</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ZIP</td>
+<td>✅</td>
+<td>中等</td>
+<td>✅</td>
+<td>✅</td>
+<td><code>java.util.zip</code> 提供压缩与解压 API</td>
+</tr>
+<tr>
+<td>JAR</td>
+<td>✅</td>
+<td>高</td>
+<td>✅</td>
+<td>✅</td>
+<td>JAR 基于 ZIP，支持良好</td>
+</tr>
+<tr>
+<td>GZIP</td>
+<td>✅</td>
+<td>中</td>
+<td>✅</td>
+<td>✅</td>
+<td>仅支持单文件压缩</td>
+</tr>
+<tr>
+<td>7Z</td>
+<td>❌</td>
+<td>无</td>
+<td>❌</td>
+<td>❌</td>
+<td>需依赖第三方库</td>
+</tr>
+<tr>
+<td>RAR</td>
+<td>❌</td>
+<td>无</td>
+<td>❌</td>
+<td>部分</td>
+<td>依赖第三方库，仅支持解压</td>
+</tr>
+</tbody></table>
+<p><strong>常用第三方库概览：</strong></p>
+<table>
+<thead>
+<tr>
+<th>库名</th>
+<th>支持格式</th>
+<th>是否跨平台</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Zip4j</td>
+<td>ZIP（含加密）</td>
+<td>✅</td>
+<td>支持 AES 加密、分卷</td>
+</tr>
+<tr>
+<td>Apache Commons Compress</td>
+<td>ZIP、7Z、TAR、GZ、AR 等</td>
+<td>✅</td>
+<td>支持广泛，但功能偏读取</td>
+</tr>
+<tr>
+<td>junrar</td>
+<td>RAR（仅解压 RAR4）</td>
+<td>✅</td>
+<td>仅兼容 RAR4，更新缓慢</td>
+</tr>
+<tr>
+<td>SevenZipJBinding / JNA</td>
+<td>7Z、RAR、ZIP</td>
+<td>❌（需 native）</td>
+<td>支持丰富，但需要平台依赖</td>
+</tr>
+</tbody></table>
+<h3 id="典型业务场景与痛点"><a href="#典型业务场景与痛点" class="headerlink" title="典型业务场景与痛点"></a>典型业务场景与痛点</h3><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>描述</th>
+<th>常见挑战</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>文件上传解析</td>
+<td>用户上传压缩包，系统解压并读取文件内容</td>
+<td>格式兼容、编码乱码、压缩炸弹、中文目录名</td>
+</tr>
+<tr>
+<td>日志归档与备份</td>
+<td>将服务日志、临时文件定期压缩归档</td>
+<td>性能、压缩率、多线程处理</td>
+</tr>
+<tr>
+<td>报表导出</td>
+<td>生成多个文件，打包 ZIP 提供下载</td>
+<td>临时文件清理、内存管理</td>
+</tr>
+<tr>
+<td>跨系统数据交换</td>
+<td>与其他系统通过压缩文件交互数据</td>
+<td>RAR/7Z 支持、加密校验、兼容性</td>
+</tr>
+<tr>
+<td>安全传输</td>
+<td>结合压缩与加密确保数据传输安全</td>
+<td>加密算法支持、密码管理、破解防护</td>
+</tr>
+</tbody></table>
+<h2 id="压缩基础知识"><a href="#压缩基础知识" class="headerlink" title="压缩基础知识"></a>压缩基础知识</h2><h3 id="压缩格式对比"><a href="#压缩格式对比" class="headerlink" title="压缩格式对比"></a>压缩格式对比</h3><table>
+<thead>
+<tr>
+<th>格式</th>
+<th>类型</th>
+<th>支持多文件</th>
+<th>是否支持加密</th>
+<th>典型用途</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>ZIP</strong></td>
+<td>容器格式</td>
+<td>✅</td>
+<td>✅（部分支持 AES）</td>
+<td>通用压缩、上传、下载</td>
+<td>Java 原生支持，通用性强</td>
+</tr>
+<tr>
+<td><strong>7Z</strong></td>
+<td>容器格式</td>
+<td>✅</td>
+<td>✅（强加密）</td>
+<td>高压缩率需求，如打包安装包</td>
+<td>支持多种算法，压缩率高</td>
+</tr>
+<tr>
+<td><strong>RAR</strong></td>
+<td>容器格式</td>
+<td>✅</td>
+<td>✅（较强）</td>
+<td>游戏、资源压缩包、数据备份</td>
+<td>专利格式，支持分卷、恢复记录</td>
+</tr>
+<tr>
+<td><strong>GZ</strong></td>
+<td>单文件压缩</td>
+<td>❌</td>
+<td>❌</td>
+<td>Linux 日志压缩、流式传输</td>
+<td>极简格式，仅压缩单文件</td>
+</tr>
+<tr>
+<td><strong>JAR</strong></td>
+<td>Java 专用 ZIP</td>
+<td>✅</td>
+<td>❌（仅支持签名校验）</td>
+<td>Java 类/资源打包</td>
+<td>本质是 ZIP，支持清单与签名</td>
+</tr>
+</tbody></table>
+<p><strong>注意：</strong> ZIP 与 JAR 可互相解压；但 7Z 和 RAR 对 Java 来说需第三方库解析。</p>
+<h3 id="压缩算法"><a href="#压缩算法" class="headerlink" title="压缩算法"></a>压缩算法</h3><table>
+<thead>
+<tr>
+<th>算法</th>
+<th>适用格式</th>
+<th>压缩率</th>
+<th>速度</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Deflate</strong></td>
+<td>ZIP、GZ、JAR</td>
+<td>中</td>
+<td>快</td>
+<td>Java 内置实现，平衡型</td>
+</tr>
+<tr>
+<td><strong>LZMA</strong></td>
+<td>7Z</td>
+<td>高</td>
+<td>慢</td>
+<td>高压缩率，适合超大文件</td>
+</tr>
+<tr>
+<td><strong>BZip2</strong></td>
+<td>TAR.BZ2、Commons</td>
+<td>高</td>
+<td>中</td>
+<td>多线程支持好（仅7-Zip CLI），CPU 占用高<br />压缩率较佳，适合日志归档</td>
+</tr>
+<tr>
+<td><strong>PPMd</strong></td>
+<td>7Z</td>
+<td>极高</td>
+<td>慢</td>
+<td>文字类压缩效率极高</td>
+</tr>
+<tr>
+<td><strong>Rar压缩专属算法</strong></td>
+<td>RAR</td>
+<td>中高</td>
+<td>中</td>
+<td>专利格式，支持恢复记录</td>
+</tr>
+</tbody></table>
+<p>压缩算法通常不可逆使用：压缩率越高，速度越慢；适配场景需平衡性能与存储需求。</p>
+<h3 id="内部结构与文件头"><a href="#内部结构与文件头" class="headerlink" title="内部结构与文件头"></a>内部结构与文件头</h3><p>压缩包本质上是一种文件容器格式，其结构中包含：</p>
+<h4 id="ZIP-文件结构"><a href="#ZIP-文件结构" class="headerlink" title="ZIP 文件结构"></a>ZIP 文件结构</h4><figure class="highlight angelscript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs angelscript"><span class="hljs-string">[文件1数据块]</span>  <br><span class="hljs-string">[文件2数据块]</span>  <br>...  <br><span class="hljs-string">[Central Directory（目录项）]</span>  <br><span class="hljs-string">[End of Central Directory Record]</span><br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li><strong>文件头（Local File Header）</strong>：每个文件前面包含压缩算法、时间戳、文件名等信息</li>
+<li><strong>中央目录（Central Directory）</strong>：用于快速定位各文件，便于随机访问和增量更新</li>
+<li><strong>EOCD（End of Central Directory）</strong>：ZIP 的结束标志，存放总文件数、目录偏移等</li>
+</ul>
+<h4 id="7Z-文件结构"><a href="#7Z-文件结构" class="headerlink" title="7Z 文件结构"></a>7Z 文件结构</h4><figure class="highlight json"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs json">[Header]  <br>[Compressed Data Blocks]  <br>[Stream Info + Metadata + CRC校验]<br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li>支持多层嵌套压缩、加密数据流、文件名加密、压缩字典自定义等</li>
+<li>每个 Block 可以使用不同压缩算法</li>
+</ul>
+<h4 id="RAR-文件结构"><a href="#RAR-文件结构" class="headerlink" title="RAR 文件结构"></a>RAR 文件结构</h4><figure class="highlight fortran"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs fortran">[Archive Header]  <br>[<span class="hljs-keyword">File</span> Header <span class="hljs-number">1</span> + Compressed <span class="hljs-keyword">File</span> <span class="hljs-keyword">Data</span>]  <br>[<span class="hljs-keyword">File</span> Header <span class="hljs-number">2</span> + Compressed <span class="hljs-keyword">File</span> <span class="hljs-keyword">Data</span>]  <br>...  <br>[Recovery Record（可选）]  <br>[<span class="hljs-keyword">End</span> of Archive]<br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li>每个文件块都包含校验码与恢复信息</li>
+<li>RAR5 引入更强加密机制，但格式解析更复杂</li>
+</ul>
+<h4 id="GZ-文件结构"><a href="#GZ-文件结构" class="headerlink" title="GZ 文件结构"></a>GZ 文件结构</h4><figure class="highlight oxygene"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs oxygene">[Magic Number (<span class="hljs-number">1</span>F <span class="hljs-number">8</span>B)]  <br>[Compression <span class="hljs-function"><span class="hljs-keyword">Method</span> <span class="hljs-params">(08 <span class="hljs-keyword">for</span> Deflate)</span>]  </span><br><span class="hljs-function">[<span class="hljs-title">Flags</span> + <span class="hljs-title">Timestamp</span> + <span class="hljs-title">Optional</span> <span class="hljs-title">Fields</span>]  </span><br><span class="hljs-function">[<span class="hljs-title">Compressed</span> <span class="hljs-title">Data</span>]  </span><br><span class="hljs-function">[<span class="hljs-title">CRC32</span> + <span class="hljs-title">Input</span> <span class="hljs-title">Size</span>]</span><br></code></pre></div></td></tr></table></figure>
+
+<ul>
+<li>单文件压缩格式，通常配合 <code>.tar</code> 打包使用（如 <code>.tar.gz</code>）</li>
+</ul>
+<h2 id="Zip-处理"><a href="#Zip-处理" class="headerlink" title="Zip 处理"></a>Zip 处理</h2><h3 id="java-util-zip"><a href="#java-util-zip" class="headerlink" title="java.util.zip"></a>java.util.zip</h3><table>
+<thead>
+<tr>
+<th>类</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ZipOutputStream</code></td>
+<td>基于 <code>DeflaterOutputStream</code>，负责向输出流写入 ZIP 条目与压缩数据。支持设置压缩级别。</td>
+</tr>
+<tr>
+<td><code>ZipEntry</code></td>
+<td>表示 ZIP 中的一个“条目”（文件或目录），包含文件名、时间戳、压缩方法等元数据。</td>
+</tr>
+<tr>
+<td><code>ZipInputStream</code></td>
+<td>基于 <code>InflaterInputStream</code>，按顺序读取 ZIP 条目并解压数据，适合流式处理。</td>
+</tr>
+<tr>
+<td><code>ZipFile</code></td>
+<td>随机访问 ZIP，支持按条目索引读取，更能指定字符集（<code>new ZipFile(file, charset)</code>）。</td>
+</tr>
+<tr>
+<td><code>Deflater</code> / <code>Inflater</code></td>
+<td>底层压缩/解压算法引擎，可通过 <code>ZipOutputStream#setLevel(int)</code> 调整压缩级别。</td>
+</tr>
+<tr>
+<td><code>CRC32</code><br/><code>CheckedOutputStream</code><br/><code>CheckedInputStream</code></td>
+<td>提供 CRC 校验支持，可对流做一致性校验。</td>
+</tr>
+</tbody></table>
+<p><strong>Tip</strong>：当文件名包含非 ASCII（如中文）时，<code>ZipFile</code> 的 charset 构造器可避免乱码；而 <code>ZipInputStream</code> 支持使用 UTF-8，当条目未置 EFS 标志时，它退回 <strong>CP437</strong>。</p>
+<h3 id="创建压缩包"><a href="#创建压缩包" class="headerlink" title="创建压缩包"></a>创建压缩包</h3><h4 id="核心流程"><a href="#核心流程" class="headerlink" title="核心流程"></a>核心流程</h4><ol>
+<li>打开目标输出流：<code>FileOutputStream → BufferedOutputStream → ZipOutputStream</code></li>
+<li>设置压缩级别：<code>zipOut.setLevel(Deflater.BEST_SPEED / DEFAULT_COMPRESSION / BEST_COMPRESSION)</code></li>
+<li>遍历源文件，对每个文件/目录：<ul>
+<li>创建 <code>ZipEntry entry = new ZipEntry(relativePath)</code></li>
+<li><code>zipOut.putNextEntry(entry)</code></li>
+<li>读取源文件字节，写入 <code>zipOut</code></li>
+<li><code>zipOut.closeEntry()</code></li>
+</ul>
+</li>
+<li>结束：<code>zipOut.finish()</code>（可选），关闭流。</li>
+</ol>
+<h4 id="代码实例"><a href="#代码实例" class="headerlink" title="代码实例"></a>代码实例</h4><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ZipCreator</span> </span>&#123;<br><br>    <span class="hljs-comment">// UTF-8 编码，适用于 Java 8 默认</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">createZip</span><span class="hljs-params">(Path sourceDir, Path targetZip, <span class="hljs-keyword">int</span> compressionLevel)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        <span class="hljs-comment">// 缓冲区大小：8KB，对100MB以下文件足够</span><br>        <span class="hljs-keyword">byte</span>[] buffer = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[<span class="hljs-number">8</span> * <span class="hljs-number">1024</span>];<br>        <span class="hljs-comment">// 父流 → 缓冲 → ZIP</span><br>        <span class="hljs-keyword">try</span> (ZipOutputStream zipOut = <span class="hljs-keyword">new</span> ZipOutputStream(<br>                 <span class="hljs-keyword">new</span> BufferedOutputStream(Files.newOutputStream(targetZip)))) &#123;<br><br>            <span class="hljs-comment">// 设置压缩级别（0-9）</span><br>            zipOut.setLevel(compressionLevel);<br><br>            <span class="hljs-comment">// 递归遍历目录</span><br>            Files.walk(sourceDir)<br>                .filter(path -&gt; !Files.isDirectory(path))<br>                .forEach(path -&gt; &#123;<br>                    <span class="hljs-comment">// 计算相对路径，作为 ZipEntry 名称</span><br>                    Path relPath = sourceDir.relativize(path);<br>                    ZipEntry entry = <span class="hljs-keyword">new</span> ZipEntry(relPath.toString().replace(<span class="hljs-string">&quot;\\&quot;</span>, <span class="hljs-string">&quot;/&quot;</span>));<br>                    <span class="hljs-keyword">try</span> &#123;<br>                        zipOut.putNextEntry(entry);<br>                        <span class="hljs-comment">// 数据写入</span><br>                        <span class="hljs-keyword">try</span> (InputStream in = Files.newInputStream(path)) &#123;<br>                            <span class="hljs-keyword">int</span> len;<br>                            <span class="hljs-keyword">while</span> ((len = in.read(buffer)) &gt; <span class="hljs-number">0</span>) &#123;<br>                                zipOut.write(buffer, <span class="hljs-number">0</span>, len);<br>                            &#125;<br>                        &#125;<br>                        zipOut.closeEntry();<br>                    &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>                        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> UncheckedIOException(e);<br>                    &#125;<br>                &#125;);<br>            <span class="hljs-comment">// 可选：确保所有数据写入</span><br>            zipOut.finish();<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> IOException, URISyntaxException </span>&#123;<br>        Path src = Paths.get(<span class="hljs-string">&quot;data目录&quot;</span>);        <span class="hljs-comment">// 待压缩目录</span><br>        Path dest = Paths.get(<span class="hljs-string">&quot;archive.zip&quot;</span>);   <span class="hljs-comment">// 输出 ZIP 文件</span><br>        <span class="hljs-comment">// 介于压缩率与速度的平衡：DEFAULT_COMPRESSION（级别6）</span><br>        createZip(src, dest, Deflater.DEFAULT_COMPRESSION);<br>        System.out.println(<span class="hljs-string">&quot;压缩完成：&quot;</span> + dest.toAbsolutePath());<br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="编码与效率考量"><a href="#编码与效率考量" class="headerlink" title="编码与效率考量"></a>编码与效率考量</h4><ul>
+<li><strong>文件名编码</strong>：Java 8 默认对 ZipEntry 名称采用 UTF-8 并设置 EFS 标志；在 Windows Explorer（CP437）可能出现乱码。<ul>
+<li><strong>建议</strong>：如果需兼容 GBK/CP437，可后续使用第三方库（如 Zip4j）或在解压时用 <code>new ZipFile(file, Charset.forName(&quot;GBK&quot;))</code>。</li>
+</ul>
+</li>
+<li><strong>压缩效率（100MB 以下）</strong>：<ul>
+<li>默认 <code>Deflater.DEFAULT_COMPRESSION</code>（级别6）在中等速度与中等压缩率间平衡，100MB 文件常见场景耗时 &lt;1s（现代 CPU）。</li>
+<li>对实时场景可降至 <code>BEST_SPEED</code>（级别1），对归档场景可提升至 <code>BEST_COMPRESSION</code>（级别9）。</li>
+</ul>
+</li>
+<li><strong>I/O 缓冲</strong>：8KB–16KB 缓冲区已足够，过大并不会显著提高吞吐。</li>
+</ul>
+<h3 id="解压缩"><a href="#解压缩" class="headerlink" title="解压缩"></a>解压缩</h3><h4 id="核心流程-1"><a href="#核心流程-1" class="headerlink" title="核心流程"></a>核心流程</h4><ol>
+<li>打开源 ZIP 流：<code>FileInputStream → BufferedInputStream → ZipInputStream</code></li>
+<li>迭代 <code>ZipEntry</code>：<code>while ((entry = zipIn.getNextEntry()) != null)</code></li>
+<li>构建目标文件（保留目录结构）</li>
+<li>读取压缩数据：将 <code>zipIn</code> 中的字节写入目标文件</li>
+<li>结束条目：<code>zipIn.closeEntry()</code></li>
+<li>关闭流</li>
+</ol>
+<h4 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h4><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ZipExtractor</span> </span>&#123;<br><br>    <span class="hljs-comment">// 处理UTF8编码的Zip文件</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">unzipForUtf8</span><span class="hljs-params">(Path zipPath, Path targetDir)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        <span class="hljs-keyword">byte</span>[] buffer = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[<span class="hljs-number">8</span> * <span class="hljs-number">1024</span>];<br>        <span class="hljs-keyword">try</span> (ZipInputStream zipIn = <span class="hljs-keyword">new</span> ZipInputStream(<br>                <span class="hljs-keyword">new</span> BufferedInputStream(Files.newInputStream(zipPath)))) &#123;<br>            ZipEntry entry;<br>            <span class="hljs-keyword">while</span> ((entry = zipIn.getNextEntry()) != <span class="hljs-keyword">null</span>) &#123;<br>                Path outPath = targetDir.resolve(entry.getName());<br>                <span class="hljs-keyword">if</span> (entry.isDirectory()) &#123;<br>                    Files.createDirectories(outPath);<br>                &#125; <span class="hljs-keyword">else</span> &#123;<br>                    Files.createDirectories(outPath.getParent());<br>                    <span class="hljs-keyword">try</span> (OutputStream out = Files.newOutputStream(outPath)) &#123;<br>                        <span class="hljs-keyword">int</span> len;<br>                        <span class="hljs-keyword">while</span> ((len = zipIn.read(buffer)) &gt; <span class="hljs-number">0</span>) &#123;<br>                            out.write(buffer, <span class="hljs-number">0</span>, len);<br>                        &#125;<br>                    &#125;<br>                &#125;<br>                zipIn.closeEntry();<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        Path zipFile = Paths.get(<span class="hljs-string">&quot;data目录.zip&quot;</span>);<br>        Path outDir = Paths.get(<span class="hljs-string">&quot;output&quot;</span>);<br>        unzipAutoDetect(zipFile, outDir);<br>        System.out.println(<span class="hljs-string">&quot;解压完成：&quot;</span> + outDir.toAbsolutePath());<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="改进"><a href="#改进" class="headerlink" title="改进"></a>改进</h4><p>在以上代码示例中，如果压缩包是通过非 UTF-8 / 非标准工具（如 7-Zip、WinRAR） 生成的 zip 文件，那么在解压缩时可能会抛出异常：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs stylus">java<span class="hljs-selector-class">.lang</span><span class="hljs-selector-class">.IllegalArgumentException</span>: MALFORMED<br>at java<span class="hljs-selector-class">.util</span><span class="hljs-selector-class">.zip</span><span class="hljs-selector-class">.ZipCoder</span><span class="hljs-selector-class">.toString</span>(ZipCoder<span class="hljs-selector-class">.java</span>:<span class="hljs-number">58</span>)<br></code></pre></div></td></tr></table></figure>
+
+<p>Windows默认使用 GBK 编码，可以在创建 ZipInputStream 时使用 GBK 编码，如：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">unzipForGbk</span><span class="hljs-params">(Path zipPath, Path targetDir)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>    <span class="hljs-keyword">byte</span>[] buffer = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[<span class="hljs-number">8</span> * <span class="hljs-number">1024</span>];<br>    <span class="hljs-keyword">try</span> (ZipInputStream zipIn = <span class="hljs-keyword">new</span> ZipInputStream(<br>            <span class="hljs-keyword">new</span> BufferedInputStream(Files.newInputStream(zipPath)), Charset.forName(<span class="hljs-string">&quot;GBK&quot;</span>))) &#123;<br>        ZipEntry entry;<br>        <span class="hljs-keyword">while</span> ((entry = zipIn.getNextEntry()) != <span class="hljs-keyword">null</span>) &#123;<br>            Path outPath = targetDir.resolve(entry.getName());<br>            <span class="hljs-keyword">if</span> (entry.isDirectory()) &#123;<br>                Files.createDirectories(outPath);<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                Files.createDirectories(outPath.getParent());<br>                <span class="hljs-keyword">try</span> (OutputStream out = Files.newOutputStream(outPath)) &#123;<br>                    <span class="hljs-keyword">int</span> len;<br>                    <span class="hljs-keyword">while</span> ((len = zipIn.read(buffer)) &gt; <span class="hljs-number">0</span>) &#123;<br>                        out.write(buffer, <span class="hljs-number">0</span>, len);<br>                    &#125;<br>                &#125;<br>            &#125;<br>            zipIn.closeEntry();<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>综上：为了适应多编码（UTF-8、GBK、CP437、ISO-8859-1），需要对方法进行改进，自动检测多编码，思想就是按照优先级尝试多种编码。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">unzipAutoDetect</span><span class="hljs-params">(Path zipPath, Path targetDir)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>    Charset[] charsets = &#123;<br>            StandardCharsets.UTF_8,<br>            Charset.forName(<span class="hljs-string">&quot;GBK&quot;</span>),<br>            Charset.forName(<span class="hljs-string">&quot;Cp437&quot;</span>),<br>            StandardCharsets.ISO_8859_1,<br>            Charset.forName(<span class="hljs-string">&quot;MacRoman&quot;</span>)  <span class="hljs-comment">// MacOS 早期默认</span><br>    &#125;;<br><br>    IOException lastIOException = <span class="hljs-keyword">null</span>;<br>    RuntimeException lastRuntimeException = <span class="hljs-keyword">null</span>;<br><br>    <span class="hljs-keyword">for</span> (Charset cs : charsets) &#123;<br>        System.out.println(<span class="hljs-string">&quot;尝试使用编码：&quot;</span> + cs.name());<br>        <span class="hljs-keyword">try</span> (ZipFile zipFile = <span class="hljs-keyword">new</span> ZipFile(zipPath.toFile(), cs)) &#123;<br>            Enumeration&lt;? extends ZipEntry&gt; entries = zipFile.entries();<br>            <span class="hljs-keyword">while</span> (entries.hasMoreElements()) &#123;<br>                ZipEntry entry = entries.nextElement();<br>                <span class="hljs-comment">// 同前：防 Zip Slip、创建目录或文件、写出流……</span><br>                extractEntry(zipFile, entry, targetDir);<br>            &#125;<br>            <span class="hljs-keyword">return</span>; <span class="hljs-comment">// 解压成功，结束</span><br>        &#125; <span class="hljs-keyword">catch</span> (IOException ioe) &#123;<br>            lastIOException = ioe;<br>        &#125; <span class="hljs-keyword">catch</span> (IllegalArgumentException iae) &#123;<br>            lastRuntimeException = iae;<br>        &#125;<br>        <span class="hljs-comment">// 重试下一个 charset</span><br>    &#125;<br><br>    <span class="hljs-comment">// 全部编码尝试失败，抛出一个综合异常</span><br>    String msg = <span class="hljs-string">&quot;无法识别 ZIP 文件名编码，尝试过的编码：&quot;</span> +<br>            Arrays.toString(charsets);<br>    IOException ex = <span class="hljs-keyword">new</span> IOException(msg, lastIOException);<br>    <span class="hljs-keyword">if</span> (lastRuntimeException != <span class="hljs-keyword">null</span>) &#123;<br>        ex.addSuppressed(lastRuntimeException);<br>    &#125;<br>    <span class="hljs-keyword">throw</span> ex;<br>&#125;<br><br><span class="hljs-comment">// 抽取的写出逻辑</span><br><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">extractEntry</span><span class="hljs-params">(ZipFile zipFile, ZipEntry entry, Path targetDir)</span> </span>&#123;<br>    <span class="hljs-keyword">try</span> (InputStream in = zipFile.getInputStream(entry)) &#123;<br>        Path out = targetDir.resolve(entry.getName()).normalize();<br>        <span class="hljs-keyword">if</span> (!out.startsWith(targetDir)) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IOException(<span class="hljs-string">&quot;非法的 ZIP 路径：&quot;</span> + entry.getName());<br>        &#125;<br>        <span class="hljs-keyword">if</span> (entry.isDirectory()) &#123;<br>            Files.createDirectories(out);<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            Files.createDirectories(out.getParent());<br>            <span class="hljs-keyword">try</span> (OutputStream outStream = Files.newOutputStream(out)) &#123;<br>                <span class="hljs-keyword">byte</span>[] buf = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[<span class="hljs-number">8</span> * <span class="hljs-number">1024</span>];<br>                <span class="hljs-keyword">int</span> len;<br>                <span class="hljs-keyword">while</span> ((len = in.read(buf)) &gt; <span class="hljs-number">0</span>) &#123;<br>                    outStream.write(buf, <span class="hljs-number">0</span>, len);<br>                &#125;<br>            &#125;<br>        &#125;<br>    &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> UncheckedIOException(e);<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="通用解决方案"><a href="#通用解决方案" class="headerlink" title="通用解决方案"></a>通用解决方案</h2><p>下面使用 <strong>Apache Commons Compress</strong> 结合 <strong>Zip4j</strong>，提供一个通用的 Java 工具类 <code>CompressUtil</code>：</p>
+<ul>
+<li><strong>Apache Commons Compress</strong>：格式全，API 统一；</li>
+<li><strong>Zip4j</strong>：ZIP 密码保护（ZipCrypto / AES）。</li>
+</ul>
+<h3 id="工具类"><a href="#工具类" class="headerlink" title="工具类"></a>工具类</h3><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CompressUtil</span> </span>&#123;<br><br>    <span class="hljs-comment">/* ---------------- 创建压缩包 ---------------- */</span><br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 将目录或单文件压缩为 ZIP；可选密码 (ZipCrypto / AES)。</span><br><span class="hljs-comment">     *</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> srcPath  待压缩目录或文件</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> zipPath  输出 zip</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> password null 表示无密码</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> aes256   true -&gt; AES-256；false -&gt; ZipCrypto</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> IOException if I/O error</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">createZip</span><span class="hljs-params">(Path srcPath,</span></span><br><span class="hljs-params"><span class="hljs-function">                                 Path zipPath,</span></span><br><span class="hljs-params"><span class="hljs-function">                                 String password,</span></span><br><span class="hljs-params"><span class="hljs-function">                                 <span class="hljs-keyword">boolean</span> aes256)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br><br>        <span class="hljs-keyword">try</span> (ZipFile zip = (password == <span class="hljs-keyword">null</span>)<br>                ? <span class="hljs-keyword">new</span> ZipFile(zipPath.toFile())<br>                : <span class="hljs-keyword">new</span> ZipFile(zipPath.toFile(), password.toCharArray())) &#123;<br><br>            ZipParameters baseParams = <span class="hljs-keyword">new</span> ZipParameters();<br>            baseParams.setCompressionMethod(CompressionMethod.DEFLATE);<br>            baseParams.setCompressionLevel(CompressionLevel.NORMAL);<br>            <span class="hljs-keyword">if</span> (password != <span class="hljs-keyword">null</span>) &#123;<br>                baseParams.setEncryptFiles(<span class="hljs-keyword">true</span>);<br>                baseParams.setEncryptionMethod(<br>                        aes256<br>                                ? EncryptionMethod.AES<br>                                : EncryptionMethod.ZIP_STANDARD<br>                );<br>                <span class="hljs-keyword">if</span> (aes256) &#123;<br>                    baseParams.setAesKeyStrength(AesKeyStrength.KEY_STRENGTH_256);<br>                &#125;<br>            &#125;<br><br>            <span class="hljs-keyword">if</span> (Files.isDirectory(srcPath)) &#123;<br>                <span class="hljs-comment">// 递归遍历所有文件/目录（包括空目录）</span><br>                <span class="hljs-keyword">try</span> (Stream&lt;Path&gt; stream = Files.walk(srcPath)) &#123;<br>                    stream.forEach(path -&gt; &#123;<br>                        String entry = srcPath.relativize(path)<br>                                .toString()<br>                                .replace(<span class="hljs-string">&quot;\\&quot;</span>, <span class="hljs-string">&quot;/&quot;</span>);<br>                        <span class="hljs-keyword">try</span> &#123;<br>                            ZipParameters params = <span class="hljs-keyword">new</span> ZipParameters(baseParams);<br>                            <span class="hljs-comment">// 如果是目录，确保以 “/” 结尾，让 ZIP 记录目录</span><br>                            <span class="hljs-keyword">if</span> (Files.isDirectory(path)) &#123;<br>                                <span class="hljs-keyword">if</span> (!entry.endsWith(<span class="hljs-string">&quot;/&quot;</span>)) &#123;<br>                                    entry = entry + <span class="hljs-string">&quot;/&quot;</span>;<br>                                &#125;<br>                                params.setFileNameInZip(entry);<br>                                zip.addFolder(path.toFile(), params);<br>                            &#125; <span class="hljs-keyword">else</span> &#123;<br>                                params.setFileNameInZip(entry);<br>                                zip.addFile(path.toFile(), params);<br>                            &#125;<br>                        &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>                            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> UncheckedIOException(e);<br>                        &#125;<br>                    &#125;);<br>                &#125;<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-comment">// 单文件</span><br>                ZipParameters params = <span class="hljs-keyword">new</span> ZipParameters(baseParams);<br>                params.setFileNameInZip(srcPath.getFileName().toString());<br>                zip.addFile(srcPath.toFile(), params);<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 7z 压缩：Commons Compress 的 SevenZFile 只支持 LZMA/LZMA2。</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">create7z</span><span class="hljs-params">(Path srcDir, Path out7z)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        <span class="hljs-keyword">try</span> (SevenZOutputFile out = <span class="hljs-keyword">new</span> SevenZOutputFile(out7z.toFile())) &#123;<br>            addPathTo7z(out, srcDir, srcDir);<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">addPathTo7z</span><span class="hljs-params">(SevenZOutputFile out,</span></span><br><span class="hljs-params"><span class="hljs-function">                                    Path root, Path src)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        <span class="hljs-keyword">if</span> (Files.isDirectory(src)) &#123;<br>            <span class="hljs-keyword">try</span> (DirectoryStream&lt;Path&gt; ds = Files.newDirectoryStream(src)) &#123;<br>                <span class="hljs-keyword">for</span> (Path p : ds) &#123;<br>                    addPathTo7z(out, root, p);<br>                &#125;<br>            &#125;<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            String entryName = root.relativize(src)<br>                    .toString().replace(<span class="hljs-string">&quot;\\&quot;</span>, <span class="hljs-string">&quot;/&quot;</span>);<br>            SevenZArchiveEntry entry =<br>                    out.createArchiveEntry(src.toFile(), entryName);<br>            out.putArchiveEntry(entry);<br>            <span class="hljs-keyword">try</span> (InputStream is = Files.newInputStream(src)) &#123;<br>                <span class="hljs-keyword">byte</span>[] buf = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[<span class="hljs-number">8</span> * <span class="hljs-number">1024</span>];<br>                <span class="hljs-keyword">int</span> len;<br>                <span class="hljs-keyword">while</span> ((len = is.read(buf)) != -<span class="hljs-number">1</span>) &#123;<br>                    out.write(buf, <span class="hljs-number">0</span>, len);<br>                &#125;<br>            &#125;<br>            out.closeArchiveEntry();<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 将目录压成 tar.gz（Linux 生态常用）。</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">createTarGz</span><span class="hljs-params">(Path srcDir, Path outTarGz)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        <span class="hljs-keyword">try</span> (TarArchiveOutputStream taos = <span class="hljs-keyword">new</span> TarArchiveOutputStream(<br>                <span class="hljs-keyword">new</span> GzipCompressorOutputStream(<br>                        Files.newOutputStream(outTarGz)))) &#123;<br><br>            taos.setLongFileMode(TarArchiveOutputStream.LONGFILE_POSIX);<br>            <span class="hljs-keyword">try</span> (Stream&lt;Path&gt; stream = Files.walk(srcDir)) &#123;<br>                stream<br>                    .filter(p -&gt; !p.equals(srcDir))  <span class="hljs-comment">// 不把根目录写入</span><br>                    .forEach(p -&gt; &#123;<br>                        <span class="hljs-keyword">try</span> &#123;<br>                            TarArchiveEntry entry = <span class="hljs-keyword">new</span> TarArchiveEntry(<br>                                    p.toFile(),<br>                                    srcDir.relativize(p).toString().replace(<span class="hljs-string">&quot;\\&quot;</span>, <span class="hljs-string">&quot;/&quot;</span>));<br>                            taos.putArchiveEntry(entry);<br>                            <span class="hljs-keyword">if</span> (Files.isRegularFile(p)) &#123;<br>                                Files.copy(p, taos);<br>                            &#125;<br>                            taos.closeArchiveEntry();<br>                        &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>                            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> UncheckedIOException(e);<br>                        &#125;<br>                    &#125;);<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/* ---------------- 解压 ---------------- */</span><br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 自动按扩展名解压：zip/7z/tar.gz</span><br><span class="hljs-comment">     * 若 zip 带密码请传 password，否则 null。</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">extract</span><span class="hljs-params">(Path archive, Path targetDir, String password)</span></span><br><span class="hljs-function">            <span class="hljs-keyword">throws</span> IOException, RarException </span>&#123;<br><br>        String name = archive.getFileName().toString().toLowerCase();<br>        <span class="hljs-keyword">if</span> (name.endsWith(<span class="hljs-string">&quot;.zip&quot;</span>)) &#123;<br>             extractZip(archive, targetDir, password);<br>        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (name.endsWith(<span class="hljs-string">&quot;.7z&quot;</span>)) &#123;<br>            extract7z(archive, targetDir, password);<br>        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (name.endsWith(<span class="hljs-string">&quot;.tar.gz&quot;</span>) || name.endsWith(<span class="hljs-string">&quot;.tgz&quot;</span>)) &#123;<br>            extractTarGz(archive, targetDir);<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IllegalArgumentException(<span class="hljs-string">&quot;不支持的格式: &quot;</span> + name);<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/* --- zip --- */</span><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">extractZip</span><span class="hljs-params">(Path zip, Path target, String password)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        <span class="hljs-comment">// 1. 先用临时ZipFile只做“投票”检查，不做 setCharset</span><br>        <span class="hljs-keyword">try</span> (ZipFile probe = password == <span class="hljs-keyword">null</span><br>                ? <span class="hljs-keyword">new</span> ZipFile(zip.toFile())<br>                : <span class="hljs-keyword">new</span> ZipFile(zip.toFile(), password.toCharArray())) &#123;<br><br>            <span class="hljs-keyword">long</span> utf8Count = probe.getFileHeaders() <span class="hljs-comment">// 会立刻把所有条目的文件名解析进内存，导致字符集错误，因此探测后要重新开实例（见后续）</span><br>                    .stream()<br>                    .filter(FileHeader::isFileNameUTF8Encoded)<br>                    .count();<br>            <span class="hljs-keyword">boolean</span> useUtf8 = utf8Count &gt;= (probe.getFileHeaders().size() + <span class="hljs-number">1</span>) / <span class="hljs-number">2</span>;<br><br>            <span class="hljs-comment">// 2. 再重新创建一个真正用来解压的 ZipFile，直接带正确字符集</span><br>            <span class="hljs-keyword">try</span> (ZipFile real = password == <span class="hljs-keyword">null</span><br>                    ? <span class="hljs-keyword">new</span> ZipFile(zip.toFile())<br>                    : <span class="hljs-keyword">new</span> ZipFile(zip.toFile(), password.toCharArray())) &#123;<br><br>                <span class="hljs-keyword">if</span> (!useUtf8) &#123;<br>                    real.setCharset(Charset.forName(<span class="hljs-string">&quot;GBK&quot;</span>));<br>                &#125;<br>                real.extractAll(target.toString());<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/* --- 7z --- */</span><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">extract7z</span><span class="hljs-params">(Path sevenZ, Path target, String password)</span></span><br><span class="hljs-function">            <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        <span class="hljs-keyword">try</span> (SevenZFile zf = password == <span class="hljs-keyword">null</span><br>                ? <span class="hljs-keyword">new</span> SevenZFile(sevenZ.toFile())<br>                : <span class="hljs-keyword">new</span> SevenZFile(sevenZ.toFile(), password.toCharArray())) &#123;<br><br>            SevenZArchiveEntry entry;<br>            <span class="hljs-keyword">byte</span>[] buf = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[<span class="hljs-number">8</span> * <span class="hljs-number">1024</span>];<br>            <span class="hljs-keyword">while</span> ((entry = zf.getNextEntry()) != <span class="hljs-keyword">null</span>) &#123;<br>                Path out = target.resolve(entry.getName()).normalize();<br>                <span class="hljs-keyword">if</span> (!out.startsWith(target))<br>                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IOException(<span class="hljs-string">&quot;Zip-Slip: &quot;</span> + entry.getName());<br><br>                <span class="hljs-keyword">if</span> (entry.isDirectory()) &#123;<br>                    Files.createDirectories(out);<br>                &#125; <span class="hljs-keyword">else</span> &#123;<br>                    Files.createDirectories(out.getParent());<br>                    <span class="hljs-keyword">try</span> (OutputStream os = Files.newOutputStream(out)) &#123;<br>                        <span class="hljs-keyword">int</span> len;<br>                        <span class="hljs-keyword">while</span> ((len = zf.read(buf)) &gt; <span class="hljs-number">0</span>) &#123;<br>                            os.write(buf, <span class="hljs-number">0</span>, len);<br>                        &#125;<br>                    &#125;<br>                &#125;<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/* --- tar.gz --- */</span><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">extractTarGz</span><span class="hljs-params">(Path tarGz, Path target)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        <span class="hljs-keyword">try</span> (GzipCompressorInputStream gis =<br>                     <span class="hljs-keyword">new</span> GzipCompressorInputStream(Files.newInputStream(tarGz));<br>             TarArchiveInputStream tis = <span class="hljs-keyword">new</span> TarArchiveInputStream(gis)) &#123;<br><br>            TarArchiveEntry entry;<br>            <span class="hljs-keyword">while</span> ((entry = tis.getNextEntry()) != <span class="hljs-keyword">null</span>) &#123;<br>                Path out = target.resolve(entry.getName()).normalize();<br>                <span class="hljs-keyword">if</span> (!out.startsWith(target)) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IOException(<span class="hljs-string">&quot;Zip-Slip: &quot;</span> + entry.getName());<br>                <span class="hljs-keyword">if</span> (entry.isDirectory()) &#123;<br>                    Files.createDirectories(out);<br>                &#125; <span class="hljs-keyword">else</span> &#123;<br>                    Files.createDirectories(out.getParent());<br>                    <span class="hljs-keyword">try</span> (OutputStream os = Files.newOutputStream(out)) &#123;<br>                        IOUtils.copy(tis, os);<br>                    &#125;<br>                &#125;<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/* ---------------- 小工具 ---------------- */</span><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">CompressUtil</span><span class="hljs-params">()</span> </span>&#123;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="测试类"><a href="#测试类" class="headerlink" title="测试类"></a>测试类</h3><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CompressUtilTest</span> </span>&#123;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 测试 CompressUtil.createZip</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Test</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">testCreateZip</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        Path src = Paths.get(<span class="hljs-string">&quot;.gitignore&quot;</span>);        <span class="hljs-comment">// 待压缩目录</span><br>        Path dest = Paths.get(<span class="hljs-string">&quot;data目录压缩包.zip&quot;</span>);   <span class="hljs-comment">// 输出 ZIP 文件</span><br>        CompressUtil.createZip(src, dest, <span class="hljs-string">&quot;123456&quot;</span>, <span class="hljs-keyword">true</span>);<br><span class="hljs-comment">//        CompressUtil.createZip(src, dest, null, false);</span><br>        System.out.println(<span class="hljs-string">&quot;压缩成功：&quot;</span> + dest);<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 测试 CompressUtil.create7z</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Test</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">testCreate7z</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        Path src = Paths.get(<span class="hljs-string">&quot;data目录&quot;</span>);        <span class="hljs-comment">// 待压缩目录</span><br>        Path dest = Paths.get(<span class="hljs-string">&quot;data目录压缩包.7z&quot;</span>);   <span class="hljs-comment">// 输出 7z 文件</span><br>        CompressUtil.create7z(src, dest);<br>        System.out.println(<span class="hljs-string">&quot;7z 压缩成功：&quot;</span> + dest);<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 测试 CompressUtil.createTarGz</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Test</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">testCreateTarGz</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        Path src = Paths.get(<span class="hljs-string">&quot;data目录&quot;</span>);        <span class="hljs-comment">// 待压缩目录</span><br>        Path dest = Paths.get(<span class="hljs-string">&quot;data目录压缩包.tar.gz&quot;</span>);   <span class="hljs-comment">// 输出 tar.gz 文件</span><br>        CompressUtil.createTarGz(src, dest);<br>        System.out.println(<span class="hljs-string">&quot;tar.gz 压缩成功：&quot;</span> + dest);<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 测试 CompressUtil.extractZip</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Test</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">testExtractZip</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> IOException, RarException </span>&#123;<br>        Path zipPath = Paths.get(<span class="hljs-string">&quot;data目录压缩包.zip&quot;</span>);  <span class="hljs-comment">// 待解压 ZIP 文件</span><br>        Path extractDir = Paths.get(<span class="hljs-string">&quot;解压zip压缩包目录&quot;</span>);          <span class="hljs-comment">// 解压目标目录</span><br>        CompressUtil.extract(zipPath, extractDir, <span class="hljs-string">&quot;123456&quot;</span>);<br>        System.out.println(<span class="hljs-string">&quot;ZIP 解压成功：&quot;</span> + extractDir);<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 测试 CompressUtil.extract7z</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Test</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">testExtract7z</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> IOException, RarException </span>&#123;<br>        Path sevenZPath = Paths.get(<span class="hljs-string">&quot;data目录压缩包.7z&quot;</span>);  <span class="hljs-comment">// 待解压 7z 文件</span><br>        Path extractDir = Paths.get(<span class="hljs-string">&quot;解压7z压缩包目录&quot;</span>);          <span class="hljs-comment">// 解压目标目录</span><br>        CompressUtil.extract(sevenZPath, extractDir, <span class="hljs-string">&quot;123&quot;</span>);<br>        System.out.println(<span class="hljs-string">&quot;7z 解压成功：&quot;</span> + extractDir);<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 测试 CompressUtil.extractTarGz</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Test</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">testExtractTarGz</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> RarException, IOException </span>&#123;<br>        Path tarGzPath = Paths.get(<span class="hljs-string">&quot;data目录压缩包.tar.gz&quot;</span>);<br>        Path extractDir = Paths.get(<span class="hljs-string">&quot;解压tar.gz压缩包目录&quot;</span>);<br>        CompressUtil.extract(tarGzPath, extractDir, <span class="hljs-keyword">null</span>);<br>        System.out.println(<span class="hljs-string">&quot;tar.gz 解压成功：&quot;</span> + extractDir);<br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="安全防护"><a href="#安全防护" class="headerlink" title="安全防护"></a>安全防护</h2><h3 id="Zip-Bomb"><a href="#Zip-Bomb" class="headerlink" title="Zip Bomb"></a>Zip Bomb</h3><h4 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h4><p>Zip Bomb（压缩炸弹）是一种恶意构造的压缩包，体积极小（如几 KB），解压后却膨胀到极大的体积（如几 TB），以耗尽磁盘空间、内存或 CPU 资源，造成系统 DoS。</p>
+<h4 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h4><ul>
+<li>多层嵌套压缩：将同一份数据重复压缩数十层</li>
+<li>超高冗余率：利用极高压缩率算法（如重复单字符）</li>
+</ul>
+<h4 id="检测策略"><a href="#检测策略" class="headerlink" title="检测策略"></a>检测策略</h4><ol>
+<li><p><strong>设定阈值</strong></p>
+<ul>
+<li>读取所有条目的 “压缩大小” 与 “原始大小”</li>
+<li>计算总压缩比：<code>sum(uncompressed) / sum(compressed)</code></li>
+<li>若压缩比 &gt; 100（具体根据业务可调，常见 50–200）时拒绝解压</li>
+<li>或单个条目原始大小超过阈值（如 &gt;1 GB）时拒绝解压</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">try</span> (ZipFile probe = (password == <span class="hljs-keyword">null</span>)<br>        ? <span class="hljs-keyword">new</span> ZipFile(zip.toFile())<br>        : <span class="hljs-keyword">new</span> ZipFile(zip.toFile(), password.toCharArray())) &#123;<br><br>    <span class="hljs-keyword">long</span> totalC = <span class="hljs-number">0</span>, totalU = <span class="hljs-number">0</span>, utf8Count = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">for</span> (FileHeader fh : probe.getFileHeaders()) &#123;<br>        totalC += fh.getCompressedSize();<br>        totalU += fh.getUncompressedSize();<br>        <span class="hljs-keyword">if</span> (fh.isFileNameUTF8Encoded()) utf8Count++;<br>    &#125;<br>    <span class="hljs-keyword">if</span> (totalC &gt; <span class="hljs-number">0</span> &amp;&amp; (<span class="hljs-keyword">double</span>) totalU / totalC &gt; <span class="hljs-number">100</span>) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IOException(String.format(<br>                <span class="hljs-string">&quot;检测到压缩比过高（%.1f），疑似 Zip Bomb，终止解压&quot;</span>, (<span class="hljs-keyword">double</span>) totalU / totalC));<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p><strong>限制嵌套深度</strong></p>
+<ul>
+<li>禁止多层嵌套（如 Entry 名称中出现超过 N 个 “.zip” 后缀）</li>
+</ul>
+</li>
+<li><p><strong>限制总条目数</strong></p>
+<ul>
+<li>若压缩包包含文件数 &gt;100 000，则可认为可疑</li>
+</ul>
+</li>
+<li><p><strong>流式监控</strong></p>
+<ul>
+<li>在解压过程中累加已写出字节数</li>
+<li>若超出预先计算的最大“安全”解压大小，立刻中断</li>
+</ul>
+</li>
+</ol>
+<h3 id="Zip-Slip-防护"><a href="#Zip-Slip-防护" class="headerlink" title="Zip-Slip 防护"></a>Zip-Slip 防护</h3><h4 id="漏洞成因"><a href="#漏洞成因" class="headerlink" title="漏洞成因"></a>漏洞成因</h4><p>压缩包条目名中含有 <code>../</code>、绝对路径（如 <code>/etc/passwd</code>）或 Windows 驱动器前缀（如 <code>C:\secret.txt</code>），直接拼接后会写出到项目目录之外。</p>
+<h4 id="防护原则"><a href="#防护原则" class="headerlink" title="防护原则"></a>防护原则</h4><ol>
+<li><p><strong>归一化</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">Path out = targetDir.resolve(entryName).normalize();<br></code></pre></div></td></tr></table></figure></li>
+<li><p><strong>前缀校验</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">if</span> (!out.startsWith(targetDir)) &#123;<br>    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IOException(<span class="hljs-string">&quot;非法路径：&quot;</span> + entryName);<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p><strong>过滤黑名单</strong>（可选）</p>
+<ul>
+<li>拒绝包含 <code>..</code>、以 <code>/</code> 或 <code>\</code> 开头的名称</li>
+<li>拒绝包含控制字符（<code>\0</code>、<code>\r</code>、<code>\n</code>）</li>
+</ul>
+</li>
+<li><p><strong>字符集安全</strong></p>
+<ul>
+<li>对文件名先按预期字符集解码，再检查是否含有非法 Unicode 码点（如 U+202E “RTL Override”）</li>
+</ul>
+</li>
+<li><p><strong>只读沙箱</strong>（高级）</p>
+<ul>
+<li>在专门的临时目录中解压，解压后再移动至生产目录</li>
+</ul>
+</li>
+</ol>
+<h3 id="密码暴力破解限制"><a href="#密码暴力破解限制" class="headerlink" title="密码暴力破解限制"></a>密码暴力破解限制</h3><h4 id="风险场景"><a href="#风险场景" class="headerlink" title="风险场景"></a>风险场景</h4><p>对于带密码的 ZIP（ZipCrypto/AES），攻击者可不断尝试不同密码，若没有限制则可高速穷举，开发者需要在自己系统的接口层面进行限制，当然对于破解者本地运行程序进行破解，则无法进行限制，只能通过选择更不容易破解的加密算法。</p>
+<h4 id="限制策略"><a href="#限制策略" class="headerlink" title="限制策略"></a>限制策略</h4><ol>
+<li><strong>尝试次数限制</strong><ul>
+<li>每个压缩包最多允许尝试 3–5 次解密失败，超过则拒绝服务</li>
+</ul>
+</li>
+<li><strong>时间窗口与锁定</strong><ul>
+<li>在 1 分钟内多次失败，锁定该用户或该压缩包 10 分钟</li>
+</ul>
+</li>
+<li><strong>延时退避</strong><ul>
+<li>每次失败后增加延时：初始 500 ms，之后 1 s、2 s、4 s…</li>
+</ul>
+</li>
+<li><strong>验证码或二次验证</strong><ul>
+<li>超过 N 次失败后，要求用户输入 CAPTCHA 或二次校验（如手机短信）</li>
+</ul>
+</li>
+<li><strong>统一入口限流</strong><ul>
+<li>对所有解压接口统一限流：每秒不超过 M 次请求</li>
+</ul>
+</li>
+<li><strong>日志告警</strong><ul>
+<li>记录失败密码尝试日志，配合 SIEM 监控异常行为</li>
+</ul>
+</li>
+<li><strong>加密算法选择</strong><ul>
+<li>推荐使用 AES/GCM 而非传统 ZipCrypto，因后者更易被暴力破解</li>
+</ul>
+</li>
+</ol>
+<h2 id="最终代码呈现"><a href="#最终代码呈现" class="headerlink" title="最终代码呈现"></a>最终代码呈现</h2><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 通用压缩/解压工具 —— Apache Commons Compress + Zip4j + junrar</span><br><span class="hljs-comment"> * 支持：ZIP(含加密) / 7Z / TAR.GZ</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@author</span> yt</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CompressUtil</span> </span>&#123;<br><br>    <span class="hljs-comment">// 最大允许压缩比</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">double</span> MAX_COMPRESSION_RATIO = <span class="hljs-number">10.0</span>;<br><br>    <span class="hljs-comment">// 解压出来大小限制</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">long</span> MAX_UNCOMPRESSED_SIZE = <span class="hljs-number">1024</span> * <span class="hljs-number">1024</span> * <span class="hljs-number">1024</span>; <span class="hljs-comment">// 1024 MB</span><br><br>    <span class="hljs-comment">/* ---------------- 创建压缩包 ---------------- */</span><br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 将目录或单文件压缩为 ZIP；可选密码 (ZipCrypto / AES)。</span><br><span class="hljs-comment">     *</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> srcPath  待压缩目录或文件</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> zipPath  输出 zip</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> password null 表示无密码</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> aes256   true -&gt; AES-256；false -&gt; ZipCrypto</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> IOException if I/O error</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">createZip</span><span class="hljs-params">(Path srcPath,</span></span><br><span class="hljs-params"><span class="hljs-function">                                 Path zipPath,</span></span><br><span class="hljs-params"><span class="hljs-function">                                 String password,</span></span><br><span class="hljs-params"><span class="hljs-function">                                 <span class="hljs-keyword">boolean</span> aes256)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        <span class="hljs-comment">// 规范为绝对路径</span><br>        srcPath = srcPath.toAbsolutePath().normalize();<br>        <span class="hljs-keyword">try</span> (ZipFile zip = (password == <span class="hljs-keyword">null</span>)<br>                ? <span class="hljs-keyword">new</span> ZipFile(zipPath.toFile())<br>                : <span class="hljs-keyword">new</span> ZipFile(zipPath.toFile(), password.toCharArray())) &#123;<br><br>            ZipParameters baseParams = <span class="hljs-keyword">new</span> ZipParameters();<br>            baseParams.setCompressionMethod(CompressionMethod.DEFLATE);<br>            baseParams.setCompressionLevel(CompressionLevel.NORMAL);<br>            <span class="hljs-keyword">if</span> (password != <span class="hljs-keyword">null</span>) &#123;<br>                baseParams.setEncryptFiles(<span class="hljs-keyword">true</span>);<br>                baseParams.setEncryptionMethod(<br>                        aes256<br>                                ? EncryptionMethod.AES<br>                                : EncryptionMethod.ZIP_STANDARD<br>                );<br>                <span class="hljs-keyword">if</span> (aes256) &#123;<br>                    baseParams.setAesKeyStrength(AesKeyStrength.KEY_STRENGTH_256);<br>                &#125;<br>            &#125;<br><br>            <span class="hljs-keyword">if</span> (Files.isDirectory(srcPath)) &#123;<br>                <span class="hljs-comment">// 递归遍历所有文件/目录（包括空目录）</span><br>                <span class="hljs-keyword">try</span> (Stream&lt;Path&gt; stream = Files.walk(srcPath)) &#123;<br>                    Path finalSrcPath = srcPath;<br>                    stream.filter(path -&gt; !path.equals(finalSrcPath))<br>                            .forEach(path -&gt; &#123;<br>                                String entry = finalSrcPath.relativize(path)<br>                                        .toString()<br>                                        .replace(<span class="hljs-string">&quot;\\&quot;</span>, <span class="hljs-string">&quot;/&quot;</span>);<br>                                <span class="hljs-comment">// 清理多余前缀</span><br>                                <span class="hljs-keyword">if</span> (entry.startsWith(<span class="hljs-string">&quot;/&quot;</span>)) &#123;<br>                                    entry = entry.substring(<span class="hljs-number">1</span>);<br>                                &#125;<br>                                <span class="hljs-keyword">if</span> (entry.startsWith(<span class="hljs-string">&quot;./&quot;</span>)) &#123;<br>                                    entry = entry.substring(<span class="hljs-number">2</span>);<br>                                &#125;<br>                                <span class="hljs-keyword">try</span> &#123;<br>                                    ZipParameters params = <span class="hljs-keyword">new</span> ZipParameters(baseParams);<br>                                    <span class="hljs-comment">// 如果是目录，确保以 “/” 结尾，让 ZIP 记录目录</span><br>                                    <span class="hljs-keyword">if</span> (Files.isDirectory(path)) &#123;<br>                                        <span class="hljs-keyword">if</span> (!entry.endsWith(<span class="hljs-string">&quot;/&quot;</span>)) &#123;<br>                                            entry = entry + <span class="hljs-string">&quot;/&quot;</span>;<br>                                        &#125;<br>                                        params.setFileNameInZip(entry);<br>                                        zip.addFolder(path.toFile(), params);<br>                                    &#125; <span class="hljs-keyword">else</span> &#123;<br>                                        params.setFileNameInZip(entry);<br>                                        zip.addFile(path.toFile(), params);<br>                                    &#125;<br>                                &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>                                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> UncheckedIOException(e);<br>                                &#125;<br>                            &#125;);<br>                &#125;<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-comment">// 单文件</span><br>                ZipParameters params = <span class="hljs-keyword">new</span> ZipParameters(baseParams);<br>                params.setFileNameInZip(srcPath.getFileName().toString());<br>                zip.addFile(srcPath.toFile(), params);<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 7z 压缩：Commons Compress 的 SevenZFile 只支持 LZMA/LZMA2。</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">create7z</span><span class="hljs-params">(Path srcDir, Path out7z)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        <span class="hljs-keyword">try</span> (SevenZOutputFile out = <span class="hljs-keyword">new</span> SevenZOutputFile(out7z.toFile())) &#123;<br>            addPathTo7z(out, srcDir, srcDir);<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">addPathTo7z</span><span class="hljs-params">(SevenZOutputFile out,</span></span><br><span class="hljs-params"><span class="hljs-function">                                    Path root, Path src)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        <span class="hljs-keyword">if</span> (Files.isDirectory(src)) &#123;<br>            <span class="hljs-keyword">try</span> (DirectoryStream&lt;Path&gt; ds = Files.newDirectoryStream(src)) &#123;<br>                <span class="hljs-keyword">for</span> (Path p : ds) &#123;<br>                    addPathTo7z(out, root, p);<br>                &#125;<br>            &#125;<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            String entryName = root.relativize(src)<br>                    .toString().replace(<span class="hljs-string">&quot;\\&quot;</span>, <span class="hljs-string">&quot;/&quot;</span>);<br>            SevenZArchiveEntry entry =<br>                    out.createArchiveEntry(src.toFile(), entryName);<br>            out.putArchiveEntry(entry);<br>            <span class="hljs-keyword">try</span> (InputStream is = Files.newInputStream(src)) &#123;<br>                <span class="hljs-keyword">byte</span>[] buf = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[<span class="hljs-number">8</span> * <span class="hljs-number">1024</span>];<br>                <span class="hljs-keyword">int</span> len;<br>                <span class="hljs-keyword">while</span> ((len = is.read(buf)) != -<span class="hljs-number">1</span>) &#123;<br>                    out.write(buf, <span class="hljs-number">0</span>, len);<br>                &#125;<br>            &#125;<br>            out.closeArchiveEntry();<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 将目录压成 tar.gz（Linux 生态常用）。</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">createTarGz</span><span class="hljs-params">(Path srcDir, Path outTarGz)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        <span class="hljs-keyword">try</span> (TarArchiveOutputStream taos = <span class="hljs-keyword">new</span> TarArchiveOutputStream(<br>                <span class="hljs-keyword">new</span> GzipCompressorOutputStream(<br>                        Files.newOutputStream(outTarGz)))) &#123;<br><br>            taos.setLongFileMode(TarArchiveOutputStream.LONGFILE_POSIX);<br>            <span class="hljs-keyword">try</span> (Stream&lt;Path&gt; stream = Files.walk(srcDir)) &#123;<br>                stream<br>                        .filter(p -&gt; !p.equals(srcDir))  <span class="hljs-comment">// 不把根目录写入</span><br>                        .forEach(p -&gt; &#123;<br>                            <span class="hljs-keyword">try</span> &#123;<br>                                TarArchiveEntry entry = <span class="hljs-keyword">new</span> TarArchiveEntry(<br>                                        p.toFile(),<br>                                        srcDir.relativize(p).toString().replace(<span class="hljs-string">&quot;\\&quot;</span>, <span class="hljs-string">&quot;/&quot;</span>));<br>                                taos.putArchiveEntry(entry);<br>                                <span class="hljs-keyword">if</span> (Files.isRegularFile(p)) &#123;<br>                                    Files.copy(p, taos);<br>                                &#125;<br>                                taos.closeArchiveEntry();<br>                            &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>                                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> UncheckedIOException(e);<br>                            &#125;<br>                        &#125;);<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/* ---------------- 解压 ---------------- */</span><br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 自动按扩展名解压：zip/7z/tar.gz</span><br><span class="hljs-comment">     * 若 zip 带密码请传 password，否则 null。</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">extract</span><span class="hljs-params">(Path archive, Path targetDir, String password)</span></span><br><span class="hljs-function">            <span class="hljs-keyword">throws</span> IOException, RarException </span>&#123;<br><br>        String name = archive.getFileName().toString().toLowerCase();<br>        <span class="hljs-keyword">if</span> (name.endsWith(<span class="hljs-string">&quot;.zip&quot;</span>)) &#123;<br>            extractZip(archive, targetDir, password);<br>        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (name.endsWith(<span class="hljs-string">&quot;.7z&quot;</span>)) &#123;<br>            extract7z(archive, targetDir, password);<br>        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (name.endsWith(<span class="hljs-string">&quot;.tar.gz&quot;</span>) || name.endsWith(<span class="hljs-string">&quot;.tgz&quot;</span>)) &#123;<br>            extractTarGz(archive, targetDir);<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IllegalArgumentException(<span class="hljs-string">&quot;不支持的格式: &quot;</span> + name);<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/* --- ZIP 解压（含压缩比 &amp; Zip-Slip &amp; 字符集探测） --- */</span><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">extractZip</span><span class="hljs-params">(Path zip, Path target, String password)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        <span class="hljs-comment">// 1. 探针模式：统计压缩比 &amp; UTF-8 标志投票</span><br>        <span class="hljs-keyword">boolean</span> useUtf8;<br>        <span class="hljs-keyword">try</span> (ZipFile probe = (password == <span class="hljs-keyword">null</span>)<br>                ? <span class="hljs-keyword">new</span> ZipFile(zip.toFile())<br>                : <span class="hljs-keyword">new</span> ZipFile(zip.toFile(), password.toCharArray())) &#123;<br><br>            <span class="hljs-keyword">long</span> totalC = <span class="hljs-number">0</span>, totalU = <span class="hljs-number">0</span>, utf8Count = <span class="hljs-number">0</span>;<br>            <span class="hljs-keyword">for</span> (FileHeader fh : probe.getFileHeaders()) &#123;<br>                totalC += fh.getCompressedSize();<br>                totalU += fh.getUncompressedSize();<br>                <span class="hljs-keyword">if</span> (fh.isFileNameUTF8Encoded()) utf8Count++;<br>            &#125;<br>            <span class="hljs-keyword">if</span> (totalC &gt; <span class="hljs-number">0</span> &amp;&amp; (<span class="hljs-keyword">double</span>) totalU / totalC &gt; MAX_COMPRESSION_RATIO) &#123;<br>                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IOException(String.format(<br>                        <span class="hljs-string">&quot;检测到压缩比过高（%.1f），疑似 Zip Bomb，终止解压&quot;</span>, (<span class="hljs-keyword">double</span>) totalU / totalC));<br>            &#125;<br>            useUtf8 = utf8Count &gt;= (probe.getFileHeaders().size() + <span class="hljs-number">1</span>) / <span class="hljs-number">2</span>;<br>        &#125;<br><br>        <span class="hljs-comment">// 2. 真正解压：带字符集 &amp; Zip-Slip 检查</span><br>        <span class="hljs-keyword">try</span> (ZipFile real = (password == <span class="hljs-keyword">null</span>)<br>                ? <span class="hljs-keyword">new</span> ZipFile(zip.toFile())<br>                : <span class="hljs-keyword">new</span> ZipFile(zip.toFile(), password.toCharArray())) &#123;<br><br>            <span class="hljs-keyword">if</span> (!useUtf8) &#123;<br>                real.setCharset(Charset.forName(<span class="hljs-string">&quot;GBK&quot;</span>));<br>            &#125;<br>            <span class="hljs-keyword">for</span> (FileHeader fh : real.getFileHeaders()) &#123;<br>                String name = fh.getFileName();<br>                <span class="hljs-comment">// 过滤 ../、绝对路径等</span><br>                <span class="hljs-keyword">if</span> (name.contains(<span class="hljs-string">&quot;..&quot;</span>) || name.startsWith(<span class="hljs-string">&quot;/&quot;</span>) || name.startsWith(<span class="hljs-string">&quot;~&quot;</span>)) &#123;<br>                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IOException(<span class="hljs-string">&quot;拒绝可疑条目路径：&quot;</span> + name);<br>                &#125;<br>                Path out = target.resolve(name).normalize();<br>                <span class="hljs-keyword">if</span> (!out.startsWith(target)) &#123;<br>                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IOException(<span class="hljs-string">&quot;Zip-Slip 安全风险：&quot;</span> + name);<br>                &#125;<br>                <span class="hljs-keyword">if</span> (fh.isDirectory()) &#123;<br>                    Files.createDirectories(out);<br>                &#125; <span class="hljs-keyword">else</span> &#123;<br>                    Files.createDirectories(out.getParent());<br>                    <span class="hljs-keyword">try</span> (InputStream in = real.getInputStream(fh);<br>                         OutputStream os = Files.newOutputStream(out)) &#123;<br>                        <span class="hljs-keyword">byte</span>[] buf = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[<span class="hljs-number">8</span> * <span class="hljs-number">1024</span>];<br>                        <span class="hljs-keyword">int</span> len;<br>                        <span class="hljs-keyword">while</span> ((len = in.read(buf)) &gt; <span class="hljs-number">0</span>) &#123;<br>                            os.write(buf, <span class="hljs-number">0</span>, len);<br>                        &#125;<br>                    &#125;<br>                &#125;<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/* --- 7z 解压（含大小阈值 &amp; Zip-Slip） --- */</span><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">extract7z</span><span class="hljs-params">(Path sevenZ, Path target, String password)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        <span class="hljs-comment">// 1. 探针模式：累计 uncompressedSize</span><br>        <span class="hljs-keyword">long</span> totalU = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">try</span> (SevenZFile probe = (password == <span class="hljs-keyword">null</span>)<br>                ? <span class="hljs-keyword">new</span> SevenZFile(sevenZ.toFile())<br>                : <span class="hljs-keyword">new</span> SevenZFile(sevenZ.toFile(), password.toCharArray())) &#123;<br>            SevenZArchiveEntry e;<br>            <span class="hljs-keyword">while</span> ((e = probe.getNextEntry()) != <span class="hljs-keyword">null</span>) &#123;<br>                totalU += e.getSize();<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">if</span> (totalU &gt; MAX_UNCOMPRESSED_SIZE) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IOException(String.format(<br>                    <span class="hljs-string">&quot;检测到解压后总大小 %d bytes，超过 %d bytes，终止解压&quot;</span>,<br>                    totalU, MAX_UNCOMPRESSED_SIZE));<br>        &#125;<br><br>        <span class="hljs-comment">// 2. 真正解压：Zip-Slip 检查</span><br>        <span class="hljs-keyword">try</span> (SevenZFile zf = (password == <span class="hljs-keyword">null</span>)<br>                ? <span class="hljs-keyword">new</span> SevenZFile(sevenZ.toFile())<br>                : <span class="hljs-keyword">new</span> SevenZFile(sevenZ.toFile(), password.toCharArray())) &#123;<br><br>            SevenZArchiveEntry entry;<br>            <span class="hljs-keyword">byte</span>[] buf = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[<span class="hljs-number">8</span> * <span class="hljs-number">1024</span>];<br>            <span class="hljs-keyword">while</span> ((entry = zf.getNextEntry()) != <span class="hljs-keyword">null</span>) &#123;<br>                String name = entry.getName();<br>                <span class="hljs-keyword">if</span> (name.contains(<span class="hljs-string">&quot;..&quot;</span>) || name.startsWith(<span class="hljs-string">&quot;/&quot;</span>) || name.startsWith(<span class="hljs-string">&quot;~&quot;</span>)) &#123;<br>                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IOException(<span class="hljs-string">&quot;拒绝可疑条目路径：&quot;</span> + name);<br>                &#125;<br>                Path out = target.resolve(name).normalize();<br>                <span class="hljs-keyword">if</span> (!out.startsWith(target)) &#123;<br>                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IOException(<span class="hljs-string">&quot;Zip-Slip 安全风险：&quot;</span> + name);<br>                &#125;<br>                <span class="hljs-keyword">if</span> (entry.isDirectory()) &#123;<br>                    Files.createDirectories(out);<br>                &#125; <span class="hljs-keyword">else</span> &#123;<br>                    Files.createDirectories(out.getParent());<br>                    <span class="hljs-keyword">try</span> (OutputStream os = Files.newOutputStream(out)) &#123;<br>                        <span class="hljs-keyword">int</span> len;<br>                        <span class="hljs-keyword">while</span> ((len = zf.read(buf)) &gt; <span class="hljs-number">0</span>) &#123;<br>                            os.write(buf, <span class="hljs-number">0</span>, len);<br>                        &#125;<br>                    &#125;<br>                &#125;<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/* --- tar.gz 解压（含压缩比 &amp; Zip-Slip） --- */</span><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">extractTarGz</span><span class="hljs-params">(Path tarGz, Path target)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        <span class="hljs-comment">// 1. 探针模式：压缩比检测</span><br>        <span class="hljs-keyword">long</span> totalC = Files.size(tarGz), totalU = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">try</span> (GzipCompressorInputStream gis =<br>                     <span class="hljs-keyword">new</span> GzipCompressorInputStream(Files.newInputStream(tarGz));<br>             TarArchiveInputStream tis = <span class="hljs-keyword">new</span> TarArchiveInputStream(gis)) &#123;<br>            TarArchiveEntry e;<br>            <span class="hljs-keyword">while</span> ((e = (TarArchiveEntry) tis.getNextEntry()) != <span class="hljs-keyword">null</span>) &#123;<br>                <span class="hljs-keyword">if</span> (!e.isDirectory()) &#123;<br>                    totalU += e.getSize();<br>                &#125;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">if</span> (totalC &gt; <span class="hljs-number">0</span> &amp;&amp; (<span class="hljs-keyword">double</span>) totalU / totalC &gt; MAX_COMPRESSION_RATIO) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IOException(String.format(<br>                    <span class="hljs-string">&quot;检测到压缩比过高（%.1f），疑似 Zip Bomb，终止解压&quot;</span>, (<span class="hljs-keyword">double</span>) totalU / totalC));<br>        &#125;<br><br>        <span class="hljs-comment">// 2. 真正解压：Zip-Slip 检查</span><br>        <span class="hljs-keyword">try</span> (GzipCompressorInputStream gis =<br>                     <span class="hljs-keyword">new</span> GzipCompressorInputStream(Files.newInputStream(tarGz));<br>             TarArchiveInputStream tis = <span class="hljs-keyword">new</span> TarArchiveInputStream(gis)) &#123;<br><br>            TarArchiveEntry entry;<br>            <span class="hljs-keyword">while</span> ((entry = (TarArchiveEntry) tis.getNextEntry()) != <span class="hljs-keyword">null</span>) &#123;<br>                String name = entry.getName();<br>                <span class="hljs-keyword">if</span> (name.contains(<span class="hljs-string">&quot;..&quot;</span>) || name.startsWith(<span class="hljs-string">&quot;/&quot;</span>) || name.startsWith(<span class="hljs-string">&quot;~&quot;</span>)) &#123;<br>                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IOException(<span class="hljs-string">&quot;拒绝可疑条目路径：&quot;</span> + name);<br>                &#125;<br>                Path out = target.resolve(name).normalize();<br>                <span class="hljs-keyword">if</span> (!out.startsWith(target)) &#123;<br>                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IOException(<span class="hljs-string">&quot;Zip-Slip 安全风险：&quot;</span> + name);<br>                &#125;<br>                <span class="hljs-keyword">if</span> (entry.isDirectory()) &#123;<br>                    Files.createDirectories(out);<br>                &#125; <span class="hljs-keyword">else</span> &#123;<br>                    Files.createDirectories(out.getParent());<br>                    <span class="hljs-keyword">try</span> (OutputStream os = Files.newOutputStream(out)) &#123;<br>                        IOUtils.copy(tis, os);<br>                    &#125;<br>                &#125;<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/* ---------------- 小工具 ---------------- */</span><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">CompressUtil</span><span class="hljs-params">()</span> </span>&#123;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文系统梳理了 Java 压缩处理的动机、常见格式差异、核心算法和内部结构，并给出 Zip4j 与 Commons-Compress 融合的压缩解压解决方案，满足设置密码、多算法压缩解压、Zip-Bomb 检测与Zip-Slip 防护，整体上已经能满足 Java 中的压缩解压处理。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Java%E5%B7%A5%E5%85%B7%E7%B1%BB/">Java工具类</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Java/">Java</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Java%E5%B7%A5%E5%85%B7%E7%B1%BB/">Java工具类</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%8E%8B%E7%BC%A9/">压缩</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E8%A7%A3%E5%8E%8B/">解压</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/06/26/sse/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Server-Sent Events基础</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/06/17/redis-distributed-lock-annotation/">
+                        <span class="hidden-mobile">Redis——分布式锁注解</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
