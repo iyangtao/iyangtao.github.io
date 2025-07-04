@@ -1,0 +1,802 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <link rel="icon" href="/img/MyInfo/%E5%A4%B4%E5%83%8F.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Yangtao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言在生成式AI快速发展的浪潮中，DeepSeek 凭借强大的推理能力和灵活的模型接口，成为企业接入智能助手的重要选择。本文将以实际项目为例，在 Spring Boot 中快速集成 DeepSeek API，涵盖同步与流式对话、多轮上下文、JSON结构化输出、推理模型调用等核心能力，构建稳定高效的 AI 服务。 api_key 申请及测试 在 DeepSeek 开放平台 https:&#x2F;&#x2F;platf">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Boot接入DeepSeek">
+<meta property="og:url" content="http://example.com/2025/07/04/ai-deepseek/index.html">
+<meta property="og:site_name" content="Yangtao&#39;s space">
+<meta property="og:description" content="前言在生成式AI快速发展的浪潮中，DeepSeek 凭借强大的推理能力和灵活的模型接口，成为企业接入智能助手的重要选择。本文将以实际项目为例，在 Spring Boot 中快速集成 DeepSeek API，涵盖同步与流式对话、多轮上下文、JSON结构化输出、推理模型调用等核心能力，构建稳定高效的 AI 服务。 api_key 申请及测试 在 DeepSeek 开放平台 https:&#x2F;&#x2F;platf">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/deepseek-logo.webp">
+<meta property="article:published_time" content="2025-07-04T09:44:36.000Z">
+<meta property="article:modified_time" content="2025-07-04T09:44:36.000Z">
+<meta property="article:author" content="Yangtao">
+<meta property="article:tag" content="DeepSeek">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="人工智能">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/deepseek-logo.webp">
+  
+  
+  <title>Spring Boot接入DeepSeek - Yangtao&#39;s space</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Programmer Yangtao</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                作者
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://blog-1304850123.cos.ap-guangzhou.myqcloud.com/deepseek-logo.webp') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Spring Boot接入DeepSeek">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Yangtao
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2025-07-04 17:44" pubdate>
+        2025年7月4日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      22k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      38 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Spring Boot接入DeepSeek</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：3 分钟前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在生成式AI快速发展的浪潮中，DeepSeek 凭借强大的推理能力和灵活的模型接口，成为企业接入智能助手的重要选择。本文将以实际项目为例，在 Spring Boot 中快速集成 DeepSeek API，涵盖同步与流式对话、多轮上下文、JSON结构化输出、推理模型调用等核心能力，构建稳定高效的 AI 服务。</p>
+<h2 id="api-key-申请及测试"><a href="#api-key-申请及测试" class="headerlink" title="api_key 申请及测试"></a>api_key 申请及测试</h2><ol>
+<li><p>在 DeepSeek 开放平台 <a target="_blank" rel="noopener" href="https://platform.deepseek.com/">https://platform.deepseek.com/</a> 中进行额度充值；</p>
+</li>
+<li><p>在 API keys 栏 <a target="_blank" rel="noopener" href="https://platform.deepseek.com/api_keys">https://platform.deepseek.com/api_keys</a> 中创建新的 API key；</p>
+</li>
+<li><p>申请完毕测试 API keys 的可用性：</p>
+<figure class="highlight cmd"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs cmd">curl -X POST &quot;https://api.deepseek.com/chat/completions&quot; <br>-H &quot;Authorization: Bearer &#123;your API key&#125;&quot; <br>-H &quot;Content-<span class="hljs-built_in">Type</span>: application/json&quot; <br>--data-raw &quot;&#123;\&quot;messages\&quot;:[&#123;\&quot;content\&quot;:\&quot;你好\&quot;,\&quot;role\&quot;:\&quot;user\&quot;&#125;],\&quot;model\&quot;:\&quot;deepseek-reasoner\&quot;,\&quot;stream\&quot;:false&#125;&quot;<br></code></pre></div></td></tr></table></figure>
+
+<p>当得到类似于以下的 JSON 格式报文输出，则说明 API key 有效</p>
+<figure class="highlight json"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;1f3e100c-8cbc-4185-b905-5e60285c0543&quot;</span>,<br>    <span class="hljs-attr">&quot;object&quot;</span>: <span class="hljs-string">&quot;chat.completion&quot;</span>,<br>    <span class="hljs-attr">&quot;created&quot;</span>: <span class="hljs-number">1751619898</span>,<br>    <span class="hljs-attr">&quot;model&quot;</span>: <span class="hljs-string">&quot;deepseek-reasoner&quot;</span>,<br>    <span class="hljs-attr">&quot;choices&quot;</span>: [<br>        &#123;<br>            <span class="hljs-attr">&quot;index&quot;</span>: <span class="hljs-number">0</span>,<br>            <span class="hljs-attr">&quot;message&quot;</span>: &#123;<br>                <span class="hljs-attr">&quot;role&quot;</span>: <span class="hljs-string">&quot;assistant&quot;</span>,<br>                <span class="hljs-attr">&quot;content&quot;</span>: <span class="hljs-string">&quot;你好呀！xxxxxxxxxxxxxxxxxxxx&quot;</span><br>            &#125;,<br>            <span class="hljs-attr">&quot;logprobs&quot;</span>: <span class="hljs-literal">null</span>,<br>            <span class="hljs-attr">&quot;finish_reason&quot;</span>: <span class="hljs-string">&quot;stop&quot;</span><br>        &#125;<br>    ],<br>    <span class="hljs-attr">&quot;usage&quot;</span>: &#123;<br>        <span class="hljs-attr">&quot;prompt_tokens&quot;</span>: <span class="hljs-number">6</span>,<br>        <span class="hljs-attr">&quot;completion_tokens&quot;</span>: <span class="hljs-number">208</span>,<br>        <span class="hljs-attr">&quot;total_tokens&quot;</span>: <span class="hljs-number">214</span>,<br>        <span class="hljs-attr">&quot;prompt_tokens_details&quot;</span>: &#123;<br>            <span class="hljs-attr">&quot;cached_tokens&quot;</span>: <span class="hljs-number">0</span><br>        &#125;,<br>        <span class="hljs-attr">&quot;completion_tokens_details&quot;</span>: &#123;<br>            <span class="hljs-attr">&quot;reasoning_tokens&quot;</span>: <span class="hljs-number">163</span><br>        &#125;,<br>        <span class="hljs-attr">&quot;prompt_cache_hit_tokens&quot;</span>: <span class="hljs-number">0</span>,<br>        <span class="hljs-attr">&quot;prompt_cache_miss_tokens&quot;</span>: <span class="hljs-number">6</span><br>    &#125;,<br>    <span class="hljs-attr">&quot;system_fingerprint&quot;</span>: <span class="hljs-string">&quot;fp_393bca965e_prod0623_fp8_kvcache&quot;</span><br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>DeepSeek 官方 API文档地址：<a target="_blank" rel="noopener" href="https://api-docs.deepseek.com/zh-cn/%E3%80%82">https://api-docs.deepseek.com/zh-cn/。</a></p>
+</li>
+</ol>
+<h2 id="基本参数"><a href="#基本参数" class="headerlink" title="基本参数"></a>基本参数</h2><h3 id="应用配置"><a href="#应用配置" class="headerlink" title="应用配置"></a>应用配置</h3><p>在 Spring Boot 应用中添加常用的配置：</p>
+<p>application.yaml</p>
+<figure class="highlight yaml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs yaml"><span class="hljs-attr">deepseek:</span><br>  <span class="hljs-attr">auth-prefix:</span> <span class="hljs-string">Bearer</span><br>  <span class="hljs-attr">api-key:</span> <span class="hljs-string">sk-3747284e80bc49038cb053c109aa1941</span><br>  <span class="hljs-attr">base-url:</span> <span class="hljs-string">https://api.deepseek.com</span><br>  <span class="hljs-attr">chat-path:</span> <span class="hljs-string">/chat/completions</span><br>  <span class="hljs-attr">models-path:</span> <span class="hljs-string">/models</span><br>  <span class="hljs-attr">balance-path:</span> <span class="hljs-string">/user/balance</span><br></code></pre></div></td></tr></table></figure>
+
+<p>对应的配置类为：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Data</span><br><span class="hljs-meta">@Configuration</span><br><span class="hljs-meta">@ConfigurationProperties(prefix = &quot;deepseek&quot;)</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DeepSeekProperties</span> </span>&#123;<br>	<span class="hljs-comment">// 认证前缀，通常为 &quot;Bearer &quot;</span><br>    <span class="hljs-keyword">private</span> String authPrefix;<br>    <span class="hljs-comment">// API 密钥，用于身份验证</span><br>    <span class="hljs-keyword">private</span> String apiKey;<br>    <span class="hljs-comment">// DeepSeek API 的基础 URL</span><br>    <span class="hljs-keyword">private</span> String baseUrl;<br>    <span class="hljs-comment">// 聊天路径，通常为 &quot;/chat/completions&quot;</span><br>    <span class="hljs-keyword">private</span> String chatPath;<br>    <span class="hljs-comment">// 模型列表路径，通常为 &quot;/models&quot;</span><br>    <span class="hljs-keyword">private</span> String modelsPath;<br>    <span class="hljs-comment">// 余额查询路径，通常为 &quot;/user/balance&quot;</span><br>    <span class="hljs-keyword">private</span> String balancePath;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="模型"><a href="#模型" class="headerlink" title="模型"></a>模型</h3><p>DeepSeek 含有两种模型，分别为：</p>
+<ul>
+<li><code>deepseek-chat</code>：对话模型，对应为DeepSeek-V3-0324，上下文长度64K，输出长度默认4k、最大8k。</li>
+<li><code>deepseek-reasoner</code>：推理模型，对应为DeepSeek-R1-0528，上下文长度64K，输出长度默认32k、最大64k（含思维链）。</li>
+</ul>
+<p>关于模型具体可查看 <a target="_blank" rel="noopener" href="https://api-docs.deepseek.com/zh-cn/quick_start/pricing%E3%80%82">https://api-docs.deepseek.com/zh-cn/quick_start/pricing。</a></p>
+<p>定义模型枚举如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Getter</span><br><span class="hljs-meta">@AllArgsConstructor</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">ModelEnum</span> </span>&#123;<br><br>    CHAT(<span class="hljs-string">&quot;deepseek-chat&quot;</span>, <span class="hljs-string">&quot;对话模型&quot;</span>),<br>    REASONER(<span class="hljs-string">&quot;deepseek-reasoner&quot;</span>, <span class="hljs-string">&quot;推理模型&quot;</span>);<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> String code;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> String desc;<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="角色"><a href="#角色" class="headerlink" title="角色"></a>角色</h3><ul>
+<li><p><code>system</code></p>
+<ul>
+<li><p>系统角色（设定初始指令）。</p>
+</li>
+<li><p>用于设定模型行为的指令或人格。</p>
+</li>
+<li><p>一般只出现一次，放在 <code>messages</code> 的最前面。</p>
+</li>
+<li><p>模型会将其当作“世界观”或“行为指导”。</p>
+</li>
+</ul>
+<p><strong>示例</strong>：</p>
+<figure class="highlight json"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs json">&#123; <span class="hljs-attr">&quot;role&quot;</span>: <span class="hljs-string">&quot;system&quot;</span>, <span class="hljs-attr">&quot;content&quot;</span>: <span class="hljs-string">&quot;你是一位经验丰富的Java后端开发专家，请用中文回答。&quot;</span> &#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p><code>user</code></p>
+<ul>
+<li><p>用户角色（提问者）。</p>
+</li>
+<li><p>表示人类用户输入的内容。</p>
+</li>
+<li><p>多轮对话中，每次提问都用这个角色。</p>
+</li>
+</ul>
+<p><strong>示例</strong>：</p>
+<figure class="highlight json"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs json">&#123; <span class="hljs-attr">&quot;role&quot;</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">&quot;content&quot;</span>: <span class="hljs-string">&quot;请给我一段MyBatis分页查询的示例代码。&quot;</span> &#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p><code>assistant</code></p>
+<ul>
+<li>助手角色（模型生成的回复）。</li>
+</ul>
+<ul>
+<li><p>表示模型（AI）的回答。</p>
+</li>
+<li><p>多轮对话中每次回应都用这个角色。</p>
+</li>
+<li><p>在补全式接口（如流式输出）中，模型生成的回复也自动归为这个角色。</p>
+</li>
+</ul>
+<p><strong>示例</strong>：</p>
+<figure class="highlight json"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs json">&#123; <span class="hljs-attr">&quot;role&quot;</span>: <span class="hljs-string">&quot;assistant&quot;</span>, <span class="hljs-attr">&quot;content&quot;</span>: <span class="hljs-string">&quot;以下是MyBatis分页查询的示例...&quot;</span> &#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p><code>tool</code></p>
+<ul>
+<li>工具角色（函数调用结果）。</li>
+</ul>
+<ul>
+<li><p>表示工具调用的返回值，通常配合函数/工具调用功能。</p>
+</li>
+<li><p><code>tool_call_id</code> 需要指定与哪个函数调用绑定。</p>
+</li>
+<li><p>当前仅在支持函数调用的模型中使用（DeepSeek Chat 暂未确认是否已支持）。</p>
+</li>
+</ul>
+<p><strong>示例</strong>：</p>
+<figure class="highlight json"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs json">&#123;<br>  <span class="hljs-attr">&quot;role&quot;</span>: <span class="hljs-string">&quot;tool&quot;</span>,<br>  <span class="hljs-attr">&quot;tool_call_id&quot;</span>: <span class="hljs-string">&quot;call_123&quot;</span>,<br>  <span class="hljs-attr">&quot;content&quot;</span>: <span class="hljs-string">&quot;&#123; \&quot;weather\&quot;: \&quot;晴\&quot;, \&quot;temperature\&quot;: 28 &#125;&quot;</span><br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+</ul>
+<p>定义角色枚举如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Getter</span><br><span class="hljs-meta">@AllArgsConstructor</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">RoleEnum</span> </span>&#123;<br><br>    SYSTEM(<span class="hljs-string">&quot;system&quot;</span>, <span class="hljs-string">&quot;系统&quot;</span>),<br>    USER(<span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-string">&quot;用户&quot;</span>),<br>    ASSISTANT(<span class="hljs-string">&quot;assistant&quot;</span>, <span class="hljs-string">&quot;助手&quot;</span>),<br>    TOOL(<span class="hljs-string">&quot;tool&quot;</span>, <span class="hljs-string">&quot;工具&quot;</span>);<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> String code;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> String desc;<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="Temperature"><a href="#Temperature" class="headerlink" title="Temperature"></a>Temperature</h3><p><strong>温度</strong>：取值范围为 [0, 2.0]，默认1.0，更高的值会使输出更随机。</p>
+<p>推荐值为：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>温度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>代码生成/数学解题</td>
+<td>0.0</td>
+</tr>
+<tr>
+<td>数据抽取/分析</td>
+<td>1.0</td>
+</tr>
+<tr>
+<td>通用对话</td>
+<td>1.3</td>
+</tr>
+<tr>
+<td>翻译</td>
+<td>1.3</td>
+</tr>
+<tr>
+<td>创意类写作/诗歌创作</td>
+<td>1.5</td>
+</tr>
+</tbody></table>
+<p>定义 temperature 枚举如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Getter</span><br><span class="hljs-meta">@AllArgsConstructor</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">TemperatureEnum</span> </span>&#123;<br><br>    CODE_GENERATION(<span class="hljs-number">0.0</span>, <span class="hljs-string">&quot;代码生成/数学解题&quot;</span>),<br>    DATA_EXTRACTION(<span class="hljs-number">1.0</span>, <span class="hljs-string">&quot;数据抽取/分析&quot;</span>),<br>    GENERAL_DIALOGUE(<span class="hljs-number">1.3</span>, <span class="hljs-string">&quot;通用对话&quot;</span>),<br>    TRANSLATION(<span class="hljs-number">1.3</span>, <span class="hljs-string">&quot;翻译&quot;</span>),<br>    CREATIVE_WRITING(<span class="hljs-number">1.5</span>, <span class="hljs-string">&quot;创意类写作/诗歌创作&quot;</span>);<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">double</span> value;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> String desc;<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="错误码"><a href="#错误码" class="headerlink" title="错误码"></a>错误码</h3><p>调用 DeepSeek API 时，可能会遇到以下错误：</p>
+<table>
+<thead>
+<tr>
+<th>错误码</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>400 - 格式错误</td>
+<td><strong>原因</strong>：请求体格式错误 <br /><strong>解决方法</strong>：请根据错误信息提示修改请求体</td>
+</tr>
+<tr>
+<td>401 - 认证失败</td>
+<td><strong>原因</strong>：API key 错误，认证失败 <br /><strong>解决方法</strong>：请检查您的 API key 是否正确，如没有 API key，请先 <a target="_blank" rel="noopener" href="https://platform.deepseek.com/api_keys">创建 API key</a></td>
+</tr>
+<tr>
+<td>402 - 余额不足</td>
+<td><strong>原因</strong>：账号余额不足 <br /><strong>解决方法</strong>：请确认账户余额，并前往 <a target="_blank" rel="noopener" href="https://platform.deepseek.com//top_up">充值</a> 页面进行充值</td>
+</tr>
+<tr>
+<td>422 - 参数错误</td>
+<td><strong>原因</strong>：请求体参数错误 <br /><strong>解决方法</strong>：请根据错误信息提示修改相关参数</td>
+</tr>
+<tr>
+<td>429 - 请求速率达到上限</td>
+<td><strong>原因</strong>：请求速率（TPM 或 RPM）达到上限 <br /><strong>解决方法</strong>：请合理规划您的请求速率。</td>
+</tr>
+<tr>
+<td>500 - 服务器故障</td>
+<td><strong>原因</strong>：服务器内部故障 <br /><strong>解决方法</strong>：请等待后重试。若问题一直存在，请联系我们解决</td>
+</tr>
+<tr>
+<td>503 - 服务器繁忙</td>
+<td><strong>原因</strong>：服务器负载过高 <br /><strong>解决方法</strong>：请稍后重试您的请求</td>
+</tr>
+</tbody></table>
+<h2 id="典型场景"><a href="#典型场景" class="headerlink" title="典型场景"></a>典型场景</h2><h3 id="简单对话"><a href="#简单对话" class="headerlink" title="简单对话"></a>简单对话</h3><ol>
+<li><p>根据 DeepSeek 官方文档 **<a target="_blank" rel="noopener" href="https://api-docs.deepseek.com/zh-cn/api/create-chat-completion">对话补全 | DeepSeek API Docs</a>**，可定义以下数据结构：</p>
+<p>RequestDTO：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Data</span><br><span class="hljs-meta">@NoArgsConstructor</span><br><span class="hljs-meta">@AllArgsConstructor</span><br><span class="hljs-meta">@Accessors(chain = true)</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RequestDTO</span> </span>&#123;<br>    <span class="hljs-comment">// 模型名称：deepseek-chat、deepseek-reasoner</span><br>    <span class="hljs-keyword">private</span> String model;<br>    <span class="hljs-comment">// chat最大token数为8k，默认值为4k；reasoner最大token数为64k，默认值为32k</span><br>    <span class="hljs-meta">@JsonAlias(&quot;max_tokens&quot;)</span><br>    <span class="hljs-keyword">private</span> Integer maxTokens;<br>    <span class="hljs-keyword">private</span> Integer maxTokens = <span class="hljs-number">4096</span>;<br>    <span class="hljs-comment">// 请求消息列表</span><br>    <span class="hljs-keyword">private</span> List&lt;Message&gt; messages;<br>    <span class="hljs-comment">// 是否使用流式响应（SSE），data: [DONE]结尾</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">boolean</span> stream;<br>    <span class="hljs-comment">// 流式响应选项</span><br>    <span class="hljs-meta">@JsonAlias(&quot;stream_options&quot;)</span><br>    <span class="hljs-keyword">private</span> StreamOptions streamOptions;<br>    <span class="hljs-comment">// 响应格式</span><br>    <span class="hljs-meta">@JsonAlias(&quot;response_format&quot;)</span><br>    <span class="hljs-keyword">private</span> ResponseFormat responseFormat;<br>    <span class="hljs-comment">// 温度：0-2，默认1，更高的值会使输出更随机</span><br>    <span class="hljs-keyword">private</span> Double temperature = <span class="hljs-number">1.0</span>;<br>    <span class="hljs-comment">// 采样温度：0-1，默认值为1.0，越高则输出越随机</span><br>    <span class="hljs-meta">@JsonAlias(&quot;top_p&quot;)</span><br>    <span class="hljs-keyword">private</span> Double topP = <span class="hljs-number">1.0</span>;<br>    <span class="hljs-comment">// 频率惩罚：-2.0到2.0之间，默认值为0.0，越大则越不容易重复</span><br>    <span class="hljs-meta">@JsonAlias(&quot;frequency_penalty&quot;)</span><br>    <span class="hljs-keyword">private</span> Double frequencyPenalty = <span class="hljs-number">0.0</span>;<br>    <span class="hljs-comment">// 存在惩罚：-2.0到2.0之间，默认值为0.0，越大则越容易谈论新主题</span><br>    <span class="hljs-meta">@JsonAlias(&quot;presence_penalty&quot;)</span><br>    <span class="hljs-keyword">private</span> Double presencePenalty = <span class="hljs-number">0.0</span>;<br>    <span class="hljs-comment">// 停止词列表：模型生成的文本中遇到这些词时会停止生成</span><br>    <span class="hljs-meta">@JsonAlias(&quot;stop&quot;)</span><br>    <span class="hljs-keyword">private</span> List&lt;String&gt; stopStringList;<br>    <span class="hljs-comment">// 工具列表</span><br>    <span class="hljs-keyword">private</span> List&lt;Tool&gt; tools;<br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 调用tool的行为</span><br><span class="hljs-comment">     * 1. none：模型不调用工具，而是生成一条消息</span><br><span class="hljs-comment">     * 2. auto：模型可以选择生成一条消息或调用一个或多个tool</span><br><span class="hljs-comment">     * 3. required：模型必须调用一个或多个 tool</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@JsonAlias(&quot;tool_choice&quot;)</span><br>    <span class="hljs-keyword">private</span> String toolChoice;<br>    <span class="hljs-comment">// 是否返回输出token的对数频率</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">boolean</span> logprobs;<br>    <span class="hljs-comment">// 0-20的整数，指定每个输出位置返回输出概率top N的token，且返回这些token的对数概率（logprobs必须为true）</span><br>    <span class="hljs-keyword">private</span> Integer top_logprobs;<br><br>    <span class="hljs-meta">@Data</span><br>    <span class="hljs-meta">@NoArgsConstructor</span><br>    <span class="hljs-meta">@AllArgsConstructor</span><br>    <span class="hljs-meta">@Accessors(chain = true)</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Message</span> </span>&#123;<br>        <span class="hljs-comment">// 角色：system、user、assistant、tool</span><br>        <span class="hljs-keyword">private</span> String role;<br>        <span class="hljs-comment">// 内容</span><br>        <span class="hljs-keyword">private</span> String content;<br>        <span class="hljs-comment">// 参与者的名称，区分相同角色的不同参与者</span><br>        <span class="hljs-keyword">private</span> String name;<br>    &#125;<br><br>    <span class="hljs-meta">@Data</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ResponseFormat</span> </span>&#123;<br>        <span class="hljs-comment">// 格式：text（默认）、json_object（JSON对象，需通过系统或用户消息指示模型生成JSON）</span><br>        <span class="hljs-keyword">private</span> String type;<br>    &#125;<br><br>    <span class="hljs-meta">@Data</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">StreamOptions</span> </span>&#123;<br>        <span class="hljs-comment">// 是否包含使用信息（data: [DONE]前输出）</span><br>        <span class="hljs-meta">@JsonAlias(&quot;include_usage&quot;)</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">boolean</span> includeUsage = <span class="hljs-keyword">false</span>;<br>    &#125;<br><br>    <span class="hljs-meta">@Data</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Tool</span> </span>&#123;<br>        <span class="hljs-comment">// 类型，目前仅支持 &quot;function&quot;</span><br>        <span class="hljs-keyword">private</span> String type;<br>        <span class="hljs-comment">// 函数</span><br>        <span class="hljs-keyword">private</span> Function function;<br>    &#125;<br><br>    <span class="hljs-meta">@Data</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Function</span> </span>&#123;<br>        <span class="hljs-comment">// 函数名称</span><br>        <span class="hljs-keyword">private</span> String name;<br>        <span class="hljs-comment">// 函数描述</span><br>        <span class="hljs-keyword">private</span> String description;<br>        <span class="hljs-comment">// 函数参数，符合 OpenAPI 规范的 JSON Schema</span><br>        <span class="hljs-keyword">private</span> Object parameters;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>非流式响应 BlockingResponseDTO：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Data</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BlockingResponseDTO</span> </span>&#123;<br>    <span class="hljs-comment">// 对话唯一标识符</span><br>    <span class="hljs-keyword">private</span> String id;<br>    <span class="hljs-comment">// 响应的选择列表，每个选择包含生成的消息和相关信息</span><br>    <span class="hljs-keyword">private</span> List&lt;Choice&gt; choices;<br>    <span class="hljs-comment">// 创建时间戳（秒）</span><br>    <span class="hljs-keyword">private</span> Long created;<br>    <span class="hljs-comment">// 模型名称</span><br>    <span class="hljs-keyword">private</span> String model;<br>    <span class="hljs-comment">// 模型运行的后端配置</span><br>    <span class="hljs-meta">@JsonProperty(&quot;system_fingerprint&quot;)</span><br>    <span class="hljs-keyword">private</span> String systemFingerprint;<br>    <span class="hljs-comment">// 对象的类型，值为 &quot;chat.completion&quot;</span><br>    <span class="hljs-keyword">private</span> String object;<br>    <span class="hljs-comment">// 用量信息</span><br>    <span class="hljs-keyword">private</span> Usage usage;<br><br>    <span class="hljs-meta">@Data</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Choice</span> </span>&#123;<br>        <span class="hljs-comment">// 选择列表中的索引，从0开始</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> index;<br>        <span class="hljs-comment">// 生成的消息</span><br>        <span class="hljs-keyword">private</span> Message message;<br>        <span class="hljs-comment">/**</span><br><span class="hljs-comment">         * 停止生成的原因</span><br><span class="hljs-comment">         * 1. stop：自然停止或遇到请求stop字段中的字符串</span><br><span class="hljs-comment">         * 2. length：达到模型上下文的最大长度或请求的最大token数</span><br><span class="hljs-comment">         * 3. content_filter：内容过滤器触发</span><br><span class="hljs-comment">         * 4. insufficient_system_resource：系统推理资源不足，生成被打断</span><br><span class="hljs-comment">         */</span><br>        <span class="hljs-meta">@JsonProperty(&quot;finish_reason&quot;)</span><br>        <span class="hljs-keyword">private</span> String finishReason;<br>        <span class="hljs-comment">// choice的对数概率信息</span><br>        <span class="hljs-keyword">private</span> Logprobs logprobs;<br>    &#125;<br><br>    <span class="hljs-meta">@Data</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Message</span> </span>&#123;<br>        <span class="hljs-comment">// 生成消息的角色</span><br>        <span class="hljs-keyword">private</span> String role;<br>        <span class="hljs-comment">// 生成的消息内容</span><br>        <span class="hljs-keyword">private</span> String content;<br>        <span class="hljs-comment">// 推理内容（deepseek-reasoner模型专用）</span><br>        <span class="hljs-meta">@JsonProperty(&quot;reasoning_content&quot;)</span><br>        <span class="hljs-keyword">private</span> String reasoningContent;<br>        <span class="hljs-comment">// tool调用列表</span><br>        <span class="hljs-meta">@JsonProperty(&quot;tool_calls&quot;)</span><br>        <span class="hljs-keyword">private</span> List&lt;Tool&gt; toolCalls;<br>    &#125;<br><br>    <span class="hljs-meta">@Data</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Tool</span> </span>&#123;<br>        <span class="hljs-comment">// tool调用的ID</span><br>        <span class="hljs-keyword">private</span> String id;<br>        <span class="hljs-comment">// tool的类型，目前仅支持 &quot;function&quot;</span><br>        <span class="hljs-keyword">private</span> String type;<br>        <span class="hljs-comment">// 工具参数</span><br>        <span class="hljs-keyword">private</span> Function function;<br>    &#125;<br><br>    <span class="hljs-meta">@Data</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Function</span> </span>&#123;<br>        <span class="hljs-comment">// 函数名称</span><br>        <span class="hljs-keyword">private</span> String name;<br>        <span class="hljs-comment">// 调用函数的参数，符合JSON Schema规范</span><br>        <span class="hljs-keyword">private</span> String arguments;<br>    &#125;<br><br>    <span class="hljs-meta">@Data</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Logprobs</span> </span>&#123;<br>        <span class="hljs-comment">// 包含输出token对数概率信息的列表</span><br>        <span class="hljs-meta">@JsonProperty(&quot;content&quot;)</span><br>        <span class="hljs-keyword">private</span> List&lt;Content&gt; content;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Content</span> </span>&#123;<br>        <span class="hljs-comment">// 输出的token</span><br>        <span class="hljs-keyword">private</span> String token;<br>        <span class="hljs-comment">// 该token的对数概率</span><br>        <span class="hljs-keyword">private</span> Double logprob;<br>        <span class="hljs-comment">/**</span><br><span class="hljs-comment">         * 一个包含该token UTF-8字节表示的整数列表。</span><br><span class="hljs-comment">         * 一般在一个UTF-8字符被拆分成多个token来表示时有用。</span><br><span class="hljs-comment">         * 如果token没有对应的字节表示，则该值为 null。</span><br><span class="hljs-comment">         */</span><br>        <span class="hljs-meta">@JsonProperty(&quot;bytes&quot;)</span><br>        <span class="hljs-keyword">private</span> List&lt;Integer&gt; bytes;<br>        <span class="hljs-comment">// 一个包含在该输出位置上，输出概率top N的token的列表，以及它们的对数概率。</span><br>        <span class="hljs-meta">@JsonProperty(&quot;top_logprobs&quot;)</span><br>        List&lt;InnerContent&gt; topLogprobs;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">InnerContent</span> </span>&#123;<br>        <span class="hljs-comment">// 输出的token</span><br>        <span class="hljs-keyword">private</span> String token;<br>        <span class="hljs-comment">// 该token的对数概率</span><br>        <span class="hljs-keyword">private</span> Double logprob;<br>        <span class="hljs-comment">/**</span><br><span class="hljs-comment">         * 一个包含该token UTF-8字节表示的整数列表。</span><br><span class="hljs-comment">         * 一般在一个UTF-8字符被拆分成多个token来表示时有用。</span><br><span class="hljs-comment">         * 如果token没有对应的字节表示，则该值为 null。</span><br><span class="hljs-comment">         */</span><br>        <span class="hljs-meta">@JsonProperty(&quot;bytes&quot;)</span><br>        <span class="hljs-keyword">private</span> List&lt;Integer&gt; bytes;<br>    &#125;<br><br>    <span class="hljs-meta">@Data</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Usage</span> </span>&#123;<br>        <span class="hljs-comment">// 用户输入中命中的缓存token数量</span><br>        <span class="hljs-meta">@JsonProperty(&quot;prompt_cache_hit_tokens&quot;)</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> promptCacheHitTokens;<br>        <span class="hljs-comment">// 用户输入中未命中的token数量</span><br>        <span class="hljs-meta">@JsonProperty(&quot;prompt_cache_miss_tokens&quot;)</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> promptCacheMissTokens;<br>        <span class="hljs-comment">// 用户输入的token数量</span><br>        <span class="hljs-meta">@JsonProperty(&quot;prompt_tokens&quot;)</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> promptTokens;<br>        <span class="hljs-comment">// 模型生成的token数量</span><br>        <span class="hljs-meta">@JsonProperty(&quot;completion_tokens&quot;)</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> completionTokens;<br>        <span class="hljs-comment">// 总token数量（用户输入 + 模型生成）</span><br>        <span class="hljs-meta">@JsonProperty(&quot;total_tokens&quot;)</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> totalTokens;<br>        <span class="hljs-comment">// 详细信息</span><br>        <span class="hljs-meta">@JsonProperty(&quot;completion_tokens_details&quot;)</span><br>        <span class="hljs-keyword">private</span> CompletionTokensDetails completionTokensDetails;<br>        <span class="hljs-comment">// 用户输入中命中的缓存token数量的详细信息</span><br>        <span class="hljs-meta">@JsonProperty(&quot;prompt_tokens_details&quot;)</span><br>        <span class="hljs-keyword">private</span> PromptTokensDetails promptTokensDetails;<br>    &#125;<br><br>    <span class="hljs-meta">@Data</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CompletionTokensDetails</span> </span>&#123;<br>        <span class="hljs-comment">// 推理模型产生的思维连token数量</span><br>        <span class="hljs-meta">@JsonProperty(&quot;reasoning_tokens&quot;)</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> reasoningTokens;<br>    &#125;<br><br>    <span class="hljs-meta">@Data</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PromptTokensDetails</span> </span>&#123;<br>        <span class="hljs-comment">// 用户输入中命中的缓存token数量</span><br>        <span class="hljs-meta">@JsonProperty(&quot;cached_tokens&quot;)</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> cachedTokens;<br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>流式响应 StreamingResponseDTO：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Data</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">StreamingResponseDTO</span> </span>&#123;<br>    <span class="hljs-comment">// 对话唯一标识符</span><br>    <span class="hljs-keyword">private</span> String id;<br>    <span class="hljs-comment">// 响应的选择列表，每个选择包含生成的消息和相关信息</span><br>    <span class="hljs-keyword">private</span> List&lt;Choice&gt; choices;<br>    <span class="hljs-comment">// 创建时间戳（秒）</span><br>    <span class="hljs-keyword">private</span> Long created;<br>    <span class="hljs-comment">// 模型名称</span><br>    <span class="hljs-keyword">private</span> String model;<br>    <span class="hljs-comment">// 模型运行的后端配置</span><br>    <span class="hljs-meta">@JsonProperty(&quot;system_fingerprint&quot;)</span><br>    <span class="hljs-keyword">private</span> String systemFingerprint;<br>    <span class="hljs-comment">// 对象的类型，值为 &quot;chat.completion&quot;</span><br>    <span class="hljs-keyword">private</span> String object;<br>    <span class="hljs-comment">// 用量信息</span><br>    <span class="hljs-keyword">private</span> Usage usage;<br><br>    <span class="hljs-meta">@Data</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Choice</span> </span>&#123;<br>        <span class="hljs-comment">// 选择列表中的索引，从0开始</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> index;<br>        <span class="hljs-comment">// 消息增量</span><br>        <span class="hljs-keyword">private</span> Delta delta;<br>        <span class="hljs-comment">/**</span><br><span class="hljs-comment">         * 停止生成的原因</span><br><span class="hljs-comment">         * 1. stop：自然停止或遇到请求stop字段中的字符串</span><br><span class="hljs-comment">         * 2. length：达到模型上下文的最大长度或请求的最大token数</span><br><span class="hljs-comment">         * 3. content_filter：内容过滤器触发</span><br><span class="hljs-comment">         * 4. insufficient_system_resource：系统推理资源不足，生成被打断</span><br><span class="hljs-comment">         */</span><br>        <span class="hljs-meta">@JsonProperty(&quot;finish_reason&quot;)</span><br>        <span class="hljs-keyword">private</span> String finishReason;<br>    &#125;<br><br>    <span class="hljs-meta">@Data</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Delta</span> </span>&#123;<br>        <span class="hljs-comment">// 生成消息的角色</span><br>        <span class="hljs-keyword">private</span> String role;<br>        <span class="hljs-comment">// 生成的消息内容</span><br>        <span class="hljs-keyword">private</span> String content;<br>        <span class="hljs-comment">// 推理内容（deepseek-reasoner模型专用）</span><br>        <span class="hljs-meta">@JsonProperty(&quot;reasoning_content&quot;)</span><br>        <span class="hljs-keyword">private</span> String reasoningContent;<br>    &#125;<br><br>    <span class="hljs-meta">@Data</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Usage</span> </span>&#123;<br>        <span class="hljs-comment">// 用户输入中命中的缓存token数量</span><br>        <span class="hljs-meta">@JsonProperty(&quot;prompt_cache_hit_tokens&quot;)</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> promptCacheHitTokens;<br>        <span class="hljs-comment">// 用户输入中未命中的token数量</span><br>        <span class="hljs-meta">@JsonProperty(&quot;prompt_cache_miss_tokens&quot;)</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> promptCacheMissTokens;<br>        <span class="hljs-comment">// 用户输入的token数量</span><br>        <span class="hljs-meta">@JsonProperty(&quot;prompt_tokens&quot;)</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> promptTokens;<br>        <span class="hljs-comment">// 模型生成的token数量</span><br>        <span class="hljs-meta">@JsonProperty(&quot;completion_tokens&quot;)</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> completionTokens;<br>        <span class="hljs-comment">// 总token数量（用户输入 + 模型生成）</span><br>        <span class="hljs-meta">@JsonProperty(&quot;total_tokens&quot;)</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> totalTokens;<br>        <span class="hljs-comment">// 详细信息</span><br>        <span class="hljs-meta">@JsonProperty(&quot;completion_tokens_details&quot;)</span><br>        <span class="hljs-keyword">private</span> CompletionTokensDetails completionTokensDetails;<br>        <span class="hljs-comment">// 用户输入中命中的缓存token数量的详细信息</span><br>        <span class="hljs-meta">@JsonProperty(&quot;prompt_tokens_details&quot;)</span><br>        <span class="hljs-keyword">private</span> PromptTokensDetails promptTokensDetails;<br>    &#125;<br><br>    <span class="hljs-meta">@Data</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CompletionTokensDetails</span> </span>&#123;<br>        <span class="hljs-comment">// 推理模型产生的思维连token数量</span><br>        <span class="hljs-meta">@JsonProperty(&quot;reasoning_tokens&quot;)</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> reasoningTokens;<br>    &#125;<br><br>    <span class="hljs-meta">@Data</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PromptTokensDetails</span> </span>&#123;<br>        <span class="hljs-comment">// </span><br>        <span class="hljs-meta">@JsonProperty(&quot;cached_tokens&quot;)</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> cachedTokens;<br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>创建 DeepSeekUtil 工具类如下，注入需要的 DeepSeekProperties、WebClient 以及 ObjectMapper 组件</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Slf4j</span><br><span class="hljs-meta">@Component</span><br><span class="hljs-meta">@RequiredArgsConstructor</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DeepSeekUtil</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> DeepSeekProperties deepSeekProperties;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> WebClient webClient;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> ObjectMapper objectMapper;<br><br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>阻塞式对话，可以自定义所有 DeepSeek 请求参数，一次性获取大模型生成结果</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> BlockingResponseDTO <span class="hljs-title">doBlockingRequest</span><span class="hljs-params">(RequestDTO requestDTO)</span> </span>&#123;<br>    <span class="hljs-keyword">try</span> &#123;<br>        requestDTO.setStream(<span class="hljs-keyword">false</span>);<br>        BlockingResponseDTO resp = webClient.post()<br>                .uri(deepSeekProperties.getBaseUrl())<br>                .header(<span class="hljs-string">&quot;Content-Type&quot;</span>, MediaType.APPLICATION_JSON_VALUE)<br>                .header(<span class="hljs-string">&quot;Authorization&quot;</span>, deepSeekProperties.getAuthPrefix() + <span class="hljs-string">&quot; &quot;</span> + deepSeekProperties.getApiKey())<br>                .bodyValue(requestDTO)<br>                .retrieve()<br>                .bodyToMono(BlockingResponseDTO.class)<br>                .block();  <span class="hljs-comment">// 当前保持阻塞调用</span><br>        log.info(<span class="hljs-string">&quot;【API调用】响应：&#123;&#125;&quot;</span>, resp);<br>        <span class="hljs-keyword">return</span> resp;<br>    &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>        log.error(<span class="hljs-string">&quot;【API调用】请求失败：&#123;&#125;&quot;</span>, e.getMessage(), e);<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>封装一个简易的文本对话方法，除了用户输入内容，其余都使用默认的请求参数，同时返回大模型生成的文本</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">blockingRequest</span><span class="hljs-params">(String content)</span> </span>&#123;<br>    RequestDTO requestDTO = <span class="hljs-keyword">new</span> RequestDTO()<br>            .setModel(ModelEnum.CHAT.getCode())<br>            .setMessages(Collections.singletonList(<span class="hljs-keyword">new</span> RequestDTO.Message().setRole(RoleEnum.USER.getCode()).setContent(content)))<br>            .setStream(<span class="hljs-keyword">false</span>);<br>    BlockingResponseDTO resp = doBlockingRequest(requestDTO);<br>    <span class="hljs-keyword">if</span> (resp != <span class="hljs-keyword">null</span> &amp;&amp; !resp.getChoices().isEmpty()) &#123;<br>        <span class="hljs-keyword">return</span> resp.getChoices().get(<span class="hljs-number">0</span>).getMessage().getContent();<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>流式对话，可以自定义所有 DeepSeek 请求参数，流式性获取大模型生成结果</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> Flux&lt;StreamingResponseDTO&gt; <span class="hljs-title">doStreamingRequest</span><span class="hljs-params">(RequestDTO requestDTO)</span> </span>&#123;<br>    <span class="hljs-comment">// 开启流式输出</span><br>    requestDTO.setStream(<span class="hljs-keyword">true</span>);<br>    <span class="hljs-keyword">return</span> webClient.post()<br>            .uri(deepSeekProperties.getBaseUrl())<br>            .header(<span class="hljs-string">&quot;Authorization&quot;</span>, deepSeekProperties.getAuthPrefix() + <span class="hljs-string">&quot; &quot;</span> + deepSeekProperties.getApiKey())<br>            .contentType(MediaType.APPLICATION_JSON)<br>            .accept(MediaType.APPLICATION_NDJSON)  <span class="hljs-comment">// 或者 MediaType.TEXT_EVENT_STREAM</span><br>            .bodyValue(requestDTO)<br>            .retrieve()<br>            .bodyToFlux(String.class)<br>            .flatMap(line -&gt; &#123;<br>                <span class="hljs-comment">// 去掉前缀 &quot;data:&quot; 和空行</span><br>                line = line.trim();<br>                <span class="hljs-keyword">if</span> (line.isEmpty() || line.equals(<span class="hljs-string">&quot;data: [DONE]&quot;</span>) || line.equals(<span class="hljs-string">&quot;[DONE]&quot;</span>)) &#123;<br>                    <span class="hljs-keyword">return</span> Mono.empty();                <span class="hljs-comment">// 过滤掉 DONE</span><br>                &#125;<br>                <span class="hljs-keyword">if</span> (line.startsWith(<span class="hljs-string">&quot;data:&quot;</span>)) &#123;<br>                    line = line.substring(<span class="hljs-number">5</span>).trim();<br>                &#125;<br>                <span class="hljs-keyword">try</span> &#123;<br>                    <span class="hljs-keyword">return</span> Mono.just(objectMapper.readValue(line, StreamingResponseDTO.class));<br>                &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>                    <span class="hljs-keyword">return</span> Mono.error(e);<br>                &#125;<br>            &#125;)<br>            .doOnError(e -&gt; log.error(<span class="hljs-string">&quot;【Stream API】错误&quot;</span>, e));<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>同样封装一个简易的文本对话方法，输入用户输出内容，流式输出大模型生成的文本</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> Flux&lt;String&gt; <span class="hljs-title">streamingRequest</span><span class="hljs-params">(String content)</span> </span>&#123;<br>    RequestDTO requestDTO = <span class="hljs-keyword">new</span> RequestDTO()<br>            .setModel(ModelEnum.CHAT.getCode())<br>            .setMessages(Collections.singletonList(<span class="hljs-keyword">new</span> RequestDTO.Message().setRole(RoleEnum.USER.getCode()).setContent(content)))<br>            .setStream(<span class="hljs-keyword">true</span>);<br>    <span class="hljs-comment">// sse事件交由controller处理</span><br>    <span class="hljs-keyword">return</span> doStreamingRequest(requestDTO).map(e -&gt; e.getChoices().get(<span class="hljs-number">0</span>).getDelta().getContent());<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+</ol>
+<h3 id="多轮对话"><a href="#多轮对话" class="headerlink" title="多轮对话"></a>多轮对话</h3><p>DeepSeek 对话 API 是一个“无状态” API，即服务端不记录用户请求的上下文，用户在每次请求时，需将之前所有对话历史拼接好（即完整记录角色以及文本、维护好 <code>messages</code> 参数）后，传递给对话 API。</p>
+<p><strong>场景</strong>：询问广东省河流长度。</p>
+<p>第一次对话问：</p>
+<figure class="highlight json"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;model&quot;</span>: <span class="hljs-string">&quot;deepseek-chat&quot;</span>,<br>    <span class="hljs-attr">&quot;maxTokens&quot;</span>: <span class="hljs-number">4096</span>,<br>    <span class="hljs-attr">&quot;messages&quot;</span>: [<br>        &#123;<br>            <span class="hljs-attr">&quot;role&quot;</span>: <span class="hljs-string">&quot;user&quot;</span>,<br>            <span class="hljs-attr">&quot;content&quot;</span>: <span class="hljs-string">&quot;广东省最长的河流是哪条？（简要回答名称及长度即可）&quot;</span>,<br>            <span class="hljs-attr">&quot;name&quot;</span>: <span class="hljs-literal">null</span><br>        &#125;<br>    ],<br>    <span class="hljs-attr">&quot;stream&quot;</span>: <span class="hljs-literal">false</span>,<br>    <span class="hljs-comment">// 其他字段</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>第一次对话答：</p>
+<figure class="highlight json"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;4761872d-3ac6-4b68-83fb-fe6318a2f814&quot;</span>,<br>    <span class="hljs-attr">&quot;choices&quot;</span>: [<br>        &#123;<br>            <span class="hljs-attr">&quot;index&quot;</span>: <span class="hljs-number">0</span>,<br>            <span class="hljs-attr">&quot;message&quot;</span>: &#123;<br>                <span class="hljs-attr">&quot;role&quot;</span>: <span class="hljs-string">&quot;assistant&quot;</span>,<br>                <span class="hljs-attr">&quot;content&quot;</span>: <span class="hljs-string">&quot;广东省最长的河流是**珠江**，其干流长度约**2320公里**（含西江段）。&quot;</span>,<br>                <span class="hljs-attr">&quot;reasoning_content&quot;</span>: <span class="hljs-literal">null</span>,<br>                <span class="hljs-attr">&quot;tool_calls&quot;</span>: <span class="hljs-literal">null</span><br>            &#125;,<br>            <span class="hljs-attr">&quot;logprobs&quot;</span>: <span class="hljs-literal">null</span>,<br>            <span class="hljs-attr">&quot;finish_reason&quot;</span>: <span class="hljs-string">&quot;stop&quot;</span><br>        &#125;<br>    ],<br>    <span class="hljs-attr">&quot;created&quot;</span>: <span class="hljs-number">1751563029</span>,<br>    <span class="hljs-attr">&quot;model&quot;</span>: <span class="hljs-string">&quot;deepseek-chat&quot;</span>,<br>    <span class="hljs-comment">// 其他字段</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>第二次对话问：</p>
+<figure class="highlight json"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;model&quot;</span>: <span class="hljs-string">&quot;deepseek-chat&quot;</span>,<br>    <span class="hljs-attr">&quot;maxTokens&quot;</span>: <span class="hljs-number">4096</span>,<br>    <span class="hljs-attr">&quot;messages&quot;</span>: [<br>        &#123;<br>            <span class="hljs-attr">&quot;role&quot;</span>: <span class="hljs-string">&quot;user&quot;</span>,<br>            <span class="hljs-attr">&quot;content&quot;</span>: <span class="hljs-string">&quot;广东省最长的河流是哪条？（简要回答名称及长度即可）&quot;</span>,<br>            <span class="hljs-attr">&quot;name&quot;</span>: <span class="hljs-literal">null</span><br>        &#125;,<br>        &#123;<br>            <span class="hljs-attr">&quot;role&quot;</span>: <span class="hljs-string">&quot;assistant&quot;</span>,<br>            <span class="hljs-attr">&quot;content&quot;</span>: <span class="hljs-string">&quot;广东省最长的河流是**珠江**，其干流长度约**2320公里**（含西江段）。&quot;</span>,<br>            <span class="hljs-attr">&quot;name&quot;</span>: <span class="hljs-literal">null</span><br>        &#125;,<br>        &#123;<br>            <span class="hljs-attr">&quot;role&quot;</span>: <span class="hljs-string">&quot;user&quot;</span>,<br>            <span class="hljs-attr">&quot;content&quot;</span>: <span class="hljs-string">&quot;那第二、第三长的呢？&quot;</span>,<br>            <span class="hljs-attr">&quot;name&quot;</span>: <span class="hljs-literal">null</span><br>        &#125;<br>    ],<br>    <span class="hljs-attr">&quot;stream&quot;</span>: <span class="hljs-literal">false</span>,<br>    <span class="hljs-comment">// 其他字段</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>第二次对话答：</p>
+<figure class="highlight json"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;c4ead835-0e9b-42ca-adee-65fe71c3dce9&quot;</span>,<br>    <span class="hljs-attr">&quot;choices&quot;</span>: [<br>        &#123;<br>            <span class="hljs-attr">&quot;index&quot;</span>: <span class="hljs-number">0</span>,<br>            <span class="hljs-attr">&quot;message&quot;</span>: &#123;<br>                <span class="hljs-attr">&quot;role&quot;</span>: <span class="hljs-string">&quot;assistant&quot;</span>,<br>                <span class="hljs-attr">&quot;content&quot;</span>: <span class="hljs-string">&quot;广东省第二、第三长的河流分别是：  \n\n1. **韩江**（约470公里）  \n2. **北江**（约468公里）  \n\n（注：长度数据可能因测量标准不同略有差异。）&quot;</span>,<br>                <span class="hljs-attr">&quot;reasoning_content&quot;</span>: <span class="hljs-literal">null</span>,<br>                <span class="hljs-attr">&quot;tool_calls&quot;</span>: <span class="hljs-literal">null</span><br>            &#125;,<br>            <span class="hljs-attr">&quot;logprobs&quot;</span>: <span class="hljs-literal">null</span>,<br>            <span class="hljs-attr">&quot;finish_reason&quot;</span>: <span class="hljs-string">&quot;stop&quot;</span><br>        &#125;<br>    ],<br>    <span class="hljs-attr">&quot;created&quot;</span>: <span class="hljs-number">1751563087</span>,<br>    <span class="hljs-attr">&quot;model&quot;</span>: <span class="hljs-string">&quot;deepseek-chat&quot;</span>,<br>    <span class="hljs-comment">// 其他字段</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>如以上所示，在第二次对话中，请求参数 <code>messages</code> 添加了上一次的 user 的问和 assistant 的答，并将 user 新的提问添加到这两个 <code>message</code> 之后。</p>
+<h3 id="JSON-输出"><a href="#JSON-输出" class="headerlink" title="JSON 输出"></a>JSON 输出</h3><p>在很多场景下，用户需要让模型严格按照 JSON 格式来输出，以实现输出的结构化，便于后续逻辑进行解析。DeepSeek 提供了 JSON Output 功能，来确保模型输出合法的 JSON 字符串。</p>
+<p>在调用对话 API 时需要做到：</p>
+<ol>
+<li>设置 <code>response_format</code> 参数为 <code>&#123;&#39;type&#39;: &#39;json_object&#39;&#125;</code>；</li>
+<li>用户传入的 system 或 user prompt 中必须含有 <code>json</code> 字样，并给出希望模型输出的 JSON 格式的样例；</li>
+<li>需要合理设置 <code>max_tokens</code> 参数，防止 JSON 字符串被中途截断。</li>
+</ol>
+<p><strong>示例</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">RequestDTO requestDTO = <span class="hljs-keyword">new</span> RequestDTO();<br>requestDTO.setModel(ModelEnum.CHAT.getCode());<br>requestDTO.setMaxTokens(<span class="hljs-number">8192</span>);<br>requestDTO.setMessages(<br>        Arrays.asList(<br>                <span class="hljs-keyword">new</span> RequestDTO.Message()<br>                        .setRole(<span class="hljs-string">&quot;system&quot;</span>)<br>                        .setContent(<span class="hljs-string">&quot;&quot;</span><span class="hljs-string">&quot;</span><br><span class="hljs-string">                                你需要按照纯文本的JSON格式字符串进行响应。</span><br><span class="hljs-string">                                JSON中包含一个字段叫做answer，内容为你的回答。</span><br><span class="hljs-string">                                案例：</span><br><span class="hljs-string">                                用户提问：1+1等于多少？</span><br><span class="hljs-string">                                如果你理解了，回复应当是：&#123;&quot;</span>answer<span class="hljs-string">&quot;: &quot;</span><span class="hljs-number">2</span><span class="hljs-string">&quot;&#125;</span><br><span class="hljs-string">                            &quot;</span><span class="hljs-string">&quot;&quot;</span><br>                        ),<br>                <span class="hljs-keyword">new</span> RequestDTO.Message()<br>                        .setRole(<span class="hljs-string">&quot;user&quot;</span>)<br>                        .setContent(<span class="hljs-string">&quot;2+3等于多少？&quot;</span>)<br>        )<br>);<br>requestDTO.setResponseFormat(<span class="hljs-keyword">new</span> RequestDTO.ResponseFormat().setType(<span class="hljs-string">&quot;json_object&quot;</span>));<br>requestDTO.setStream(<span class="hljs-keyword">false</span>);<br><span class="hljs-keyword">return</span> deepSeekUtil.doBlockingRequest(requestDTO).getChoices().get(<span class="hljs-number">0</span>).getMessage().getContent();<br></code></pre></div></td></tr></table></figure>
+
+<p>运行，模型输出：</p>
+<figure class="highlight json"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;answer&quot;</span>: <span class="hljs-string">&quot;5&quot;</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="推理模型"><a href="#推理模型" class="headerlink" title="推理模型"></a>推理模型</h3><p>推理模型与对话模型的主要区别有：</p>
+<ul>
+<li>输入参数 <code>model</code> 的值为 <code>deepseek-reasoner</code>。</li>
+<li>输入参数 <code>max_tokens</code>：模型单次回答的最大长度（含思维连输出），默认为 32K，最大为 64K。</li>
+<li>输出字段 <code>message.reasoning_content</code> 为思维链内容。</li>
+<li>API 最大支持 64K 上下文，输出的 <code>reasoning_content</code> 长度不计入 64K 上下文长度中。</li>
+<li>不支持的功能：FIM 补全 (Beta)</li>
+<li>不支持的参数：<code>temperature</code>、<code>top_p</code>、<code>presence_penalty</code>、<code>frequency_penalty</code>、<code>logprobs</code>、<code>top_logprobs</code>。其中设置 <code>logprobs</code>、<code>top_logprobs</code> 会报错。</li>
+</ul>
+<h4 id="非流式"><a href="#非流式" class="headerlink" title="非流式"></a>非流式</h4><p>使用非流式调用，大模型会将推理内容和正文一起返回，如：</p>
+<figure class="highlight json"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;8c1a2be9-ac0e-4f4f-bd50-800785489b09&quot;</span>,<br>    <span class="hljs-attr">&quot;choices&quot;</span>: [<br>        &#123;<br>            <span class="hljs-attr">&quot;index&quot;</span>: <span class="hljs-number">0</span>,<br>            <span class="hljs-attr">&quot;message&quot;</span>: &#123;<br>                <span class="hljs-attr">&quot;role&quot;</span>: <span class="hljs-string">&quot;assistant&quot;</span>,<br>                <span class="hljs-attr">&quot;content&quot;</span>: <span class="hljs-string">&quot;正文内容xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;</span>,<br>                <span class="hljs-attr">&quot;reasoning_content&quot;</span>: <span class="hljs-string">&quot;推理内容xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;</span>,<br>                <span class="hljs-attr">&quot;tool_calls&quot;</span>: <span class="hljs-literal">null</span><br>            &#125;,<br>            <span class="hljs-attr">&quot;logprobs&quot;</span>: <span class="hljs-literal">null</span>,<br>            <span class="hljs-attr">&quot;finish_reason&quot;</span>: <span class="hljs-string">&quot;stop&quot;</span><br>        &#125;<br>    ],<br>    <span class="hljs-comment">// 其他字段</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="流式"><a href="#流式" class="headerlink" title="流式"></a>流式</h4><p>使用流式调用，大模型会先返回推理内容、正文 content 为 null 的响应报文，如：</p>
+<figure class="highlight json"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;45113af0-4011-406e-a3f6-a0dc7bacfa2b&quot;</span>,<br>    <span class="hljs-attr">&quot;choices&quot;</span>: [<br>        &#123;<br>            <span class="hljs-attr">&quot;index&quot;</span>: <span class="hljs-number">0</span>,<br>            <span class="hljs-attr">&quot;delta&quot;</span>: &#123;<br>                <span class="hljs-attr">&quot;role&quot;</span>: <span class="hljs-literal">null</span>,<br>                <span class="hljs-attr">&quot;content&quot;</span>: <span class="hljs-literal">null</span>,<br>                <span class="hljs-attr">&quot;reasoning_content&quot;</span>: <span class="hljs-string">&quot;推理内容xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;</span><br>            &#125;,<br>            <span class="hljs-attr">&quot;finish_reason&quot;</span>: <span class="hljs-literal">null</span><br>        &#125;<br>    ],<br>    <span class="hljs-comment">// 其他字段</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>推理完成后，会返回正文，此时响应报文的推理内容为 null，如：</p>
+<figure class="highlight json"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;45113af0-4011-406e-a3f6-a0dc7bacfa2b&quot;</span>,<br>    <span class="hljs-attr">&quot;choices&quot;</span>: [<br>        &#123;<br>            <span class="hljs-attr">&quot;index&quot;</span>: <span class="hljs-number">0</span>,<br>            <span class="hljs-attr">&quot;delta&quot;</span>: &#123;<br>                <span class="hljs-attr">&quot;role&quot;</span>: <span class="hljs-literal">null</span>,<br>                <span class="hljs-attr">&quot;content&quot;</span>: <span class="hljs-string">&quot;正文内容xxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;</span>,<br>                <span class="hljs-attr">&quot;reasoning_content&quot;</span>: <span class="hljs-literal">null</span><br>            &#125;,<br>            <span class="hljs-attr">&quot;finish_reason&quot;</span>: <span class="hljs-literal">null</span><br>        &#125;<br>    ],<br>    <span class="hljs-comment">// 其他字段</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="列出模型"><a href="#列出模型" class="headerlink" title="列出模型"></a>列出模型</h3><ol>
+<li><p>接口 ResponseDTO 如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Data</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ModelResponseDTO</span> </span>&#123;<br>    <span class="hljs-comment">// “list”</span><br>    <span class="hljs-keyword">private</span> String object;<br>    <span class="hljs-comment">// 模型列表</span><br>    <span class="hljs-keyword">private</span> List&lt;Model&gt; data;<br><br>    <span class="hljs-meta">@Data</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Model</span> </span>&#123;<br>        <span class="hljs-comment">// 模型的标识符</span><br>        <span class="hljs-keyword">private</span> String id;<br>        <span class="hljs-comment">// 对象的类型，其值为model</span><br>        <span class="hljs-keyword">private</span> String object;<br>        <span class="hljs-comment">// 拥有该模型的组织</span><br>        <span class="hljs-meta">@JsonProperty(&quot;owned_by&quot;)</span><br>        <span class="hljs-keyword">private</span> String ownedBy;<br>    &#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>在 DeepSeekUtil 中定义获取模型列表的方法如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> ModelResponseDTO <span class="hljs-title">listModels</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-keyword">try</span> &#123;<br>        ModelResponseDTO resp = webClient.get()<br>                .uri(deepSeekProperties.getBaseUrl() + deepSeekProperties.getModelsPath())<br>                .header(<span class="hljs-string">&quot;Authorization&quot;</span>, deepSeekProperties.getAuthPrefix() + <span class="hljs-string">&quot; &quot;</span> + deepSeekProperties.getApiKey())<br>                .retrieve()<br>                .bodyToMono(ModelResponseDTO.class)<br>                .block();<br>        log.info(<span class="hljs-string">&quot;【API调用】响应：&#123;&#125;&quot;</span>, resp);<br>        <span class="hljs-keyword">return</span> resp;<br>    &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>        log.error(<span class="hljs-string">&quot;【API调用】请求失败：&#123;&#125;&quot;</span>, e.getMessage(), e);<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+</ol>
+<h3 id="查询余额"><a href="#查询余额" class="headerlink" title="查询余额"></a>查询余额</h3><ol>
+<li><p>接口 ResponseDTO 如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Data</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BalanceResponseDTO</span> </span>&#123;<br>    <span class="hljs-comment">// 是否有余额可供API调用</span><br>    <span class="hljs-meta">@JsonProperty(&quot;is_available&quot;)</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">boolean</span> isAvailable;<br>    <span class="hljs-comment">// 余额信息</span><br>    <span class="hljs-meta">@JsonProperty(&quot;balance_infos&quot;)</span><br>    <span class="hljs-keyword">private</span> List&lt;BalanceInfo&gt; balanceInfos;<br><br>    <span class="hljs-meta">@Data</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BalanceInfo</span> </span>&#123;<br>        <span class="hljs-comment">// 货币类型，例如CNY、USD</span><br>        <span class="hljs-meta">@JsonProperty(&quot;currency&quot;)</span><br>        <span class="hljs-keyword">private</span> String currency;<br>        <span class="hljs-comment">// 可用余额（含赠金以及充值余额）</span><br>        <span class="hljs-meta">@JsonProperty(&quot;total_balance&quot;)</span><br>        <span class="hljs-keyword">private</span> String totalBalance;<br>        <span class="hljs-comment">// 未过期的赠金余额</span><br>        <span class="hljs-meta">@JsonProperty(&quot;granted_balance&quot;)</span><br>        <span class="hljs-keyword">private</span> String grantedBalance;<br>        <span class="hljs-comment">// 充值余额</span><br>        <span class="hljs-meta">@JsonProperty(&quot;topped_up_balance&quot;)</span><br>        <span class="hljs-keyword">private</span> String toppedUpBalance;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+<li><p>在 DeepSeekUtil 中定义获取余额的方法如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> BalanceResponseDTO <span class="hljs-title">getBalance</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-keyword">try</span> &#123;<br>        BalanceResponseDTO resp = webClient.get()<br>                .uri(deepSeekProperties.getBaseUrl() + deepSeekProperties.getBalancePath())<br>                .header(<span class="hljs-string">&quot;Authorization&quot;</span>, deepSeekProperties.getAuthPrefix() + <span class="hljs-string">&quot; &quot;</span> + deepSeekProperties.getApiKey())<br>                .retrieve()<br>                .bodyToMono(BalanceResponseDTO.class)<br>                .block();<br>        log.info(<span class="hljs-string">&quot;【API调用】响应：&#123;&#125;&quot;</span>, resp);<br>        <span class="hljs-keyword">return</span> resp;<br>    &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>        log.error(<span class="hljs-string">&quot;【API调用】请求失败：&#123;&#125;&quot;</span>, e.getMessage(), e);<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure></li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文演示了在 Spring Boot 中调用 DeepSeek AI 的全过程：</p>
+<ul>
+<li>申请密钥 ➜ 配置 Yaml ➜ 编写工具类 ➜ 同步/流式对话</li>
+<li>进阶的多轮上下文、严格 JSON、推理模型</li>
+<li>以及模型列表与余额查询等运维接口</li>
+</ul>
+<p>开发者可以基于 <code>DeepSeekUtil</code> 再封装业务层 Service、接入 WebFlux SSE、或结合数据库把上下文落库，实现更丰富的 AI 场景。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/AI/">AI</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/DeepSeek/">DeepSeek</a>
+                    
+                      <a class="hover-with-bg" href="/tags/AI/">AI</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/">人工智能</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/06/26/sse/">
+                        <span class="hidden-mobile">Server-Sent Events基础</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'iyangtao/iyangtao.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <span>power by: </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span><u>Hexo</u></span></a> <span> - </span> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span><u>Fluid</u></span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js" ></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(null);
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
