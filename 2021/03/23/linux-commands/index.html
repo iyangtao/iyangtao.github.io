@@ -226,7 +226,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      68 分钟
+      69 分钟
     </span>
   
 
@@ -394,6 +394,21 @@
 <li><code>arch</code> 命令输出的信息比较简单，主要用于快速确认系统的硬件架构。</li>
 <li>在编写跨平台兼容的脚本或程序时，使用 <code>arch</code> 可以帮助开发者判断运行环境，从而作出相应的处理。</li>
 <li>由于输出信息较少，<code>arch</code> 命令常被用作其他脚本和命令的一部分，以提供必要的系统架构信息。</li>
+</ul>
+<h3 id="lscpu"><a href="#lscpu" class="headerlink" title="lscpu"></a>lscpu</h3><p><strong>命令说明</strong>：<code>lscpu</code> 命令用于显示系统的 CPU 架构信息，包括处理器类型、核心数量、线程数、架构位数、缓存信息等。这个命令可以帮助用户快速了解 CPU 的硬件信息，适用于性能分析、硬件诊断以及系统配置检查等场景。</p>
+<p><strong>常用选项</strong></p>
+<ul>
+<li><code>-e</code> 或 <code>--extended</code>：以表格的形式显示所有 CPU 的详细信息。</li>
+<li><code>-p</code> 或 <code>--parse</code>：以简洁的格式输出 CPU 信息，适用于脚本处理。</li>
+<li><code>-J</code> 或 <code>--json</code>：以 JSON 格式输出 CPU 信息，方便与其他工具集成。</li>
+<li><code>-c</code> 或 <code>--cpu</code>：指定查看某个 CPU 核心的具体信息。</li>
+<li><code>-h</code> 或 <code>--help</code>：显示帮助信息，列出 <code>lscpu</code> 命令的所有选项。</li>
+</ul>
+<p><strong>注意事项</strong></p>
+<ul>
+<li><code>lscpu</code> 命令是查看系统 CPU 资源的快速工具，对于多核和多线程的处理器，它能提供每个核心和线程的详细信息，适合用于了解处理器性能的瓶颈。</li>
+<li>输出中的“Core(s) per socket”和“Thread(s) per core”可以帮助用户了解每个 CPU 插槽（Socket）上有多少个物理核心以及每个核心可以处理的线程数。</li>
+<li>如果想获取更多关于 CPU 性能的详细信息，可以结合 <code>top</code> 或 <code>htop</code> 等实时监控工具使用，获取更细粒度的资源使用情况。</li>
 </ul>
 <h3 id="lsusb"><a href="#lsusb" class="headerlink" title="lsusb"></a>lsusb</h3><p><strong>命令说明</strong>：<code>lsusb</code> 是一个用于显示本机的 USB 设备的列表的命令。这个命令对于诊断和管理 USB 设备特别有用，可以查看挂载的设备信息，包括设备厂商、设备ID等。</p>
 <p><strong>常用选项</strong></p>
